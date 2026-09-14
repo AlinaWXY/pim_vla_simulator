@@ -18,6 +18,10 @@
 
 当前已有上游 LPDDR5 模型，尚未编译，也尚未实现 LPDDR PIM 扩展或 Thor 接口。
 
+## ATTACC 增量分析
+
+[`AttAcc Ramulator Analysis`](docs/attacc-ramulator-analysis/README.md) 对照 ATTACC 使用的固定 Ramulator 提交，记录全部有效文件变化、新命令、时序与能量来源，并区分已确认代码、可复核推导和待补资料。分析分支为 `attacc-ramulator-analysis`；报告附固定源码快照及可重复的补丁重建检查。
+
 本机原始 Ramulator Git 元数据（包括提交历史和原分支）保存在
 `.git/upstream-backups/ramulator2.git`。此备份不参与本项目提交，也不会随本项目的 clone/push 传输。
 可在项目根目录用以下命令查看原始历史：

@@ -1,0 +1,35 @@
+{
+  "snapshot_files": 51,
+  "patches": 21,
+  "effective_files": 39,
+  "added_files": 18,
+  "modified_files": 21,
+  "timing_values": 436,
+  "organization_values": 240,
+  "constraint_rows": 151,
+  "hbm2_numeric_crosschecks": 70,
+  "commands_added": [
+    "PRESB",
+    "PREPB",
+    "ACTAB",
+    "ACTSB",
+    "ACTPB",
+    "MACAB",
+    "MACSB",
+    "MACPB",
+    "WRGB",
+    "MVSB",
+    "MVGB",
+    "SFM",
+    "SETM",
+    "SETH",
+    "BARRIER"
+  ],
+  "commands_removed_from_pim": [
+    "RDA",
+    "WRA",
+    "RFMab",
+    "RFMsb"
+  ],
+  "validation": "source hashes + baseline hashes + zero-fuzz/zero-offset patch application + catalog coverage; no simulator build or silicon validation"
+}

@@ -1,0 +1,29 @@
+parameter,value_or_rule,source,status,qualification
+rate,4800/5200/5600/6000/6400 MT/s,S1 速率档；S3 HBM3 文档待核对,CODE,作者配置；非硬件测量
+nBL,2 cycles,S1 QDR 表示和 8n prefetch；上游 4,PARTIAL,接口建模选择；不是原 HBM2 BL=4 的直接复制
+nCL,各档 ceil(14ns*rate/4000),S1 表；S2 CL=14，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRCDRD,各档 ceil(14ns*rate/4000),S1 表；S2 tRCDRD=14，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRCDWR,各档 ceil(14ns*rate/4000),S1 表；S2 tRCDWR=14，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRP,各档 ceil(14ns*rate/4000),S1 表；S2 tRP=14，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRAS,各档 ceil(34ns*rate/4000),S1 表；S2 tRAS=34，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRC,58/63/68/72/77 cycles,S1；S2 tRAS34+tRP14=48ns,DERIVED,与 ceil(48ns*rate/4000) 相符；这是复核推导，非作者公开计算脚本
+nWR,各档 ceil(16ns*rate/4000),S1 表；S2 tWR=16，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRTPS,各档 ceil(4ns*rate/4000),S1 表；S2 tRTP_S=4，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRTPL,各档 ceil(6ns*rate/4000),S1 表；S2 tRTP_L=6，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nCWL,各档 ceil(4ns*rate/4000),S1 表；S2 CWL=4，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nCCDS,2 cycles,S1；S2 tCCD_S=1ns,PARTIAL,可与 ceil(1ns*rate/4000) 对齐，但作者未给逐值推导
+nCCDL,4 cycles,S1；S2 tCCD_L=2ns,PARTIAL,固定 4 不等于所有速率的 HBM2 ns 换算；具体最小周期依据待确认
+nCCDAB,PC=6/6/6/6/7；NPC=4/4/4/4/4,S1 README power constraint；S4 方法,PARTIAL,确认为相邻 MACAB 间隔；缺 E/功耗预算→整数周期计算表
+nCCDSB,PC=6/6/7/7/8；NPC=4/4/4/4/4,S1 README power constraint；S4 方法,PARTIAL,相邻 MACSB 间隔；不是 ALU pipeline latency
+nRRDS,2 cycles,S1；S2 tRRD_S=4ns,MISSING,不匹配 S2 按绝对时间换算；具体依据未定位
+nRRDL,4 cycles,S1；S2 tRRD_L=6ns,MISSING,不匹配 S2 按绝对时间换算；具体依据未定位
+nWTRS,各档 ceil(6ns*rate/4000),S1 表；S2 tWTR_S=6，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nWTRL,各档 ceil(8ns*rate/4000),S1 表；S2 tWTR_L=8，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRTW,3 cycles,S1；原版同值,CODE,原值保留；未出现在 HBM3-PIM 的 V() 约束表达式中
+nFAW,各档 ceil(30ns*rate/4000),S1 表；S2 tFAW=30，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nRFC,preset -1；运行时按 density 表算,S1；原版已有 160/260/350/450ns；新增310/410/610/650ns,PARTIAL,新增值无逐项来源；默认 8Gb 使用 350ns；不能照搬 S2 260ns
+nRFCSB,240/260/280/300/320 cycles,S1 相当于 200ns；S2 无同名量,MISSING,无对应出处；PIM 模型未在 V() 时序约束中消费此字段
+nREFI,各档 ceil(3900ns*rate/4000),S1 表；S2 tREFI=3900，tCK=1ns,DERIVED,所有五档与该换算吻合；参考文件已核对，换算过程为本次独立复核
+nREFISB,preset -1；244/122/82/61ns 表,S1；注释为 4/8/12/16Hi,PARTIAL,表值像 3900ns/(16*rank) 取整，但无作者公式；直接 rank 索引疑似错位
+nRREFD,10/11/12/12/13 cycles,S1 相当于 ceil(8ns*rate/4000),MISSING,S2 未提供 tRREFD；相同数字不能代替来源
+tCK_ps,表中1200…1600；运行时833/769/714/666/625ps,S1 int(1e6/(rate/4)),DERIVED,表末值被覆盖；Python wrapper 只固定使用769ps

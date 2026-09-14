@@ -1,0 +1,293 @@
+{
+  "attacc_repository": "https://github.com/scale-snu/attacc_simulator",
+  "attacc_commit": "c60005143a6b492d7ef83231723386478b59a506",
+  "ramulator_repository": "https://github.com/CMU-SAFARI/ramulator2",
+  "ramulator_commit": "b7c70275f04126c647edb989270cc429776955d1",
+  "ramulator_tree": "114060ac1e5760dcab307f9b574f0d59821de508",
+  "audit_date": "2026-09-14",
+  "attacc_files": [
+    {
+      "path": ".gitmodules",
+      "sha256": "b82d9885e84d606e7ad45afd6b33017c620488657716394a316a9cbb37d38432",
+      "bytes": 85
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "89e78a789b21f2fc808a6833d4dcd720366744d582f88f76765c84e6a9bb8092",
+      "bytes": 1134
+    },
+    {
+      "path": "README.md",
+      "sha256": "e33690b35cf4080a63e71e02fff4d1e5daa1196807d4cae7832aec1c9270b3de",
+      "bytes": 6922
+    },
+    {
+      "path": "__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "main.py",
+      "sha256": "ea0f14b2a5a7c3b76a7210ad1aec259982671f4f96d208a5ffa555e54ead07ea",
+      "bytes": 6580
+    },
+    {
+      "path": "pim_ramulator_src/HBM3-PIM.cpp",
+      "sha256": "c9255cec93f8d4f61e9688d228be53f358e81d79a338d0b532260b01899f5e13",
+      "bytes": 31082
+    },
+    {
+      "path": "pim_ramulator_src/HBM3_base.yaml",
+      "sha256": "55bf53fee37a7656243dc636c9c69983ca33ac49789c785b92431c98815c5568",
+      "bytes": 589
+    },
+    {
+      "path": "pim_ramulator_src/PIM_DRAM_system.cpp",
+      "sha256": "a952b3bdba9f32dfe2b8e22f5923355bb9fefeba42811c2a291a65d9b7814276",
+      "bytes": 5336
+    },
+    {
+      "path": "pim_ramulator_src/all_bank_refresh_hbm3.cpp",
+      "sha256": "58c20a723e01d04b529df52b944f44c7c59ace9db9db8acd9814c8b09f364acf",
+      "bytes": 1611
+    },
+    {
+      "path": "pim_ramulator_src/attacc_bank.yaml",
+      "sha256": "90f47ee655e12bdc87ed27590d1b7bdbc2a3e111db318de69ee0c9bb13e69185",
+      "bytes": 638
+    },
+    {
+      "path": "pim_ramulator_src/attacc_bg.yaml",
+      "sha256": "1e13d809c6a989529652995cd54d2a1d00dff8e83afa633cd68262b20eb40859",
+      "bytes": 634
+    },
+    {
+      "path": "pim_ramulator_src/attacc_buffer.yaml",
+      "sha256": "f6bebc8e4dfd4eeb4ed465810cc874b750f9395901384822475aba5955939cc8",
+      "bytes": 642
+    },
+    {
+      "path": "pim_ramulator_src/hbm3_controller.cpp",
+      "sha256": "e9417f5a654c17e1578928ad3961e20459d82422355c902b82d10685b1dd7924",
+      "bytes": 14338
+    },
+    {
+      "path": "pim_ramulator_src/hbm3_linear_mappers.cpp",
+      "sha256": "c789fd1ef8e79d4ea6bbb3cfd11a54c5f9d92bf688c5e0eb065c3e517abc5651",
+      "bytes": 3447
+    },
+    {
+      "path": "pim_ramulator_src/hbm3_pim_controller.cpp",
+      "sha256": "c610f8aaba62b060958386e5f1b2df9eafc136511a712d2686c5764ffad4ed6b",
+      "bytes": 17626
+    },
+    {
+      "path": "pim_ramulator_src/hbm3_pim_linear_mappers.cpp",
+      "sha256": "05a3403d4d1c11102361ec3a6a67502a1559234e1218ddd4ed148bdb873bccd1",
+      "bytes": 3563
+    },
+    {
+      "path": "pim_ramulator_src/hbm3_trace_recorder.cpp",
+      "sha256": "0b28b72a8a1afd33821fbe9fda8e4797dca4cfe84a8166544ed69071402f0010",
+      "bytes": 2052
+    },
+    {
+      "path": "pim_ramulator_src/no_refresh.cpp",
+      "sha256": "9ec3a05a3bd0f1578c9c30816b0b1081f06e9008523dc0eb4ba37fa9d3879ad1",
+      "bytes": 1066
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_CMakeLists.patch",
+      "sha256": "ecdd28b4811b0c521ddd27ca919c527c15c95713434cbecc61eac5e7a488c475",
+      "bytes": 195
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_addr_mapper_CMakeLists.patch",
+      "sha256": "8ea6729734aa0ecc51884f6a1ab829d4748ef8e0ae3a7874826e0eed903b91c6",
+      "bytes": 281
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_addr_mapper_impl_linear_mappers.patch",
+      "sha256": "c3e9e30eabdb86f901d9f521ede63fecf1eca4b04cd1e4c393b5e608988b0a0e",
+      "bytes": 310
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_base_base.patch",
+      "sha256": "26fb983c8c2a0422c631cbc854c558318a41461962a0fd9078f9bd13ffdb4627",
+      "bytes": 824
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_base_request.patch",
+      "sha256": "1af07c66207d9a7a627e45fb5c75e9ce15fe1fb26a662d1b7ac4a38bf762d30a",
+      "bytes": 515
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_CMakeLists.patch",
+      "sha256": "a2663015d79a143fc53278ed0b34d5bd89487e61e1bfc68caf0c65f256d653a8",
+      "bytes": 369
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_controller_CMakeLists.patch",
+      "sha256": "b70acdabcdaae9c470e5dc507811aa47e211adbcb1fc64828a6e64540636b25f",
+      "bytes": 755
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_controller_controller.patch",
+      "sha256": "6bf762086f98971e04b4f66bf1501fa3c4b8089352adaebf0f07fca4a748ef6b",
+      "bytes": 364
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_controller_impl_dummy_controller.patch",
+      "sha256": "0b6332b666fc6da4136ebc6d9e5983e6917b7326af2c623ada928de5479c0b21",
+      "bytes": 400
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_controller_impl_generic_dram_controller.patch",
+      "sha256": "17c18dfc63c86a95a2e12a5ec2b38f373d8072c884d742c6b192c52c1a1d942f",
+      "bytes": 585
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_controller_impl_scheduler_generic_scheduler.patch",
+      "sha256": "a534bae8abbd4ab6845d01b5e5fa24856647ccb6a5ca773893d8da16e927ef1a",
+      "bytes": 1539
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_impl_HBM3.patch",
+      "sha256": "fd3a3a1c87897eea82b51d6d45e3a29eaa08acdea0749de28104224fb119f913",
+      "bytes": 11453
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_lambdas_action.patch",
+      "sha256": "85672a0f4e4f4e86c0af6d0cc71be905606516964a223602f6b8193885820234",
+      "bytes": 8686
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_dram_lambdas_preq.patch",
+      "sha256": "17e79b5ae4f9f791b0f0cada07cec06e75f39ebc94de364256a998723044f3b9",
+      "bytes": 4759
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_frontend_CMakeLists.patch",
+      "sha256": "715d59a7d4f6560be0a1c3f263430774383fdcd33e4b0104359e4f918a515d66",
+      "bytes": 596
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_frontend_impl_memory_trace_loadstore_trace.patch",
+      "sha256": "498d42c9f40351d353398906cd90402cbe11f629224a6a99b12687d44ce2472c",
+      "bytes": 619
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_main.patch",
+      "sha256": "ecf400fb803e9b0c57cdda1037aa65e76eb3e78cd0ded81e596158e0ddc3e622",
+      "bytes": 426
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_memory_system_CMakeLists.patch",
+      "sha256": "e597ea1aee29e678dd305f9d0f366e87d97cc1c3fcd7c3e16f656ca42efac980",
+      "bytes": 247
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_memory_system_impl_dummy_memory_system.patch",
+      "sha256": "1b9d1cd835b17cc56d44997e0fd55a9c21751474cf0e448771e437a78933ab55",
+      "bytes": 379
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_memory_system_impl_generic_DRAM_system.patch",
+      "sha256": "eec287e66ab96cb8a99881afc92243ec3bd128ebf06bfd79f157fdb4cc3df88c",
+      "bytes": 656
+    },
+    {
+      "path": "pim_ramulator_src/patches/src_memory_system_memory_system.patch",
+      "sha256": "0dc6fd58fd44dedb47d26690f32078f28aaa2835e46e838efe3a3254d082a16c",
+      "bytes": 323
+    },
+    {
+      "path": "pim_ramulator_src/pim_loadstore_trace.cpp",
+      "sha256": "847433454cf59a7ef09c0a724e523508ff4dfd002cb2bdecb500390743752a64",
+      "bytes": 4979
+    },
+    {
+      "path": "pim_ramulator_src/pim_scheduler.cpp",
+      "sha256": "be8cb800438931b0f7fc69818264b7967d5d41bfc7406018edad2ee6453e7ec2",
+      "bytes": 2827
+    },
+    {
+      "path": "pim_ramulator_src/trace_gen/gen_trace_attacc_bank.py",
+      "sha256": "3d532527c684c3ae14cc85a7726773b2e6896a962d6921dd1bb4188d155f573b",
+      "bytes": 13044
+    },
+    {
+      "path": "pim_ramulator_src/trace_gen/gen_trace_attacc_bg.py",
+      "sha256": "e2dc8e032f4e2da064c6294f3c90ef9c151cb578dbb8cf6ae32edb77866b9ff6",
+      "bytes": 13301
+    },
+    {
+      "path": "pim_ramulator_src/trace_gen/gen_trace_attacc_buffer.py",
+      "sha256": "e5020974cfa299c234ce4adf4dfc023b38f531768945bdba7b76f8a333736d7c",
+      "bytes": 12914
+    },
+    {
+      "path": "set_pim_ramulator.sh",
+      "sha256": "341dce2a2cca0244e6e89e725524e034cd1e7f617e6dad0124e6315cb2065cfc",
+      "bytes": 1385
+    },
+    {
+      "path": "src/config.py",
+      "sha256": "9c568d6a66edc26f5d9f891d07a718e1fcd223579ddbdeb7e1a11f819e9aa9e3",
+      "bytes": 9565
+    },
+    {
+      "path": "src/devices.py",
+      "sha256": "21421e53c99e38b55ea7e4f8dd3904adbc365bb2fa036325c8bd0978aba920f8",
+      "bytes": 14233
+    },
+    {
+      "path": "src/model.py",
+      "sha256": "afc2a9354010dc95be273bcb0e390f36d018c1d56d8cb58a50298a9d20215d08",
+      "bytes": 10651
+    },
+    {
+      "path": "src/ramulator_wrapper.py",
+      "sha256": "fcfd182901d234935a47774b5cd5dbedbc984da0cb34672fc2ad740522917334",
+      "bytes": 10102
+    },
+    {
+      "path": "src/system.py",
+      "sha256": "b0cd6f8d6fb38a6b32a55c2b7ca43cb613511d4f9b2037c28d20d82d076b9bac",
+      "bytes": 19160
+    },
+    {
+      "path": "src/type.py",
+      "sha256": "5045fe5d777321b531185e0f0bee489193a3aca330c3704c6ce10f62d2ba8b22",
+      "bytes": 492
+    }
+  ],
+  "baseline_files": {
+    "src/CMakeLists.txt": "260e7a8da360e591237921422679205267498c692e40e8ad014c315b460a0291",
+    "src/addr_mapper/CMakeLists.txt": "d2014d974ffa3774a979e9fe5c8ab5258e6aed1db01e7d4a2f148604123a180f",
+    "src/addr_mapper/impl/linear_mappers.cpp": "dc4ccf6aaac17dde42215dc0ef140ae9d89b89f0bd7c50e38180300834251597",
+    "src/base/base.h": "2f457880feb0a17093412c8e581537dcbd059baa332f3871367f1abbddba2345",
+    "src/base/request.h": "a8de20fe2e552642d0297d8912197e9a88b8158948aa82c298671acbbd0d6eea",
+    "src/dram/CMakeLists.txt": "32ff280a0b2bac241d8a629eea015c232bb2c4402436eb11423b880e6abab19b",
+    "src/dram_controller/CMakeLists.txt": "89a029b66231e789b6d031087e135c1c578657f7f270cb5e241d2049f931c5ce",
+    "src/dram_controller/controller.h": "19551d8096d2130b73ef4597a26aa36fce758203fbdeb3f54ce02a0237ca1aef",
+    "src/dram_controller/impl/dummy_controller.cpp": "9ace7761e3dca40a2e37d3f09be794ba59be88093fbd87d893c5051778fae049",
+    "src/dram_controller/impl/generic_dram_controller.cpp": "0a4e983b8d94ede3e17032e541b134886886d5992cc59b491f53d3110dd8401f",
+    "src/dram_controller/impl/scheduler/generic_scheduler.cpp": "85239e4a321538bc76965bafbe36b5737ffb1318d58e3ef7135ebdeac9d2a87a",
+    "src/dram/impl/HBM3.cpp": "e606a236e027e40a9e271053e1e877f15554e11a9fa7b2da76ff4038110159b3",
+    "src/dram/lambdas/action.h": "cc325e7328efcaedb18feaf1a93bc7989af7d9b4e5fbf1642f2bda3a4c41f9ff",
+    "src/dram/lambdas/preq.h": "f361c28e060ff9519221a93d2bea5b8bae2944813a97ba978d2d247d3de51dcd",
+    "src/frontend/CMakeLists.txt": "d28259a9f9b9cd088f3084c9078158a18bb13e189ec7fe95b608b35d3daf277f",
+    "src/frontend/impl/memory_trace/loadstore_trace.cpp": "3452a884d9eda585c096b9fee96cf44cd9703b6c69812763da191d2fea0fdbbe",
+    "src/main.cpp": "7cca4ed6f29578e7a8a58478e375332dfca6dd490463f615c25c855638a74970",
+    "src/memory_system/CMakeLists.txt": "5e64fdf5c70a9c553049786a30e72a174e7f0a263a5cdf20b7403a3b137ac442",
+    "src/memory_system/impl/dummy_memory_system.cpp": "8c019b053a775afb23aef05787ab3fbd2f699d11dcc32097e147838ca8b860cd",
+    "src/memory_system/impl/generic_DRAM_system.cpp": "d70ce69afa4c10927f4fcc977877562da7940190c6d72516acaf4727df2ec1e3",
+    "src/memory_system/memory_system.h": "c5ce2c3ff68f3bb99376b29a8746bb90ddb199b6783780d89f70bf6f9df3563d"
+  },
+  "baseline_support_files": {
+    "src/base/utils.cpp": "e5be936a5c5cc3fec759d3fb6173940d04c6be23e7324a7d003855e24b58cc67",
+    "src/dram/node.h": "d162f3a6d3d930e8f48505d0b2bba4eec4919266bcfaeca67a3ec4fa431ab226",
+    "src/dram_controller/impl/refresh/all_bank_refresh.cpp": "5ad610a8620f086277eba58a39d36bf57de51856262b87fc555b2bfc67af8cbe"
+  }
+}

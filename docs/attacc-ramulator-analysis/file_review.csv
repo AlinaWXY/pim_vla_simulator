@@ -1,0 +1,40 @@
+path,category,change_summary,data_provenance,status
+src/CMakeLists.txt,构建,移除 test 子目录,无硬件参数；作者构建裁剪,CODE；物理来源按所指条目判定
+src/addr_mapper/CMakeLists.txt,构建,注册两个 HBM3 地址映射实现文件,无硬件参数；地址位序见 architecture.md,CODE；物理来源按所指条目判定
+src/addr_mapper/impl/linear_mappers.cpp,格式,仅增加空行,无语义或数据变化,CODE；物理来源按所指条目判定
+src/base/base.h,统计,禁止递归输出子组件统计,输出接口改变；不等于删除内部计数,CODE；物理来源按所指条目判定
+src/base/request.h,请求,Write 显式设为 1；PIM 请求 ID 4–13,作者接口编号；见 commands.md,CODE；物理来源按所指条目判定
+src/dram/CMakeLists.txt,构建,增加 HBM3-PIM；移除 DDR3/DDR4/DDR4-VRR/DDR5/LPDDR5/HBM/HBM2 构建项,构建裁剪；源码仍存在；不宜直接用于本项目 LPDDR5 分支,CODE；物理来源按所指条目判定
+src/dram_controller/CMakeLists.txt,构建,注册控制器、PIM 调度器、刷新和日志；移除六种 RowHammer 插件构建项,作者构建选择,CODE；物理来源按所指条目判定
+src/dram_controller/controller.h,接口,增加 is_pending 与 get_clk,完成判断和调试接口；非硬件延迟,CODE；物理来源按所指条目判定
+src/dram_controller/impl/dummy_controller.cpp,接口,增加始终返回 true 的 is_pending,占位行为；dummy 路径可能不结束,CODE；物理来源按所指条目判定
+src/dram_controller/impl/generic_dram_controller.cpp,完成判断,汇总 active/priority/read/write/pending 队列,未增加新的硬件时间参数,CODE；物理来源按所指条目判定
+src/dram_controller/impl/scheduler/generic_scheduler.cpp,调度,FRFCFS 增加 rowhit_list；保护有待处理 row hit 的 bank,作者算法；无外部数值依据；非简单按命中率乘系数,CODE；物理来源按所指条目判定
+src/dram/impl/HBM3.cpp,HBM3 基线,rank 层级；12 组织；5 速率；QDR 时钟；刷新表；约束层级调整,S2/S3 部分来源；逐值见 timing_sources.csv 和 generated 表,CODE；物理来源按所指条目判定
+src/dram/lambdas/action.h,状态与广播,ACTAB/SB/PB、PRESB/PREPB、广播 timing 更新；PREab 改名 PREA；更深层级遍历,作者实现；PRESB 和 PB 广播存在静态不一致，见 findings.md,CODE；物理来源按所指条目判定
+src/dram/lambdas/preq.h,前置条件,MACAB/SB/PB 检查目标 bank 行状态并生成 ACT/PRE；扩展全关闭检查,作者状态机；不是 JEDEC 已验证的 PIM 语义,CODE；物理来源按所指条目判定
+src/frontend/CMakeLists.txt,构建,增加 PIM trace；移除 readwrite_trace/simpleO3/gem5 构建项,作者构建选择,CODE；物理来源按所指条目判定
+src/frontend/impl/memory_trace/loadstore_trace.cpp,前端吞吐,每 tick 循环发送直到 trace 完或请求被拒绝,作者注入策略；改变到达时间而非 DRAM latency,CODE；物理来源按所指条目判定
+src/main.cpp,终止条件,删除 example include；前端结束且 memory pending 为空才退出,作者 drain 逻辑；PIM 没有独立结果完成事件,CODE；物理来源按所指条目判定
+src/memory_system/CMakeLists.txt,构建,注册 PIM_DRAM_system.cpp,无硬件参数,CODE；物理来源按所指条目判定
+src/memory_system/impl/dummy_memory_system.cpp,接口,增加空实现 is_pending,bool 函数无返回；占位实现有缺陷,CODE；物理来源按所指条目判定
+src/memory_system/impl/generic_DRAM_system.cpp,完成判断,增加各 controller pending 聚合,作者 drain 逻辑,CODE；物理来源按所指条目判定
+src/memory_system/memory_system.h,接口,增加抽象 is_pending,无硬件参数,CODE；物理来源按所指条目判定
+src/addr_mapper/impl/hbm3_linear_mappers.cpp,地址映射,HBM3-Base/Custom；按 32B 事务移位；七层地址,作者位序；组织参数仅声明参考 JESD238A，未逐表验证,CODE；物理来源按所指条目判定
+src/addr_mapper/impl/hbm3_pim_linear_mappers.cpp,地址映射,HBM3-PIM/Custom；CH PCH Ra BG Ba Ro Co,作者映射，匹配三个 trace 生成器；非厂商物理地址表,CODE；物理来源按所指条目判定
+src/dram/impl/HBM3-PIM.cpp,PIM 设备,22 命令、14 请求；10 速率表；新增 2 时序名；状态和前置条件,逐命令见 commands.md；全部约束与表值已提取；物理来源见 timing_sources.csv,CODE；物理来源按所指条目判定
+src/dram_controller/impl/hbm3_controller.cpp,控制器,普通 HBM3 行列双发射；pending 读返回与 drain,读返回沿用 nCL+nBL；0.2/0.8 水位继承；priority 512*3+32 同样继承原版通用控制器,CODE；物理来源按所指条目判定
+src/dram_controller/impl/hbm3_pim_controller.cpp,控制器,专用 PIM 队列、优先级、行列双发射、PIM 发出即移除,队列优先级和双发射属于模型选择；缺少 PIM 结果完成计时,CODE；物理来源按所指条目判定
+src/dram_controller/impl/plugin/hbm3_trace_recorder.cpp,日志,每 channel 输出实际发射命令；假定每 tick 调用两次,second 标志每两次 update 增加一次时钟；不是通过 get_clk 取时钟,CODE；物理来源按所指条目判定
+src/dram_controller/impl/refresh/all_bank_refresh_hbm3.cpp,刷新,每 nREFI 对每 pseudochannel 注入 REFab,nREFI 由设备提供；m_num_ranks 实际取 pseudochannel 数；见刷新边界问题,CODE；物理来源按所指条目判定
+src/dram_controller/impl/refresh/no_refresh.cpp,刷新,空 tick 的 No 刷新模式,人为关闭刷新；示例默认不用,CODE；物理来源按所指条目判定
+src/dram_controller/impl/scheduler/pim_scheduler.cpp,调度,保护 row hit；BARRIER 限制后方最终命令但允许 ACT/PRE 提前,作者算法；BARRIER 无固定 latency/energy,CODE；物理来源按所指条目判定
+src/frontend/impl/memory_trace/pim_loadstore_trace.cpp,前端,解析 LD/ST 及 10 类 PIM 文本请求；批量注入,作者 trace 协议；文件不含时间戳和数值数据,CODE；物理来源按所指条目判定
+src/memory_system/impl/PIM_DRAM_system.cpp,系统与统计,按 channel 创建控制器；新增请求计数；总周期；pending 汇总,统计的是成功接收请求；ACT/PRE 数量需看命令日志；不算能量,CODE；物理来源按所指条目判定
+attacc_bank.yaml,实验配置,bank 模式 trace；HBM3_8Gb_2R、16 channel、5.2Gbps PC,作者实验默认值；NoTranslation 2^31、clock_ratio=1；见 architecture.md,CODE；物理来源按所指条目判定
+attacc_bg.yaml,实验配置,BG 模式 trace；设备和时序与 bank 模式相同,PE 位置由 trace 命令和能量系数区分,CODE；物理来源按所指条目判定
+attacc_buffer.yaml,实验配置,buffer 模式 trace；设备和时序与 bank 模式相同,PE 位置由 trace 命令和能量系数区分,CODE；物理来源按所指条目判定
+HBM3_base.yaml,实验配置,普通 HBM3 对照；FRFCFS、GenericDRAM、HBM3-Custom,ATTACC 修改后的 HBM3 对照，不等于上游原始 HBM3,CODE；物理来源按所指条目判定
+trace_gen/gen_trace_attacc_bank.py,trace,MACAB 的 score/softmax/context、双 head 重叠、barrier 和 dummy MAC,架构设计和循环推导；宏常量与 CLI 覆盖见 architecture.md；注释时延不生效,CODE；物理来源按所指条目判定
+trace_gen/gen_trace_attacc_bg.py,trace,MACSB；按列/bank/row 排列数据；输出搬移与重叠,作者映射算法；共用组织与默认值；无物理时序测量,CODE；物理来源按所指条目判定
+trace_gen/gen_trace_attacc_buffer.py,trace,MACPB；按 BG/rank/bank/column/row 交错,作者映射算法；共用组织与默认值；无物理时序测量,CODE；物理来源按所指条目判定

@@ -1,0 +1,152 @@
+model,level,preceding,following,expression,window,source,line
+ramulator-original-HBM3,channel,ACT,ACT;PRE;PREA;REFab;REFsb;RFMab;RFMsb,2,1,ramulator2/src/dram/impl/HBM3.cpp,300
+ramulator-original-HBM3,pseudochannel,ACT,ACT,"V(""nRRDS"")",1,ramulator2/src/dram/impl/HBM3.cpp,304
+ramulator-original-HBM3,pseudochannel,ACT,ACT,"V(""nFAW"")",4,ramulator2/src/dram/impl/HBM3.cpp,306
+ramulator-original-HBM3,pseudochannel,ACT,REFsb;RFMsb,"V(""nRRDS"") + 1",1,ramulator2/src/dram/impl/HBM3.cpp,309
+ramulator-original-HBM3,pseudochannel,REFsb;RFMsb,REFsb;RFMsb,"V(""nRREFD"")",1,ramulator2/src/dram/impl/HBM3.cpp,311
+ramulator-original-HBM3,pseudochannel,REFsb;RFMsb,ACT,"V(""nRREFD"") - 1",1,ramulator2/src/dram/impl/HBM3.cpp,313
+ramulator-original-HBM3,pseudochannel,RD;RDA,RD;RDA,"V(""nBL"")",1,ramulator2/src/dram/impl/HBM3.cpp,317
+ramulator-original-HBM3,pseudochannel,WR;WRA,WR;WRA,"V(""nBL"")",1,ramulator2/src/dram/impl/HBM3.cpp,318
+ramulator-original-HBM3,pseudochannel,RD;RDA,RD;RDA,"V(""nCCDS"")",1,ramulator2/src/dram/impl/HBM3.cpp,322
+ramulator-original-HBM3,pseudochannel,WR;WRA,WR;WRA,"V(""nCCDS"")",1,ramulator2/src/dram/impl/HBM3.cpp,323
+ramulator-original-HBM3,pseudochannel,RD;RDA,WR;WRA,"V(""nCL"") + V(""nBL"") + 2 - V(""nCWL"")",1,ramulator2/src/dram/impl/HBM3.cpp,325
+ramulator-original-HBM3,pseudochannel,WR;WRA,RD;RDA,"V(""nCWL"") + V(""nBL"") + V(""nWTRS"")",1,ramulator2/src/dram/impl/HBM3.cpp,327
+ramulator-original-HBM3,pseudochannel,RD,PREA,"V(""nRTPS"")",1,ramulator2/src/dram/impl/HBM3.cpp,329
+ramulator-original-HBM3,pseudochannel,WR,PREA,"V(""nCWL"") + V(""nBL"") + V(""nWR"")",1,ramulator2/src/dram/impl/HBM3.cpp,330
+ramulator-original-HBM3,pseudochannel,ACT,ACT,"V(""nRRDS"")",1,ramulator2/src/dram/impl/HBM3.cpp,332
+ramulator-original-HBM3,pseudochannel,ACT,ACT,"V(""nFAW"")",4,ramulator2/src/dram/impl/HBM3.cpp,333
+ramulator-original-HBM3,pseudochannel,ACT,PREA,"V(""nRAS"")",1,ramulator2/src/dram/impl/HBM3.cpp,334
+ramulator-original-HBM3,pseudochannel,PREA,ACT,"V(""nRP"")",1,ramulator2/src/dram/impl/HBM3.cpp,335
+ramulator-original-HBM3,pseudochannel,ACT,REFab;RFMab,"V(""nRC"")",1,ramulator2/src/dram/impl/HBM3.cpp,337
+ramulator-original-HBM3,pseudochannel,PRE;PREA,REFab;RFMab,"V(""nRP"")",1,ramulator2/src/dram/impl/HBM3.cpp,338
+ramulator-original-HBM3,pseudochannel,RDA,REFab;RFMab,"V(""nRP"") + V(""nRTPS"")",1,ramulator2/src/dram/impl/HBM3.cpp,339
+ramulator-original-HBM3,pseudochannel,WRA,REFab;RFMab,"V(""nCWL"") + V(""nBL"") + V(""nWR"") + V(""nRP"")",1,ramulator2/src/dram/impl/HBM3.cpp,340
+ramulator-original-HBM3,pseudochannel,REFab;RFMab,ACT;REFsb;RFMsb,"V(""nRFC"")",1,ramulator2/src/dram/impl/HBM3.cpp,341
+ramulator-original-HBM3,bankgroup,RD;RDA,RD;RDA,"V(""nCCDL"")",1,ramulator2/src/dram/impl/HBM3.cpp,345
+ramulator-original-HBM3,bankgroup,WR;WRA,WR;WRA,"V(""nCCDL"")",1,ramulator2/src/dram/impl/HBM3.cpp,346
+ramulator-original-HBM3,bankgroup,WR;WRA,RD;RDA,"V(""nCWL"") + V(""nBL"") + V(""nWTRL"")",1,ramulator2/src/dram/impl/HBM3.cpp,347
+ramulator-original-HBM3,bankgroup,ACT,ACT,"V(""nRRDL"")",1,ramulator2/src/dram/impl/HBM3.cpp,349
+ramulator-original-HBM3,bankgroup,ACT,REFsb;RFMsb,"V(""nRRDL"") + 1",1,ramulator2/src/dram/impl/HBM3.cpp,350
+ramulator-original-HBM3,bankgroup,REFsb;RFMsb,ACT,"V(""nRRDL"") - 1",1,ramulator2/src/dram/impl/HBM3.cpp,351
+ramulator-original-HBM3,bank,RD,PRE,"V(""nRTPS"")",1,ramulator2/src/dram/impl/HBM3.cpp,353
+ramulator-original-HBM3,bank,ACT,ACT,"V(""nRC"")",1,ramulator2/src/dram/impl/HBM3.cpp,357
+ramulator-original-HBM3,bank,ACT,RD;RDA,"V(""nRCDRD"")",1,ramulator2/src/dram/impl/HBM3.cpp,358
+ramulator-original-HBM3,bank,ACT,WR;WRA,"V(""nRCDWR"")",1,ramulator2/src/dram/impl/HBM3.cpp,359
+ramulator-original-HBM3,bank,ACT,PRE,"V(""nRAS"")",1,ramulator2/src/dram/impl/HBM3.cpp,360
+ramulator-original-HBM3,bank,PRE,ACT,"V(""nRP"")",1,ramulator2/src/dram/impl/HBM3.cpp,361
+ramulator-original-HBM3,bank,RD,PRE,"V(""nRTPL"")",1,ramulator2/src/dram/impl/HBM3.cpp,362
+ramulator-original-HBM3,bank,WR,PRE,"V(""nCWL"") + V(""nBL"") + V(""nWR"")",1,ramulator2/src/dram/impl/HBM3.cpp,363
+ramulator-original-HBM3,bank,RDA,ACT;REFsb;RFMsb,"V(""nRTPL"") + V(""nRP"")",1,ramulator2/src/dram/impl/HBM3.cpp,364
+ramulator-original-HBM3,bank,WRA,ACT;REFsb;RFMsb,"V(""nCWL"") + V(""nBL"") + V(""nWR"") + V(""nRP"")",1,ramulator2/src/dram/impl/HBM3.cpp,365
+attacc-HBM3,channel,ACT,ACT;PRE;PREA;REFab;REFsb;RFMab;RFMsb,2,1,generated/attacc_HBM3.cpp,325
+attacc-HBM3,pseudochannel,RD;RDA,RD;RDA,"V(""nBL"")",1,generated/attacc_HBM3.cpp,330
+attacc-HBM3,pseudochannel,WR;WRA,WR;WRA,"V(""nBL"")",1,generated/attacc_HBM3.cpp,331
+attacc-HBM3,pseudochannel,RD,PREA,"V(""nRTPS"")",1,generated/attacc_HBM3.cpp,333
+attacc-HBM3,pseudochannel,WR,PREA,"V(""nCWL"") + V(""nBL"") + V(""nWR"")",1,generated/attacc_HBM3.cpp,334
+attacc-HBM3,pseudochannel,ACT,PREA,"V(""nRAS"")",1,generated/attacc_HBM3.cpp,336
+attacc-HBM3,pseudochannel,PREA,ACT,"V(""nRP"")",1,generated/attacc_HBM3.cpp,337
+attacc-HBM3,pseudochannel,ACT,REFab;RFMab,"V(""nRC"")",1,generated/attacc_HBM3.cpp,339
+attacc-HBM3,pseudochannel,PRE;PREA,REFab;RFMab,"V(""nRP"")",1,generated/attacc_HBM3.cpp,340
+attacc-HBM3,pseudochannel,RDA,REFab;RFMab,"V(""nRP"") + V(""nRTPS"")",1,generated/attacc_HBM3.cpp,341
+attacc-HBM3,pseudochannel,WRA,REFab;RFMab,"V(""nCWL"") + V(""nBL"") + V(""nWR"") + V(""nRP"")",1,generated/attacc_HBM3.cpp,342
+attacc-HBM3,pseudochannel,REFab;RFMab,ACT;REFsb;RFMsb,"V(""nRFC"")",1,generated/attacc_HBM3.cpp,343
+attacc-HBM3,rank,ACT,ACT,"V(""nRRDS"")",1,generated/attacc_HBM3.cpp,348
+attacc-HBM3,rank,ACT,ACT,"V(""nFAW"")",4,generated/attacc_HBM3.cpp,350
+attacc-HBM3,rank,ACT,REFsb;RFMsb,"V(""nRRDS"") + 1",1,generated/attacc_HBM3.cpp,353
+attacc-HBM3,rank,REFsb;RFMsb,REFsb;RFMsb,"V(""nRREFD"")",1,generated/attacc_HBM3.cpp,355
+attacc-HBM3,rank,REFsb;RFMsb,ACT,"V(""nRREFD"") - 1",1,generated/attacc_HBM3.cpp,357
+attacc-HBM3,rank,RD;RDA,RD;RDA,"V(""nCCDS"")",1,generated/attacc_HBM3.cpp,361
+attacc-HBM3,rank,WR;WRA,WR;WRA,"V(""nCCDS"")",1,generated/attacc_HBM3.cpp,362
+attacc-HBM3,rank,RD;RDA,WR;WRA,"V(""nCL"") + V(""nBL"") + 2 - V(""nCWL"")",1,generated/attacc_HBM3.cpp,364
+attacc-HBM3,rank,WR;WRA,RD;RDA,"V(""nCWL"") + V(""nBL"") + V(""nWTRS"")",1,generated/attacc_HBM3.cpp,366
+attacc-HBM3,rank,ACT,ACT,"V(""nRRDS"")",1,generated/attacc_HBM3.cpp,368
+attacc-HBM3,rank,ACT,ACT,"V(""nFAW"")",4,generated/attacc_HBM3.cpp,369
+attacc-HBM3,rank,ACT,PREA,"V(""nRAS"")",1,generated/attacc_HBM3.cpp,370
+attacc-HBM3,rank,PREA,ACT,"V(""nRP"")",1,generated/attacc_HBM3.cpp,371
+attacc-HBM3,bankgroup,RD;RDA,RD;RDA,"V(""nCCDL"")",1,generated/attacc_HBM3.cpp,375
+attacc-HBM3,bankgroup,WR;WRA,WR;WRA,"V(""nCCDL"")",1,generated/attacc_HBM3.cpp,376
+attacc-HBM3,bankgroup,WR;WRA,RD;RDA,"V(""nCWL"") + V(""nBL"") + V(""nWTRL"")",1,generated/attacc_HBM3.cpp,377
+attacc-HBM3,bankgroup,ACT,ACT,"V(""nRRDL"")",1,generated/attacc_HBM3.cpp,379
+attacc-HBM3,bankgroup,ACT,REFsb;RFMsb,"V(""nRRDL"") + 1",1,generated/attacc_HBM3.cpp,380
+attacc-HBM3,bankgroup,REFsb;RFMsb,ACT,"V(""nRRDL"") - 1",1,generated/attacc_HBM3.cpp,381
+attacc-HBM3,bank,RD,PRE,"V(""nRTPS"")",1,generated/attacc_HBM3.cpp,383
+attacc-HBM3,bank,ACT,ACT,"V(""nRC"")",1,generated/attacc_HBM3.cpp,386
+attacc-HBM3,bank,ACT,RD;RDA,"V(""nRCDRD"")",1,generated/attacc_HBM3.cpp,387
+attacc-HBM3,bank,ACT,WR;WRA,"V(""nRCDWR"")",1,generated/attacc_HBM3.cpp,388
+attacc-HBM3,bank,ACT,PRE,"V(""nRAS"")",1,generated/attacc_HBM3.cpp,389
+attacc-HBM3,bank,PRE,ACT,"V(""nRP"")",1,generated/attacc_HBM3.cpp,390
+attacc-HBM3,bank,RD,PRE,"V(""nRTPL"")",1,generated/attacc_HBM3.cpp,391
+attacc-HBM3,bank,WR,PRE,"V(""nCWL"") + V(""nBL"") + V(""nWR"")",1,generated/attacc_HBM3.cpp,392
+attacc-HBM3,bank,RDA,ACT;REFsb;RFMsb,"V(""nRTPL"") + V(""nRP"")",1,generated/attacc_HBM3.cpp,393
+attacc-HBM3,bank,WRA,ACT;REFsb;RFMsb,"V(""nCWL"") + V(""nBL"") + V(""nWR"") + V(""nRP"")",1,generated/attacc_HBM3.cpp,394
+attacc-HBM3-PIM,channel,ACTAB,ACTAB;ACT;PRE;PREA;REFab;REFsb,2,1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,372
+attacc-HBM3-PIM,channel,MACAB,MACAB,"V(""nCCDAB"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,374
+attacc-HBM3-PIM,channel,ACTAB,ACTAB,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,375
+attacc-HBM3-PIM,channel,ACTAB,MACAB,"V(""nRCDRD"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,376
+attacc-HBM3-PIM,channel,ACTAB,PREA,"V(""nRAS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,377
+attacc-HBM3-PIM,channel,MACAB,PREA,"V(""nRTPL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,378
+attacc-HBM3-PIM,channel,PREA,ACTAB,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,379
+attacc-HBM3-PIM,pseudochannel,ACTAB,REFab,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,381
+attacc-HBM3-PIM,pseudochannel,PREA,REFab,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,382
+attacc-HBM3-PIM,pseudochannel,REFab,ACTAB,"V(""nRFC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,383
+attacc-HBM3-PIM,channel,ACTSB,ACTSB;ACT;PRE;PREA;PRESB;REFab;REFsb,2,1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,388
+attacc-HBM3-PIM,channel,MACSB,MACSB,"V(""nCCDSB"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,390
+attacc-HBM3-PIM,bank,ACTSB,ACTSB,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,391
+attacc-HBM3-PIM,bank,ACTSB,MACSB,"V(""nRCDRD"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,392
+attacc-HBM3-PIM,bank,ACTSB,PRESB,"V(""nRAS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,393
+attacc-HBM3-PIM,bank,MACSB,PRESB,"V(""nRTPL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,394
+attacc-HBM3-PIM,bank,PRESB,ACTSB,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,395
+attacc-HBM3-PIM,pseudochannel,ACTSB,REFab,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,397
+attacc-HBM3-PIM,pseudochannel,PRESB,REFab,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,398
+attacc-HBM3-PIM,pseudochannel,REFab,ACTSB,"V(""nRFC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,399
+attacc-HBM3-PIM,channel,ACTPB,ACTPB;ACT;PRE;PREA;PREPB;REFab;REFsb,2,1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,404
+attacc-HBM3-PIM,channel,MACPB,MACPB,"V(""nBL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,406
+attacc-HBM3-PIM,rank,MACPB,MACPB,"V(""nCCDS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,407
+attacc-HBM3-PIM,bankgroup,MACPB,MACPB,"V(""nCCDL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,408
+attacc-HBM3-PIM,bank,ACTPB,ACTPB,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,409
+attacc-HBM3-PIM,bank,ACTPB,MACPB,"V(""nRCDRD"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,410
+attacc-HBM3-PIM,bank,ACTPB,PREPB,"V(""nRAS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,411
+attacc-HBM3-PIM,bank,MACPB,PREPB,"V(""nRTPL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,412
+attacc-HBM3-PIM,bank,PREPB,ACTPB,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,413
+attacc-HBM3-PIM,pseudochannel,ACTPB,REFab,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,415
+attacc-HBM3-PIM,pseudochannel,PREPB,REFab,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,416
+attacc-HBM3-PIM,pseudochannel,REFab,ACTPB,"V(""nRFC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,417
+attacc-HBM3-PIM,pseudochannel,WRGB;MVSB;MVGB;SFM;RD;WR,WRGB;MVSB;MVGB;SFM;RD;WR,"V(""nBL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,423
+attacc-HBM3-PIM,rank,WRGB;MVSB;MVGB;SFM;RD;WR,WRGB;MVSB;MVGB;SFM;RD;WR,"V(""nCCDS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,425
+attacc-HBM3-PIM,bankgroup,WRGB;MVSB;MVGB;SFM;RD;WR,WRGB;MVSB;MVGB;SFM;RD;WR,"V(""nCCDL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,427
+attacc-HBM3-PIM,channel,ACT,ACT;PRE;PREA;PRESB;REFab;REFsb,2,1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,436
+attacc-HBM3-PIM,pseudochannel,RD,RD,"V(""nBL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,441
+attacc-HBM3-PIM,pseudochannel,WR,WR,"V(""nBL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,442
+attacc-HBM3-PIM,pseudochannel,RD,PREA,"V(""nRTPS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,444
+attacc-HBM3-PIM,pseudochannel,WR,PREA,"V(""nCWL"") + V(""nBL"") + V(""nWR"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,445
+attacc-HBM3-PIM,pseudochannel,ACT,PREA,"V(""nRAS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,447
+attacc-HBM3-PIM,pseudochannel,PREA,ACT,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,448
+attacc-HBM3-PIM,pseudochannel,ACT,REFab,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,450
+attacc-HBM3-PIM,pseudochannel,PRE;PREA,REFab,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,451
+attacc-HBM3-PIM,pseudochannel,REFab,ACT;REFsb,"V(""nRFC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,452
+attacc-HBM3-PIM,rank,ACT,ACT,"V(""nRRDS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,457
+attacc-HBM3-PIM,rank,ACT,ACT,"V(""nFAW"")",4,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,459
+attacc-HBM3-PIM,rank,ACT,REFsb,"V(""nRRDS"") + 1",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,462
+attacc-HBM3-PIM,rank,REFsb,REFsb,"V(""nRREFD"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,464
+attacc-HBM3-PIM,rank,REFsb,ACT,"V(""nRREFD"") - 1",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,466
+attacc-HBM3-PIM,rank,RD,RD,"V(""nCCDS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,470
+attacc-HBM3-PIM,rank,WR,WR,"V(""nCCDS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,471
+attacc-HBM3-PIM,rank,RD,WR,"V(""nCL"") + V(""nBL"") + 2 - V(""nCWL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,473
+attacc-HBM3-PIM,rank,WR,RD,"V(""nCWL"") + V(""nBL"") + V(""nWTRS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,475
+attacc-HBM3-PIM,rank,ACT,ACT,"V(""nRRDS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,477
+attacc-HBM3-PIM,rank,ACT,ACT,"V(""nFAW"")",4,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,478
+attacc-HBM3-PIM,rank,ACT,PREA,"V(""nRAS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,479
+attacc-HBM3-PIM,rank,PREA,ACT,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,480
+attacc-HBM3-PIM,bankgroup,RD,RD,"V(""nCCDL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,484
+attacc-HBM3-PIM,bankgroup,WR,WR,"V(""nCCDL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,485
+attacc-HBM3-PIM,bankgroup,WR,RD,"V(""nCWL"") + V(""nBL"") + V(""nWTRL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,486
+attacc-HBM3-PIM,bankgroup,ACT,ACT,"V(""nRRDL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,488
+attacc-HBM3-PIM,bankgroup,ACT,REFsb,"V(""nRRDL"") + 1",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,489
+attacc-HBM3-PIM,bankgroup,REFsb,ACT,"V(""nRRDL"") - 1",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,490
+attacc-HBM3-PIM,bank,ACT,ACT,"V(""nRC"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,494
+attacc-HBM3-PIM,bank,ACT,RD,"V(""nRCDRD"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,495
+attacc-HBM3-PIM,bank,ACT,WR,"V(""nRCDWR"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,496
+attacc-HBM3-PIM,bank,ACT,PRE,"V(""nRAS"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,497
+attacc-HBM3-PIM,bank,PRE,ACT,"V(""nRP"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,498
+attacc-HBM3-PIM,bank,RD,PRE,"V(""nRTPL"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,499
+attacc-HBM3-PIM,bank,WR,PRE,"V(""nCWL"") + V(""nBL"") + V(""nWR"")",1,sources/attacc/pim_ramulator_src/HBM3-PIM.cpp,500
