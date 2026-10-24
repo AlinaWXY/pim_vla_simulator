@@ -1,0 +1,107 @@
+Pi0.5 MHA8：GPU Q + BG 分片 K + 原 V layout，原生 Ramulator 结果
+最终实验：run-1849371；Slurm COMPLETED，exit 0:0。
+
+计量范围
+每个数值对应一层、一个 denoising step、20 个 action tokens。
+8 heads × 256；prefix968 + suffix20；物理补齐992 KV tokens/head。
+16 channels、2 ranks/channel、4 BG/rank、4 banks/BG。
+LPDDR5X-8533，x16/channel，tCK=0.938ns，refresh 开启。
+按系统并行运行的 elapsed time 计量，不将16个channel时间相加。
+
+原生建模
+WR_BG：X定向送到一个BG，在该BG的4个bank内广播。
+WR_Q：Q按bank index在同channel的8个BG/rank位置multicast。
+两者计外部流量、共享数据通路、输入到达及bank-local双buffer所有权。
+MACK：各BG用自己的1/2个token输入，channel全bank扫描同一权重地址。
+K的PE service=2CK，但阵列同bank列访问间隔仍受nCCDL=4CK约束。
+MACQK：20-token service=20CK；BG四bank规约假定能跟上MAC吞吐。
+BG规约使用AttAcc命令级抽象，没有独立网络/加法树延迟参数。
+LOCAL_WR：每bank独立32B/4CK写端口，不走外部CA/DQ；ACT/PRE共享CA，
+真实检查目标row、列间隔、写恢复和后续读取依赖。
+最终QK输出按16-token tile计算后导出；保守串行，不声称计算/导出已重叠。
+输出FIFO生命周期由trace屏障和独立审计保证，尚无独立FIFO微架构模型。
+
+Latency breakdown（us；排他时间，相加得到总时间；显示值有四舍五入）
+算子          输入独占  阵列/MAC独占  重叠段  写回/本地收集  输出GPU边界  其它/边界  总时间
+K projection   0.0188    14.1845       1.1819    0.1698          0.0000       3.9114    19.466314
+V projection   0.1219     2.5232       2.2793    0.8911          0.6031       0.3049     6.723584
+QK^T           0.1951     4.2473       0.4052    0.0000          2.3750       0.8517     8.074304
+PV             0.1219     2.4482       2.2043    0.0000          0.6031       0.3049     5.682404
+Gate+Up        0.2880    17.0969       2.1133    1.2006          0.0000       1.5918    22.290632
+Down           0.3471     8.7506       0.8545    0.0000          9.7496       0.4746    20.176380
+
+输入列仅计没有与其它资源重叠的时间，不能当作总输入端口工作量。
+重叠段只计一次，不是再次相加的额外通信。
+阵列/MAC包含阵列操作数读取服务及必要列访问保护窗口，不是纯ALU时间。
+K的阵列/MAC独占可细分为MAC7.093156us、列间隔保护7.0913093125us。
+其它包括ACT/PRE/refresh、未归属调度和边界间隙，不能称GPU计算时间。
+V的0.8911us=prefix尾部读0.347060us + suffix写0.544040us。
+Gate+Up的1.200640us是20KiB/rank本地收集带宽预算，保留原建模假设。
+Gate/Up共享一次输入及融合调度；不能把联合时间任意拆成独立实测值。
+资源服务总量、排他时间和重叠抵扣另存JSON/CSV，不能重复相加。
+
+总数
+单层单步已测PIM阶段之和：82.413618us。
+乘18层×10步：14.83445124ms。
+这是分别测量的PIM阶段合计，不是完整AE端到端latency。
+K->QK原生依赖链27.582828us；两项独立测量之和27.540618us。
+差0.042210us来自延续的内存状态/调度；链已检查写回完成后才能读取。
+不能把独立算子的和声称为已经完成完整AE集成仿真。
+
+写回与双buffer对照
+K每层每步本地写80KiB：384banks各128B，128banks各256B。
+每bank suffix仅占一个row；2560个32B完整burst，无prefix读改写。
+最忙bank纯payload预算30.016ns，原生整个写回阶段169.778ns。
+两者不是相加关系；后者已经包括数据搬运、行准备和写恢复。
+把本地端口改为32B/8CK：写回阶段199.794ns，K总时间19.496330us。
+QK双buffer8.074304us，单buffer8.895054us，减少0.820750us。
+K双/单buffer均19.466314us；输入加速被阵列/行准备限制隐藏。
+
+通信（16channels合计）
+K：GPU X输入320KiB，bank本地写80KiB；无K外部导出/回写往返。
+V：GPU X输入640KiB，FP32结果导出160KiB，普通DRAM读64KiB、写128KiB。
+QK：GPU Q输入160KiB，完整BG score导出620KiB FP32；无跨channel数值归约。
+PV：GPU P输入620KiB BF16，完整feature结果导出160KiB FP32。
+Gate+Up：GPU输入640KiB，本地收集640KiB，非线性在rank内但尚未定时。
+Down：本地输入640KiB，输出32份rank partial共2.5MiB到GPU边界。
+Down的9.749572us导出已包含在20.176380us内，不能再加一次。
+这里计LPDDR侧服务，不推断未知GPU调度/固定DMA到达时间。
+
+尚未测量，均非零时间声明
+GPU Q projection/RoPE、GPU O projection、softmax、GPU最终归并；
+K本地RoPE/转换/打包及position metadata交付；V的GPU转换/打包；
+rank内GELU/逐元素乘法/转换/Z生成；norm/residual；action input/output。
+Time MLP与37个AdaRMS conditioning projections维持预计算，不是在线层内benchmark。
+完整算子形状与执行位置列于linear-operator-inventory.json。
+
+驻留地址
+每bank：WK rows0..63；WV64..67；Kcache68..71；Vcache72..75；
+Gate/Up76..91；Down92..99。共200KiB/bank、100MiB/layer，无区域重叠。
+WK复制16份/head，所以全系统WK为64MiB/layer；其阵列流量已经进入模拟。
+这些容量不包含GPU Q/O、action I/O和conditioning权重。
+
+验证
+12个fresh native cases（8 attention含对照/链，4 FFN含旧地址回归/新地址）。
+6项原生专项、190项原有backend测试、8项workload测试、6项分析测试通过。
+8个attention case的独立event审计通过；5种故障注入均被检出。
+FFN旧trace哈希/latency/非零command counts一致；地址平移后latency一致。
+6个主算子×16channels，共96个整数tick分解严格闭合。
+最终run期间backend和原backend源文件哈希保持不变。
+原生时序不计算张量数值；布局整数算术证明与时序验证分别进行。
+
+文件
+results/run-1849371/all-linear-breakdown/all-linear-breakdown.csv
+results/run-1849371/all-linear-breakdown/breakdown.json
+results/run-1849371/all-linear-breakdown/linear-latency-breakdown.png
+results/run-1849371/all-linear-breakdown/linear-operator-inventory.json
+results/run-1849371/native-diagnostics.json
+results/run-1849371/validation-summary.json
+results/run-1849371/artifact-sha256.json
+backend-extension/README.txt、native-extension.patch、native-tests/、legacy-regression.log
+run-1849371.tar.gz SHA256:
+ff3b188f152e8f273903798e45c409e5ade1be0ec8e32d1473211088eb7160e5
+
+复现
+远端/fact_data/xinyaowang/pim_vla_simulator/pi05_bgk_gpuq_20261023内运行：
+sbatch source/run.sbatch
+run中source为执行时冻结版本；postprocessing-code是执行后冻结的分析/审计版本。

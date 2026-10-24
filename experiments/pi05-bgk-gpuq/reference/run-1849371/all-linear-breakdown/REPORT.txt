@@ -1,0 +1,15 @@
+GPU-Q / BG-K native timing results
+
+case: native PIM service us per layer per denoise step
+k: 19.466314
+v: 6.723584
+qk: 8.074304
+pv: 5.682404
+gate_up: 22.290632
+down_tiled: 20.176380
+
+Measured PIM subset: 82.413618 us/layer/step; 14.834451240 ms x18x10.
+This is not complete AE latency. GPU Q/O, softmax, reduction, nonlinear, normalization and action I/O are unmeasured.
+Gate and Up share one measured fused schedule; do not divide its latency into two independent measurements.
+DRAM array operand reads are included in MAC service; no separate ALU-only latency is claimed.
+Exclusive CSV columns sum to wall time; resource work and inclusive unions must not be added again.

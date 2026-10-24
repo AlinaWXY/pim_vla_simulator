@@ -1,0 +1,337 @@
+{
+  "K_native_writeback_phase_us": 0.16977799999999998,
+  "K_write_payload_budget_ns": 30.016,
+  "channels": [
+    {
+      "channel": 0,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 1,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 2,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 3,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 4,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 5,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 6,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 7,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 8,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 9,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 10,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 11,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 12,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 13,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 14,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    },
+    {
+      "channel": 15,
+      "K_MACs": 4096,
+      "same_row_MAC_interval_CK_histogram": {
+        "4": 4029,
+        "299": 3
+      },
+      "writeback_CA_commands": {
+        "PREpb": 32,
+        "ACT1": 32,
+        "ACT2": 32
+      },
+      "active_write_banks": 32,
+      "bank_write_bytes_histogram": {
+        "128": 24,
+        "256": 8
+      },
+      "maximum_bank_data_service_ns": 30.016,
+      "local_written_bytes": 5120
+    }
+  ],
+  "controls": {
+    "QK_double_us": 8.074304,
+    "QK_single_us": 8.895054,
+    "K_double_us": 19.466313999999997,
+    "K_single_us": 19.466313999999997,
+    "K_local_port_4CK_us": 19.466313999999997,
+    "K_local_port_8CK_us": 19.49633,
+    "K_QK_chain_us": 27.582828000000003,
+    "K_QK_separate_sum_us": 27.540617999999995
+  },
+  "explanation": "Column cadence is a real native array guard, distinct from the 2CK K PE service. Local write phase includes native row setup and recovery; payload lower bound is not added to it."
+}

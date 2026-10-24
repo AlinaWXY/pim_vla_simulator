@@ -1,0 +1,39 @@
+{
+  "attention_bytes_per_bank": 155648,
+  "regions": [
+    {
+      "name": "W_K",
+      "start": 0,
+      "end_exclusive": 131072
+    },
+    {
+      "name": "W_V",
+      "start": 131072,
+      "end_exclusive": 139264
+    },
+    {
+      "name": "K cache",
+      "start": 139264,
+      "end_exclusive": 147456
+    },
+    {
+      "name": "V cache",
+      "start": 147456,
+      "end_exclusive": 155648
+    },
+    {
+      "name": "W_Gate + W_Up",
+      "start": 155648,
+      "end_exclusive": 188416
+    },
+    {
+      "name": "W_Down",
+      "start": 188416,
+      "end_exclusive": 204800
+    }
+  ],
+  "total_bytes_per_bank": 204800,
+  "total_bytes_per_layer": 104857600,
+  "no_overlap": true,
+  "excludes": "GPU Q/O weights, action I/O and conditioning"
+}

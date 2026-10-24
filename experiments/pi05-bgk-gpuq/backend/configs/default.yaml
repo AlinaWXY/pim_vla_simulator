@@ -1,0 +1,6 @@
+model: lpddr5-6400
+channels: 1
+ranks: 1
+density_gbit: 8
+refresh: true
+wck_mode: always_on

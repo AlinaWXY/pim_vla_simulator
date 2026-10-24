@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.so
+*.o
+*.a
+*.egg-info/
+.pytest_cache/
+.venv/
+results/
+backend/ramulator2/build*/
+backend/native-tests/
+backend-source.tar.gz
+*.log

@@ -1,0 +1,63 @@
+{
+  "attention_cases": {
+    "chain_k_qk": {
+      "status": "passed",
+      "native_event_count": 107264,
+      "local_store_row_checks": 2560
+    },
+    "k": {
+      "status": "passed",
+      "native_event_count": 78336,
+      "local_store_row_checks": 2560
+    },
+    "k_local8": {
+      "status": "passed",
+      "native_event_count": 78336,
+      "local_store_row_checks": 2560
+    },
+    "k_serial": {
+      "status": "passed",
+      "native_event_count": 78336,
+      "local_store_row_checks": 2560
+    },
+    "pv": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "qk": {
+      "status": "passed",
+      "native_event_count": 28928,
+      "local_store_row_checks": 0
+    },
+    "qk_serial": {
+      "status": "passed",
+      "native_event_count": 28928,
+      "local_store_row_checks": 0
+    },
+    "v": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    }
+  },
+  "attention_independent_audits_passed": 8,
+  "mutation_detection_checks": 5,
+  "ffn_legacy_regressions": {
+    "gate_up": {
+      "same_trace_hash": true,
+      "same_latency": true,
+      "same_issued_commands": true
+    },
+    "down_tiled": {
+      "same_trace_hash": true,
+      "same_latency": true,
+      "same_issued_commands": true
+    }
+  },
+  "exclusive_timeline_partition_checks": 96,
+  "native_backend_unchanged_during_final_run": true,
+  "original_backend_check_performed": false,
+  "original_backend_unchanged": null,
+  "postprocessing_source_note": "These analysis/audit snapshots were frozen after execution; workload/native provenance was captured by the run driver."
+}

@@ -1,0 +1,258 @@
+"""Ramulator adapter: configuration/trace in, unit-explicit results out."""
+
+import csv
+import json
+import shutil
+import subprocess
+from dataclasses import asdict
+from pathlib import Path
+
+from .config import MODELS, MemoryConfig
+from .trace import inspect_trace
+
+
+def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Path) -> dict:
+    import ramulator
+
+    model_name, preset = MODELS[config.model]
+    device_name = f"{model_name}PIM" if config.pim else model_name
+    if not hasattr(ramulator.dram, device_name):
+        raise ValueError(f"{device_name} is not available in this branch/build")
+    model_class = getattr(ramulator.dram, device_name)
+
+    def make_model():
+        return model_class(
+            org_preset=f"{model_name}_{config.density_gbit}Gb_x16",
+            timing_preset=preset,
+            rank=config.ranks,
+            **({"pim_data_path": config.pim_data_path} if config.pim else {}),
+            **config.timing_overrides,
+        )
+
+    model = make_model()
+    model.to_config()  # Validate before creating output.
+    organization, timings = model.resolve()
+    if timings["nRC"] < timings["nRAS"] + timings["nRP"]:
+        raise ValueError("nRC must cover nRAS+nRP")
+    transaction_bytes = model.internal_prefetch_size * organization["channel_width"] // 8
+    capacity = config.channels * config.ranks * config.density_gbit * 1024**3 // 8
+    source = Path(trace_path).resolve(strict=True)
+    output = Path(output_dir).resolve()
+    output.mkdir(parents=True, exist_ok=False)
+    snapshot = output / "input.trace"
+    shutil.copyfile(source, snapshot)
+    requests = inspect_trace(
+        snapshot, transaction_bytes=transaction_bytes, capacity_bytes=capacity, pim=config.pim
+    )
+    if (requests["pim_wr_gb"] or requests["pim_rd_res"]) and config.wck_mode != "always_on":
+        raise ValueError("PIM buffer transfers require pre-synchronized always_on WCK")
+    if config.pim_input_broadcast and requests["pim_mac_hb"]:
+        raise ValueError("pim_input_broadcast supports all-bank traces only")
+    if config.pim_mac_scope == "channel" and requests["pim_mac_hb"]:
+        raise ValueError("pim_mac_scope=channel supports all-bank traces only")
+    if config.pim_data_path == "attacc" and requests["pim_mac_hb"]:
+        raise ValueError("AttAcc data path supports all-bank traces only")
+    controller_class = ramulator.controller.LPDDR5PIM if config.pim else ramulator.controller.LPDDR5
+    controllers = []
+    for channel in range(config.channels):
+        controllers.append(
+            controller_class(
+                dram=make_model(),
+                scheduler=ramulator.scheduler.FRFCFSRowHit(),
+                refresh_manager=(
+                    ramulator.refresh_manager.AllBank()
+                    if config.refresh
+                    else ramulator.refresh_manager.NoRefresh()
+                ),
+                row_policy=ramulator.row_policy.Open(),
+                addr_mapper=ramulator.addr_mapper.RoBaRaCoCh(),
+                wck_sync_mode=config.wck_mode,
+                **({"pim_input_broadcast": config.pim_input_broadcast,
+                    "pim_mac_scope": config.pim_mac_scope,
+                    "pim_data_path": config.pim_data_path,
+                    "pim_local_transfer_cycles": config.pim_local_transfer_cycles,
+                    "local_input_trace_path": str(output / f"local_input.csv.ch{channel}"),
+                    "bgk_events_path": str(output / f"bgk_events.csv.ch{channel}")} if config.pim else {}),
+                controller_plugins=[
+                    ramulator.controller_plugin.CommandCounter(
+                        commands_to_count=model.commands,
+                        path=str(output / f"commands.ch{channel}.csv"),
+                    ),
+                    ramulator.controller_plugin.CmdTraceRecorder(path=str(output / "timeline.csv")),
+                ],
+            )
+        )
+    memory = ramulator.memory_system.GenericDRAM(
+        clock_ratio=config.memory_ratio,
+        controllers=controllers,
+        channel_mapper=ramulator.channel_mapper.CacheLineInterleave(),
+    )
+    frontend = ramulator.frontend.LoadStoreTrace(
+        clock_ratio=config.frontend_ratio,
+        path=str(snapshot),
+        wait_for_completion=True,
+        write_tail_cycles=timings["nCWL"] + timings["nBL_max"] + timings["nWR"],
+        max_frontend_ticks=(config.max_cycles * config.frontend_ratio // config.memory_ratio + 1),
+        events_path=str(output / "barriers.csv"),
+    )
+    sim = ramulator.Simulation(frontend, memory)
+    sim.run()
+    sim.finalize()
+    stats = sim.stats
+    if stats["frontend"]["requests_completed"] != requests["total"]:
+        raise RuntimeError("Simulation did not complete every accepted request")
+    counters = {name: 0 for name in model.commands}
+    for channel in range(config.channels):
+        with (output / f"commands.ch{channel}.csv").open() as stream:
+            for name, count in csv.reader(stream):
+                counters[name] += int(count)
+    per_channel = stats["memory_system"]["controller"]
+    if isinstance(per_channel, dict):
+        per_channel = [per_channel]
+    cycles = max(c["cycles"] for c in per_channel)
+    repo = Path(__file__).resolve().parents[1]
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True, capture_output=True, check=False
+    )
+    dirty = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=repo, text=True, capture_output=True, check=False
+    )
+    result = {
+        "schema_version": 8,
+        "bgk_model": {
+            "enabled": any(requests[x] for x in ("pim_wr_bg", "pim_wr_q", "pim_mac_k", "pim_mac_qk", "pim_rd_bg", "pim_local_wr")),
+            "K_service_CK": timings.get("nCCDK"), "QK_service_CK": timings.get("nCCDQK"),
+            "local_write_CK_per_32B": timings.get("nLOCALWR"),
+            "K_valid_tokens_per_BG": "1 or 2, encoded by emitted BG input bursts; channel MAC service uses maximum 2",
+            "Q_multicast": "same bank-index in every BG/rank; independent bank-local double-buffer ownership",
+            "input_ready": "WRGB issue + nBL_min; consumers wait for every target bank and every queued same-slot fill",
+            "MAC_completion": "new MACK/MACQK complete at issue + nCCDK/nCCDQK, native array cadence applies independently",
+            "BG_reduction": "implicit lockstep four-bank reduction sustains MAC; RD_BG waits for BG compute readiness; final-fragment dependency in trace",
+            "local_write": "independent bank-local 32B ports; native row state and ACT/PRE/recovery; completion includes nLOCALWR+nWR",
+            "local_write_no_CA": True, "local_write_no_external_DQ": True,
+            "RoPE_conversion_packing": None,
+        },
+        "config": asdict(config),
+        "capacity_bytes": capacity,
+        "transaction_bytes": transaction_bytes,
+        "requests": requests,
+        "completed_requests": stats["frontend"]["requests_completed"],
+        "memory_cycles": cycles,
+        "tCK_ns": timings["tCK_ps"] / 1000,
+        "latency_ns": cycles * timings["tCK_ps"] / 1000,
+        "completion_policy": (
+            "read callbacks; write issue callbacks plus CWL+BLmax+WR recovery; "
+            "PIM MAC callbacks at issue; annotated double-buffer SRAM ownership lasts nCCDAB; "
+            + ("PIM transfers retire at issue (AttAcc); " if config.pim_data_path == "attacc"
+               else "PIM buffer-transfer completion callbacks; ")
+            + "half-bank compute overlaps disjoint-bank reads; "
+            "global drain at other normal/PIM mode transitions"
+            "; explicit BARRIER completion fences and WAIT memory-cycle delays"
+        ),
+        "issued_commands": counters,
+        "traffic_bytes": {
+            "requested_read": requests["reads"] * transaction_bytes,
+            "requested_write": requests["writes"] * transaction_bytes,
+            "dram_read": (counters["RD"] + counters["RDA"]) * transaction_bytes,
+            "dram_write": (counters["WR"] + counters["WRA"]) * transaction_bytes,
+            "pim_input_write": counters.get("WRGB", 0) * transaction_bytes,
+            "pim_input_delivered": requests["pim_wr_gb"] * transaction_bytes
+            * (config.ranks if config.pim_input_broadcast else 1),
+            "bgk_input_delivered_to_bank_buffers": (requests["pim_wr_bg"] * organization["bank"]
+                + requests["pim_wr_q"] * config.ranks * organization["bankgroup"]) * transaction_bytes,
+            "pim_result_read": counters.get("RDRES", 0) * transaction_bytes,
+            "pim_local_input_write": requests["pim_local_gb"] * transaction_bytes,
+            "pim_bank_local_write": requests["pim_local_wr"] * transaction_bytes,
+            "bg_dispatched_input": requests["pim_wr_bg"] * transaction_bytes,
+            "bank_index_multicast_input": requests["pim_wr_q"] * transaction_bytes,
+            "bg_complete_result": requests["pim_rd_bg"] * transaction_bytes,
+            "bgk_internal_array_read": (counters.get("MACK",0) + counters.get("MACQK",0))
+                * config.ranks * organization["bankgroup"] * organization["bank"] * transaction_bytes,
+            "pim_internal": (counters.get("MACAB", 0) * 2
+                             * (config.ranks if config.pim_mac_scope == "channel" else 1)
+                             + counters.get("MACHB", 0))
+            * transaction_bytes
+            * organization["bankgroup"]
+            * organization["bank"] // 2,
+        },
+        "local_input_model": {
+            "request": "PIM_LOCAL_GB", "transaction_bytes": 32,
+            "cycles_per_burst": config.pim_local_transfer_cycles,
+            "ports_per_rank": 1, "scope": "selected rank only; independent rank-local ports",
+            "completion": "issue + cycles_per_burst; MAC waits for selected buffer readiness",
+            "external_dq_bytes": 0,
+            "source": "already-ready Z in rank-local SRAM; gather/GELU/product/cast not computed",
+            "assumption": "declared configurable local port, not an LPDDR specification or measured NL unit",
+        },
+        "pim_model": {
+            "enabled": config.pim,
+            "scope": f"MACAB addressed {config.pim_mac_scope}; RDRES per rank; "
+                     "WRGB targets depend on input_broadcast",
+            "banks_per_command": organization["bankgroup"] * organization["bank"]
+                                 * (config.ranks if config.pim_mac_scope == "channel" else 1),
+            "mac_scope": config.pim_mac_scope,
+            "data_path": config.pim_data_path,
+            "transfer_scheduling": (
+                "AttAcc-style shared WRGB/RDRES movement path: BL/CCDS/CCDL; "
+                "independent MAC path; trace/barriers supply result dependencies; "
+                "no CL/CWL completion tail, rank turnaround, or RDRES-to-MAC lock"
+                if config.pim_data_path == "attacc" else
+                "LPDDR external DQ transfers with CL/CWL completion and rank turnaround"
+            ),
+            "mac_timing_basis": "explicit local-array ACT/PRE/refresh/column constraints; "
+                                "no inherited external RD DQ/CAS/rank-turnaround constraints",
+            "channel_mac": {
+                "enabled": config.pim_mac_scope == "channel",
+                "trace": "one rank-0 MACAB with explicit BUFFER; command Rank=-1 targets all ranks",
+                "activation": "ACTAB/PREab prerequisites cover every target bank and rank",
+                "readiness": "actual MAC waits for every target input; ACT/PRE may prepare earlier",
+                "assumptions": "one shared CA command fans out to all ranks with no extra delay; "
+                               "local PEs/SRAM/accumulators operate concurrently",
+            },
+            "half_bank": {
+                "request": "PIM_MAC_HB",
+                "command": "MACHB",
+                "scope": "addressed half of bank groups in the addressed channel/rank",
+                "banks_per_command": organization["bankgroup"] * organization["bank"] // 2,
+                "gpu_read_overlap": "ordinary LD to the complementary half; unchanged read timings",
+                "transfer_latency_scale": 1.0,
+            },
+            "issue_interval_ck": timings.get("nCCDAB"),
+            "issue_interval_basis": "nCCDL (same-BG column interval), unless explicitly overridden",
+            "mac_completion": "retire at issue, as in AttAcc; no independent completion parameter",
+            "double_buffer": "optional BUFFER=0/1 on WRGB/MACAB; per-rank input-slot ownership; "
+                             "independent writes may bypass blocked MACs; "
+                             + ("result dependencies supplied by trace/barriers" if config.pim_data_path == "attacc"
+                                else "RDRES waits for final SRAM use"),
+            "pe_clock_model": "external; PE throughput assumed sufficient for the configured MAC interval",
+            "numerical_compute": False,
+            "input_buffer_write_latency_ck": timings.get("nPIMWrLatency"),
+            "result_buffer_read_latency_ck": timings.get("nPIMRdLatency"),
+            "buffer_transfer_basis": "32B DQ burst; SRAM, no array ACT/PRE/write recovery",
+            "input_broadcast": {
+                "enabled": config.pim_input_broadcast,
+                "scope": "all ranks in addressed channel" if config.pim_input_broadcast
+                         else "addressed rank in addressed channel",
+                "ranks_per_write": config.ranks if config.pim_input_broadcast else 1,
+                "trace_rule": "WRGB uses rank-0 address; WRGB and MACAB require BUFFER=0/1"
+                              if config.pim_input_broadcast else "original per-rank WRGB stream",
+                "extra_fanout_latency_ck": 0,
+                "completion": ("issue updates every target buffer (AttAcc)"
+                               if config.pim_data_path == "attacc"
+                               else "one CWL+BLmin completion updates every target buffer"),
+                "ownership": "every target slot must be free before issuing a broadcast",
+                "dq_accounting": "one 32B burst per WRGB; delivered bytes counted separately",
+                "limitations": "assumed internal fanout and sufficient SRAM ports; no broadcast "
+                               "network/energy model; no cross-channel or result broadcast",
+            },
+        },
+        "energy_pj": None,
+        "resolved_timings_ck": timings,
+        "provenance": {
+            "commit": revision.stdout.strip() if revision.returncode == 0 else None,
+            "dirty": bool(dirty.stdout) if dirty.returncode == 0 else None,
+        },
+        "raw_stats": stats,
+    }
+    (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
+    return result

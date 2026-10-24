@@ -1,0 +1,55 @@
+GPU-Q / BG-local-K attention trace contract
+
+Topology: 16 channels, 2 ranks/channel, 4 BG/rank, 4 banks/BG.
+Shape: 8 heads, head dimension256, hidden1024, horizon20, prefix968.
+attention_layout.py is a frozen copy of the accepted design's address rules.
+The footprint is152KiB/bank. Do not retain old overlapping FFN base addresses.
+
+Native commands
+PIM_WR_BG address buffer:32B external X burst, one addressed BG, fanout4banks.
+PIM_WR_Q address buffer:32B external Q burst, bank-index multicast across8BG/channel.
+PIM_MAC_K address buffer:channel allbank weight MAC; each BG owns1/2suffix queries.
+PIM_MAC_QK address buffer:channel allbank cache MAC;20queries, four local feature fragments.
+PIM_RD_BG address:32B complete BG score payload after four-bank reduction.
+PIM_LOCAL_WR address:32B bank-local write, no external GPU round trip.
+New MAC commands retire at completion. BARRIER therefore drains their service.
+Legacy MACAB still receives the declared20CK drain after its issue-completion barrier.
+Legacy rank exports retain an explicit4CK transfer drain from the prior workload policy.
+New BG exports retire after the native2CK burst and need no additional4CK drain.
+WR_BG/WR_Q share native WRGB, RD_BG shares native RDRES; bgk_events keeps the
+request identity. LOCAL_WR is logged only in bgk_events, not as an external CA command.
+
+Input/output correctness
+K projection input is ten distinct X vectors/channel, selected by token parity.
+BG selection further routes each vector only to its owning rank/BG.
+The logical K double-buffer stream is at most128B/BG; materializing it at four
+bank-local consumers uses128B/bank or512B/BG. This can reuse the1280B/bank Q
+double-buffer allocation. The128B logical stream is not a whole-BG hardware capacity claim.
+The four BG banks compute disjoint64-feature outputs and hold full1024-input reductions.
+K projection does not require a four-bank numerical reduction.
+WK is duplicated16times/head. Every bank scans128KiB exactly once.
+Each bank's four/eight full32B suffix stores touch one row, without prefix RMW.
+
+QK uses four20x16 query input fragments perbank. Bank-index Q stream identity
+matches the split-half-RoPE feature permutation. Q transfers exactly once/channel.
+The first three feature fragments scan all62tokens/BG and retain4960B partials/bank.
+The last fragment computes16token tiles, then exports1280B/BG (last tile1120B).
+This is a conservative serialized final-tile MAC/export schedule. It does not claim
+to overlap output transfers with the next tile, though two output buffers are reserved.
+Scores are complete after BG reduction; no cross-rank/channel numerical reduction.
+QK padding is992physical tokens/head, of which988are valid. GPU masks fourpadding scores.
+
+V/PV preserve the prior bank/channel ownership and bank-local order; only regionbase changes.
+V receives all20Xvectors/channel. The baseline export/RMW/store path remains:
+160KiB FP32 output,64KiB prefix-tail read,128KiB BF16 burst stores.
+PV receives620KiB padded BF16 P, exports160KiB complete FP32 output features.
+GPU O, GPU softmax, GPU Q, K localRoPE/cast/packing, GPU Vconversion/repacking are unmeasured.
+WRGB/RDRES count the LPDDR-side transfers, not unspecified GPU/DMA arrival overhead.
+
+chain_k_qk is a native service dependency test. A completion barrier separates
+K-localwriteback and QK cache reads. It is not a numerical end-to-end execution:
+local KRoPE/cast/packing remains a required unmeasured stage, not measured zero.
+
+Generate: attention_workload.generate(path,op,mode='complete',schedule='double')
+Operators:k,v,qk,pv,chain_k_qk. schedule='serial' is a singlebuffer control.
+Run correctness contracts: python test_attention_workload.py

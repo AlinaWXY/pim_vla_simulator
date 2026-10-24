@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "reference_run": "run-1849371",
+  "numeric_breakdown_fields_checked": 9909,
+  "numeric_csv_fields_checked": 108,
+  "primary_latency_us": {
+    "k": 19.466313999999997,
+    "v": 6.723584,
+    "qk": 8.074304,
+    "pv": 5.682404,
+    "gate_up": 22.290632000000002,
+    "down_tiled": 20.17638
+  },
+  "comparison": {
+    "integer_fields": "exact",
+    "relative_tolerance": 1e-12,
+    "absolute_tolerance": 1e-12
+  },
+  "reference_sha256": {
+    "breakdown.json": "92b9a8b3982266d3be038ac6b086d557a1c231fc18658ea83f1df05ea81122a5",
+    "all-linear-breakdown.csv": "19ec853ad3147290527b3a83ba1039e31ed8b658161c1db9ba276fc385022193"
+  },
+  "measured_pim_subset_us_per_layer_step": 82.41361799999999,
+  "measured_pim_subset_ms_18layers_10steps": 14.834451239999996,
+  "complete_ae_latency_ms": null,
+  "runner_sha256": "867ba4fad37b838d5283dc6e89e79690ca1df671febd97ceb9163f36b8972a6d"
+}

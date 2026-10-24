@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lpddr-pim-simulator"
+version = "0.1.0"
+description = "LPDDR experiment interface backed by Ramulator"
+requires-python = ">=3.11"
+dependencies = ["pyyaml>=6"]
+
+[tool.setuptools.packages.find]
+include = ["simulator*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+exclude = ["ramulator2"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
