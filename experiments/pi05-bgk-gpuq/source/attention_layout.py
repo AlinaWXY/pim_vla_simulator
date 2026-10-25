@@ -1,8 +1,8 @@
-"""Candidate GPU-Q / BG-sharded-K / feature-sharded-V layout.
+"""Fused feature-sharded QKV; GPU RoPE roundtrip; DRAM Q relay for QK.
 
-This is a structural specification, not a native simulator implementation or
-latency result. Existing experiments and their frozen layouts are unchanged.
-Locations are (global channel, rank, BG, bank-in-BG, bank-local byte offset).
+Locations are (channel, rank, BG, bank-in-BG, bank-local byte offset).
+The same output-feature owner produces Q, K and V. GPU repacks Q/K into
+attention layouts, preserving the preceding BF16 projection rounding.
 """
 
 import json
@@ -31,8 +31,8 @@ def round_up(value, alignment):
 def regions():
     result, base = {}, 0
     for name, used in (
-        ("w_k", HIDDEN * FEATURES_PER_K_BANK * ELEMENT_BYTES),
-        ("w_v", HIDDEN * 4 * ELEMENT_BYTES),
+        ("w_qkv", HIDDEN * 3 * 4 * ELEMENT_BYTES),
+        ("q_cache", QUERIES * FEATURES_PER_K_BANK * ELEMENT_BYTES),
         ("k_cache", TOKEN_SLOTS * FEATURES_PER_K_BANK * ELEMENT_BYTES),
         ("v_cache", TOKEN_SLOTS * 4 * LANES * ELEMENT_BYTES),
     ):
@@ -107,28 +107,40 @@ def key_location(head, token, feature, mode="rope_pair"):
     return (*token_group(head, token), bank, offset)
 
 
-def k_weight_location(head, channel_in_head, rank, bg, reduction, feature,
-                      mode="rope_pair"):
-    """One full W_K head per BG, split over its four banks.
-
-    Each bank orders weights as [input fragment, local output feature, lane].
-    An X fragment stays buffered while all 64 local output features are scanned.
-    """
-    for value, limit, name in ((head, HEADS, "head"), (channel_in_head, 2, "channel"),
-                               (rank, RANKS, "rank"), (bg, BGS, "BG"),
-                               (reduction, HIDDEN, "reduction")):
-        check(value, limit, name)
-    bank, local_feature = k_feature(feature, mode)
+def projection_weight_location(projection, head, reduction, feature):
+    """All three matrices: [input fragment, Q/K/V, feature slot, 16 lanes]."""
+    if projection not in ('q', 'k', 'v'):
+        raise ValueError(projection)
+    check(reduction, HIDDEN, "reduction")
+    owner, slot = v_feature_owner(head, feature)
     fragment, lane = divmod(reduction, LANES)
-    offset = REGIONS["w_k"]["base"] + BURST_BYTES * (
-        fragment * FEATURES_PER_K_BANK + local_feature) + ELEMENT_BYTES * lane
-    return 2 * head + channel_in_head, rank, bg, bank, offset
+    offset = REGIONS["w_qkv"]["base"] + BURST_BYTES * (
+        fragment * 12 + ('q', 'k', 'v').index(projection) * 4 + slot) + ELEMENT_BYTES * lane
+    return (*owner, offset)
 
 
-def k_projection_location(head, query, feature, mode="rope_pair"):
-    """The projection accumulator's owner is already the destination K bank."""
+def projection_owner(head, query, feature):
+    """Each producer bank computes all 20 tokens for its four output features."""
     check(query, QUERIES, "query")
-    return key_location(head, PREFIX + query, feature, mode)
+    owner, slot = v_feature_owner(head, feature)
+    return owner, query * 4 + slot
+
+
+def query_location(head, channel_in_head, query, feature, mode="rope_pair"):
+    """A complete Q copy/channel, source rank0/BG0, feature shard per bank.
+
+    Bank order [local feature fragment, query, lane] makes each input fragment
+    a contiguous sequence of twenty 32B DRAM bursts. Other BG/rank source
+    locations are reserved but unused; a native channel relay broadcasts to
+    the eight consumers of the same bank index.
+    """
+    check(head, HEADS, "head")
+    check(channel_in_head, 2, "channel_in_head")
+    check(query, QUERIES, "query")
+    bank, local_feature = k_feature(feature, mode)
+    fragment, lane = divmod(local_feature, LANES)
+    offset = REGIONS['q_cache']['base'] + BURST_BYTES * (fragment * QUERIES + query) + ELEMENT_BYTES * lane
+    return 2 * head + channel_in_head, 0, 0, bank, offset
 
 
 def k_queries_for_group(channel_in_head, rank, bg):
@@ -159,18 +171,14 @@ def value_location(head, token, feature):
 
 
 def v_weight_location(head, reduction, feature):
-    check(reduction, HIDDEN, "reduction")
-    owner, slot = v_feature_owner(head, feature)
-    fragment, lane = divmod(reduction, LANES)
-    offset = REGIONS["w_v"]["base"] + BURST_BYTES * (fragment * 4 + slot) + ELEMENT_BYTES * lane
-    return (*owner, offset)
+    return projection_weight_location('v', head, reduction, feature)
 
 
 def q_input_features(bank, fragment, mode="rope_pair"):
-    """GPU supplies these 16 post-RoPE Q features for all 20 queries.
+    """Feature identities for one DRAM Q fragment and all 20 queries.
 
-    Same-bank-index consumers across BGs may share the input stream only if an
-    actual within-rank broadcast path exists; no such latency is assumed zero.
+    The source DRAM read and shared relay are explicitly timed. The multicast
+    network itself is assumed to sustain the relay's command throughput.
     """
     check(fragment, FEATURES_PER_K_BANK // LANES, "fragment")
     return [k_feature_inverse(bank, fragment * LANES + lane, mode)
@@ -178,76 +186,61 @@ def q_input_features(bank, fragment, mode="rope_pair"):
 
 
 def manifest():
-    k_x_channel = QUERIES // 2 * HIDDEN * ELEMENT_BYTES
-    v_x_channel = QUERIES * HIDDEN * ELEMENT_BYTES
     return dict(
-        status="structural/numerical design audit only; no new native latency",
+        status="structural layout for native xinyao_1025 workload",
         shape=dict(heads=HEADS, head_dim=HEAD_DIM, queries=QUERIES, prefix=PREFIX,
                    sequence=SEQUENCE, hidden=HIDDEN),
         topology=dict(channels=CHANNELS, ranks_per_channel=RANKS,
                       BGs_per_rank=BGS, banks_per_BG=BANKS_PER_BG, total_banks=TOTAL_BANKS),
-        k_feature_mode="rope_pair", supported_feature_modes=list(MODES),
-        rope_pair_convention="split-half pairs (d,d+128), checked against Physical-Intelligence/openpi gemma._apply_rope",
-        model_reference="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/gemma.py",
-        numeric_contract="Preserve projection BF16 output rounding before FP32 RoPE and return to BF16; GPU Q also applies 1/sqrt(256). Exact floating-point kernel parity not tested.",
-        positions_contract="GPU supplies model RoPE positions; physical cache token index is not assumed equal to RoPE position when prefix padding is present.",
         regions=REGIONS,
-        layer_reserved_bytes=TOTAL_BANKS * sum(r["reserved_bytes_per_bank"] for r in REGIONS.values()),
-        k_weight_copies_per_head=16,
-        k_weight_system_bytes=TOTAL_BANKS * REGIONS["w_k"]["used_bytes_per_bank"],
-        v_weight_system_bytes=TOTAL_BANKS * REGIONS["w_v"]["used_bytes_per_bank"],
-        cache_logical_bytes_each=HEADS * SEQUENCE * HEAD_DIM * ELEMENT_BYTES,
-        cache_padded_bytes_each=HEADS * PADDED_TOKENS * HEAD_DIM * ELEMENT_BYTES,
-        cache_reserved_bytes_each=TOTAL_BANKS * REGIONS["k_cache"]["reserved_bytes_per_bank"],
+        attention_reserved_bytes_per_bank=sum(r['reserved_bytes_per_bank'] for r in REGIONS.values()),
+        layer_reserved_bytes=TOTAL_BANKS * sum(r['reserved_bytes_per_bank'] for r in REGIONS.values()),
+        projection_feature_formula="d=64*slot+32*channel_in_head+16*rank+4*BG+bank",
+        projection_weight_order="[input fragment64][Q/K/V3][feature slot4][lane16]",
+        projection_weight_copies=1,
+        projection_weight_bytes_each=HEADS * HIDDEN * HEAD_DIM * ELEMENT_BYTES,
+        qkv_weight_system_bytes=TOTAL_BANKS * REGIONS['w_qkv']['used_bytes_per_bank'],
         k_token_group_formula="channel=2h+t%2; rank=(t//2)%2; BG=(t//4)%4; slot=t//16",
         k_feature_formula="bank=(d%128)//32; local=(d//128)*32+d%32",
-        v_feature_formula="d=64*slot+32*channel_in_head+16*rank+4*BG+bank",
-        q_residency="GPU Q projection, RoPE and 1/16 scaling; stream to selected bank input buffers, no Q DRAM region",
-        k_projection_input="X from GPU; each BG selects only its 1 or 2 assigned suffix tokens",
-        v_projection_input="X from GPU in separate pass; all banks process all 20 tokens",
-        effective_GPU_input_bytes=dict(
-            k_projection=CHANNELS * k_x_channel,
-            v_projection=CHANNELS * v_x_channel,
-            q_attention=2 * HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES),
-        input_bytes_assumption="pack only selected K queries/channel; Q once/channel then internal fanout; exclude headers and padding",
-        buffers=dict(
-            baseline="independent double buffer in each physical bank; rank-shared bank-index streams are an optional separate implementation",
-            q_double_buffer_per_rank_with_shared_bank_index_streams=2 * 4 * QUERIES * LANES * ELEMENT_BYTES,
-            q_double_buffer_per_physical_bank=2 * QUERIES * LANES * ELEMENT_BYTES,
-            q_double_buffer_per_rank_if_duplicated_at_all_banks=16 * 2 * QUERIES * LANES * ELEMENT_BYTES,
-            k_projection_double_buffer_per_BG_max=2 * 2 * LANES * ELEMENT_BYTES,
-            k_projection_double_buffer_per_channel_if_all_10_queries_staged=2 * 10 * LANES * ELEMENT_BYTES,
-            v_projection_double_buffer_per_rank=2 * QUERIES * LANES * ELEMENT_BYTES,
-            BG_score_accumulator_bytes_per_token_tile=QUERIES * 4,
-            BG_score_partial_bytes_four_banks_per_token_tile=4 * QUERIES * 4),
-        qk_schedule=dict(
-            loop_order="local feature fragment (4), then all 62 K token slots; all 20 queries per MAC batch",
-            q_transfer_passes=1,
-            physical_token_slots_per_BG=TOKEN_SLOTS,
-            bank_partial_score_used_bytes=QUERIES * TOKEN_SLOTS * 4,
-            bank_partial_score_reserved_bytes=QUERIES * round_up(TOKEN_SLOTS, 16) * 4,
-            BG_reduction_vector_bytes=QUERIES * 4,
-            BG_export_tile_tokens=16,
-            BG_export_double_buffer_bytes=2 * QUERIES * 16 * 4,
-            physical_score_export_bytes=HEADS * QUERIES * PADDED_TOKENS * 4,
-            caveat="Bank partial state persists across all four Q fragments. Reduction/output can drain token tiles only after their final feature fragment. Overlap, ports, FIFO backpressure and local timings remain unmodeled."),
-        score_ownership="complete score belongs to one BG after four-bank reduction; no cross-rank/channel numerical reduction",
-        PV_ownership="V unchanged; each output feature completes token reduction in its bank",
+        k_feature_mode="rope_pair", supported_feature_modes=list(MODES),
+        q_source_formula="channel=2h+c; rank=0; BG=0; bank=K-feature-bank; [local fragment4][query20][lane16]",
+        q_logical_bytes=HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES,
+        q_dram_bytes=2 * HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES,
+        q_dram_copies_per_head=2,
+        q_residency="Post-RoPE BF16 Q stored once per head channel; native DRAM read then channel WRGB relay; no repeated GPU input during QK",
+        q_projection="PIM, same feature owners as K and V",
+        qkv_projection_input="One GPU X fragment per channel; scan Q then K then V before loading the next X fragment",
+        effective_GPU_input_bytes=dict(qkv_projection=CHANNELS * QUERIES * HIDDEN * ELEMENT_BYTES,
+            q_dram_write=2 * HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES,
+            k_suffix_write=HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES),
+        projection_export_bytes_each=HEADS * QUERIES * HEAD_DIM * 4,
+        cache_logical_bytes_each=HEADS * SEQUENCE * HEAD_DIM * ELEMENT_BYTES,
+        cache_padded_bytes_each=HEADS * PADDED_TOKENS * HEAD_DIM * ELEMENT_BYTES,
+        cache_reserved_bytes_each=TOTAL_BANKS * REGIONS['k_cache']['reserved_bytes_per_bank'],
+        buffers=dict(projection_input_double_per_rank=1280,
+            q_double_buffer_per_physical_bank=1280,
+            qkv_projection_accumulator_per_bank=3 * QUERIES * 4 * 4,
+            qk_partial_per_bank=QUERIES * TOKEN_SLOTS * 4,
+            qk_partial_reserved_per_bank=5120,
+            qk_export_double_per_BG=2560,
+            q_dram_controller_relay_per_channel=32),
+        qk_schedule=dict(loop_order="four local feature fragments, then 62 K token slots; 20 query batch",
+            q_dram_read_passes=1, physical_token_slots_per_BG=TOKEN_SLOTS,
+            physical_score_export_bytes=HEADS * QUERIES * PADDED_TOKENS * 4),
+        score_ownership="Four bank partials reduce inside each BG; no cross-rank/channel numerical reduction",
+        rope_pair_convention="split-half pairs (d,d+128); feature permutation retained for K and Q",
+        numeric_contract="Projection output BF16 rounding precedes GPU FP32 RoPE, then BF16 Q/K storage; Q scales by1/sqrt(256). Exact floating-point parity not measured.",
+        positions_contract="GPU receives model RoPE positions; physical cache token index is not assumed equal to model position",
         k_suffix_write_bytes=HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES,
         k_suffix_partial_bursts=False,
-        k_writeback="Local path required; payload timing uses independent-bank bandwidth estimate in timing-policy.json; row timing and conversion remain separate, no new native run",
-        command_timing_policy="timing-policy.json: AttAcc-level multicast/reduction assumptions plus analytical K local writeback",
-        v_writeback="Keep prior GPU-boundary export and RMW/store path for baseline; unchanged ownership does not imply local packing is implemented",
+        k_writeback="GPU-origin ordinary ST to BG-token K cache, no local producer-bank write assumption",
+        v_writeback="Retain FP32 GPU-boundary export, prefix-tail read and BF16 RMW/store baseline",
         v_suffix=dict(rmw_read_bytes=HEADS * HEAD_DIM * BURST_BYTES,
-                      write_bytes=2 * HEADS * HEAD_DIM * BURST_BYTES,
-                      new_value_bytes=HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES,
-                      preserved_prefix_bytes=HEADS * 8 * HEAD_DIM * ELEMENT_BYTES,
-                      zero_padding_bytes=HEADS * 4 * HEAD_DIM * ELEMENT_BYTES),
-        native_missing=["bank-specific Q input streams", "BG-specific K projection X selection",
-                        "four-bank score reduction network and backpressure",
-                        "bank-local RoPE/cast/packing/writeback",
-                        "GPU Q projection and real GPU/PIM input arrival timeline"],
-        caveat="Weights are statically duplicated; BGs process different tokens and cannot use the prior broadcast-only MACAB semantics unchanged.",
+            write_bytes=2 * HEADS * HEAD_DIM * BURST_BYTES,
+            new_value_bytes=HEADS * QUERIES * HEAD_DIM * ELEMENT_BYTES,
+            preserved_prefix_bytes=HEADS * 8 * HEAD_DIM * ELEMENT_BYTES,
+            zero_padding_bytes=HEADS * 4 * HEAD_DIM * ELEMENT_BYTES),
+        unmeasured=["GPU Q/K RoPE/cast/pack arithmetic", "GPU softmax/O projection", "GPU V cast/repack", "GPU DMA/arrival overhead beyond modeled controller transfers"],
     )
 
 

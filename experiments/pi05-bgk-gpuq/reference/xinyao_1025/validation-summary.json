@@ -1,0 +1,78 @@
+{
+  "attention_cases": {
+    "chain_qkv_qk": {
+      "status": "passed",
+      "native_event_count": 34048,
+      "local_store_row_checks": 0
+    },
+    "k": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "pv": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "q": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "qk": {
+      "status": "passed",
+      "native_event_count": 34048,
+      "local_store_row_checks": 0
+    },
+    "qk_serial": {
+      "status": "passed",
+      "native_event_count": 34048,
+      "local_store_row_checks": 0
+    },
+    "qkv": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "qkv_serial": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "v": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    }
+  },
+  "attention_independent_audits_passed": 9,
+  "mutation_detection_checks": 8,
+  "ffn_legacy_regressions": {
+    "gate_up": {
+      "same_trace_hash": true,
+      "same_latency": true,
+      "old_latency_us": 22.290632000000002,
+      "new_latency_us": 22.290632000000002,
+      "latency_delta_us": 0.0,
+      "same_issued_commands": true,
+      "same_work_commands": true,
+      "note": "Legacy WRGB now completes after nBL_min. Timing and refresh counts may change; payload and MAC work must match."
+    },
+    "down_tiled": {
+      "same_trace_hash": true,
+      "same_latency": true,
+      "old_latency_us": 20.17638,
+      "new_latency_us": 20.17638,
+      "latency_delta_us": 0.0,
+      "same_issued_commands": true,
+      "same_work_commands": true,
+      "note": "Legacy WRGB now completes after nBL_min. Timing and refresh counts may change; payload and MAC work must match."
+    }
+  },
+  "exclusive_timeline_partition_checks": 80,
+  "native_backend_unchanged_during_final_run": true,
+  "original_backend_check_performed": false,
+  "original_backend_unchanged": null,
+  "postprocessing_source_note": "These analysis/audit snapshots were frozen after execution; workload/native provenance was captured by the run driver."
+}

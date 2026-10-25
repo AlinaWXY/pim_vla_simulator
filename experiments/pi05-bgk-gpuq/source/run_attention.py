@@ -1,4 +1,4 @@
-"""Execute the accepted GPU-Q/BG-K layout on an isolated native backend."""
+"""Execute fused-QKV/GPU-RoPE/DRAM-Q on an isolated native backend."""
 import argparse
 from collections import Counter
 import csv
@@ -64,7 +64,7 @@ def run_case(root, name, op, schedule="double", local_write_ck=4):
         tCK_ns=result["tCK_ns"], timing=result["resolved_timings_ck"],
         matrix=manifest.get("matrix"), trace_sha256=digest(directory / "workload.trace"),
         schedule=schedule, local_write_ck=local_write_ck, fresh_native_run=True,
-        scope="Native PIM service and memory movement; GPU compute and local RoPE/cast are unmeasured.",
+        scope="Native PIM service and memory movement; GPU RoPE/cast/packing and other GPU compute are unmeasured.",
         audit_status="pending")
     dump(directory / "summary.json", summary)
     print(json.dumps(dict(name=name, latency_us=total, phase_us=dict(phases))), flush=True)
@@ -77,8 +77,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--original-backend", type=Path,
                         help="Optional separate backend to verify remains unchanged")
-    parser.add_argument("--cases", nargs="+", default=["k", "v", "qk", "pv", "chain_k_qk",
-                                                      "k_local8", "k_serial", "qk_serial"])
+    parser.add_argument("--cases", nargs="+", default=["qkv", "qk", "pv", "q", "k", "v", "chain_qkv_qk",
+                                                      "qkv_serial", "qk_serial"])
     args = parser.parse_args()
     args.backend = args.backend.resolve(strict=True)
     args.output = args.output.resolve()
@@ -107,9 +107,7 @@ def main():
     dump(args.output / "provenance.json", provenance)
     rows = []
     for name in args.cases:
-        if name == "k_local8":
-            rows.append(run_case(args.output, name, "k", local_write_ck=8))
-        elif name.endswith("_serial"):
+        if name.endswith("_serial"):
             rows.append(run_case(args.output, name, name.removesuffix("_serial"), schedule="serial"))
         else:
             rows.append(run_case(args.output, name, name))
@@ -117,9 +115,10 @@ def main():
     if args.original_backend is not None:
         assert backend_hashes(args.original_backend) == original_before, "Original backend changed"
     dump(args.output / "attention-summary.json", dict(runs=rows,
-        primary_cases=["k", "v", "qk", "pv"],
-        unknown_latency_us=dict(GPU_Q=None, GPU_O=None, GPU_softmax=None,
-            local_K_RoPE_cast=None, GPU_V_cast_pack=None, GPU_arrival_processing=None),
+        primary_cases=["qkv", "qk", "pv"],
+        control_cases=["q", "k", "v", "qkv_serial", "qk_serial", "chain_qkv_qk"],
+        unknown_latency_us=dict(GPU_QK_RoPE_cast_pack=None, GPU_O=None, GPU_softmax=None,
+            GPU_V_cast_pack=None, GPU_arrival_processing=None),
         original_backend_check_performed=args.original_backend is not None,
         original_backend_unchanged=(True if args.original_backend is not None else None),
         private_backend_unchanged_during_run=True))

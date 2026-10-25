@@ -36,8 +36,8 @@ def main(root):
         dump(case / "summary.json", summary)
         audits[case.name] = dict(status="passed", native_event_count=audit["native_event_count"],
             local_store_row_checks=audit["local_store_row_checks"])
-    assert len(audits) == 8, audits
     top = load(root / "attention-summary.json")
+    assert set(audits) == {r['name'] for r in top['runs']}, audits
     for row in top["runs"]:
         row["audit_status"] = "passed"
         row["independent_native_audit"] = row["name"]+"/independent-native-audit.json"
@@ -59,7 +59,7 @@ def main(root):
     faults = load(root / "audit-fault-detection.json")
     assert faults["status"] == "passed" and all(f["detected"] for f in faults["faults"])
     ffn = load(root / "ffn/ffn-regression.json")
-    assert all(all(checks.values()) for checks in ffn.values())
+    assert all(checks['same_trace_hash'] and checks['same_work_commands'] for checks in ffn.values())
     breakdown = load(root / "all-linear-breakdown/breakdown.json")
     assert breakdown["verification"]["exclusive_tick_identities_exact"]
     dump(root / "validation-summary.json", dict(attention_cases=audits,

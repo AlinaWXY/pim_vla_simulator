@@ -1,0 +1,19 @@
+[workload-tests]
+[analysis-tests]
+[attention]
+[native-tests]
+[ffn]
+[native-audit]
+[audit-fault-detection]
+[breakdown]
+[plot]
+[diagnostics]
+[reference comparison] exact_same_schema; 13780 exact JSON numeric fields checked
+[finalize]
+{
+  "status": "passed",
+  "output": "/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1025/experiments/pi05-bgk-gpuq/results/validation-1865620",
+  "measured_pim_subset_us": 86.30068999999999,
+  "measured_pim_subset_ms_18x10": 15.534124199999999,
+  "complete_ae_latency_ms": null
+}

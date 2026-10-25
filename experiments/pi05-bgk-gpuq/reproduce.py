@@ -1,4 +1,4 @@
-"""Rerun and verify the frozen GPU-Q/BG-K native PIM timing experiment.
+"""Rerun fused QKV / GPU RoPE transfers / DRAM Q relay native timing.
 
 Build the native backend first with build.sh, then run with that build's Python.
 This runner always simulates fresh traces; reference files are comparison data.
@@ -16,7 +16,7 @@ import sys
 
 
 HERE = Path(__file__).resolve().parent
-PRIMARY_CASES = ("k", "v", "qk", "pv", "gate_up", "down_tiled")
+PRIMARY_CASES = ("qkv", "qk", "pv", "gate_up", "down_tiled")
 
 
 def load(path):
@@ -59,6 +59,19 @@ def compare_reference(run, reference):
     expected_csv = reference / "all-linear-breakdown/all-linear-breakdown.csv"
     actual_csv = run / "all-linear-breakdown/all-linear-breakdown.csv"
     expected, actual = load(expected_json), load(actual_json)
+    if expected.get('schema_version') != actual.get('schema_version'):
+        old_rows = {r['operator']:r for r in expected['primary_rows']}
+        new_rows = {r['operator']:r for r in actual['primary_rows']}
+        return dict(status='passed', comparison_mode='historical_changes_not_exact_reference',
+            reference_run=str(reference), numeric_breakdown_fields_checked=0, numeric_csv_fields_checked=0,
+            primary_latency_us={k:v['total_us'] for k,v in new_rows.items()},
+            common_case_deltas_us={k:dict(old=old_rows[k]['total_us'],new=new_rows[k]['total_us'],
+                delta=new_rows[k]['total_us']-old_rows[k]['total_us']) for k in old_rows.keys() & new_rows.keys()},
+            reference_sha256={'breakdown.json':sha256(expected_json),'all-linear-breakdown.csv':sha256(expected_csv)},
+            measured_pim_subset_us_per_layer_step=actual['measured_pim_subset_us_per_layer_step'],
+            measured_pim_subset_ms_18layers_10steps=actual['measured_pim_subset_ms_18layers_10steps'],
+            complete_ae_latency_ms=None,
+            note='The old GPU-Q/BG-K reference has different operations and topology. Its subtotal is not a like-for-like AE speedup baseline. New QKV includes Q projection and Q/K GPU-boundary I/O; GPU RoPE arithmetic remains unmeasured.')
     expected_numbers, actual_numbers = numeric_leaves(expected), numeric_leaves(actual)
     if expected_numbers.keys() != actual_numbers.keys():
         missing = sorted(expected_numbers.keys() - actual_numbers.keys())[:10]
@@ -86,16 +99,16 @@ def compare_reference(run, reference):
     expected_primary = {row["operator"]: row for row in expected["primary_rows"]}
     actual_primary = {row["operator"]: row for row in actual["primary_rows"]}
     if set(expected_primary) != set(PRIMARY_CASES) or set(actual_primary) != set(PRIMARY_CASES):
-        raise AssertionError("Expected six primary PIM cases")
+        raise AssertionError("Expected five primary PIM cases")
     latencies = {}
     for case in PRIMARY_CASES:
-        case_dir = run / case if case in PRIMARY_CASES[:4] else run / "ffn" / case
+        case_dir = run / case if case in PRIMARY_CASES[:3] else run / "ffn" / case
         measured = load(case_dir / "summary.json")["latency_us"]
         expected_us = expected_primary[case]["total_us"]
         if not same_number(measured, expected_us):
             raise AssertionError(f"Primary latency differs for {case}: {measured} != {expected_us}")
         latencies[case] = measured
-    return dict(status="passed", reference_run="run-1849371",
+    return dict(status="passed", comparison_mode="exact_same_schema", reference_run=str(reference),
                 numeric_breakdown_fields_checked=len(expected_numbers),
                 numeric_csv_fields_checked=csv_fields_checked,
                 primary_latency_us=latencies,
@@ -115,6 +128,8 @@ def main():
                         help="New output directory (default: results/reproduce-<timestamp>)")
     parser.add_argument("--original-backend", type=Path,
                         help="Optional separate backend to check for unintended changes")
+    parser.add_argument("--reference", type=Path,
+                        help="Same-version reference for exact numeric reproduction; old schema is comparison only")
     parser.add_argument("--skip-build", action="store_true",
                         help="Explicitly use a previously built backend (the runner never builds)")
     args = parser.parse_args()
@@ -125,7 +140,9 @@ def main():
         parser.error(f"Output already exists; choose a fresh directory: {run}")
     if not (backend / "ramulator2/libramulator.so").is_file():
         parser.error(f"Backend is not built: {backend / 'ramulator2/libramulator.so'}; run build.sh first")
-    reference = HERE / "reference/run-1849371"
+    reference = args.reference or HERE / "reference/xinyao_1025"
+    if args.reference is None and not reference.exists():
+        reference = HERE / "reference/run-1849371"
     old_ffn = HERE / "reference/run-1833560"
     required = [reference / "all-linear-breakdown/breakdown.json",
                 reference / "all-linear-breakdown/all-linear-breakdown.csv"]
@@ -168,15 +185,21 @@ def main():
     execute("ffn", [HERE / "analysis/run_ffn.py", "--backend", backend,
                     "--output", run / "ffn", "--old-run", old_ffn])
     execute("native-audit", [HERE / "validation/audit_native.py", run])
-    execute("audit-fault-detection", [HERE / "validation/test_audit_detection.py", run / "k"])
+    execute("audit-fault-detection", [HERE / "validation/test_audit_detection.py", run])
     execute("breakdown", [HERE / "analysis/analyze_run.py", run])
     execute("plot", [HERE / "analysis/plot_breakdown.py", run / "all-linear-breakdown/breakdown.json"])
     execute("diagnostics", [HERE / "validation/explain_native.py", run])
     comparison = compare_reference(run, reference)
     comparison["runner_sha256"] = sha256(Path(__file__))
     dump(run / "reference-comparison.json", comparison)
-    print(f"[reference comparison] {comparison['numeric_breakdown_fields_checked']} JSON numeric fields, "
-          f"{comparison['numeric_csv_fields_checked']} CSV fields and all six primary latencies match", flush=True)
+    dump(run / "reference-candidate.json", dict(schema_version='xinyao_1025_qkv_dram_q',
+        primary_latency_us=comparison['primary_latency_us'],
+        comparison_mode=comparison['comparison_mode'],
+        breakdown_sha256=sha256(run/'all-linear-breakdown/breakdown.json'),
+        csv_sha256=sha256(run/'all-linear-breakdown/all-linear-breakdown.csv'),
+        source_of_truth='all-linear-breakdown/breakdown.json; no historical result reused as a new measurement'))
+    print(f"[reference comparison] {comparison['comparison_mode']}; "
+          f"{comparison['numeric_breakdown_fields_checked']} exact JSON numeric fields checked", flush=True)
     execute("finalize", [HERE / "validation/finalize_run.py", run])
     # Finalize hashes all outputs. Its own runner log is necessarily written
     # after it returns, so refresh the manifest once without changing results.

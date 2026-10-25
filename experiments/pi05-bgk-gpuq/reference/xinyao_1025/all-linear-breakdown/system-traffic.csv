@@ -1,0 +1,6 @@
+operator,requested_read,requested_write,dram_read,dram_write,pim_input_write,q_dram_read,q_internal_relay,pim_movement_write_total,pim_input_delivered,bgk_input_delivered_to_bank_buffers,pim_result_read,pim_local_input_write,pim_bank_local_write,bg_dispatched_input,bank_index_multicast_input,bg_complete_result,bgk_internal_array_read,pim_internal
+qkv,65536,376832,65536,376832,655360,0,0,655360,1310720,0,491520,0,0,0,0,0,0,12582912
+qk,0,0,163840,0,0,163840,163840,163840,0,1310720,634880,0,0,0,0,634880,4063232,0
+pv,0,0,0,0,634880,0,0,634880,1269760,0,163840,0,0,0,0,0,0,4063232
+gate_up,0,0,0,0,655360,0,0,655360,1310720,0,0,0,0,0,0,0,0,16777216
+down_tiled,0,0,0,0,0,0,0,0,0,0,2621440,655360,0,0,0,0,0,8388608

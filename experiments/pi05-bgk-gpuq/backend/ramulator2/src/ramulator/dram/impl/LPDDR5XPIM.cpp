@@ -104,6 +104,7 @@ class LPDDR5XPIM : public DRAMSpec {
         Command::MACQK,     // PIM_MAC_QK -> MACQK
         Command::RDRES,     // PIM_RD_BG -> RDRES
         Command::LOCALWR,   // PIM_LOCAL_WR -> LOCALWR
+        Command::RD,        // PIM_RD_Q -> ordinary RD followed by controller relay
     };
 
     // Runtime config (organization, timing values, timing constraints)

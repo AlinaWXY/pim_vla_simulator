@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "comparison_mode": "exact_same_schema",
+  "reference_run": "/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1025/experiments/pi05-bgk-gpuq/reference/xinyao_1025",
+  "numeric_breakdown_fields_checked": 13780,
+  "numeric_csv_fields_checked": 100,
+  "primary_latency_us": {
+    "qkv": 20.423074,
+    "qk": 17.7282,
+    "pv": 5.682404,
+    "gate_up": 22.290632000000002,
+    "down_tiled": 20.17638
+  },
+  "comparison": {
+    "integer_fields": "exact",
+    "relative_tolerance": 1e-12,
+    "absolute_tolerance": 1e-12
+  },
+  "reference_sha256": {
+    "breakdown.json": "5f3cc7812fbc6e46e46d0a0d45f84a248235768e7bdbe722001a23ed4d3d918b",
+    "all-linear-breakdown.csv": "e4b0d6889afca470e95a8398be837694322ff788e9b33eb55c1073759d1b3e5c"
+  },
+  "measured_pim_subset_us_per_layer_step": 86.30068999999999,
+  "measured_pim_subset_ms_18layers_10steps": 15.534124199999999,
+  "complete_ae_latency_ms": null,
+  "runner_sha256": "b234ebfe06f32804d80fc12dddcacdfa2dec46ed9218a564decf38f12defd25e"
+}

@@ -64,6 +64,11 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   int m_bgs = 0, m_banks_per_bg = 0, m_mack = -1, m_macqk = -1, m_localwr = -1;
   int m_k_cycles = 2, m_qk_cycles = 20, m_bank_write_cycles = 4, m_local_recovery = 0;
   int m_bgk_input_cycles = 2;
+  // One physical 32B controller staging entry. It remains reserved through
+  // the return burst and the charged WRGB multicast, including its tail.
+  bool m_q_staging_busy = false;
+  Clk_t m_q_staging_free_at = 0;
+  size_t s_q_dram_reads = 0, s_q_relays = 0;
   std::string m_bgk_events_path;
   std::ofstream m_bgk_events;
   size_t s_bank_local_writes = 0, s_bgk_requests = 0;
@@ -140,6 +145,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     m_bank_write_cycles = spec.get_timing_value("nLOCALWR");
     m_local_recovery = spec.get_timing_value("nWR");
     m_bgk_input_cycles = spec.get_timing_value("nBL_min");
+    // AttAcc's no-CWL movement abstraction still consumes a complete burst.
+    // Legacy WRGB consumers previously became ready at issue, one burst early.
+    if (m_data_path == "attacc") m_pim_wr_latency = m_bgk_input_cycles;
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -150,6 +158,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     m_stats.add("local_input_transfers", s_local_transfers);
     m_stats.add("bgk_requests", s_bgk_requests);
     m_stats.add("bank_local_writes", s_bank_local_writes);
+    m_stats.add("q_dram_reads", s_q_dram_reads);
+    m_stats.add("q_internal_relays", s_q_relays);
     if (!m_bgk_events_path.empty()) {
       m_bgk_events.open(m_bgk_events_path);
       if (!m_bgk_events) throw std::runtime_error("Cannot open bgk_events_path");
@@ -168,7 +178,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         (req.pim_buffer >= 0 && req.type_id != Request::Type::PIM_WR_GB &&
          req.type_id != Request::Type::PIM_MAC_AB && req.type_id != Request::Type::PIM_LOCAL_GB &&
          req.type_id != Request::Type::PIM_WR_BG && req.type_id != Request::Type::PIM_WR_Q &&
-         req.type_id != Request::Type::PIM_MAC_K && req.type_id != Request::Type::PIM_MAC_QK)) {
+         req.type_id != Request::Type::PIM_MAC_K && req.type_id != Request::Type::PIM_MAC_QK &&
+         req.type_id != Request::Type::PIM_RD_Q)) {
       throw std::runtime_error("PIM buffer annotation requires WRGB/MACAB and slot 0/1");
     }
     // Map before admission so overlapping-bank requests can apply backpressure
@@ -211,12 +222,14 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       const int rank = req.addr_vec[m_rank_level];
       const int bg = req.addr_vec[m_bg_level];
       const int bank = req.addr_vec[m_bank_level];
+      if (req.type_id == Request::Type::PIM_RD_Q && (rank != 0 || bg != 0))
+        throw std::runtime_error("PIM_RD_Q source must be rank0/BG0, with an explicit bank index");
       for (size_t b = 0; b < m_bank_inputs.size(); ++b) {
         const int br = b / (m_bgs * m_banks_per_bg);
         const int bgid = (b / m_banks_per_bg) % m_bgs;
         const int bb = b % m_banks_per_bg;
         const bool selected = is_bgk_mac(req) ||
-            (req.type_id == Request::Type::PIM_WR_Q ? bb == bank :
+            ((req.type_id == Request::Type::PIM_WR_Q || req.type_id == Request::Type::PIM_RD_Q) ? bb == bank :
              req.type_id == Request::Type::PIM_LOCAL_WR ? br == rank && bgid == bg && bb == bank :
              br == rank && bgid == bg);
         if (selected) req.pim_bank_mask |= uint64_t{1} << b;
@@ -227,7 +240,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       } else if (req.type_id == Request::Type::PIM_WR_BG || req.type_id == Request::Type::PIM_RD_BG) {
         req.addr_vec[m_bank_level] = -1;
       }
-      req.pim_rank_mask = is_bgk_mac(req) || req.type_id == Request::Type::PIM_WR_Q
+      req.pim_rank_mask = is_bgk_mac(req) || req.type_id == Request::Type::PIM_WR_Q || req.type_id == Request::Type::PIM_RD_Q
           ? (1 << m_inputs.size()) - 1 : 1 << rank;
       req.final_command = spec_command(req.type_id);
       req.arrive = m_clk;
@@ -351,6 +364,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     s_pim_requests = s_pim_completed = s_pim_latency = 0;
     s_local_transfers = 0;
     s_bank_local_writes = s_bgk_requests = 0;
+    s_q_dram_reads = s_q_relays = 0;
   }
 
  private:
@@ -384,6 +398,11 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool can_bypass(const Request& later, const Request& earlier, bool preparing_row) const {
+    // RD_Q uses the ordinary bank scheduler before its multicast. Keep its
+    // row state stable until the relay is consumed; no speculative later MAC
+    // ACT/PRE may prepare a conflicting row while this composite is queued.
+    if (earlier.type_id == Request::Type::PIM_RD_Q) return false;
+    if (later.type_id == Request::Type::PIM_RD_Q) return false;
     if (is_bgk(later) || is_bgk(earlier)) {
       if (!is_bgk(later) || !is_bgk(earlier)) return false;
       if (is_bgk_input(later) && is_bgk_input(earlier)) return false; // one external movement path
@@ -436,20 +455,24 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
   bool is_bgk(const Request& req) const { return req.type_id >= Request::Type::PIM_WR_BG; }
   bool is_bgk_input(const Request& req) const {
-    return req.type_id == Request::Type::PIM_WR_BG || req.type_id == Request::Type::PIM_WR_Q;
+    return req.type_id == Request::Type::PIM_WR_BG || req.type_id == Request::Type::PIM_WR_Q ||
+           req.type_id == Request::Type::PIM_RD_Q;
   }
   bool is_bgk_mac(const Request& req) const {
     return req.type_id == Request::Type::PIM_MAC_K || req.type_id == Request::Type::PIM_MAC_QK;
   }
-  void record_bgk(const Request& req, Clk_t ready, int service) {
+  void record_bgk(const Request& req, Clk_t ready, int service,
+                  const char* name = nullptr, Clk_t clock = -1, int target_banks = -1) {
     if (!m_bgk_events) return;
-    static const char* names[] = {"PIM_WR_BG","PIM_WR_Q","PIM_MAC_K","PIM_MAC_QK","PIM_RD_BG","PIM_LOCAL_WR"};
+    static const char* names[] = {"PIM_WR_BG","PIM_WR_Q","PIM_MAC_K","PIM_MAC_QK","PIM_RD_BG","PIM_LOCAL_WR","PIM_RD_Q"};
     const auto& spec = *m_device.m_spec;
-    m_bgk_events << m_clk << ',' << ready << ',' << names[req.type_id-Request::Type::PIM_WR_BG]
+    m_bgk_events << (clock < 0 ? m_clk : clock) << ',' << ready << ','
+        << (name ? name : names[req.type_id-Request::Type::PIM_WR_BG])
         << ',' << m_channel_id << ',' << req.addr_vec[m_rank_level] << ',' << req.addr_vec[m_bg_level]
         << ',' << req.addr_vec[m_bank_level] << ',' << req.addr_vec[spec.get_level_id("Row")]
         << ',' << req.addr_vec[spec.get_level_id("Column")] << ',' << req.pim_buffer
-        << ',' << std::popcount(req.pim_bank_mask) << ",32," << service << '\n';
+        << ',' << (target_banks < 0 ? std::popcount(req.pim_bank_mask) : target_banks)
+        << ",32," << service << '\n';
   }
   void enqueue_bgk_done(ReqBuffer::iterator it, Clk_t ready) {
     it->depart = ready;
@@ -475,6 +498,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     return true;
   }
   bool issue_bgk(ReqBuffer::iterator it) {
+    if (it->type_id == Request::Type::PIM_RD_Q) return issue_q_dram_read(it);
     it->command = get_preq_command(it->final_command,it->addr_vec);
     // Payload issues through independent local ports; only ACT/PRE uses CA.
     if (it->command == m_localwr) return false;
@@ -496,6 +520,57 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     }
     record_bgk(*it,ready,service);
     enqueue_bgk_done(it,ready);
+    return true;
+  }
+
+  bool issue_q_dram_read(ReqBuffer::iterator it) {
+    if (it->pim_q_stage == 0) {
+      if (m_q_staging_busy || m_clk < m_q_staging_free_at) return false;
+      // Preserve the composite in the ordered PIM queue until its multicast
+      // retires. The normal controller owns ACT1/ACT2/PRE/RD, CL, and BL.
+      // ReqBuffer is a std::list, so this pointer survives other insertions.
+      Request* owner = &*it;
+      Request read = *it;
+      read.type_id = Request::Type::Read;
+      read.pim_buffer = -1;
+      read.callback = [this, owner](Request& done) {
+        if (done.command != m_cmd_rd && done.command != m_cmd_rda)
+          throw std::runtime_error("RD_Q must complete a real DRAM read, not forwarding");
+        const int latency = m_device.m_spec->read_latency;
+        record_bgk(*owner, done.depart, latency, "PIM_RD_Q", done.depart - latency, 1);
+        owner->pim_q_stage = 2;
+        ++s_q_dram_reads;
+      };
+      if (!LPDDR5Controller::send(read)) return false;
+      it->pim_q_stage = 1;
+      m_q_staging_busy = true;
+      return true;
+    }
+    if (it->pim_q_stage != 2 || !bgk_targets_ready(*it, false)) return false;
+    // The staged payload must traverse the same movement path as GPU WRGB.
+    // Broadcast the bank-index fragment to all BGs/ranks in this channel.
+    // The DRAM source address stays intact in the event for independent audit.
+    AddrVec_t target = it->addr_vec;
+    target[m_rank_level] = target[m_bg_level] = -1;
+    if (!check_timing(m_wrgb, target)) return false;
+    it->command = m_wrgb;
+    m_device.issue_command(m_wrgb, target, m_clk);
+    Request multicast = *it;
+    multicast.addr_vec = target;
+    m_rowpolicy->on_issue(multicast);
+    for (auto* p : m_plugins) p->on_issue(multicast);
+    const Clk_t ready = m_clk + m_bgk_input_cycles;
+    for (size_t b = 0; b < m_bank_inputs.size(); ++b) {
+      if (!(it->pim_bank_mask & (uint64_t{1} << b))) continue;
+      auto& input = m_bank_inputs[b][it->pim_buffer];
+      input.written = true;
+      input.ready_at = ready;
+    }
+    record_bgk(*it, ready, m_bgk_input_cycles, "PIM_RELAY_Q");
+    ++s_q_relays;
+    m_q_staging_busy = false;
+    m_q_staging_free_at = ready;
+    enqueue_bgk_done(it, ready);
     return true;
   }
   void issue_bank_local_writes() {

@@ -38,6 +38,8 @@ class AttributionTests(unittest.TestCase):
         self.assertEqual(phase_kind(dict(name="arbitrary", kind="gather")), "local_gather")
 
     def test_native_event_categories(self):
+        self.assertEqual(category("PIM_RD_Q"), "q_dram_read")
+        self.assertEqual(category("PIM_RELAY_Q"), "q_broadcast")
         self.assertEqual(category("MAC_K"), "mac_array")
         self.assertEqual(category("MAC_QK"), "mac_array")
         self.assertEqual(category("PIM_LOCAL_WR"), "local_write")
@@ -47,6 +49,14 @@ class AttributionTests(unittest.TestCase):
         self.assertEqual(category("PIM_WR_Q"), "gpu_input")
         self.assertEqual(category("PIM_RD_BG"), "gpu_output")
         self.assertIsNone(category("ACTAB"))
+
+    def test_dram_relay_is_not_gpu_input_and_closes(self):
+        p = partition(0, 20, dict(q_dram_read=[(0,10)], q_broadcast=[(10,12)],
+                                  mac_array=[(8,18)]))
+        self.assertEqual(p["exclusive"]["gpu_input"], 0)
+        self.assertEqual(p["exclusive"]["q_dram_read"], 8)
+        self.assertEqual(p["exclusive"]["overlap"], 4)
+        self.assertEqual(sum(p["exclusive"].values()), 20)
 
     def test_outside_phase_is_not_silently_discarded(self):
         with self.assertRaises(AssertionError):

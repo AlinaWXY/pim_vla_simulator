@@ -242,9 +242,14 @@ def _partitions(data):
                     group = writes[fragment*20:(fragment+1)*20]
                     check(all(e["pim_buffer"] == buffer and e["Rank"] == 0 and e["pim_rank_mask"] == 3 for e in group), "WRGB rank broadcast or buffer mismatch")
                     check({e["Column"]*32 for e in group} == set(range(0,640,32)), "WRGB query-vector coverage")
-                    check(group[-1]["tick"] <= group_mac[0]["tick"], "MAC started before complete WRGB fragment")
-                    windows["wrgb"].append((group[0]["tick"],group[-1]["tick"]))
-                    ready.append(group[-1]["tick"])
+                    input_ready = group[-1]["tick"] + data["result"]["resolved_timings_ck"]["nBL_min"]*ratio
+                    check(input_ready <= group_mac[0]["tick"], "MAC started before final WRGB burst completion")
+                    windows["wrgb"].append((group[0]["tick"],input_ready))
+                    if fragment >= 2:
+                        previous_mac = macs[(fragment-1)*slots-1]
+                        check(group[0]["tick"] >= previous_mac["tick"]+20*ratio,
+                              "WRGB double-buffer reused before previous consumer finished")
+                    ready.append(input_ready)
                 else:
                     for rank in (0,1):
                         rank_events = [e for e in locals_ if e["Rank"] == rank]

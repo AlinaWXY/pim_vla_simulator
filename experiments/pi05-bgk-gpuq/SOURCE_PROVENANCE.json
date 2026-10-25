@@ -1,19 +1,39 @@
 {
-  "reference_run": "run-1849371",
-  "reference_date": "2026-10-23",
-  "packaged_date": "2026-10-24",
+  "reference_run": "xinyao_1025",
+  "reference_date": "2026-10-25",
+  "packaged_date": "2026-10-25",
   "backend_base_repository": "https://github.com/Cathyhsy/lpddr-pim-simulator",
   "backend_base_commit": "e84cf08180fa97cd96c2d38c7962fea67adc0d67",
-  "backend_source_note": "Includes the final experimental working-tree extensions used by run-1849371; the base commit alone does not contain them. Full source is vendored, not a submodule.",
+  "backend_source_note": "Includes the prior experimental extensions plus fused V-layout QKV, explicit GPU RoPE transfer phases, native DRAM-Q read/relay and corrected WRGB burst readiness. Full source is vendored.",
   "runtime_backend": "backend/ (the experiment does not build or execute the repository-root ramulator2)",
   "native_reference_environment": {
-    "python": "3.11.16", "compiler": "GCC 11.5.0", "cmake": "3.26.5"
+    "python": "3.11.16",
+    "compiler": "GCC 11.5.0",
+    "cmake": "3.26.5"
   },
   "vendored_build_dependencies": {
-    "fmt": {"repository": "https://github.com/fmtlib/fmt", "tag": "10.2.1", "commit": "e69e5f977d458f2650bb346dadf2ad30c5320281"},
-    "yaml-cpp": {"repository": "https://github.com/jbeder/yaml-cpp", "tag": "yaml-cpp-0.9.0", "commit": "56e3bb550c91fd7005566f19c079cb7a503223cf"},
-    "nanobind": {"repository": "https://github.com/wjakob/nanobind", "tag": "v2.4.0", "commit": "0f9ce749b257fdfe701edb3cf6f7027ba029434a"},
-    "robin-map": {"repository": "https://github.com/Tessil/robin-map", "commit": "188c45569cc2a5dd768077c193830b51d33a5020"}
+    "fmt": {
+      "repository": "https://github.com/fmtlib/fmt",
+      "tag": "10.2.1",
+      "commit": "e69e5f977d458f2650bb346dadf2ad30c5320281"
+    },
+    "yaml-cpp": {
+      "repository": "https://github.com/jbeder/yaml-cpp",
+      "tag": "yaml-cpp-0.9.0",
+      "commit": "56e3bb550c91fd7005566f19c079cb7a503223cf"
+    },
+    "nanobind": {
+      "repository": "https://github.com/wjakob/nanobind",
+      "tag": "v2.4.0",
+      "commit": "0f9ce749b257fdfe701edb3cf6f7027ba029434a"
+    },
+    "robin-map": {
+      "repository": "https://github.com/Tessil/robin-map",
+      "commit": "188c45569cc2a5dd768077c193830b51d33a5020"
+    }
   },
-  "licenses": "Original LICENSE files are retained in backend/ and each vendored dependency."
+  "licenses": "Original LICENSE files are retained in backend/ and each vendored dependency.",
+  "experiment_base_branch": "xinyao_1024",
+  "experiment_base_commit": "c98428cb4c801851784f799e867bb5d0f1d4b70c",
+  "branch": "xinyao_1025"
 }

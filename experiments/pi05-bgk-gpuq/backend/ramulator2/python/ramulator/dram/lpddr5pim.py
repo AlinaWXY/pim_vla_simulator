@@ -114,6 +114,7 @@ class LPDDR5PIM(LPDDR5):
         "PIM_LOCAL_GB": "WRGB",  # Controller-only SRAM event; placeholder request id 6.
         "PIM_WR_BG": "WRGB", "PIM_WR_Q": "WRGB", "PIM_MAC_K": "MACK",
         "PIM_MAC_QK": "MACQK", "PIM_RD_BG": "RDRES", "PIM_LOCAL_WR": "LOCALWR",
+        "PIM_RD_Q": "RD",  # Controller expands into ordinary RD then WRGB relay.
     }
     timing_constraints = _pim_constraints()
 
@@ -162,7 +163,10 @@ class LPDDR5PIM(LPDDR5):
             timings["nCCDAB"] = timings["nCCDL"]
         if self.pim_data_path == "attacc":
             if {"nPIMWrLatency", "nPIMRdLatency"}.intersection(overrides):
-                raise ValueError("AttAcc transfers retire at issue; transfer latency overrides are unsupported")
+                raise ValueError("AttAcc completion latency is fixed by movement semantics; transfer latency overrides are unsupported")
+            # These zero-valued DRAM constraint placeholders avoid CL/CWL
+            # input locks. The controller separately waits nBL_min for WRGB
+            # data readiness and completion; RDRES still retires at issue.
             timings["nPIMWrLatency"] = timings["nPIMRdLatency"] = 0
             if type(timings["nCCDAB"]) is not int or timings["nCCDAB"] <= 0:
                 raise ValueError("nCCDAB must be a positive integer")

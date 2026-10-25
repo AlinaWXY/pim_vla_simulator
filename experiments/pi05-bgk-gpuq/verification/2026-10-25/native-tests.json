@@ -1,0 +1,11 @@
+{
+  "passed": 6,
+  "cases": {
+    "BG_dispatch_and_K_array_cadence": 27.202,
+    "Q_multicast_and_BG_result_readiness": 42.21,
+    "double_buffer_overlap_and_overwrite_guard": 42.21,
+    "independent_local_ports_4CK": 90.048,
+    "independent_local_ports_8CK": 120.064,
+    "local_write_native_row_recovery": 176.344
+  }
+}

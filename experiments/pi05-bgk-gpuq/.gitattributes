@@ -5,6 +5,7 @@
 *.txt text eol=lf
 *.json text eol=lf
 *.csv text eol=lf
-# Preserve frozen reference bytes (Python csv emits CRLF) for provenance hashes.
-reference/** -text
+# Preserve frozen reference bytes (CSV CRLF and matplotlib SVG whitespace).
+# Generated artifacts retain their provenance hashes; source checks stay enabled.
+reference/** -text -whitespace
 verification/** -text

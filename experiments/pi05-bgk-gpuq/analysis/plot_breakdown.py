@@ -15,6 +15,8 @@ def main():
     rows = data["primary_rows"]
     groups = [
         ("Input only", ("gpu_input_only_us","local_input_only_us"), "#4d83b8"),
+        ("Q DRAM read", ("q_dram_read_only_us",), "#496585"),
+        ("Q local rebroadcast", ("q_broadcast_only_us",), "#6a9db9"),
         ("Array service + column guard", ("mac_array_only_us","array_column_only_us"), "#327b68"),
         ("Overlap", ("overlap_us",), "#88b5a2"),
         ("Local writeback", ("local_write_only_us",), "#e4a84f"),
@@ -23,7 +25,7 @@ def main():
         ("Local gather", ("local_gather_only_us","bg_reduce_only_us"), "#d296aa"),
         ("Other / boundary", ("other_us","boundary_us"), "#a8adb5"),
     ]
-    labels = {"k":"K projection", "v":"V projection", "qk":"QK^T", "pv":"PV",
+    labels = {"qkv":"Fused QKV + cache I/O", "k":"K projection", "v":"V projection", "qk":"QK^T", "pv":"PV",
               "gate_up":"FFN Gate + Up", "down_tiled":"FFN Down"}
     plt.rcParams.update({"font.family":"DejaVu Sans","font.size":10,"svg.fonttype":"none"})
     fig, ax = plt.subplots(figsize=(11,5.8), constrained_layout=True)
@@ -43,13 +45,13 @@ def main():
     ax.set_axisbelow(True)
     ax.spines[["top","right","left"]].set_visible(False)
     ax.tick_params(axis="y",length=0)
-    ax.set_title("Pi0.5 MHA8: GPU Q, BG-sharded K, unchanged V and rank-local FFN",loc="left",pad=28,weight="bold")
+    ax.set_title("Pi0.5 MHA8: shared-X QKV, GPU RoPE boundary, DRAM Q relay",loc="left",pad=28,weight="bold")
     ax.text(0,1.025,"16 LPDDR channels | 20 action tokens | 988 valid KV tokens | refresh enabled",
             transform=ax.transAxes,color="#525962",fontsize=10)
     ax.legend(loc="upper center",bbox_to_anchor=(.5,-.17),ncol=3,frameon=False,fontsize=9)
     fig.text(.01,-.035,
         f"Measured PIM subset x18 layers x10 steps: {data['measured_pim_subset_ms_18layers_10steps']:.3f} ms. "
-        "GPU Q/O, softmax, nonlinear and reduction compute remain unmeasured.\n"
+        "GPU RoPE/repack, O, softmax, nonlinear and reduction compute remain unmeasured.\n"
         "Exclusive colors sum to wall time. Array reads are included with MAC service. This is not complete AE latency.",
         fontsize=9,color="#525962")
     base = args.breakdown_json.parent / "linear-latency-breakdown"

@@ -154,6 +154,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
           op == "PIM_MAC_QK" ? Request::Type::PIM_MAC_QK :
           op == "PIM_RD_BG" ? Request::Type::PIM_RD_BG :
           op == "PIM_LOCAL_WR" ? Request::Type::PIM_LOCAL_WR :
+          op == "PIM_RD_Q" ? Request::Type::PIM_RD_Q :
           op == "BARRIER" ? Barrier : op == "WAIT" ? Wait : -1;
       if (type == -1) throw std::runtime_error("LoadStoreTrace: unknown operation " + op);
       int pim_buffer = -1;
@@ -161,13 +162,13 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
         if ((type != Request::Type::PIM_WR_GB && type != Request::Type::PIM_MAC_AB &&
              type != Request::Type::PIM_LOCAL_GB && type != Request::Type::PIM_WR_BG &&
              type != Request::Type::PIM_WR_Q && type != Request::Type::PIM_MAC_K &&
-             type != Request::Type::PIM_MAC_QK) ||
+             type != Request::Type::PIM_MAC_QK && type != Request::Type::PIM_RD_Q) ||
             (buffer != "0" && buffer != "1")) {
           throw std::runtime_error("LoadStoreTrace: BUFFER must be 0/1 on WRGB or MACAB");
         }
         pim_buffer = buffer == "0" ? 0 : 1;
       }
-      if ((type == Request::Type::PIM_LOCAL_GB || (type >= Request::Type::PIM_WR_BG &&
+      if ((type == Request::Type::PIM_LOCAL_GB || type == Request::Type::PIM_RD_Q || (type >= Request::Type::PIM_WR_BG &&
           type <= Request::Type::PIM_MAC_QK)) && pim_buffer < 0)
         throw std::runtime_error("PIM_LOCAL_GB requires BUFFER=0/1");
       size_t consumed = 0;

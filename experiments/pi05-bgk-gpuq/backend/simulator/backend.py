@@ -118,12 +118,22 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         ["git", "status", "--porcelain"], cwd=repo, text=True, capture_output=True, check=False
     )
     result = {
-        "schema_version": 8,
+        "schema_version": 9,
         "bgk_model": {
-            "enabled": any(requests[x] for x in ("pim_wr_bg", "pim_wr_q", "pim_mac_k", "pim_mac_qk", "pim_rd_bg", "pim_local_wr")),
+            "enabled": any(requests[x] for x in ("pim_wr_bg", "pim_wr_q", "pim_mac_k", "pim_mac_qk", "pim_rd_bg", "pim_local_wr", "pim_rd_q")),
             "K_service_CK": timings.get("nCCDK"), "QK_service_CK": timings.get("nCCDQK"),
             "local_write_CK_per_32B": timings.get("nLOCALWR"),
             "K_valid_tokens_per_BG": "1 or 2, encoded by emitted BG input bursts; channel MAC service uses maximum 2",
+            "Q_DRAM_refill": {
+                "request": "PIM_RD_Q ADDRESS BUFFER",
+                "source": "rank0/BG0, four bank-index sources per channel",
+                "staging_bytes_per_channel": 32,
+                "scheduling": "conservative serial RD return then WRGB relay; one composite in flight",
+                "read_completion": "native ordinary RD with ACT/PRE and CL+BL return",
+                "relay_completion": "charged shared-path WRGB + nBL_min; same bank index in every BG/rank",
+                "callback": "after relay completion only; no GPU round trip",
+                "fanout_extra_latency_CK": 0,
+            },
             "Q_multicast": "same bank-index in every BG/rank; independent bank-local double-buffer ownership",
             "input_ready": "WRGB issue + nBL_min; consumers wait for every target bank and every queued same-slot fill",
             "MAC_completion": "new MACK/MACQK complete at issue + nCCDK/nCCDQK, native array cadence applies independently",
@@ -143,7 +153,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         "completion_policy": (
             "read callbacks; write issue callbacks plus CWL+BLmax+WR recovery; "
             "PIM MAC callbacks at issue; annotated double-buffer SRAM ownership lasts nCCDAB; "
-            + ("PIM transfers retire at issue (AttAcc); " if config.pim_data_path == "attacc"
+            + ("AttAcc WRGB completes after nBL_min, result transfers retire at issue; " if config.pim_data_path == "attacc"
                else "PIM buffer-transfer completion callbacks; ")
             + "half-bank compute overlaps disjoint-bank reads; "
             "global drain at other normal/PIM mode transitions"
@@ -155,11 +165,14 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             "requested_write": requests["writes"] * transaction_bytes,
             "dram_read": (counters["RD"] + counters["RDA"]) * transaction_bytes,
             "dram_write": (counters["WR"] + counters["WRA"]) * transaction_bytes,
-            "pim_input_write": counters.get("WRGB", 0) * transaction_bytes,
+            "pim_input_write": (counters.get("WRGB", 0) - requests["pim_rd_q"]) * transaction_bytes,
+            "q_dram_read": requests["pim_rd_q"] * transaction_bytes,
+            "q_internal_relay": requests["pim_rd_q"] * transaction_bytes,
+            "pim_movement_write_total": counters.get("WRGB", 0) * transaction_bytes,
             "pim_input_delivered": requests["pim_wr_gb"] * transaction_bytes
             * (config.ranks if config.pim_input_broadcast else 1),
             "bgk_input_delivered_to_bank_buffers": (requests["pim_wr_bg"] * organization["bank"]
-                + requests["pim_wr_q"] * config.ranks * organization["bankgroup"]) * transaction_bytes,
+                + (requests["pim_wr_q"] + requests["pim_rd_q"]) * config.ranks * organization["bankgroup"]) * transaction_bytes,
             "pim_result_read": counters.get("RDRES", 0) * transaction_bytes,
             "pim_local_input_write": requests["pim_local_gb"] * transaction_bytes,
             "pim_bank_local_write": requests["pim_local_wr"] * transaction_bytes,
@@ -195,7 +208,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             "transfer_scheduling": (
                 "AttAcc-style shared WRGB/RDRES movement path: BL/CCDS/CCDL; "
                 "independent MAC path; trace/barriers supply result dependencies; "
-                "no CL/CWL completion tail, rank turnaround, or RDRES-to-MAC lock"
+                "WRGB waits nBL_min (no CWL), RDRES retires at issue; ordinary RD retains CL+BL; "
+                "no additional broadcast-network latency or RDRES-to-MAC lock"
                 if config.pim_data_path == "attacc" else
                 "LPDDR external DQ transfers with CL/CWL completion and rank turnaround"
             ),
@@ -226,7 +240,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                                 else "RDRES waits for final SRAM use"),
             "pe_clock_model": "external; PE throughput assumed sufficient for the configured MAC interval",
             "numerical_compute": False,
-            "input_buffer_write_latency_ck": timings.get("nPIMWrLatency"),
+            "input_buffer_write_latency_ck": (timings.get("nBL_min") if config.pim_data_path == "attacc"
+                                               else timings.get("nPIMWrLatency")),
             "result_buffer_read_latency_ck": timings.get("nPIMRdLatency"),
             "buffer_transfer_basis": "32B DQ burst; SRAM, no array ACT/PRE/write recovery",
             "input_broadcast": {
@@ -237,7 +252,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                 "trace_rule": "WRGB uses rank-0 address; WRGB and MACAB require BUFFER=0/1"
                               if config.pim_input_broadcast else "original per-rank WRGB stream",
                 "extra_fanout_latency_ck": 0,
-                "completion": ("issue updates every target buffer (AttAcc)"
+                "completion": ("issue + nBL_min makes every target buffer ready (AttAcc)"
                                if config.pim_data_path == "attacc"
                                else "one CWL+BLmin completion updates every target buffer"),
                 "ownership": "every target slot must be free before issuing a broadcast",

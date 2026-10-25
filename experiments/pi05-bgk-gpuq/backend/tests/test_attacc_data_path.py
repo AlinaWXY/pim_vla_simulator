@@ -40,7 +40,7 @@ def test_attacc_has_no_cwl_input_ready_tail(tmp_path):
     ], pim_mac_scope="channel", pim_data_path="attacc")
     last_write = max(e["clock"] for e in events if e["command"] == "WRGB")
     mac = next(e["clock"] for e in events if e["command"] == "MACAB")
-    assert 0 < mac - last_write < 14
+    assert result["resolved_timings_ck"]["nBL_min"] <= mac - last_write < 14
     read = next(e["clock"] for e in events if e["command"] == "RDRES")
     assert read < mac + 50
     assert result["pim_model"]["data_path"] == "attacc"
@@ -86,6 +86,6 @@ def test_attacc_rejects_half_bank(tmp_path):
 
 @pytest.mark.parametrize("timing", ["nPIMWrLatency", "nPIMRdLatency"])
 def test_attacc_rejects_conflicting_completion_overrides(tmp_path, timing):
-    with pytest.raises(ValueError, match="retire at issue"):
+    with pytest.raises(ValueError, match="completion latency is fixed"):
         run(tmp_path, ["PIM_WR_GB 0 0"], pim_data_path="attacc",
             timing_overrides={timing: 25})

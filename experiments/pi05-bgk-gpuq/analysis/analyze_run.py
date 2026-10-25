@@ -1,4 +1,4 @@
-"""Native timeline attribution for GPU-Q / BG-K attention and rank-local FFN.
+"""Native timeline attribution for fused QKV, DRAM Q relay and rank-local FFN.
 
 Every reported elapsed column is mutually exclusive. Inclusive service and
 overlap credit are also retained, and must not be added as elapsed latency.
@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 
 
-RESOURCES = ("gpu_input", "local_input", "mac_array", "array_column", "bg_reduce", "local_write",
+RESOURCES = ("gpu_input", "q_dram_read", "q_broadcast", "local_input", "mac_array", "array_column", "bg_reduce", "local_write",
              "dram_read", "dram_write", "gpu_output", "local_gather")
 
 
@@ -76,6 +76,10 @@ def partition(start, stop, windows):
 
 def category(operation):
     op = operation.upper()
+    if op == "PIM_RD_Q":
+        return "q_dram_read"
+    if op == "PIM_RELAY_Q":
+        return "q_broadcast"
     if "MAC" in op:
         return "mac_array"
     if any(word in op for word in ("REDUCE", "BGACC", "BG_ACC")):
@@ -152,6 +156,7 @@ def inspect(directory):
         rich_path = directory / "simulation" / f"bgk_events.csv.ch{channel}"
         rich = read_csv(rich_path) if rich_path.exists() else []
         rich_keys = set()
+        rich_native_keys = set()
         if rich_path.exists():
             hashes[rich_path.name] = digest(rich_path)
         for e in rich:
@@ -178,6 +183,10 @@ def inspect(directory):
                     windows["array_column"].append((end, min(guard_end, total_ticks)))
                     work["array_column_service_ticks"] += min(guard_end, total_ticks) - end
             rich_keys.add((int(e["clock"]), kind))
+            if e["operation"] == "PIM_RD_Q":
+                rich_native_keys.add((int(e["clock"]), "RD"))
+            elif e["operation"] == "PIM_RELAY_Q":
+                rich_native_keys.add((int(e["clock"]), "WRGB"))
             work[kind + "_service_ticks"] += service * ratio
             work[kind + "_events"] += 1
             work[kind + "_bytes"] += int(e.get("bytes", 0))
@@ -185,7 +194,8 @@ def inspect(directory):
         # windows use the explicitly recorded configured service parameters.
         for e in rows:
             kind = category(e["command"])
-            if kind is None or (int(e["clock"]), kind) in rich_keys:
+            if (kind is None or (int(e["clock"]), kind) in rich_keys
+                    or (int(e["clock"]), e["command"]) in rich_native_keys):
                 continue
             if kind == "mac_array":
                 service = timing["nCCDAB"]
@@ -266,20 +276,22 @@ def inspect(directory):
         definitions=dict(mac_array="Native service including DRAM array operand reads; not isolated ALU time.",
             array_column="Native same-array column-spacing guard after MACK service: [issue+2 CK, issue+4 CK), intersected with pipeline phases. An attribution window, not an additional independently summed transfer latency.",
             bg_reduction="Four-bank local reduction is provisioned to keep pace with MAC_QK; a zero separate event column is not a measured zero physical delay.",
-            multicast="WR_BG/WR_Q use command-level input traffic and readiness; no added fanout-dependent network delay.",
+            multicast="WRGB and Q relay use command-level traffic and readiness; no added fanout-dependent network delay.",
+            q_dram_read="Actual native DRAM read issue through data return (nCL+nBL_min), counted once; not GPU input.",
+            q_broadcast="Controller-to-bank WRGB relay after the Q DRAM read completes. Internal relay payload is not new GPU input. Native WRGB spacing and buffer readiness apply.",
             input_window="Native data-service windows (2 CK per 32 B at the baseline); command-spacing gaps remain other unless another resource is active.",
             fenced_transfer="Measured phase includes its scheduling, row handling, and explicit tails.",
             pipeline="Native service-window union; simultaneous resources are a separate overlap column.",
-            other="Unattributed elapsed scheduling/ACT/PRE/refresh/recovery/fence gaps; not isolated DRAM stall. K MAC service is 2 CK; its additional array column guard is separately attributed and is not arithmetic.",
+            other="Unattributed elapsed scheduling/ACT/PRE/refresh/recovery/fence gaps; not isolated DRAM stall. Projection and QK MAC service uses 20 CK in this version.",
             service_work="Summed work across potentially parallel resources, not additive wall time."))
 
 
 def inventory():
     rows = []
     for name, x, w, y, place, measurement in (
-        ("Q projection", [20,1024], [1024,2048], [20,8,256], "GPU", None),
-        ("K projection", [20,1024], [1024,2048], [20,8,256], "PIM", "k"),
-        ("V projection", [20,1024], [1024,2048], [20,8,256], "PIM", "v"),
+        ("Q projection", [20,1024], [1024,2048], [20,8,256], "PIM", "qkv (joint); q isolated control"),
+        ("K projection", [20,1024], [1024,2048], [20,8,256], "PIM", "qkv (joint); k isolated control"),
+        ("V projection", [20,1024], [1024,2048], [20,8,256], "PIM", "qkv (joint); v isolated control"),
         ("QK^T", [8,20,256], [8,256,988], [8,20,988], "PIM", "qk"),
         ("PV", [8,20,988], [8,988,256], [8,20,256], "PIM", "pv"),
         ("O projection", [20,2048], [2048,1024], [20,1024], "GPU", None),
@@ -307,7 +319,7 @@ def main():
     ffn = args.ffn_root or args.run_root / "ffn"
     output = args.output or args.run_root / "all-linear-breakdown"
     output.mkdir(parents=True, exist_ok=True)
-    cases = [(op,args.run_root/op) for op in ("k","v","qk","pv")]
+    cases = [(op,args.run_root/op) for op in ("qkv","qk","pv")]
     cases += [(op,ffn/op) for op in ("gate_up","down_tiled")]
     evidence = {op:inspect(path) for op,path in cases}
     rows = [dict(evidence[op]["row"], operator=op) for op,_ in cases]
@@ -316,23 +328,31 @@ def main():
         row["layers18_steps10_ms"] = row["total_us"] * 180 / 1000
     write_csv(output / "all-linear-breakdown.csv", rows)
     write_csv(output / "system-traffic.csv", [dict(operator=op,**evidence[op]["traffic_bytes"]) for op,_ in cases])
+    write_csv(output / "phase-breakdown.csv", [dict(operator=op,**phase)
+        for op,_ in cases for phase in evidence[op]["phases"]])
     write_csv(output / "channel-partitions.csv", [r for op,_ in cases for r in evidence[op]["channel_rows"]])
-    resident = dict(attention_bytes_per_bank=155648,
-        regions=[dict(name="W_K",start=0,end_exclusive=131072),
-                 dict(name="W_V",start=131072,end_exclusive=139264),
-                 dict(name="K cache",start=139264,end_exclusive=147456),
-                 dict(name="V cache",start=147456,end_exclusive=155648),
-                 dict(name="W_Gate + W_Up",start=155648,end_exclusive=188416),
-                 dict(name="W_Down",start=188416,end_exclusive=204800)],
-        total_bytes_per_bank=204800,total_bytes_per_layer=204800*512,
-        no_overlap=True, excludes="GPU Q/O weights, action I/O and conditioning")
+    resident = dict(attention_bytes_per_bank=45056,
+        regions=[dict(name="W_QKV interleaved by input fragment",start=0,end_exclusive=24576),
+                 dict(name="Q cache (only rank0 BG0 stores payload)",start=24576,end_exclusive=28672),
+                 dict(name="K cache",start=28672,end_exclusive=36864),
+                 dict(name="V cache",start=36864,end_exclusive=45056),
+                 dict(name="W_Gate + W_Up",start=45056,end_exclusive=77824),
+                 dict(name="W_Down",start=77824,end_exclusive=94208)],
+        total_bytes_per_bank=94208,total_bytes_per_layer=94208*512,
+        no_overlap=True, excludes="GPU O weights, action I/O and conditioning",
+        note="Reserved bank address ranges include sparse Q-cache holes; actual Q payload is 160 KiB/system.")
     assert all(a["end_exclusive"] == b["start"] for a,b in zip(resident["regions"],resident["regions"][1:]))
-    payload = dict(primary_rows=rows, measured_pim_subset_us_per_layer_step=subtotal,
+    controls = {op:inspect(args.run_root/op) for op in ("q","k","v")
+                if (args.run_root/op/"summary.json").exists()}
+    write_csv(output / "isolated-projection-controls.csv", [value["row"] for value in controls.values()])
+    payload = dict(schema_version="xinyao_1025_qkv_dram_q", primary_rows=rows,
+        isolated_projection_controls=controls,
+        measured_pim_subset_us_per_layer_step=subtotal,
         analysis_source_sha256=digest(__file__),
         measured_pim_subset_ms_18layers_10steps=subtotal*180/1000,
         complete_ae_latency_ms=None, timing_scope="Separately timed native PIM stages; not an integrated AE chain.",
-        unknown_latency_us=dict(GPU_Q=None,GPU_O=None,GPU_softmax=None,GPU_FFN_partial_reduce=None,
-            GELU_multiply_cast=None,K_RoPE=None,normalization_residual=None,action_input_output=None,
+        unknown_latency_us=dict(GPU_QK_RoPE_and_repack=None,GPU_V_cast_repack=None,GPU_O=None,GPU_softmax=None,GPU_FFN_partial_reduce=None,
+            GELU_multiply_cast=None,normalization_residual=None,action_input_output=None,
             conditioning_precompute=None,GPU_dispatch_arrival_processing=None),
         linear_operator_inventory=inventory(), resident_layout=resident, operators=evidence,
         verification=dict(exclusive_tick_identities_exact=True, native_commands_match=True,
@@ -340,10 +360,13 @@ def main():
     dump(output / "breakdown.json", payload)
     dump(output / "linear-operator-inventory.json", inventory())
     dump(output / "resident-layout.json", resident)
-    text = ["GPU-Q / BG-K native timing results", "", "case: native PIM service us per layer per denoise step"]
+    text = ["Fused QKV / GPU RoPE boundary / DRAM Q relay native timing results", "", "case: native PIM service us per layer per denoise step"]
     text.extend(f"{r['operator']}: {r['total_us']:.6f}" for r in rows)
     text += ["", f"Measured PIM subset: {subtotal:.6f} us/layer/step; {subtotal*180/1000:.9f} ms x18x10.",
-        "This is not complete AE latency. GPU Q/O, softmax, reduction, nonlinear, normalization and action I/O are unmeasured.",
+        "This is not complete AE latency. GPU Q/K RoPE and repacking, O projection, softmax, reduction, nonlinear, normalization and action I/O are unmeasured.",
+        "Q/K/V share each X fragment in the joint qkv case. Isolated q/k/v controls are not added to the main total or divided out of the fused measurement.",
+        "Q DRAM reads and controller WRGB rebroadcast are distinct from GPU input; the native RD and relay windows are each attributed exactly once.",
+        "Q uses one 32-byte controller staging slot per channel. Each read waits for DRAM return, then completes its WRGB relay before the next read. This serializes the read-to-relay path and limits prefetch/compute overlap; it is a modeled hardware constraint, not an intrinsic DRAM-bandwidth limit.",
         "Gate and Up share one measured fused schedule; do not divide its latency into two independent measurements.",
         "DRAM array operand reads are included in MAC service; no separate ALU-only latency is claimed.",
         "Exclusive CSV columns sum to wall time; resource work and inclusive unions must not be added again."]

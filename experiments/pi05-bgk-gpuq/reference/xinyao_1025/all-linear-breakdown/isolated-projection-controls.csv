@@ -1,0 +1,4 @@
+operator,channel,total_us,identity_error_ticks,last_service_tick,gpu_input_only_us,q_dram_read_only_us,q_broadcast_only_us,local_input_only_us,mac_array_only_us,array_column_only_us,bg_reduce_only_us,local_write_only_us,dram_read_only_us,dram_write_only_us,gpu_output_only_us,local_gather_only_us,overlap_us,other_us,boundary_us
+q,0,7.392377999999999,0,250913,0.22512,0.0,0.0,0.0,2.6264,0.0,0.0,0.0,0.0,1.380736,0.603134,0.0,2.17616,0.3799193125,0.0009086874999999999
+k,0,6.449687999999999,0,218753,0.22512,0.0,0.0,0.0,2.6264,0.0,0.0,0.0,0.0,0.438046,0.603134,0.0,2.17616,0.3799193125,0.0009086874999999999
+v,1,6.902741999999999,0,234209,0.22512,0.0,0.0,0.0,2.6264,0.0,0.0,0.0,0.34706,0.54404,0.603134,0.0,2.17616,0.3799193125,0.0009086874999999999
