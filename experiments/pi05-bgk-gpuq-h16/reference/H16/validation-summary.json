@@ -1,0 +1,87 @@
+{
+  "horizon": 16,
+  "attention_heads": 8,
+  "attention_cases": {
+    "chain_qkv_qk": {
+      "status": "passed",
+      "native_event_count": 28032,
+      "local_store_row_checks": 0
+    },
+    "k": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "pv": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "q": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "qk": {
+      "status": "passed",
+      "native_event_count": 28032,
+      "local_store_row_checks": 0
+    },
+    "qk_serial": {
+      "status": "passed",
+      "native_event_count": 28032,
+      "local_store_row_checks": 0
+    },
+    "qkv": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "qkv_serial": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    },
+    "v": {
+      "status": "passed",
+      "native_event_count": 0,
+      "local_store_row_checks": 0
+    }
+  },
+  "attention_independent_audits_passed": 9,
+  "mutation_detection_checks": 8,
+  "ffn_H16_relocation_controls": {
+    "gate_up": {
+      "comparison_horizon": 16,
+      "control_attention_bytes_per_bank": 0,
+      "primary_attention_bytes_per_bank": 43008,
+      "same_trace_request_counts": true,
+      "same_latency": true,
+      "control_latency_us": 17.945816,
+      "primary_latency_us": 17.945816,
+      "latency_delta_us": 0.0,
+      "same_issued_commands": true,
+      "same_work_commands": true,
+      "note": "Both cases use H=16 and 16-CK MAC service. Weight base addresses differ; payload and MAC work must match. Timing and row/refresh commands may differ."
+    },
+    "down_tiled": {
+      "comparison_horizon": 16,
+      "control_attention_bytes_per_bank": 0,
+      "primary_attention_bytes_per_bank": 43008,
+      "same_trace_request_counts": true,
+      "same_latency": true,
+      "control_latency_us": 16.017288,
+      "primary_latency_us": 16.017288,
+      "latency_delta_us": 0.0,
+      "same_issued_commands": true,
+      "same_work_commands": true,
+      "note": "Both cases use H=16 and 16-CK MAC service. Weight base addresses differ; payload and MAC work must match. Timing and row/refresh commands may differ."
+    }
+  },
+  "shared_backend_directed_test_note": "Shared native backend directed tests are configuration-level checks; the nine independently audited attention traces above use H=16.",
+  "exclusive_timeline_partition_checks": 80,
+  "native_backend_unchanged_during_final_run": true,
+  "original_backend_check_performed": false,
+  "original_backend_unchanged": null,
+  "postprocessing_source_note": "These analysis/audit snapshots were frozen after execution; workload/native provenance was captured by the run driver."
+}

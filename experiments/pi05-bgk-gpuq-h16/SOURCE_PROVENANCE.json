@@ -1,0 +1,13 @@
+{
+  "variant": "H=16 action horizon, 8-head MHA",
+  "action_horizon": 16,
+  "attention_heads": 8,
+  "head_dimension": 256,
+  "branch": "xinyao_1025",
+  "derived_from_commit": "c2dda15325b48e63886047f2797076db33b50e97",
+  "derived_from_experiment": "../pi05-bgk-gpuq (H=20)",
+  "runtime_backend": "../pi05-bgk-gpuq/backend",
+  "backend_changes": false,
+  "date": "2026-10-25",
+  "note": "Fresh H=16 trace generation and native timing; not a scalar rescaling of H=20 latency. Native MAC service is 16 CK for 16 query vectors under the same one-query-per-CK throughput assumption. GPU arithmetic remains unmeasured."
+}

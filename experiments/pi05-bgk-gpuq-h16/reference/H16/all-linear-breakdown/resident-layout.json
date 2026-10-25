@@ -1,0 +1,42 @@
+{
+  "horizon": 16,
+  "attention_heads": 8,
+  "attention_bytes_per_bank": 43008,
+  "regions": [
+    {
+      "name": "W_QKV interleaved by input fragment",
+      "start": 0,
+      "end_exclusive": 24576
+    },
+    {
+      "name": "Q cache (only rank0 BG0 stores payload)",
+      "start": 24576,
+      "end_exclusive": 26624
+    },
+    {
+      "name": "K cache",
+      "start": 26624,
+      "end_exclusive": 34816
+    },
+    {
+      "name": "V cache",
+      "start": 34816,
+      "end_exclusive": 43008
+    },
+    {
+      "name": "W_Gate + W_Up",
+      "start": 43008,
+      "end_exclusive": 75776
+    },
+    {
+      "name": "W_Down",
+      "start": 75776,
+      "end_exclusive": 92160
+    }
+  ],
+  "total_bytes_per_bank": 92160,
+  "total_bytes_per_layer": 47185920,
+  "no_overlap": true,
+  "excludes": "GPU O weights, action I/O and conditioning",
+  "note": "Reserved bank address ranges include sparse Q-cache holes; actual Q payload is 128 KiB/system."
+}

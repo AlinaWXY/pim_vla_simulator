@@ -1,0 +1,263 @@
+[
+  {
+    "operator": "Q projection",
+    "input_shape": [
+      16,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      2048
+    ],
+    "output_shape": [
+      16,
+      8,
+      256
+    ],
+    "execution": "PIM",
+    "measured_case": "qkv (joint); q isolated control",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "K projection",
+    "input_shape": [
+      16,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      2048
+    ],
+    "output_shape": [
+      16,
+      8,
+      256
+    ],
+    "execution": "PIM",
+    "measured_case": "qkv (joint); k isolated control",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "V projection",
+    "input_shape": [
+      16,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      2048
+    ],
+    "output_shape": [
+      16,
+      8,
+      256
+    ],
+    "execution": "PIM",
+    "measured_case": "qkv (joint); v isolated control",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "QK^T",
+    "input_shape": [
+      8,
+      16,
+      256
+    ],
+    "matrix_shape": [
+      8,
+      256,
+      984
+    ],
+    "output_shape": [
+      8,
+      16,
+      984
+    ],
+    "execution": "PIM",
+    "measured_case": "qk",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "PV",
+    "input_shape": [
+      8,
+      16,
+      984
+    ],
+    "matrix_shape": [
+      8,
+      984,
+      256
+    ],
+    "output_shape": [
+      8,
+      16,
+      256
+    ],
+    "execution": "PIM",
+    "measured_case": "pv",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "O projection",
+    "input_shape": [
+      16,
+      2048
+    ],
+    "matrix_shape": [
+      2048,
+      1024
+    ],
+    "output_shape": [
+      16,
+      1024
+    ],
+    "execution": "GPU",
+    "measured_case": null,
+    "latency_us": null
+  },
+  {
+    "operator": "FFN Gate",
+    "input_shape": [
+      16,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      4096
+    ],
+    "output_shape": [
+      16,
+      4096
+    ],
+    "execution": "PIM",
+    "measured_case": "gate_up (joint)",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "FFN Up",
+    "input_shape": [
+      16,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      4096
+    ],
+    "output_shape": [
+      16,
+      4096
+    ],
+    "execution": "PIM",
+    "measured_case": "gate_up (joint)",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "FFN Down",
+    "input_shape": [
+      16,
+      4096
+    ],
+    "matrix_shape": [
+      4096,
+      1024
+    ],
+    "output_shape": [
+      16,
+      1024
+    ],
+    "execution": "PIM",
+    "measured_case": "down_tiled",
+    "latency_us": "see measured case"
+  },
+  {
+    "operator": "Action input",
+    "input_shape": [
+      16,
+      32
+    ],
+    "matrix_shape": [
+      32,
+      1024
+    ],
+    "output_shape": [
+      16,
+      1024
+    ],
+    "execution": "not modeled",
+    "measured_case": null,
+    "latency_us": null
+  },
+  {
+    "operator": "Action output",
+    "input_shape": [
+      16,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      32
+    ],
+    "output_shape": [
+      16,
+      32
+    ],
+    "execution": "not modeled",
+    "measured_case": null,
+    "latency_us": null
+  },
+  {
+    "operator": "Time MLP 1",
+    "input_shape": [
+      1,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      1024
+    ],
+    "output_shape": [
+      1,
+      1024
+    ],
+    "execution": "precompute",
+    "measured_case": null,
+    "latency_us": null
+  },
+  {
+    "operator": "Time MLP 2",
+    "input_shape": [
+      1,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      1024
+    ],
+    "output_shape": [
+      1,
+      1024
+    ],
+    "execution": "precompute",
+    "measured_case": null,
+    "latency_us": null
+  },
+  {
+    "operator": "AdaRMS conditioning (37 projections)",
+    "input_shape": [
+      1,
+      1024
+    ],
+    "matrix_shape": [
+      1024,
+      3072
+    ],
+    "output_shape": [
+      1,
+      3072
+    ],
+    "execution": "precompute",
+    "measured_case": null,
+    "latency_us": null
+  }
+]

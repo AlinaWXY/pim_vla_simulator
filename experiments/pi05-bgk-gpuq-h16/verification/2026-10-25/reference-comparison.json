@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "comparison_mode": "exact_same_schema",
+  "reference_run": "/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1025/experiments/pi05-bgk-gpuq-h16/reference/H16",
+  "numeric_breakdown_fields_checked": 13787,
+  "numeric_csv_fields_checked": 100,
+  "primary_latency_us": {
+    "qkv": 16.751742,
+    "qk": 14.305438,
+    "pv": 4.408600000000001,
+    "gate_up": 17.945816,
+    "down_tiled": 16.017288
+  },
+  "comparison": {
+    "integer_fields": "exact",
+    "relative_tolerance": 1e-12,
+    "absolute_tolerance": 1e-12
+  },
+  "reference_sha256": {
+    "breakdown.json": "89fcec81ba8743f086e59f2a0717a4df5d49e5e61943b37e6e325528c9534e3f",
+    "all-linear-breakdown.csv": "611c87b0b1032fcacfd2f1ee16759c8cf910e4a6fdef1167efe392ed297191ec"
+  },
+  "measured_pim_subset_us_per_layer_step": 69.42888399999998,
+  "measured_pim_subset_ms_18layers_10steps": 12.497199119999998,
+  "complete_ae_latency_ms": null,
+  "horizon": 16,
+  "attention_heads": 8,
+  "runner_sha256": "1b4af3a19c62652f1e8d59e2e3d7b3fe86975d69288045f0ad2398022d3e794d"
+}

@@ -1,0 +1,18 @@
+{"command": ["/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1024/.venv/bin/python", "-m", "unittest", "discover", "-s", "/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1025/experiments/pi05-bgk-gpuq-h16/source", "-p", "test_*.py", "-v"], "returncode": 0}
+test_H16_shape_service_and_buffer_contract (test_attention_workload.AttentionWorkloadTests.test_H16_shape_service_and_buffer_contract) ... ok
+test_K_stores_match_target_without_partial_bursts (test_attention_workload.AttentionWorkloadTests.test_K_stores_match_target_without_partial_bursts) ... ok
+test_QK_column_coverage_export_completeness_and_tile_capacity (test_attention_workload.AttentionWorkloadTests.test_QK_column_coverage_export_completeness_and_tile_capacity) ... ok
+test_Q_roundtrip_copies_and_DRAM_source_bursts (test_attention_workload.AttentionWorkloadTests.test_Q_roundtrip_copies_and_DRAM_source_bursts) ... ok
+test_V_PV_layout_and_RMW_preserved (test_attention_workload.AttentionWorkloadTests.test_V_PV_layout_and_RMW_preserved) ... ok
+test_fused_X_is_loaded_once_and_scans_all_three_matrices (test_attention_workload.AttentionWorkloadTests.test_fused_X_is_loaded_once_and_scans_all_three_matrices) ... ok
+test_numeric_Q_K_repacking_and_BG_reduction (test_attention_workload.AttentionWorkloadTests.test_numeric_Q_K_repacking_and_BG_reduction) ... ok
+test_payload_counts_and_no_unmodeled_Q_GPU_input (test_attention_workload.AttentionWorkloadTests.test_payload_counts_and_no_unmodeled_Q_GPU_input) ... ok
+test_regions_disjoint_and_source_copies_accounted (test_attention_workload.AttentionWorkloadTests.test_regions_disjoint_and_source_copies_accounted) ... ok
+test_roundtrip_fences_explicit_unknown_GPU_boundary (test_attention_workload.AttentionWorkloadTests.test_roundtrip_fences_explicit_unknown_GPU_boundary) ... ok
+test_serial_control_preserves_payload_and_fences_reuse (test_attention_workload.AttentionWorkloadTests.test_serial_control_preserves_payload_and_fences_reuse) ... ok
+test_weight_unique_feature_owners_and_numeric_projection (test_attention_workload.AttentionWorkloadTests.test_weight_unique_feature_owners_and_numeric_projection) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.836s
+
+OK

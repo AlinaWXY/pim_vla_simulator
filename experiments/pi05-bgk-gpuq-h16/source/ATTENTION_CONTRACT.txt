@@ -1,0 +1,87 @@
+xinyao_1025 H=16 action-horizon mapping and native trace contract
+
+H=16 is the number of action/query tokens, NOT the number of attention heads.
+The head count remains 8, with 256 features/head. B=1; hidden=1024;
+prefix=968; suffix=16; valid KV length=984; physical KV length=992.
+Two channels/head; 16 channels; 2 ranks/channel; 4 BG/rank; 4 banks/BG.
+32B bursts, 16 BF16 lanes, 2KiB DRAM rows. 512 physical banks total.
+This is an independently generated H=16 trace and native run, not an H=20
+latency multiplied by 16/20. MACAB and MACQK each use 16CK service under
+the same one-query-per-cycle PE assumption (nCCDAB=nCCDQK=16).
+
+Per-bank DRAM allocation
+QKV weights [0,24576), Q [24576,26624), K [26624,34816), V [34816,43008).
+Q uses only rank0/BG0 source banks (2048B each); its 2KiB region is reserved
+in every bank to simplify non-overlapping allocation. Resident Q payload128KiB.
+Attention reserves42KiB per bank; FFN allocations begin after this boundary.
+
+QKV projection
+All three matrices use the V output-feature ownership:
+  d = 64*slot + 32*channel_in_head + 16*rank + 4*BG + bank.
+Each bank has four output features per matrix and processes all16tokens.
+Weights: [input fragment64][Q/K/V3][feature slot4][input lane16], BF16.
+One head has one copy of each weight matrix; all three matrices total12MiB.
+For each16-input-feature fragment, load16Xvectors once per channel into a
+rank-shared double buffer (2*16*16*2=1024B/rank), then scan Q4/K4/V4 columns.
+The input is not loaded three times. Input traffic is512KiB system-wide.
+Three output accumulators use768B/bank. Legacy MACAB gets an explicit16CK
+drain after its issue-retirement barrier. Native timing enforces input readiness
+and protects both input buffer slots against overwrite before consumption.
+
+GPU roundtrip
+Each Q/K/V result exports128KiB FP32 to the GPU boundary. GPU projection BF16
+rounding, Q/K RoPE, Q scaling, packing and V conversion are required but
+unmeasured. They are not assigned a measured zero latency.
+Q stores128KiB BF16: one complete Q copy in each of the two channels/head.
+The replication is a charged GPU-origin store, not a free PIM replication.
+K suffix stores64KiB BF16 using ordinary DRAM ST, no local-write shortcut.
+V keeps the64KiB prefix-tail read plus128KiB BF16 read-modify-write stores.
+Those physical tail stores contain8 retained prefix +16 suffix +8 padding tokens.
+V baseline postprocessing remains a separately unmeasured GPU operation.
+
+QK target layouts
+K: token t owns channel=2h+t%2, rank=(t//2)%2, BG=(t//4)%4, slot=t//16.
+Each of the16 BGs/head owns exactly one suffix token for H=16.
+Within the four BG banks: bank=(d%128)//32, local=(d//128)*32+d%32.
+K bank order [token slot62][local feature64]. Each suffix bank receives128B.
+Q: source rank0/BG0; same feature-bank permutation as K.
+Q bank order [local fragment4][query16][lane16], two full channel copies/head.
+PIM_RD_Q address buffer reads a32B Q source burst from DRAM. Native backend
+waits for RD return, then issues a shared WRGB relay to all eight BG/rank
+consumers of that bank index. This is not a GPU readback or fresh GPU input.
+One32B relay staging buffer/channel serializes read->relay->nextread.
+Q data reaches per-bank double16x16 BF16 input buffers (1024B/bank).
+There are4096Q source reads and4096native relays:128KiB each,1MiB after
+physical eight-way fanout. Fanout propagation has no independent network model.
+
+QK loops over four local feature fragments. First three scan62token slots;
+last fragment computes at most16token tiles and then exports completed scores.
+Partial accumulators use3968B/bank (4096B reservation), BG output double buffer
+2048B (1024B maximum tile). MAC completion precedes tile export. QK exports
+496KiB FP32 including8 padded tokens/head; GPU masks padding. Four-bank BG
+reduction uses the AttAcc throughput assumption, with no separate accumulator
+pipeline latency. No cross-rank/channel score reduction is needed.
+PV preserves feature ownership,496KiB BF16 P input and128KiB FP32 output.
+
+Native commands used
+PIM_WR_GB address buffer: shared channel32B GPU-input burst to rank SRAMs.
+PIM_MAC_AB address buffer: fused projection/PV allbank MAC,16query service.
+PIM_RD_Q address buffer: native source DRAM RD followed by automatic WRGB relay.
+PIM_MAC_QK address buffer: allbank cache MAC,16queries; completion tracked.
+PIM_RD_BG address:32B complete BG score output;2CK completion tracked.
+PIM_RD_RES address:32B rank output; legacy export phase retains4CK tail drain.
+LD/ST: ordinary DRAM read/write, including GPU-origin RoPE result stores.
+RD_Q expands to RD and WRGB in command accounting and retains source identity
+in bgk_events as PIM_RD_Q/PIM_RELAY_Q.
+
+Case semantics
+Primary cases:qkv,qk,pv. q/k/v are isolated controls, not additive production
+latencies because their X input passes would triple-charge the fused input.
+qkv_serial/qk_serial are singlebuffer controls with identical payloads.
+chain_qkv_qk checks native store visibility and subsequent Q relay/attention,
+not a numerical end-to-end GPU execution; GPU transform boundaries are explicit.
+Standalone qk assumes Q and K are already resident in the specified layout.
+External GPU DMA/arrival overhead beyond controller transfers is unmeasured.
+
+Generate: attention_workload.generate(path,op,mode='complete',schedule='double').
+Tests: python -m unittest discover -s source -p test_attention_workload.py -v

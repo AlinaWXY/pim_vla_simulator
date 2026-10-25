@@ -1,0 +1,16 @@
+{"command": ["/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1024/.venv/bin/python", "-m", "unittest", "discover", "-s", "/fact_data/xinyaowang/pim_vla_reproduce_xinyao_1025/experiments/pi05-bgk-gpuq-h16/analysis", "-p", "test_*.py", "-v"], "returncode": 0}
+test_column_guard_is_not_arithmetic_and_can_overlap_input (test_analysis.AttributionTests.test_column_guard_is_not_arithmetic_and_can_overlap_input) ... ok
+test_dram_relay_is_not_gpu_input_and_closes (test_analysis.AttributionTests.test_dram_relay_is_not_gpu_input_and_closes) ... ok
+test_inventory_distinguishes_horizon_from_attention_heads (test_analysis.AttributionTests.test_inventory_distinguishes_horizon_from_attention_heads) ... ok
+test_native_event_categories (test_analysis.AttributionTests.test_native_event_categories) ... ok
+test_outside_phase_is_not_silently_discarded (test_analysis.AttributionTests.test_outside_phase_is_not_silently_discarded) ... ok
+test_parallel_banks_are_union_not_summed_walltime (test_analysis.AttributionTests.test_parallel_banks_are_union_not_summed_walltime) ... ok
+test_three_resources_need_two_overlap_credits (test_analysis.AttributionTests.test_three_resources_need_two_overlap_credits) ... ok
+test_transfer_fences_are_distinct_from_pipeline_windows (test_analysis.AttributionTests.test_transfer_fences_are_distinct_from_pipeline_windows) ... ok
+test_layout_buffers_and_resident_regions (test_analysis.H16FFNTests.test_layout_buffers_and_resident_regions) ... ok
+test_native_trace_request_coverage_scales_horizon_not_weight_work (test_analysis.H16FFNTests.test_native_trace_request_coverage_scales_horizon_not_weight_work) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.146s
+
+OK

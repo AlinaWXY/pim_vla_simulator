@@ -1,9 +1,12 @@
 # PIM VLA Simulator
 
-最新 Pi0.5 AE MHA8 线性算子时序复现见
-[`experiments/pi05-bgk-gpuq/`](experiments/pi05-bgk-gpuq/README.md)。
-该目录包含独立原生后端、构建依赖、统一运行入口、latency/breakdown 参考值及审计，
-不依赖旧服务器实验路径。运行时使用该目录的 `backend/`，不是根目录的上游 `ramulator2/`。
+Pi0.5 AE MHA8 线性算子时序复现（H 表示 action horizon，head 数均为 8）：
+
+- [H=20：共享 X 的 QKV、GPU RoPE 边界、DRAM Q 回读](experiments/pi05-bgk-gpuq/README.md)。
+- [H=16：独立 mapping、原生仿真与 breakdown](experiments/pi05-bgk-gpuq-h16/README.md)。
+
+两个版本分别保存结果与审计，共用 `experiments/pi05-bgk-gpuq/backend/` 的原生后端和构建依赖；
+不依赖旧服务器实验路径，也不执行根目录的历史上游 `ramulator2/`。
 
 独立的 Thor + Ramulator（LPDDR PIM）仿真器项目，目前处于源码基线准备阶段。
 

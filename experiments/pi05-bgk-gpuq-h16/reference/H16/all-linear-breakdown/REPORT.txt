@@ -1,0 +1,17 @@
+H=16 action tokens, 8 attention heads: fused QKV / GPU RoPE boundary / DRAM Q relay native timing results
+
+case: native PIM service us per layer per denoise step
+qkv: 16.751742
+qk: 14.305438
+pv: 4.408600
+gate_up: 17.945816
+down_tiled: 16.017288
+
+Measured PIM subset: 69.428884 us/layer/step; 12.497199120 ms x18x10.
+This is not complete AE latency. GPU Q/K RoPE and repacking, O projection, softmax, reduction, nonlinear, normalization and action I/O are unmeasured.
+Q/K/V share each X fragment in the joint qkv case. Isolated q/k/v controls are not added to the main total or divided out of the fused measurement.
+Q DRAM reads and controller WRGB rebroadcast are distinct from GPU input; the native RD and relay windows are each attributed exactly once.
+Q uses one 32-byte controller staging slot per channel. Each read waits for DRAM return, then completes its WRGB relay before the next read. This serializes the read-to-relay path and limits prefetch/compute overlap; it is a modeled hardware constraint, not an intrinsic DRAM-bandwidth limit.
+Gate and Up share one measured fused schedule; do not divide its latency into two independent measurements.
+DRAM array operand reads are included in MAC service; no separate ALU-only latency is claimed.
+Exclusive CSV columns sum to wall time; resource work and inclusive unions must not be added again.

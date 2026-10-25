@@ -1,0 +1,55 @@
+{
+  "status": "passed",
+  "faults": [
+    {
+      "case": "qk",
+      "fault": "wrong_multicast_fanout",
+      "detected": true,
+      "reason": "Wrong multicast/compute fanout {'clock': 49, 'ready_at': 51, 'operation': 'PIM_RELAY_Q', 'Channel': 0, 'Rank': 0, 'BankGroup': 0, 'Bank': 0, 'Row': 12, 'Column': 0, 'buffer': 0, 'target_banks': 7, 'bytes': 32, 'service_c"
+    },
+    {
+      "case": "qk",
+      "fault": "missing_Q_read",
+      "detected": true,
+      "reason": "Unexpected legacy native identity ('LD', 0, 0, 0, 0, 12, 0, -1)"
+    },
+    {
+      "case": "qk",
+      "fault": "relay_before_read_return",
+      "detected": true,
+      "reason": "Rich event missing unique native command {'clock': 47, 'ready_at': 49, 'operation': 'PIM_RELAY_Q', 'Channel': 0, 'Rank': 0, 'BankGroup': 0, 'Bank': 0, 'Row': 12, 'Column': 0, 'buffer': 0, 'target_banks': 8, 'bytes': 32, "
+    },
+    {
+      "case": "qk",
+      "fault": "missing_relay_completion",
+      "detected": true,
+      "reason": "Missing arrival/completion service {'clock': 49, 'ready_at': 49, 'operation': 'PIM_RELAY_Q', 'Channel': 0, 'Rank': 0, 'BankGroup': 0, 'Bank': 0, 'Row': 12, 'Column': 0, 'buffer': 0, 'target_banks': 8, 'bytes': 32, 'servi"
+    },
+    {
+      "case": "qk",
+      "fault": "wrong_Q_source_bank",
+      "detected": true,
+      "reason": "Q read native source-bank mismatch"
+    },
+    {
+      "case": "qk",
+      "fault": "wrong_ACT_row",
+      "detected": true,
+      "reason": "RD wrong/closed row ch0 bank(0, 0, 0)"
+    },
+    {
+      "case": "qkv",
+      "fault": "MAC_before_complete_X",
+      "detected": true,
+      "reason": "MAC starts before whole input fragment ready ('qkv', 0, 0)"
+    },
+    {
+      "case": "qkv",
+      "fault": "missing_X_vector",
+      "detected": true,
+      "reason": "Native dropped requested operation/address"
+    }
+  ],
+  "result_files_modified": false,
+  "method": "in-memory CSV read interception only"
+}
