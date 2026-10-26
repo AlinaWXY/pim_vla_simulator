@@ -1,0 +1,15 @@
+{
+  "branch": "research/thor-openpi-mha8-h20-latency-20261022",
+  "commit": "5bbcdd47685402998621db9a99bed8cc2f9f1070",
+  "worktree": "/fact_data/shiyuhuang/projects/vla-pi05-latency-v2",
+  "clean": true,
+  "pushed": false,
+  "cpu_tests_passed": 6,
+  "local_sha256_files_verified": 68,
+  "cpu_allocation_released": "1832258",
+  "own_slurm_queue_empty": true,
+  "ssh_closed": true,
+  "gpu_final_check_hkt": "2026-10-22T17:47:08+08:00",
+  "gpu_compute_processes": [],
+  "gpu_utilization_percent": 0
+}

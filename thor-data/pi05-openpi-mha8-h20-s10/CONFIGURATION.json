@@ -1,0 +1,167 @@
+{
+  "model": "pi0.5",
+  "implementation": "OpenPI PyTorch",
+  "observation_date": "2026-10-22",
+  "publication_date": "2026-10-26",
+  "timezone": "Asia/Hong_Kong",
+  "device": "Thor",
+  "batch_size": 1,
+  "action_horizon": 20,
+  "denoising_steps": 10,
+  "attention": "physical synthetic MHA in both VLM and action expert",
+  "query_heads": 8,
+  "kv_heads": 8,
+  "head_dim": 256,
+  "expert_layers": 18,
+  "expert_residual_width": 1024,
+  "expert_ffn_width": 4096,
+  "prefix_positions": 968,
+  "total_kv_positions": 988,
+  "image_inputs": "three 224x224 views",
+  "padded_text_state_positions": 200,
+  "conditioning": "AdaRMS/time-conditioning precomputed for 10-step schedule",
+  "checkpoint_origin": "lerobot/pi05_base snapshot b211f3d44c36b6acfcf7ae94a64e8e96f75a64ba",
+  "openpi_source_commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+  "experiment_source_commit": "5bbcdd47685402998621db9a99bed8cc2f9f1070",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.53.2",
+  "dtype": "selective BF16/FP32, not uniform BF16",
+  "parameter_dtype_elements": {
+    "torch.bfloat16": 3695217776,
+    "torch.float32": 119720608
+  },
+  "torch_threads": 1,
+  "interop_threads": 1,
+  "compile": false,
+  "cuda_graph": false,
+  "cache_flush": false,
+  "coarse": {
+    "warmups_per_block": 20,
+    "samples_per_block": 100,
+    "blocks": [
+      "clean_before",
+      "same-pass phase",
+      "clean_after"
+    ]
+  },
+  "fine": {
+    "step_index_zero_based": 4,
+    "layers": 18,
+    "warmups_per_block": 20,
+    "clean_samples_per_block": 100,
+    "cuda_profile_samples": 20,
+    "separate_CPU_label_pass": true,
+    "includes_action_IO": true,
+    "includes_Euler": false
+  },
+  "source_summary": {
+    "coarse": {
+      "clean_mean_ms": 222.75732980982866,
+      "clean_p50_ms": 221.25601005973294,
+      "clean_p95_ms": 230.60156902647577,
+      "phase_total_mean_ms": 224.8803289794922,
+      "phase_instrumentation_overhead_pct": 0.9689193649749406,
+      "before_after_drift_pct": 0.6472688647107816
+    },
+    "phases": [
+      {
+        "stage": "vit",
+        "mean_ms": 25.637991342544556,
+        "share_pct": 11.40072653703855
+      },
+      {
+        "stage": "vlm",
+        "mean_ms": 77.7055574798584,
+        "share_pct": 34.55418169854452
+      },
+      {
+        "stage": "ae",
+        "mean_ms": 120.81717025756836,
+        "share_pct": 53.72509494531476
+      },
+      {
+        "stage": "other",
+        "mean_ms": 0.7196098995208741,
+        "share_pct": 0.3199968191021716
+      }
+    ],
+    "clean_step_p50_ms": 11.845439910888672,
+    "clean_step_mean_ms": 11.923620471954345,
+    "profiled_step_mean_ms": 18.448153686523437,
+    "post_profile_step_mean_ms": 15.118375358581543,
+    "profile_overhead_pct": 54.71939693078545,
+    "post_profile_drift_pct": 26.793496942825467,
+    "gpu_active_union_ms": 10.72430805,
+    "fine_totals_ms": {
+      "Matrix / linear": 4.668502350000001,
+      "Movement / pointwise / setup": 5.01985215,
+      "Nonlinear / normalization": 1.0256494999999994,
+      "Shared overlap": 0.01030405
+    },
+    "prefix_kv_mib": 136.125,
+    "actual_dimensions": {
+      "vlm": {
+        "layers": 18,
+        "residual_width": 2048,
+        "ffn_width": 16384,
+        "query_heads": 8,
+        "kv_heads": 8,
+        "head_dim": 256,
+        "q_weight": [
+          2048,
+          2048
+        ],
+        "k_weight": [
+          2048,
+          2048
+        ],
+        "v_weight": [
+          2048,
+          2048
+        ],
+        "o_weight": [
+          2048,
+          2048
+        ]
+      },
+      "expert": {
+        "layers": 18,
+        "residual_width": 1024,
+        "ffn_width": 4096,
+        "query_heads": 8,
+        "kv_heads": 8,
+        "head_dim": 256,
+        "q_weight": [
+          2048,
+          1024
+        ],
+        "k_weight": [
+          2048,
+          1024
+        ],
+        "v_weight": [
+          2048,
+          1024
+        ],
+        "o_weight": [
+          1024,
+          2048
+        ]
+      }
+    }
+  },
+  "restrictions": [
+    "Synthetic expanded KV heads, not independently trained MHA.",
+    "Kernel-active profile is not clean wall time or an offload microbenchmark.",
+    "Profiler overhead and post-profile drift are recorded, not corrected away.",
+    "No PIM/GPU end-to-end hardware measurement is claimed."
+  ],
+  "html_snapshot": {
+    "file": "html/latest-h16-report.html",
+    "sha256": "1c7b58acf0ebd60326269af61ef865013e42d041a77495351d2d1b8adc966dd1",
+    "unchanged_bytes": true,
+    "content_scope": "xinyao_1025 H16 layout and conditional GPU+PIM estimate",
+    "not_a_Thor_H16_measurement": true,
+    "relative_source_links": "Original local links are preserved, not rewritten."
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "coarse": {
+    "clean_mean_ms": 222.75732980982866,
+    "clean_p50_ms": 221.25601005973294,
+    "clean_p95_ms": 230.60156902647577,
+    "phase_total_mean_ms": 224.8803289794922,
+    "phase_instrumentation_overhead_pct": 0.9689193649749406,
+    "before_after_drift_pct": 0.6472688647107816
+  },
+  "phases": [
+    {
+      "stage": "vit",
+      "mean_ms": 25.637991342544556,
+      "share_pct": 11.40072653703855
+    },
+    {
+      "stage": "vlm",
+      "mean_ms": 77.7055574798584,
+      "share_pct": 34.55418169854452
+    },
+    {
+      "stage": "ae",
+      "mean_ms": 120.81717025756836,
+      "share_pct": 53.72509494531476
+    },
+    {
+      "stage": "other",
+      "mean_ms": 0.7196098995208741,
+      "share_pct": 0.3199968191021716
+    }
+  ],
+  "clean_step_p50_ms": 11.845439910888672,
+  "clean_step_mean_ms": 11.923620471954345,
+  "profiled_step_mean_ms": 18.448153686523437,
+  "post_profile_step_mean_ms": 15.118375358581543,
+  "profile_overhead_pct": 54.71939693078545,
+  "post_profile_drift_pct": 26.793496942825467,
+  "gpu_active_union_ms": 10.72430805,
+  "fine_totals_ms": {
+    "Matrix / linear": 4.668502350000001,
+    "Movement / pointwise / setup": 5.01985215,
+    "Nonlinear / normalization": 1.0256494999999994,
+    "Shared overlap": 0.01030405
+  },
+  "prefix_kv_mib": 136.125,
+  "actual_dimensions": {
+    "vlm": {
+      "layers": 18,
+      "residual_width": 2048,
+      "ffn_width": 16384,
+      "query_heads": 8,
+      "kv_heads": 8,
+      "head_dim": 256,
+      "q_weight": [
+        2048,
+        2048
+      ],
+      "k_weight": [
+        2048,
+        2048
+      ],
+      "v_weight": [
+        2048,
+        2048
+      ],
+      "o_weight": [
+        2048,
+        2048
+      ]
+    },
+    "expert": {
+      "layers": 18,
+      "residual_width": 1024,
+      "ffn_width": 4096,
+      "query_heads": 8,
+      "kv_heads": 8,
+      "head_dim": 256,
+      "q_weight": [
+        2048,
+        1024
+      ],
+      "k_weight": [
+        2048,
+        1024
+      ],
+      "v_weight": [
+        2048,
+        1024
+      ],
+      "o_weight": [
+        1024,
+        2048
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "cache_bitwise_equal": true,
+  "raw_runs_successful": true,
+  "fine_outputs_bitwise_equal": true,
+  "fine_samples": 20,
+  "single_cuda_stream": true,
+  "attention_qk_sv_calls": 18,
+  "heads": 8,
+  "head_dim": 256,
+  "nonlinear_softmax_gelu_calls": 18,
+  "online_conditioning_kernels": 0,
+  "exclusive_totals_reconciled": true,
+  "phase_totals_reconciled": true
+}

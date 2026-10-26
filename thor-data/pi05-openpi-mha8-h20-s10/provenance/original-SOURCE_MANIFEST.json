@@ -1,0 +1,62 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "ef6f52675b1f3d0b35db5c88f3669f5d08b49a3c1584b48b635f9e3f2418cb21"
+  },
+  {
+    "path": "analyze.py",
+    "sha256": "b3c8249fd82066188a3b192feb2201b0eebb0f5002565b365524df184e9ac296"
+  },
+  {
+    "path": "draw_architecture.py",
+    "sha256": "9537e63018cfa13e6c379b87e7cbd54407103adbefd9155e5b71610d0ec21c09"
+  },
+  {
+    "path": "inspect_parameters.py",
+    "sha256": "bddcc193d67dcde6bf96a2a62b03e315097e3a9d4ae2cd8f61d278d263df4a78"
+  },
+  {
+    "path": "labels_driver.py",
+    "sha256": "aaee8a727230168997aaec5603ab0f15e7dac10a5752177fdc65e5a7e7e1de25"
+  },
+  {
+    "path": "mha8.py",
+    "sha256": "078e5e3e9e8690969080bf5e321e2f666d1cf9b865e16f5e800690bde1e2dca6"
+  },
+  {
+    "path": "repository_README.md",
+    "sha256": "0c0770faadd6814be34a0fe8722fcbbe08bb14ee27fa91bb5e686ccc050bbe33"
+  },
+  {
+    "path": "results.gitignore",
+    "sha256": "7d77d3e8f3f7e1f2d757726715f74a0790e8ff7a0b73aa9d4fe7a304be2ac9e4"
+  },
+  {
+    "path": "run.sh",
+    "sha256": "bd6afe9e3ba615fcba6c1ed2143688fe80285f95caecdeb5e264f0c0f48fd633"
+  },
+  {
+    "path": "run_parameters.sh",
+    "sha256": "6ce0865262eb0509262a25ac3cd0d873dab5be2f5e8b5816c44c9dc32294df87"
+  },
+  {
+    "path": "runner.py",
+    "sha256": "8dff74d310b4b0c26e6162f04474bdc0a593db7a6b33bd892f5595fc981f591b"
+  },
+  {
+    "path": "test_analysis.py",
+    "sha256": "2bb51aaf8f492c6e527fd022a90de965f5ce7478ac7c7f6a1724a18d0d2b740f"
+  },
+  {
+    "path": "test_mha8.py",
+    "sha256": "36bea4133483694faddb9bcb98652113abd60edacba5dbe8cccfdfd4d46a2d81"
+  },
+  {
+    "path": "parameters.json",
+    "sha256": "a4400f6bbd513414be8a3851e9e64a338d48534caa1b37d283ab35fa784dac0a"
+  },
+  {
+    "path": "resource_final.txt",
+    "sha256": "e4d72cb9dd0dbb6bab08884f35150fe0978b1d5f1bd21e7ebb657641628bd45f"
+  }
+]
