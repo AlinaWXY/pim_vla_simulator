@@ -28,8 +28,28 @@ class MemoryConfig:
     pim_mac_scope: str = "rank"
     pim_data_path: str = "lpddr"
     pim_local_transfer_cycles: int = 2
+    pim_rank_rope: bool = False
+    pim_ffn_dram: bool = False
+    ffn_z_preinstalled: bool = False
+    rope_ii_cycles: int = 1
+    rope_latency_cycles: int = 4
+    pim_cast_cycles: int = 1
+    rank_reduce_cycles: int = 4
 
     def __post_init__(self):
+        if type(self.pim_ffn_dram) is not bool or type(self.ffn_z_preinstalled) is not bool:
+            raise ValueError("FFN DRAM flags must be boolean")
+        if self.ffn_z_preinstalled and not self.pim_ffn_dram:
+            raise ValueError("ffn_z_preinstalled requires pim_ffn_dram")
+        if self.pim_ffn_dram and (not self.pim or self.ranks != 2 or self.channels != 16 or self.pim_data_path != "attacc" or self.pim_input_broadcast or self.pim_mac_scope != "rank" or self.pim_rank_rope):
+            raise ValueError("FFN DRAM requires 16 channels, 2 ranks, rank-scoped AttAcc without broadcast or rank RoPE mode")
+        if type(self.pim_rank_rope) is not bool:
+            raise ValueError("pim_rank_rope must be boolean")
+        for name in ("rope_ii_cycles", "rope_latency_cycles", "pim_cast_cycles", "rank_reduce_cycles"):
+            if type(getattr(self, name)) is not int or getattr(self, name) < 1:
+                raise ValueError(f"{name} must be positive")
+        if self.pim_rank_rope and (not self.pim or self.ranks != 2 or self.channels != 16 or self.pim_data_path != "attacc" or self.pim_input_broadcast or self.pim_mac_scope != "rank"):
+            raise ValueError("rank RoPE requires 16 channels, 2 ranks, PIM AttAcc, rank scope, and no cross-rank input broadcast")
         if type(self.pim_local_transfer_cycles) is not int or self.pim_local_transfer_cycles < 1:
             raise ValueError("pim_local_transfer_cycles must be a positive integer")
         if not isinstance(self.model, str) or self.model not in MODELS:

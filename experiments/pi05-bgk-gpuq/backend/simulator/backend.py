@@ -71,6 +71,14 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_mac_scope": config.pim_mac_scope,
                     "pim_data_path": config.pim_data_path,
                     "pim_local_transfer_cycles": config.pim_local_transfer_cycles,
+                    "pim_rank_rope": config.pim_rank_rope,
+                    "pim_ffn_dram": config.pim_ffn_dram,
+                    "ffn_z_preinstalled": config.ffn_z_preinstalled,
+                    "ffn_dram_events_path": str(output / f"ffn_dram_events.csv.ch{channel}") if config.pim_ffn_dram else "",
+                    "rope_ii_cycles": config.rope_ii_cycles,
+                    "rope_latency_cycles": config.rope_latency_cycles,
+                    "pim_cast_cycles": config.pim_cast_cycles,
+                    "rank_reduce_cycles": config.rank_reduce_cycles,
                     "local_input_trace_path": str(output / f"local_input.csv.ch{channel}"),
                     "bgk_events_path": str(output / f"bgk_events.csv.ch{channel}")} if config.pim else {}),
                 controller_plugins=[
@@ -269,5 +277,72 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         },
         "raw_stats": stats,
     }
+    if config.pim_rank_rope:
+        result["schema_version"] = 10
+        result["rank_rope_model"] = {
+            "active_physical_rank": 1, "gpu_reserved_rank": 0,
+            "projection_batch": 8, "qk_batch": 16,
+            "projection_mac_completion_ck": timings["nCCDAB"],
+            "rope_pairs_per_request": 8, "rope_ii_cycles": config.rope_ii_cycles,
+            "rope_latency_cycles": config.rope_latency_cycles,
+            "rope_request_completion_ck": 7 * config.rope_ii_cycles + config.rope_latency_cycles,
+            "cast_cycles_per_32B": config.pim_cast_cycles,
+            "rank_reduce_cycles": config.rank_reduce_cycles,
+            "input_buffers_bytes_per_bank": 64, "coefficient_buffer_bytes_per_bank": 32,
+            "output_fifo_bytes_per_bank": 64, "query_buffer_bytes_per_bank": 512,
+            "local_read_completion": "LOCALRD issue + nCL + nBL_min; native array timing, no external DQ",
+            "local_write_completion": "LOCALWR issue + nLOCALWR + nWR; native array timing, no external DQ",
+            "query_export": "native RD and local buffer tap; callback after actual read return",
+            "query_remote": "peer channel ADDRESS xor 32 export must complete before WRGB to one bank buffer",
+            "query_ownership": "global_query=2*local_token+channel_parity; paired channels own alternate tokens",
+            "numerical_compute": False,
+            "latency_basis": "configured research-unit timing; not synthesized or measured hardware",
+        }
+        result["pim_model"]["mac_completion"] = "projection issue+nCCDAB; QK issue+nCCDQK; rank reduction then result export"
+        result["bgk_model"]["BG_reduction"] = "rank1 sixteen-bank reduction; explicit configurable latency per 16-query K-vector"
+        result["bgk_model"]["RoPE_conversion_packing"] = result["rank_rope_model"]
+        result["traffic_bytes"].update({
+            "bgk_internal_array_read": counters.get("MACQK", 0) * 16 * transaction_bytes,
+            "local_array_read": counters.get("LOCALRD", 0) * transaction_bytes,
+            "pim_bank_local_write": counters.get("LOCALWR", 0) * transaction_bytes,
+            "q_export_external_read": requests.get("pim_q_export", 0) * transaction_bytes,
+            "q_remote_external_write": requests.get("pim_q_remote", 0) * transaction_bytes,
+            "rank_complete_result": requests["pim_rd_bg"] * transaction_bytes,
+            "external_dq_total": (counters.get("RD", 0) + counters.get("RDA", 0) +
+                counters.get("WR", 0) + counters.get("WRA", 0) + counters.get("WRGB", 0) +
+                counters.get("RDRES", 0)) * transaction_bytes,
+        })
+    else:
+        if not config.pim_ffn_dram:
+            result["issued_commands"].pop("LOCALRD", None)
+        for key in ("pim_rank_rope", "rope_ii_cycles", "rope_latency_cycles", "pim_cast_cycles", "rank_reduce_cycles"):
+            result["config"].pop(key, None)
+    if config.pim_ffn_dram:
+        result["schema_version"] = 11
+        result["ffn_dram_model"] = {
+            "active_physical_rank": 1, "z_preinstalled": config.ffn_z_preinstalled,
+            "z_base_bytes_per_bank": 360448, "z_payload_bytes_per_bank": 512,
+            "z_reserved_bytes_per_bank": 2048, "rank_resident_z_sram_bytes": 0,
+            "rank_nonlinear_input_staging_bytes": 128, "rank_nonlinear_output_staging_bytes": 32,
+            "bank_staging_bytes": 32, "input_double_buffer_bytes_per_rank": 1024,
+            "rank_port_cycles_per_32B": config.pim_local_transfer_cycles,
+            "store": "128B G/U gather via rank port, excluded nonlinear value boundary,32B return, native LOCALWR+nWR",
+            "store_overlap": "Rank materialization staging released at RETURN completion; independent32B bank staging remains until LOCALWR payload consumed",
+            "load": "native LOCALRD+nCL+nBL_min,32B rank-port gather/transpose; all16 matching bank columns required before MAC",
+            "mac_completion": "Legacy issue retirement with explicit workload WAIT16; buffer remains owned for nCCDAB",
+            "nonlinear_latency_ck": None, "numerical_compute": False,
+            "latency_basis": "Configured research timing model; not synthesized/measured nonlinear hardware",
+        }
+        result["traffic_bytes"].update({
+            "ffn_z_array_write": counters.get("LOCALWR", 0) * transaction_bytes,
+            "ffn_z_array_read": counters.get("LOCALRD", 0) * transaction_bytes,
+            "ffn_gu_local_gather": counters.get("LOCALWR", 0) * 128,
+            "ffn_z_local_return": counters.get("LOCALWR", 0) * transaction_bytes,
+            "ffn_z_local_load": counters.get("LOCALRD", 0) * transaction_bytes,
+            "external_dq_total": sum(counters.get(op, 0) for op in ("RD", "RDA", "WR", "WRA", "WRGB", "RDRES")) * transaction_bytes,
+        })
+    else:
+        result["config"].pop("pim_ffn_dram", None)
+        result["config"].pop("ffn_z_preinstalled", None)
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

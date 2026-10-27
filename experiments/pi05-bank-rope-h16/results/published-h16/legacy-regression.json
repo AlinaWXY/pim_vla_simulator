@@ -1,0 +1,27 @@
+{
+  "chain": {
+    "latency_us": 34.886095999999995,
+    "expected_us": 34.886096,
+    "passed": true
+  },
+  "v": {
+    "latency_us": 10.282356,
+    "expected_us": 10.282356,
+    "passed": true
+  },
+  "pv": {
+    "latency_us": 9.189585999999998,
+    "expected_us": 9.189586,
+    "passed": true
+  },
+  "gate_up": {
+    "latency_us": 35.675892,
+    "expected_us": 35.675892,
+    "passed": true
+  },
+  "down_tiled": {
+    "latency_us": 24.640322,
+    "expected_us": 24.640322,
+    "passed": true
+  }
+}

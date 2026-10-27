@@ -1,0 +1,8 @@
+{
+  "report_annotation": "REPORT.md adds scope, buffer accounting and scheduling clarification after the run. REPORT.generated.md is the unchanged generated report; numerical results were not edited.",
+  "runtime_source_archive": "runtime-source.tar.gz; all286 provenance-listed source files verified before archiving",
+  "baseline_local_git_commit": "d7d8ad6",
+  "native_guards_and_smoke": 7,
+  "source_unit_tests": 42,
+  "audit_unit_tests": 28
+}

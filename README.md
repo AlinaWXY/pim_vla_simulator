@@ -2,6 +2,7 @@
 
 Pi0.5 AE MHA8 线性算子时序复现（H 表示 action horizon，head 数均为 8）：
 
+- [H=16 最终版：bank 内 RoPE、DRAM Z 与全套已建模 AE 阶段](experiments/pi05-bank-rope-h16/README.md)，[冻结结果与完整复现包](experiments/pi05-bank-rope-h16/results/published-h16/README.md)。
 - [H=20：共享 X 的 QKV、GPU RoPE 边界、DRAM Q 回读](experiments/pi05-bgk-gpuq/README.md)。
 - [H=16：独立 mapping、原生仿真与 breakdown](experiments/pi05-bgk-gpuq-h16/README.md)。
 

@@ -15,6 +15,7 @@
 #include "ramulator/dram/commands/ACTHB.h"
 #include "ramulator/dram/commands/CAS_RD.h"
 #include "ramulator/dram/commands/CAS_WR.h"
+#include "ramulator/dram/commands/LOCALRD.h"
 #include "ramulator/dram/commands/LOCALWR.h"
 #include "ramulator/dram/commands/MACAB.h"
 #include "ramulator/dram/commands/MACHB.h"
@@ -40,7 +41,7 @@ class LPDDR5PIM : public DRAMSpec {
     enum : int { Channel, Rank, BankGroup, Bank, Row, Column, COUNT };
   };
   struct Command {
-    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, ACTAB, MACAB, WRGB, RDRES, ACTHB, MACHB, PREHB, MACK, MACQK, LOCALWR, COUNT };
+    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, ACTAB, MACAB, WRGB, RDRES, ACTHB, MACHB, PREHB, MACK, MACQK, LOCALWR, LOCALRD, COUNT };
   };
   struct State {
     enum : int { Opened, Closed, Activating, N_A, COUNT };
@@ -59,7 +60,7 @@ class LPDDR5PIM : public DRAMSpec {
       Cmd::WRA<LPDDR5PIM>, Cmd::REFab<LPDDR5PIM>, Cmd::REFpb<LPDDR5PIM>, Cmd::ACTAB<LPDDR5PIM>,
       Cmd::MACAB<LPDDR5PIM>, Cmd::WRGB<LPDDR5PIM>, Cmd::RDRES<LPDDR5PIM>, Cmd::ACTHB<LPDDR5PIM>,
       Cmd::MACHB<LPDDR5PIM>, Cmd::PREHB<LPDDR5PIM>, Cmd::MACK<LPDDR5PIM>, Cmd::MACQK<LPDDR5PIM>,
-      Cmd::LOCALWR<LPDDR5PIM>
+      Cmd::LOCALWR<LPDDR5PIM>, Cmd::LOCALRD<LPDDR5PIM>
   >;
 
   LPDDR5PIM(const ConfigNode& config) {
@@ -71,7 +72,7 @@ class LPDDR5PIM : public DRAMSpec {
 
     // String name maps + reverse lookup vectors
     set_names(levels, level_names, {"Channel", "Rank", "BankGroup", "Bank", "Row", "Column"});
-    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR"});
+    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD"});
     set_names(states, state_names, {"Opened", "Closed", "Activating", "N_A"});
     set_names(timings, timing_names, {
         "rate", "nBL_min", "nBL_max", "nCL", "nRCD", "nRP", "nRPab", "nRAS", "nRC", "nWR", "nRTP", "nCWL", "nPPD",
@@ -104,7 +105,16 @@ class LPDDR5PIM : public DRAMSpec {
         Command::MACQK,     // PIM_MAC_QK -> MACQK
         Command::RDRES,     // PIM_RD_BG -> RDRES
         Command::LOCALWR,   // PIM_LOCAL_WR -> LOCALWR
-        Command::RD,        // PIM_RD_Q -> ordinary RD followed by controller relay
+        Command::RD,        // PIM_RD_Q -> RD
+        Command::LOCALWR,   // PIM_SPILL -> LOCALWR
+        Command::LOCALRD,   // PIM_ROPE_COEF -> LOCALRD
+        Command::LOCALRD,   // PIM_ROPE_LOAD -> LOCALRD
+        Command::LOCALRD,   // PIM_ROPE_EXEC -> LOCALRD
+        Command::LOCALWR,   // PIM_ROPE_STORE -> LOCALWR
+        Command::RD,        // PIM_Q_EXPORT -> RD
+        Command::WRGB,      // PIM_Q_REMOTE -> WRGB
+        Command::LOCALWR,   // PIM_Z_STORE -> LOCALWR
+        Command::LOCALRD,   // PIM_Z_LOAD -> LOCALRD
     };
 
     // Runtime config (organization, timing values, timing constraints)

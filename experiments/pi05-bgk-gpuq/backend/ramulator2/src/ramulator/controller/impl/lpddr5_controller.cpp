@@ -3,6 +3,8 @@
 #include <bit>
 #include <cstdint>
 #include <fstream>
+#include <limits>
+#include <unordered_map>
 #include "ramulator/base/base.h"
 #include "ramulator/controller/impl/lpddr_controller_base.h"
 #include "ramulator/controller/refresh/i_refresh_manager.h"
@@ -95,6 +97,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   size_t s_pim_completed = 0;
   size_t s_pim_latency = 0;
 
+#include "rank_rope_extension.inc"
+#include "ffn_dram_extension.inc"
+
  public:
   void init() override {
     // The registered LPDDR5Controller constructor has already initialized the
@@ -148,6 +153,16 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     // AttAcc's no-CWL movement abstraction still consumes a complete burst.
     // Legacy WRGB consumers previously became ready at issue, one burst early.
     if (m_data_path == "attacc") m_pim_wr_latency = m_bgk_input_cycles;
+    RAMULATOR_PARSE_PARAM(m_rank_rope, bool, "pim_rank_rope").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_rope_ii, int, "rope_ii_cycles").default_val(1);
+    RAMULATOR_PARSE_PARAM(m_rope_latency, int, "rope_latency_cycles").default_val(4);
+    RAMULATOR_PARSE_PARAM(m_cast_cycles, int, "pim_cast_cycles").default_val(1);
+    RAMULATOR_PARSE_PARAM(m_rank_reduce_cycles, int, "rank_reduce_cycles").default_val(4);
+    init_rank_rope();
+    RAMULATOR_PARSE_PARAM(m_ffn_dram, bool, "pim_ffn_dram").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_ffn_z_preinstalled, bool, "ffn_z_preinstalled").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_ffn_events_path, std::string, "ffn_dram_events_path").default_val("");
+    init_ffn_dram();
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -160,6 +175,18 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     m_stats.add("bank_local_writes", s_bank_local_writes);
     m_stats.add("q_dram_reads", s_q_dram_reads);
     m_stats.add("q_internal_relays", s_q_relays);
+    if (m_ffn_dram) {
+      m_stats.add("ffn_z_stores", s_z_stores);
+      m_stats.add("ffn_z_loads", s_z_loads);
+      m_stats.add("ffn_gu_gather_bytes", s_z_gather_bytes);
+      m_stats.add("ffn_z_return_bytes", s_z_return_bytes);
+      m_stats.add("ffn_z_load_port_bytes", s_z_load_port_bytes);
+      if (!m_ffn_events_path.empty()) {
+        m_ffn_events.open(m_ffn_events_path);
+        if (!m_ffn_events) throw std::runtime_error("Cannot open ffn_dram_events_path");
+        m_ffn_events << "clock,ready_at,operation,Channel,Rank,BankGroup,Bank,Row,Column,buffer,bytes,service_cycles,generation,bank_mask,mac_columns\n";
+      }
+    }
     if (!m_bgk_events_path.empty()) {
       m_bgk_events.open(m_bgk_events_path);
       if (!m_bgk_events) throw std::runtime_error("Cannot open bgk_events_path");
@@ -179,13 +206,18 @@ class LPDDR5PIMController final : public LPDDR5Controller {
          req.type_id != Request::Type::PIM_MAC_AB && req.type_id != Request::Type::PIM_LOCAL_GB &&
          req.type_id != Request::Type::PIM_WR_BG && req.type_id != Request::Type::PIM_WR_Q &&
          req.type_id != Request::Type::PIM_MAC_K && req.type_id != Request::Type::PIM_MAC_QK &&
-         req.type_id != Request::Type::PIM_RD_Q)) {
+         req.type_id != Request::Type::PIM_RD_Q && req.type_id != Request::Type::PIM_ROPE_LOAD &&
+         req.type_id != Request::Type::PIM_ROPE_EXEC && req.type_id != Request::Type::PIM_Q_REMOTE &&
+         req.type_id != Request::Type::PIM_Z_LOAD)) {
       throw std::runtime_error("PIM buffer annotation requires WRGB/MACAB and slot 0/1");
     }
     // Map before admission so overlapping-bank requests can apply backpressure
     // without blocking independent reads behind a global PIM completion fence.
     m_addr_mapper->apply(req);
     req.addr_vec[0] = m_channel_id;
+    req.pim_origin_addr_vec = req.addr_vec;
+    if ((m_rank_rope || m_ffn_dram) && req.type_id >= Request::Type::PIM_MAC_AB && req.addr_vec[m_rank_level] != 1)
+      throw std::runtime_error("rank0 is reserved for GPU: PIM requests must address physical rank1");
     if (req.type_id < Request::Type::PIM_MAC_AB) {
       for (const auto& buffers : m_inputs) {
         for (const auto& buffer : buffers) {
@@ -214,6 +246,10 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (m_pim_buffer.size() >= m_pim_buffer.max_size) {
       return false;
     }
+    if (is_ffn_z(req)) return send_ffn_z(req);
+    if (is_rank_rope(req)) return send_rank_rope(req);
+    if (m_rank_rope && (req.type_id == Request::Type::PIM_MAC_AB || req.type_id == Request::Type::PIM_WR_GB))
+      req.pim_bank_mask = ((uint64_t{1} << (m_bgs*m_banks_per_bg)) - 1) << (m_bgs*m_banks_per_bg);
     if (is_bgk(req)) {
       if (m_data_path != "attacc") throw std::runtime_error("BG-K extension requires AttAcc movement path");
       if (req.size_bytes != 32) throw std::runtime_error("BG-K extension requires 32B requests");
@@ -232,15 +268,20 @@ class LPDDR5PIMController final : public LPDDR5Controller {
             ((req.type_id == Request::Type::PIM_WR_Q || req.type_id == Request::Type::PIM_RD_Q) ? bb == bank :
              req.type_id == Request::Type::PIM_LOCAL_WR ? br == rank && bgid == bg && bb == bank :
              br == rank && bgid == bg);
-        if (selected) req.pim_bank_mask |= uint64_t{1} << b;
+        if (selected && (!m_rank_rope || br == 1)) req.pim_bank_mask |= uint64_t{1} << b;
       }
       if (is_bgk_mac(req)) {
-        if (rank != 0 || bg != 0 || bank != 0) throw std::runtime_error("BG-K MAC must use canonical rank/BG/bank0 address");
-        req.addr_vec[m_rank_level] = req.addr_vec[m_bg_level] = req.addr_vec[m_bank_level] = -1;
+        if (rank != (m_rank_rope ? 1 : 0) || bg != 0 || bank != 0) throw std::runtime_error("BG-K MAC must use canonical active-rank/BG0/bank0 address");
+        req.addr_vec[m_bg_level] = req.addr_vec[m_bank_level] = -1;
+        req.addr_vec[m_rank_level] = m_rank_rope ? 1 : -1;
       } else if (req.type_id == Request::Type::PIM_WR_BG || req.type_id == Request::Type::PIM_RD_BG) {
         req.addr_vec[m_bank_level] = -1;
       }
-      req.pim_rank_mask = is_bgk_mac(req) || req.type_id == Request::Type::PIM_WR_Q || req.type_id == Request::Type::PIM_RD_Q
+      if (m_rank_rope && req.type_id == Request::Type::PIM_RD_BG) {
+        req.pim_bank_mask = ((uint64_t{1} << (m_bgs*m_banks_per_bg)) - 1) << (m_bgs*m_banks_per_bg);
+        req.addr_vec[m_bg_level] = -1;
+      }
+      req.pim_rank_mask = m_rank_rope ? 2 : is_bgk_mac(req) || req.type_id == Request::Type::PIM_WR_Q || req.type_id == Request::Type::PIM_RD_Q
           ? (1 << m_inputs.size()) - 1 : 1 << rank;
       req.final_command = spec_command(req.type_id);
       req.arrive = m_clk;
@@ -365,6 +406,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     s_local_transfers = 0;
     s_bank_local_writes = s_bgk_requests = 0;
     s_q_dram_reads = s_q_relays = 0;
+    s_z_stores = s_z_loads = s_z_gather_bytes = s_z_return_bytes = s_z_load_port_bytes = 0;
   }
 
  private:
@@ -398,6 +440,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool can_bypass(const Request& later, const Request& earlier, bool preparing_row) const {
+    if (m_ffn_dram && (is_ffn_z(later) || is_ffn_z(earlier))) return z_bypass(later, earlier);
+    if (m_rank_rope && (is_rank_rope(later) || is_rank_rope(earlier))) return rr_bypass(later, earlier);
     // RD_Q uses the ordinary bank scheduler before its multicast. Keep its
     // row state stable until the relay is consumed; no speculative later MAC
     // ACT/PRE may prepare a conflicting row while this composite is queued.
@@ -453,7 +497,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
 
 
-  bool is_bgk(const Request& req) const { return req.type_id >= Request::Type::PIM_WR_BG; }
+  bool is_bgk(const Request& req) const { return req.type_id >= Request::Type::PIM_WR_BG && req.type_id <= Request::Type::PIM_RD_Q; }
   bool is_bgk_input(const Request& req) const {
     return req.type_id == Request::Type::PIM_WR_BG || req.type_id == Request::Type::PIM_WR_Q ||
            req.type_id == Request::Type::PIM_RD_Q;
@@ -466,11 +510,12 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (!m_bgk_events) return;
     static const char* names[] = {"PIM_WR_BG","PIM_WR_Q","PIM_MAC_K","PIM_MAC_QK","PIM_RD_BG","PIM_LOCAL_WR","PIM_RD_Q"};
     const auto& spec = *m_device.m_spec;
+    const auto& address = m_rank_rope && !req.pim_origin_addr_vec.empty() ? req.pim_origin_addr_vec : req.addr_vec;
     m_bgk_events << (clock < 0 ? m_clk : clock) << ',' << ready << ','
         << (name ? name : names[req.type_id-Request::Type::PIM_WR_BG])
-        << ',' << m_channel_id << ',' << req.addr_vec[m_rank_level] << ',' << req.addr_vec[m_bg_level]
-        << ',' << req.addr_vec[m_bank_level] << ',' << req.addr_vec[spec.get_level_id("Row")]
-        << ',' << req.addr_vec[spec.get_level_id("Column")] << ',' << req.pim_buffer
+        << ',' << m_channel_id << ',' << address[m_rank_level] << ',' << address[m_bg_level]
+        << ',' << address[m_bank_level] << ',' << address[spec.get_level_id("Row")]
+        << ',' << address[spec.get_level_id("Column")] << ',' << req.pim_buffer
         << ',' << (target_banks < 0 ? std::popcount(req.pim_bank_mask) : target_banks)
         << ",32," << service << '\n';
   }
@@ -489,6 +534,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       if (is_bgk_input(req)) {
         if (m_clk < input.in_use_until) return false;
       } else if (actual_mac) {
+        if (m_rank_rope && req.type_id == Request::Type::PIM_MAC_QK && m_rope_banks[b].query_mask != 0xffff)
+          throw std::runtime_error("Rank QK requires all sixteen query slices in every bank");
         if (!input.written) throw std::runtime_error("BG-K MAC references unfilled bank-local input buffer");
         if (m_clk < input.ready_at) return false;
       } else if (req.type_id == Request::Type::PIM_RD_BG || req.type_id == Request::Type::PIM_LOCAL_WR) {
@@ -499,6 +546,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
   bool issue_bgk(ReqBuffer::iterator it) {
     if (it->type_id == Request::Type::PIM_RD_Q) return issue_q_dram_read(it);
+    if (m_rank_rope && it->type_id == Request::Type::PIM_RD_BG && m_clk < m_rank_reduction_ready) return false;
     it->command = get_preq_command(it->final_command,it->addr_vec);
     // Payload issues through independent local ports; only ACT/PRE uses CA.
     if (it->command == m_localwr) return false;
@@ -518,8 +566,12 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       if(is_bgk_input(*it)) { input.written=true; input.ready_at=ready; }
       if(actual_mac) { input.in_use_until=ready; m_bank_compute_ready[b]=ready; }
     }
+    if (m_rank_rope && actual_mac) {
+      m_rank_reduction_ready = ready + m_rank_reduce_cycles;
+      record_bgk(*it, m_rank_reduction_ready, m_rank_reduce_cycles, "PIM_RANK_REDUCE", ready, 16);
+    }
     record_bgk(*it,ready,service);
-    enqueue_bgk_done(it,ready);
+    enqueue_bgk_done(it, m_rank_rope && actual_mac ? m_rank_reduction_ready : ready);
     return true;
   }
 
@@ -602,6 +654,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void issue_local_ready() {
+    issue_ffn_z_local();
+    issue_rank_rope_local();
     issue_bank_local_writes();
     // These ports are rank-local SRAM links, not CA/DQ commands. Up to one
     // transfer per rank may start in this memory cycle, independently of DQ.
@@ -644,7 +698,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
   bool issue_pim_ready() {
     for (auto it = m_pim_buffer.begin(); it != m_pim_buffer.end(); ++it) {
-      if (is_local(*it)) continue;
+      if (is_local(*it) || (is_rank_rope(*it) && it->type_id == Request::Type::PIM_ROPE_EXEC)) continue;
       const int command = get_preq_command(it->final_command, it->addr_vec);
       if (it->type_id == Request::Type::PIM_LOCAL_WR && command == m_localwr) continue;
       const bool preparing_row = (it->final_command == m_macab || is_bgk_mac(*it)) &&
@@ -664,6 +718,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool issue_pim(ReqBuffer::iterator it) {
+    if (is_ffn_z(*it)) return issue_ffn_z(it, false);
+    if (is_rank_rope(*it)) return issue_rank_rope(it, false);
     if (is_bgk(*it)) return issue_bgk(it);
     it->command = get_preq_command(it->final_command, it->addr_vec);
     const int slot = it->pim_buffer < 0 ? 0 : it->pim_buffer;
@@ -677,6 +733,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     // Only the actual MAC consumes input. ACT/PRE may prepare its weight row
     // while the input SRAM is still being filled.
     if (it->command == m_macab) {
+      if (!ffn_mac_ready(*it)) return false;
       for (size_t rank = 0; rank < m_inputs.size(); ++rank) {
         if (!(it->pim_rank_mask & (1 << rank))) continue;
         const auto& input = m_inputs[rank][slot];
@@ -716,9 +773,12 @@ class LPDDR5PIMController final : public LPDDR5Controller {
           }
         }
       }
-      const int latency = (it->final_command == m_macab || it->final_command == m_machb) ? 0 :
+      if (it->final_command == m_macab) ffn_mac_issued(*it);
+      if (m_rank_rope && it->final_command == m_macab) m_projection_ready = m_clk + m_mac_interval;
+      const int latency = (it->final_command == m_macab || it->final_command == m_machb) ? (m_rank_rope ? m_mac_interval : 0) :
           (it->final_command == m_wrgb ? m_pim_wr_latency : m_pim_rd_latency);
       it->depart = m_clk + latency;
+      if (m_rank_rope) record_bgk(*it, it->depart, latency, it->final_command == m_macab ? "PIM_MAC_AB" : it->final_command == m_wrgb ? "PIM_WR_GB" : "PIM_RD_RES", -1, 16);
       auto pos = std::upper_bound(m_pim_pending.begin(), m_pim_pending.end(), it->depart,
           [](Clk_t clk, const Request& pending) { return clk < pending.depart; });
       m_pim_pending.insert(pos, *it);

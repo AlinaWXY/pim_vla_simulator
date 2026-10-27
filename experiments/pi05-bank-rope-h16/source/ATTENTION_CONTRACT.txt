@@ -1,0 +1,111 @@
+H=16 token-sharded projection / bank-local RoPE / rank-local QK
+
+Scope
+  One layer, one denoising step, eight MHA heads, head_dim256, hidden1024.
+  Sixteen channels each have GPU physical rank0 and PIM physical rank1.
+  Only rank1 computes. Each head owns channels2h and2h+1, not two ranks
+  in one channel. There are256 active PIM banks,16 per PIM rank.
+  Prefix968, suffix16, effective KV984, padded KV992.
+
+Ownership
+  Token t: channel=2h+t%2, physical rank1, local_token=t//2.
+  Each PIM rank owns484 prefix,8 suffix and4 padding tokens.
+  Flattened bank b=4*BG+bank. Pair j=8*b+u, u=0..7.
+  Its two feature components are j and j+128. Local lane=2*u+component.
+  Each rank stores a complete copy of its head's WQ and WK, partitioned
+  over its16 banks. Projection receives8 local X tokens and reduces all1024
+  input dimensions locally. There is no projection cross-rank reduction.
+
+DRAM per active bank
+  [0,65536) WQ/WK: [input_fragment64][Q/K2][pair8][component2][input_lane16].
+  [65536,81920) prefix K reservation; first484*32B contain484 real tokens.
+  [81920,83968) one reusable working row:
+      columns0..7   BF16 coefficient rows [local_token8][pair8][cos/sin2]
+      columns8..15  locally produced Q, one32B column per local token
+      columns16..23 locally produced suffix K, one32B column per local token
+      columns24..27 zero K padding, one32B column per padding token
+  The work row uses896B of its2048B. Remote Q has no DRAM allocation.
+  Unused address gaps are not attention tokens. QK visits484 prefix cols,
+  eight work-row suffix cols and four padding cols exactly once.
+  A work row is reused across layers/steps only after its transient results
+  are no longer needed. Distinct persistent per-layer working rows would
+  require coefficient replication; that is not this single-layer model.
+
+Native command contract
+  Trace syntax is OP physical_address [buffer]. BARRIER marker is global.
+  All operation addresses select physical rank1.
+  MemoryConfig requires pim_rank_rope=True, pim_input_broadcast=False and
+  pim_mac_scope=rank. Model projection batch service nCCDAB=8, QK nCCDQK=16.
+
+  PIM_WR_GB: ordinary32B external X ingress, rank1 shared input buffer.
+  PIM_MAC_AB: rank1-only16-bank projection;32 output columns per input
+      fragment, eight local tokens, BF16 operands and FP32 accumulators.
+      Native completion and input-buffer lifetime include compute service.
+  PIM_SPILL: bank-local32B BF16 store into Qlocal or Ksuffix column.
+      Consumes completed FP32 accumulators and the configured conversion
+      latency. It is not an external GPU write.
+  PIM_ROPE_COEF: bank-local coefficient-column read, no external DQ.
+  PIM_ROPE_LOAD: bank-local Q/K-column read into input buffer0 or1.
+  PIM_ROPE_EXEC: eight pair issues from its input buffer; native II/latency.
+  PIM_ROPE_STORE: local in-place32B write after the corresponding EXEC.
+      Address selects its completed output; two bounded32B output entries
+      allow the following EXEC while a preceding result awaits STORE.
+      Input double buffering is64B, coefficient buffer32B, output FIFO64B.
+      Capacity is160B/bank; these capacities do not remove DRAM or pipeline
+      stalls. In-place writes cannot overwrite an unread input column.
+
+  Per local token: COEF, LOAD_Q0, EXEC_Q0, LOAD_K1, EXEC_K1, STORE_Q, STORE_K.
+  The same coefficient column serves Q and K. There are no global barriers
+  between tokens; native per-bank coefficient/input/output hazards apply.
+  A serial control uses buffer0 and stores Q before loading K.
+  Each bank issues128 pairs. Ideal compute duration is127*II+latency,
+  excluding all read, write, row-management, refresh and backpressure delays.
+
+  PIM_Q_EXPORT:32B Q DRAM read and external DQ export, with local Q-buffer
+      tap. Local token t occupies global query row2*t+channel%2.
+  PIM_Q_REMOTE:32B external delivery directly to the corresponding peer
+      bank Q-buffer. Source is target_address xor32, same BG/bank and
+      local Q column. A global completed-export barrier precedes deliveries.
+      The target writes global query row2*t+(1-channel%2), not DRAM.
+      The source keeps its row and does not receive an echoed copy.
+  Each bank has a512B Q buffer holding all16 query rows before QK begins.
+
+  PIM_MAC_QK: canonical rank1/BG0/bank0 request; reads the same K-column
+      offset at all16 banks of that rank, computes16 queries and reduces
+      complete256-feature dots through BG then rank. Explicit rank reduction
+      timing is a configurable hardware assumption.
+  PIM_RD_BG in this mode:32B export of complete rank scores, not BG partials.
+      Address offset is local_K_token*64 + query_half*32. Every16-key tile
+      completes then exports at most1024B/rank before the next tile.
+      Tiles bound score storage and never repeat the K scan or reload Q.
+  Results from the two ranks occupy different K-token columns. The GPU
+  reassembles token order, rather than adding cross-rank partial scores.
+
+Per-layer/per-step external payload, all16 channels
+  X ingress:16 ranks*8 local tokens*1024*2B =262144B.
+  Q export:8 heads*16 queries*256*2B =65536B.
+  Q peer-buffer delivery:65536B.
+  Complete FP32 padded scores:8*16*992*4B =507904B.
+  Total901120B =880KiB. Each balanced channel handles55KiB.
+  Optional one-time source DRAM read of unique X adds32768B =32KiB,
+  if X was not already available at the controller. Its channel placement
+  must be specified separately. GPU dispatch/arrival overhead is unmeasured.
+  X is shared between Q and K. K has no rank exchange; local RoPE adds no
+  external DQ. No old GPU RoPE export/writeback is added to these numbers.
+
+Separate initialization and internal traffic
+  WQ/WK replicated residency/initial write16MiB per layer, coefficients64KiB
+  per actual position set, prefix K and zero padding are installation costs.
+  One internal K scan is256 active banks*496*32B=4063232B=3.875MiB.
+  Local projection spill, RoPE reads/writes and coefficients are internal
+  bank traffic, not additional external payload.
+
+Numerical boundary
+  Coefficients are precomputed from actual model positions in FP32 and stored
+  as BF16. Projection FP32 results are rounded to BF16 before local spill.
+  The native simulator models timing/state, not float payloads, Q scaling or
+  bitwise PyTorch/JAX inference. Any multiplier/intermediate rounding claim
+  requires separate numerical validation. RoPE II, latency, conversion and
+  rank-reduction latency are parameters, not measured silicon results.
+  GPU softmax, P return, PV, V projection, O projection, FFN and model-level
+  end-to-end latency are outside this experiment.

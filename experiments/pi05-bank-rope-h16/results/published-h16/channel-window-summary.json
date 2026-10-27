@@ -1,0 +1,4215 @@
+{
+  "source": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1025\\experiments\\pi05-bank-rope-h16\\results\\ae-dram-1876714",
+  "units": "per channel, per layer, per step",
+  "stage_sum_us": 124.47447599999998,
+  "payload_equivalent_us": 14.527743999999998,
+  "payload_equivalent_spare_us": 109.94673199999998,
+  "payload_equivalent_spare_fraction": 0.8832873656764781,
+  "zero_external_command_phase_us": 37.9815253125,
+  "actual_GPU_usable_time_us": null,
+  "limitations": [
+    "AttAcc WRGB/RDRES do not retain full LPDDR direction/rank turnaround timing",
+    "No concurrent rank0 GPU workload; full-bank PIM/ordinary admission is serialized",
+    "Zero-command phases need boundary data tails, rank switching, CA and GPU row timing checked",
+    "Five independently timed stages; no continuous full-AE overlap claim"
+  ],
+  "transfer_assumption": "32B per command at nBL_min=2 CK, tCK=0.938ns; not a physical DQ interval trace",
+  "stages": {
+    "chain": {
+      "stage_us": 34.886095999999995,
+      "payload_equivalent_us_per_channel": 3.30176,
+      "payload_equivalent_spare_us_per_channel": 31.584335999999993,
+      "zero_external_command_phase_us": 9.378124000000003,
+      "channels": [
+        {
+          "channel": 0,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 1,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "29": 1,
+            "31": 2,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "281": 1,
+            "299": 1,
+            "307": 6,
+            "314": 1,
+            "488": 1,
+            "496": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1269": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "29": 1,
+            "31": 2,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "281": 1,
+            "299": 1,
+            "307": 6,
+            "314": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1269": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "30": 1,
+            "31": 2,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "280": 1,
+            "299": 1,
+            "307": 6,
+            "313": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1270": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "30": 1,
+            "31": 2,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "280": 1,
+            "299": 1,
+            "307": 6,
+            "313": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1270": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 3,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "279": 1,
+            "299": 1,
+            "307": 6,
+            "312": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1271": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 3,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "279": 1,
+            "299": 1,
+            "307": 6,
+            "312": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1271": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "32": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "278": 1,
+            "299": 1,
+            "307": 6,
+            "311": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1272": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "32": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "278": 1,
+            "299": 1,
+            "307": 6,
+            "311": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1272": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "33": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "277": 1,
+            "299": 1,
+            "307": 6,
+            "310": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1273": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "33": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "277": 1,
+            "299": 1,
+            "307": 6,
+            "310": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1273": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "34": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "276": 1,
+            "299": 1,
+            "307": 6,
+            "309": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1274": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "34": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "276": 1,
+            "299": 1,
+            "307": 6,
+            "309": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1274": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "35": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "275": 1,
+            "299": 1,
+            "307": 6,
+            "308": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1275": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "35": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "275": 1,
+            "299": 1,
+            "307": 6,
+            "308": 1,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1275": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "35": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "275": 1,
+            "299": 1,
+            "307": 7,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1276": 1
+          },
+          "payload_equivalent_us": 3.30176
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "WRGB": 640,
+            "RD": 128,
+            "RDRES": 992
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 37190,
+          "inter_command_interval_histogram_CK": {
+            "2": 127,
+            "4": 1406,
+            "26": 1,
+            "27": 1,
+            "28": 111,
+            "31": 2,
+            "35": 1,
+            "49": 15,
+            "227": 1,
+            "228": 29,
+            "264": 20,
+            "271": 28,
+            "275": 1,
+            "299": 1,
+            "307": 7,
+            "488": 1,
+            "495": 1,
+            "511": 2,
+            "515": 1,
+            "523": 1,
+            "568": 1,
+            "1276": 1
+          },
+          "payload_equivalent_us": 3.30176
+        }
+      ]
+    },
+    "v": {
+      "stage_us": 10.282356,
+      "payload_equivalent_us_per_channel": 3.1216639999999996,
+      "payload_equivalent_spare_us_per_channel": 7.160692000000001,
+      "zero_external_command_phase_us": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 1,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "28": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10905,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "46": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "WRGB": 1024,
+            "RDRES": 256,
+            "RD": 128,
+            "WR": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 10909,
+          "inter_command_interval_histogram_CK": {
+            "2": 372,
+            "3": 4,
+            "4": 1221,
+            "27": 1,
+            "30": 1,
+            "50": 1,
+            "67": 7,
+            "68": 46,
+            "104": 7,
+            "196": 1,
+            "307": 1,
+            "332": 1
+          },
+          "payload_equivalent_us": 3.1216639999999996
+        }
+      ]
+    },
+    "pv": {
+      "stage_us": 9.189585999999998,
+      "payload_equivalent_us_per_channel": 2.3412479999999998,
+      "payload_equivalent_spare_us_per_channel": 6.848337999999998,
+      "zero_external_command_phase_us": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 1,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "28": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "WRGB": 992,
+            "RDRES": 256
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 9793,
+          "inter_command_interval_histogram_CK": {
+            "4": 1185,
+            "27": 1,
+            "67": 7,
+            "68": 45,
+            "104": 7,
+            "307": 1,
+            "460": 1
+          },
+          "payload_equivalent_us": 2.3412479999999998
+        }
+      ]
+    },
+    "gate_up_z_store": {
+      "stage_us": 36.195544,
+      "payload_equivalent_us_per_channel": 1.9210239999999998,
+      "payload_equivalent_spare_us_per_channel": 34.274519999999995,
+      "zero_external_command_phase_us": 2.440676,
+      "channels": [
+        {
+          "channel": 0,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 1,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "751": 3,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "WRGB": 1024
+          },
+          "first_external_issue_CK": 2,
+          "last_external_issue_CK": 35023,
+          "inter_command_interval_histogram_CK": {
+            "4": 961,
+            "451": 1,
+            "452": 28,
+            "487": 25,
+            "711": 1,
+            "716": 2,
+            "746": 1,
+            "750": 1,
+            "751": 2,
+            "754": 1
+          },
+          "payload_equivalent_us": 1.9210239999999998
+        }
+      ]
+    },
+    "down_tiled_dram": {
+      "stage_us": 33.920894,
+      "payload_equivalent_us_per_channel": 3.8420479999999997,
+      "payload_equivalent_spare_us_per_channel": 30.078846,
+      "zero_external_command_phase_us": 26.162725312499997,
+      "channels": [
+        {
+          "channel": 0,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "RDRES": 2048
+          },
+          "first_external_issue_CK": 6936,
+          "last_external_issue_CK": 36159,
+          "inter_command_interval_histogram_CK": {
+            "4": 2041,
+            "28": 1,
+            "29": 2,
+            "6912": 1,
+            "6927": 1,
+            "7134": 1
+          },
+          "payload_equivalent_us": 3.8420479999999997
+        }
+      ]
+    }
+  },
+  "phases": [
+    {
+      "case": "chain",
+      "phase": "projection_input_compute",
+      "begin_us": 2.9312499999999998e-05,
+      "end_us": 17.649466625,
+      "duration_us": 17.649437312499998,
+      "external_command_counts_per_channel": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "projection_local_spill",
+      "begin_us": 17.649466625,
+      "end_us": 17.855826625,
+      "duration_us": 0.20636,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "rope_local",
+      "begin_us": 17.855826625,
+      "end_us": 18.384858625,
+      "duration_us": 0.529032,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "q_export_to_gpu",
+      "begin_us": 18.384858625,
+      "end_us": 22.281310625,
+      "duration_us": 3.8964519999999996,
+      "external_command_counts_per_channel": [
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "q_remote_buffer_fill",
+      "begin_us": 22.281310625,
+      "end_us": 22.528942625,
+      "duration_us": 0.247632,
+      "external_command_counts_per_channel": [
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_0_compute",
+      "begin_us": 22.528942625,
+      "end_us": 22.814094625,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_0_export",
+      "begin_us": 22.814094625,
+      "end_us": 22.933220624999997,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_1_compute",
+      "begin_us": 22.933220624999997,
+      "end_us": 23.178038625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_1_export",
+      "begin_us": 23.178038625,
+      "end_us": 23.297164624999997,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_2_compute",
+      "begin_us": 23.297164624999997,
+      "end_us": 23.784924625,
+      "duration_us": 0.48775999999999997,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_2_export",
+      "begin_us": 23.784924625,
+      "end_us": 23.904050624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_3_compute",
+      "begin_us": 23.904050624999996,
+      "end_us": 24.148868625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_3_export",
+      "begin_us": 24.148868625,
+      "end_us": 24.267994624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_4_compute",
+      "begin_us": 24.267994624999996,
+      "end_us": 24.553146624999997,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_4_export",
+      "begin_us": 24.553146624999997,
+      "end_us": 24.672272624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_5_compute",
+      "begin_us": 24.672272624999998,
+      "end_us": 24.917090624999997,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_5_export",
+      "begin_us": 24.917090624999997,
+      "end_us": 25.036216624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_6_compute",
+      "begin_us": 25.036216624999998,
+      "end_us": 25.281034624999997,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_6_export",
+      "begin_us": 25.281034624999997,
+      "end_us": 25.400160624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_7_compute",
+      "begin_us": 25.400160624999998,
+      "end_us": 25.644978624999997,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_7_export",
+      "begin_us": 25.644978624999997,
+      "end_us": 25.764104624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_8_compute",
+      "begin_us": 25.764104624999998,
+      "end_us": 26.049256624999998,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_8_export",
+      "begin_us": 26.049256624999998,
+      "end_us": 26.168382625,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_9_compute",
+      "begin_us": 26.168382625,
+      "end_us": 26.413200624999998,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_9_export",
+      "begin_us": 26.413200624999998,
+      "end_us": 26.532326624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_10_compute",
+      "begin_us": 26.532326624999996,
+      "end_us": 26.777144625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_10_export",
+      "begin_us": 26.777144625,
+      "end_us": 26.896270624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_11_compute",
+      "begin_us": 26.896270624999996,
+      "end_us": 27.141088625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_11_export",
+      "begin_us": 27.141088625,
+      "end_us": 27.260214624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_12_compute",
+      "begin_us": 27.260214624999996,
+      "end_us": 27.790184625,
+      "duration_us": 0.5299699999999999,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_12_export",
+      "begin_us": 27.790184625,
+      "end_us": 27.909310624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_13_compute",
+      "begin_us": 27.909310624999996,
+      "end_us": 28.154128625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_13_export",
+      "begin_us": 28.154128625,
+      "end_us": 28.273254624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_14_compute",
+      "begin_us": 28.273254624999996,
+      "end_us": 28.518072625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_14_export",
+      "begin_us": 28.518072625,
+      "end_us": 28.637198624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_15_compute",
+      "begin_us": 28.637198624999996,
+      "end_us": 28.882016625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_15_export",
+      "begin_us": 28.882016625,
+      "end_us": 29.001142624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_16_compute",
+      "begin_us": 29.001142624999996,
+      "end_us": 29.286294624999996,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_16_export",
+      "begin_us": 29.286294624999996,
+      "end_us": 29.405420624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_17_compute",
+      "begin_us": 29.405420624999998,
+      "end_us": 29.650238624999997,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_17_export",
+      "begin_us": 29.650238624999997,
+      "end_us": 29.769364624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_18_compute",
+      "begin_us": 29.769364624999998,
+      "end_us": 30.014182624999997,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_18_export",
+      "begin_us": 30.014182624999997,
+      "end_us": 30.133308624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_19_compute",
+      "begin_us": 30.133308624999998,
+      "end_us": 30.378126624999997,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_19_export",
+      "begin_us": 30.378126624999997,
+      "end_us": 30.497252624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_20_compute",
+      "begin_us": 30.497252624999998,
+      "end_us": 30.782404624999998,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_20_export",
+      "begin_us": 30.782404624999998,
+      "end_us": 30.901530624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_21_compute",
+      "begin_us": 30.901530624999996,
+      "end_us": 31.146348624999998,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_21_export",
+      "begin_us": 31.146348624999998,
+      "end_us": 31.286110625,
+      "duration_us": 0.139762,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_22_compute",
+      "begin_us": 31.286110625,
+      "end_us": 31.741040624999997,
+      "duration_us": 0.45492999999999995,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_22_export",
+      "begin_us": 31.741040624999997,
+      "end_us": 31.860166624999998,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_23_compute",
+      "begin_us": 31.860166624999998,
+      "end_us": 32.104984625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_23_export",
+      "begin_us": 32.104984625,
+      "end_us": 32.224110624999994,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_24_compute",
+      "begin_us": 32.224110624999994,
+      "end_us": 32.509262625,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_24_export",
+      "begin_us": 32.509262625,
+      "end_us": 32.628388625,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_25_compute",
+      "begin_us": 32.628388625,
+      "end_us": 32.873206624999995,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_25_export",
+      "begin_us": 32.873206624999995,
+      "end_us": 32.992332624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_26_compute",
+      "begin_us": 32.992332624999996,
+      "end_us": 33.237150625,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_26_export",
+      "begin_us": 33.237150625,
+      "end_us": 33.356276625,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_27_compute",
+      "begin_us": 33.356276625,
+      "end_us": 33.601094624999995,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_27_export",
+      "begin_us": 33.601094624999995,
+      "end_us": 33.720220624999996,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_28_compute",
+      "begin_us": 33.720220624999996,
+      "end_us": 34.005372625,
+      "duration_us": 0.28515199999999996,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_28_export",
+      "begin_us": 34.005372625,
+      "end_us": 34.124498624999994,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_29_compute",
+      "begin_us": 34.124498624999994,
+      "end_us": 34.369316624999996,
+      "duration_us": 0.24481799999999998,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_29_export",
+      "begin_us": 34.369316624999996,
+      "end_us": 34.488442625,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_30_compute",
+      "begin_us": 34.488442625,
+      "end_us": 34.766090625,
+      "duration_us": 0.27764799999999995,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "chain",
+      "phase": "qk_tile_30_export",
+      "begin_us": 34.766090625,
+      "end_us": 34.885216625,
+      "duration_us": 0.119126,
+      "external_command_counts_per_channel": [
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "v",
+      "phase": "v_input_compute",
+      "begin_us": 2.9312499999999998e-05,
+      "end_us": 8.467384625,
+      "duration_us": 8.467355312499999,
+      "external_command_counts_per_channel": [
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "v",
+      "phase": "v_result_export",
+      "begin_us": 8.467384625,
+      "end_us": 9.428834624999999,
+      "duration_us": 0.9614499999999999,
+      "external_command_counts_per_channel": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "v",
+      "phase": "v_prefix_tail_read",
+      "begin_us": 9.428834624999999,
+      "end_us": 9.748692624999999,
+      "duration_us": 0.319858,
+      "external_command_counts_per_channel": [
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128,
+        128
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "v",
+      "phase": "v_suffix_write",
+      "begin_us": 9.748692624999999,
+      "end_us": 10.281476625,
+      "duration_us": 0.5327839999999999,
+      "external_command_counts_per_channel": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "pv",
+      "phase": "pv_input_compute",
+      "begin_us": 2.9312499999999998e-05,
+      "end_us": 8.227256624999999,
+      "duration_us": 8.2272273125,
+      "external_command_counts_per_channel": [
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992,
+        992
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "pv",
+      "phase": "pv_result_export",
+      "begin_us": 8.227256624999999,
+      "end_us": 9.188706625,
+      "duration_us": 0.9614499999999999,
+      "external_command_counts_per_channel": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "gate_up_z_store",
+      "phase": "input_and_compute",
+      "begin_us": 2.9312499999999998e-05,
+      "end_us": 33.753988625,
+      "duration_us": 33.753959312499994,
+      "external_command_counts_per_channel": [
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "gate_up_z_store",
+      "phase": "z_stream_store",
+      "begin_us": 33.753988625,
+      "end_us": 36.194664624999994,
+      "duration_us": 2.440676,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_0_input_and_compute",
+      "begin_us": 2.9312499999999998e-05,
+      "end_us": 6.504150624999999,
+      "duration_us": 6.5041213125,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_0_result_export",
+      "begin_us": 6.504150624999999,
+      "end_us": 8.449562624999999,
+      "duration_us": 1.945412,
+      "external_command_counts_per_channel": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_1_input_and_compute",
+      "begin_us": 8.449562624999999,
+      "end_us": 14.942398625,
+      "duration_us": 6.492836,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_1_result_export",
+      "begin_us": 14.942398625,
+      "end_us": 16.887810625,
+      "duration_us": 1.945412,
+      "external_command_counts_per_channel": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_2_input_and_compute",
+      "begin_us": 16.887810625,
+      "end_us": 23.366576624999997,
+      "duration_us": 6.478765999999999,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_2_result_export",
+      "begin_us": 23.366576624999997,
+      "end_us": 25.311050624999996,
+      "duration_us": 1.9444739999999998,
+      "external_command_counts_per_channel": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "zero_external_command_phase": false
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_3_input_and_compute",
+      "begin_us": 25.311050624999996,
+      "end_us": 31.998052624999996,
+      "duration_us": 6.687002,
+      "external_command_counts_per_channel": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "zero_external_command_phase": true
+    },
+    {
+      "case": "down_tiled_dram",
+      "phase": "tile_3_result_export",
+      "begin_us": 31.998052624999996,
+      "end_us": 33.920014625,
+      "duration_us": 1.921962,
+      "external_command_counts_per_channel": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "zero_external_command_phase": false
+    }
+  ],
+  "source_sha256": {
+    "chain\\manifest.json": "600f1d0e26707d5c4c4cf7385314b5a01a7e16559132a5be1ba110d6bc125102",
+    "chain\\simulation\\result.json": "fbb8816a5872a828da65e79083411cd67d42cf5551e34132edf761ab247c070f",
+    "chain\\simulation\\barriers.csv": "26d9eecc614a4a1ad0fa20fd0ad8dc5294c414abcd08806a14f3d34368d75448",
+    "chain\\simulation\\timeline.csv.ch0": "e08102e95c811e1b1294657f4f09d39b43b1e8f26c9325668021485c3aa6b3f6",
+    "chain\\simulation\\timeline.csv.ch1": "fcd2b79e01b8417f05616db4e8feacb5b7485edf8482bdd9a74283d15ae8eb40",
+    "chain\\simulation\\timeline.csv.ch2": "19abf54accbc564662b1a5673b7191c0952e79d24543d38530c72eaba56fe6fa",
+    "chain\\simulation\\timeline.csv.ch3": "e146cc6a98ddb62438a96ad2758a068d5148f656037b1f7f4e346439b06f536a",
+    "chain\\simulation\\timeline.csv.ch4": "a8edbc163ad2adf8e056053ac158895f82d3fc3c5798b30519ba100e9ea333ac",
+    "chain\\simulation\\timeline.csv.ch5": "5944f6e961e75c49630c14e1ec1600fe4acd875d746ae216081d8177397a11c3",
+    "chain\\simulation\\timeline.csv.ch6": "1336554d5c20a43e268f23c876f86b2add3f2cccf22bf35b7c59a38234324de9",
+    "chain\\simulation\\timeline.csv.ch7": "0aa3ffb1bebd92431747c57a5b9f93acd7374246446b6e07a4044aba970f530e",
+    "chain\\simulation\\timeline.csv.ch8": "0b598ab2b7dafd73a8a4175370535e8438d50e7eca0b1eb0f8ce605156ca1516",
+    "chain\\simulation\\timeline.csv.ch9": "60d9a2bd837b6eac6092d4724db56c5fb387c2824c93cc5ee0187c580e7bcbf3",
+    "chain\\simulation\\timeline.csv.ch10": "3cf45e872a9fdc5cfd744ebbedd4f5ec25feb3dbff79645c6938a6c6f51a7a28",
+    "chain\\simulation\\timeline.csv.ch11": "eb634edd6f8447316fa1d2c4207938e8cb149403f895b6fcb34051748a3e0942",
+    "chain\\simulation\\timeline.csv.ch12": "e9255630bf92d0e5e5bc790809d5226814aa05610941928cd86e929c9db8ac1c",
+    "chain\\simulation\\timeline.csv.ch13": "d52f2f01b9a3122ea1783b51884e2dec8d8e646fd1ccafa4b138bf0a7abefd1b",
+    "chain\\simulation\\timeline.csv.ch14": "36a6f4383e3008bdc163291038978862efd6b661f9002821c96c87f2ea8f1510",
+    "chain\\simulation\\timeline.csv.ch15": "169c076d902b149aae6e7b48df3ddcfc7e810338fc5da7c8e6f4997ef4caf22f",
+    "v\\manifest.json": "af309b81db08b1eb4490b709720de5feff4853831281aa7d0f01d2c74284e6b5",
+    "v\\simulation\\result.json": "faa4945c69cc3a517bc59f9747e25286b447fc23665e90a3ecb79c8b728e588b",
+    "v\\simulation\\barriers.csv": "5d45c5f7fd33d07e35a6797264fff9055012823b32bedbe87f212470d738bb23",
+    "v\\simulation\\timeline.csv.ch0": "88cad676bd8622664898fd86ee2505cf747549921aa55f7f443ddc9dece488d4",
+    "v\\simulation\\timeline.csv.ch1": "536f90cac40e6871ef63a374e42eaf1c2cc963994f28222ab9ca1ba58f9274f5",
+    "v\\simulation\\timeline.csv.ch2": "c32fa67573de2c45f9c493cd0ae27ff250022ed9855e419abaa154934f4e0f7b",
+    "v\\simulation\\timeline.csv.ch3": "2029619fe297ce0858b50c4c74bd4e32f63de2535134863d01cab4228e7a707d",
+    "v\\simulation\\timeline.csv.ch4": "5962439042d706db795b3b2a3ef544fe6b2e7fc97dfeae470e826ec35c8db08c",
+    "v\\simulation\\timeline.csv.ch5": "21f3fafa2957b8d85399c43ddb34953ead104a6c773a4e230d365f17b21569da",
+    "v\\simulation\\timeline.csv.ch6": "1b3c358ac79cdbea42d9e9515f57a28360e94fa379bdfc8917db57ce807b0abc",
+    "v\\simulation\\timeline.csv.ch7": "0f631b0fdb9ebb9c8d6bdac7089b9f970ddbd89a1fa9ae9d490b61b64e01d02a",
+    "v\\simulation\\timeline.csv.ch8": "52422a2e2d66df4be3b87cbe5d3e8a4a2fa05bde1d45194666d579fa77179a19",
+    "v\\simulation\\timeline.csv.ch9": "2dba72cb22c4b2359d31887c14890b310cf78e3d3b9519a5c3341fff61a83a0c",
+    "v\\simulation\\timeline.csv.ch10": "2fa69a1dbbd7a6a98fedf296a8f67b865bf0cc521c298bf300f8b620d66dec3a",
+    "v\\simulation\\timeline.csv.ch11": "3bd7f8b539b49948fc6c0df31b07a3fe564207bfa85d65304581ee84098d5af0",
+    "v\\simulation\\timeline.csv.ch12": "f690f16c08bb7cb2ab0d38027d31e75222f938a0eb314730d951d54aa7b87595",
+    "v\\simulation\\timeline.csv.ch13": "bbc86faedbe013f54f04ef0bf4e430e80cdcec8dbb8fe9e3744bb96bd8c0d110",
+    "v\\simulation\\timeline.csv.ch14": "a29ceef03ed243e72ffccb8b9639b8266f5637f1639f9242987a8d1276136b6a",
+    "v\\simulation\\timeline.csv.ch15": "b7d4aea959b696fddb493d1c19f3e4908b69c50471a90f69ede556171576305f",
+    "pv\\manifest.json": "fdb6e38d7f81f88e851c04555a3857bcd396213e15dd647b09fc674ef5be2caa",
+    "pv\\simulation\\result.json": "ec8aedd9422895fa8368aada3dc22bade8327332606d3df2369eb260f9032ee1",
+    "pv\\simulation\\barriers.csv": "a55ca5974edef181345eb4f9b91900b14ffb81f6134a3023ab979731f9263c6f",
+    "pv\\simulation\\timeline.csv.ch0": "33a90bba870326f2b578b4f9261e56d3021d20f667a3dec71befd9d95cfb7a22",
+    "pv\\simulation\\timeline.csv.ch1": "a7974291f7b0d9e77a622f7ff7bd63e8b3c3a72af2ca1e37dea201489c2ab351",
+    "pv\\simulation\\timeline.csv.ch2": "5681fed8f12d9a04a3c0c20167151b2c7377cbcd2865ad18883f5889f9561b5f",
+    "pv\\simulation\\timeline.csv.ch3": "8d2016993ecaaf1ee5765930eada62b6a61e04255bf83046c569c995f16a6d09",
+    "pv\\simulation\\timeline.csv.ch4": "3f1ed0f4d17152ad2339ee8f66560b6e9a622d0735b17b2a3ae3129095990091",
+    "pv\\simulation\\timeline.csv.ch5": "3aed5df6f8906ea0ee23a11adc29adeaa751045c257359e1363f23a7cbf60458",
+    "pv\\simulation\\timeline.csv.ch6": "5088d6f75bb6dccb9dbf51051ea5531bd60738c14e9ee0a1cf4c0573ebb9078e",
+    "pv\\simulation\\timeline.csv.ch7": "3f69ce87b31c115c5eff0fd58e99045f9a3ba7d6a8e179f3aba556bcbdb6c3e0",
+    "pv\\simulation\\timeline.csv.ch8": "2ac95ff01b60efa075bb8432a0684d614d85fdd0830221c9e716c6b3e42cc3ef",
+    "pv\\simulation\\timeline.csv.ch9": "20660c3f78cd58d4abbae80cd29c9f862f786412c69ccf6c1e60134815157038",
+    "pv\\simulation\\timeline.csv.ch10": "3d623400d15894f0b2eb8370cd0f9d5c73464773a9aae33f825a1e77033eb159",
+    "pv\\simulation\\timeline.csv.ch11": "8321602ff99be5566997aeb5313cfcae0ec5c01792efab11e9461459c9ee922d",
+    "pv\\simulation\\timeline.csv.ch12": "2060799f95ed7666a40c0c8ce12f36246352a74ea664001e9eb0d7c952f37b78",
+    "pv\\simulation\\timeline.csv.ch13": "e5b96a30a16107585b5921631fd36f4bc46ad86331f21ace77f6140559a48177",
+    "pv\\simulation\\timeline.csv.ch14": "de6cfcbcd6fa3adacb2993291d231166ac11676c16fd500624ad30d04f75c1ab",
+    "pv\\simulation\\timeline.csv.ch15": "1adaf3d6ab563839138271de7d0d02a3276530441354d89c88037aa1325c82fb",
+    "gate_up_z_store\\manifest.json": "f8a57cc89c9929592fc185b6ce73b374dc5f5f614e2bbf4e548401661b66bb9d",
+    "gate_up_z_store\\simulation\\result.json": "47f856a9ea57596d339fdbecaf11862cad61c2a81cd47c476b28730e10b7f9b8",
+    "gate_up_z_store\\simulation\\barriers.csv": "10ec320262a01b70131c50af03f786321a64fb9f224ed4ef87913504a6e082e9",
+    "gate_up_z_store\\simulation\\timeline.csv.ch0": "a910dac5c79a13385e126e04b24e6b1dfaf2913f0f8e665902e45f5960be6c5e",
+    "gate_up_z_store\\simulation\\timeline.csv.ch1": "1a6dbd3de725ddd9b9796ece9fc1de3f571a4eed37babe32adaadf0665ffdd17",
+    "gate_up_z_store\\simulation\\timeline.csv.ch2": "1f142a972edbb80478d5cf799a4ba9f890e5ae1d95f186a418f50f51210a1f1a",
+    "gate_up_z_store\\simulation\\timeline.csv.ch3": "aa56a77a92634268dedb8db64a27914ce5e5803a0f3f8bce766d7552b89be4e7",
+    "gate_up_z_store\\simulation\\timeline.csv.ch4": "18c586e55534bd71a604443f76737e554e82a161fe838a824d94ed4b32de6e1e",
+    "gate_up_z_store\\simulation\\timeline.csv.ch5": "226abc9762c97b6120ac0a82e77de27f1ce969b21cc6fa53ea0d334729104189",
+    "gate_up_z_store\\simulation\\timeline.csv.ch6": "7ebfad72e563ebb3b2ad127ffbd6efff9efd54f16ceea4036e0b33e5cefe8952",
+    "gate_up_z_store\\simulation\\timeline.csv.ch7": "db319b9368fd482d190f7019e492a785af46651a5f2b0d6cc296cbf468560ec7",
+    "gate_up_z_store\\simulation\\timeline.csv.ch8": "c340eb56e62eb463357236003f79ef05e7462b1ec060b86690ebaed8293f47a6",
+    "gate_up_z_store\\simulation\\timeline.csv.ch9": "65c1c7d7bf12d3bdb3449a6ca0a3ebc66b94237b43c54ed42edcfaa11c589548",
+    "gate_up_z_store\\simulation\\timeline.csv.ch10": "b09e4b627f309a09512489e25b64eebe4b712615dd5560eeaed108151f476062",
+    "gate_up_z_store\\simulation\\timeline.csv.ch11": "86cdc3cfafcc5b50985ba41bbb7ea9f87a63f6f2689c6cfe54739480947d4d7f",
+    "gate_up_z_store\\simulation\\timeline.csv.ch12": "15e45894fa0c6c5754b075713ec738d5818c96315391c703fd1fe6b044ad6de7",
+    "gate_up_z_store\\simulation\\timeline.csv.ch13": "050e1ead6af765c60c958b6381c6efbbe911236181e947bbf53e6d89096a9714",
+    "gate_up_z_store\\simulation\\timeline.csv.ch14": "998d457d5d3f6f70b564ff0ac9bbcc1a41c892c844a3f95b562ffe0408877b88",
+    "gate_up_z_store\\simulation\\timeline.csv.ch15": "fddc4b4e58300ac6a773d4f36ab2ec42e78ba6b4f97fa3794449e7d0603b3f98",
+    "down_tiled_dram\\manifest.json": "ea76e399e65818daade86b7498927c4c86936e4d4baf54b87b8db1a95338123b",
+    "down_tiled_dram\\simulation\\result.json": "2e8817d9071bc78504acb77ed112eb543772cd1076f9a152732a8cde5699e343",
+    "down_tiled_dram\\simulation\\barriers.csv": "7deab6fe5ec6ff50fc2956023620b39343c5d216020ca5dce28089e56d485edb",
+    "down_tiled_dram\\simulation\\timeline.csv.ch0": "6429b60f8a6987d365a193a162dfc72dc342408ead2e2cd7ed23495246159aec",
+    "down_tiled_dram\\simulation\\timeline.csv.ch1": "4ee7975b07d81b125d26722f2ec0d8dcc9cb9f534bdcbcf5e84c0ad479097888",
+    "down_tiled_dram\\simulation\\timeline.csv.ch2": "c9dc7b00b6bfeee8d5e17bf0e86a40caf5226e3986afa7f87babeb20a5395551",
+    "down_tiled_dram\\simulation\\timeline.csv.ch3": "97e53ec566ff5ecd35fb7dfc59465c6f56d805144ea6f17638c884ece8b836c3",
+    "down_tiled_dram\\simulation\\timeline.csv.ch4": "08a25198bb3da4a3cf5ee54cc63c8bf6fd24b4fe3f241262a52802fe2dcc793d",
+    "down_tiled_dram\\simulation\\timeline.csv.ch5": "65b6b610440523811026578635b54c44ec464414b01921b7225256aa2dc3e9f4",
+    "down_tiled_dram\\simulation\\timeline.csv.ch6": "347722b2da963c6ebac1c7f13012569a17a02ff86c91f6209f6c8a4457de2b97",
+    "down_tiled_dram\\simulation\\timeline.csv.ch7": "be20ae0b1f2cf0f82f41d76147a149f397748ea6bc9cfe47f1f5d196210c4941",
+    "down_tiled_dram\\simulation\\timeline.csv.ch8": "b419d77ecc4a997a9c5f8d93f6a8015c849f7192150fbc060736c64c05152657",
+    "down_tiled_dram\\simulation\\timeline.csv.ch9": "b3ac2e78c3934ebebc8cf6b8486a72d7da179435763d3df59f9695bfca27fffd",
+    "down_tiled_dram\\simulation\\timeline.csv.ch10": "ff5cf10369141acc8a385922d4a86f3dd15bcc840a8966a18bbe21adede51e32",
+    "down_tiled_dram\\simulation\\timeline.csv.ch11": "cb6e5ee1874f7b35aeaf6856687cca9aec905e69026a1a22ac230ca93d3aa1c5",
+    "down_tiled_dram\\simulation\\timeline.csv.ch12": "927cbfe10ce00e49b920bac8cf4c38b9593d5356268085fa3de7a868b1d9e0f1",
+    "down_tiled_dram\\simulation\\timeline.csv.ch13": "1cfc4fd72c008f9adcbf99ea4871c2fed200dee1d40cd745bc720bfe947794c4",
+    "down_tiled_dram\\simulation\\timeline.csv.ch14": "bdd402b79e41fb50fd732b17cc49e88888d42f15dadfc7d340933515ef95a07c",
+    "down_tiled_dram\\simulation\\timeline.csv.ch15": "97f382214c8237d7844a87c1fed35b13c456c3970b38926a13d9f50b318e9dc6"
+  }
+}

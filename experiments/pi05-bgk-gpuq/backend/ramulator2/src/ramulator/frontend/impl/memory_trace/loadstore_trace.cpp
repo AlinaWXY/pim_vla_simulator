@@ -3,6 +3,7 @@
 #include <fstream>
 #include <limits>
 #include <sstream>
+#include <unordered_set>
 
 #include "ramulator/base/param.h"
 #include "ramulator/frontend/i_frontend.h"
@@ -20,6 +21,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
   size_t m_curr_trace_idx = 0;
   size_t m_trace_count = 0;
   size_t m_completed = 0;
+  std::unordered_set<Addr_t> m_q_exports_issued, m_q_exports_completed;
   size_t m_barriers = 0;
   uint64_t m_wait_cycles = 0;
   std::string m_trace_path;
@@ -104,12 +106,18 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       const bool reads_to_half = pim == 2 && m_last_pim == 0 && !m_phase_has_write;
       if (m_wait_for_completion && m_last_pim >= 0 && pim != m_last_pim &&
           !reads_to_half && !drained()) return;
+      if (t.type_id == Request::Type::PIM_Q_REMOTE) {
+        const Addr_t source = t.addr ^ Addr_t{32}; // paired adjacent channels, 32B interleave
+        if (!m_q_exports_issued.count(source)) throw std::runtime_error("Q_REMOTE has no preceding peer Q_EXPORT");
+        if (!m_q_exports_completed.count(source)) return;
+      }
       Request req(t.addr, t.type_id);
       req.pim_buffer = t.pim_buffer;
       req.size_bytes = m_memory_system->get_tx_bytes();
       if (m_wait_for_completion) {
         req.callback = [this](Request& completed) {
           m_completed++;
+          if (completed.type_id == Request::Type::PIM_Q_EXPORT) m_q_exports_completed.insert(completed.addr);
           if (completed.type_id == Request::Type::Write) {
             m_write_ready_at = m_clk + memory_to_frontend(m_write_tail_cycles) + 1;
           }
@@ -118,6 +126,10 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       if (m_memory_system->send(req)) {
         m_curr_trace_idx++;
         m_trace_count++;
+        if (t.type_id == Request::Type::PIM_Q_EXPORT) {
+          m_q_exports_issued.insert(t.addr);
+          m_q_exports_completed.erase(t.addr);
+        }
         if (pim != m_last_pim) m_phase_has_write = false;
         if (t.type_id == Request::Type::Write) m_phase_has_write = true;
         m_last_pim = pim;
@@ -155,6 +167,15 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
           op == "PIM_RD_BG" ? Request::Type::PIM_RD_BG :
           op == "PIM_LOCAL_WR" ? Request::Type::PIM_LOCAL_WR :
           op == "PIM_RD_Q" ? Request::Type::PIM_RD_Q :
+          op == "PIM_SPILL" ? Request::Type::PIM_SPILL :
+          op == "PIM_ROPE_COEF" ? Request::Type::PIM_ROPE_COEF :
+          op == "PIM_ROPE_LOAD" ? Request::Type::PIM_ROPE_LOAD :
+          op == "PIM_ROPE_EXEC" ? Request::Type::PIM_ROPE_EXEC :
+          op == "PIM_ROPE_STORE" ? Request::Type::PIM_ROPE_STORE :
+          op == "PIM_Q_EXPORT" ? Request::Type::PIM_Q_EXPORT :
+          op == "PIM_Q_REMOTE" ? Request::Type::PIM_Q_REMOTE :
+          op == "PIM_Z_STORE" ? Request::Type::PIM_Z_STORE :
+          op == "PIM_Z_LOAD" ? Request::Type::PIM_Z_LOAD :
           op == "BARRIER" ? Barrier : op == "WAIT" ? Wait : -1;
       if (type == -1) throw std::runtime_error("LoadStoreTrace: unknown operation " + op);
       int pim_buffer = -1;
@@ -162,13 +183,14 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
         if ((type != Request::Type::PIM_WR_GB && type != Request::Type::PIM_MAC_AB &&
              type != Request::Type::PIM_LOCAL_GB && type != Request::Type::PIM_WR_BG &&
              type != Request::Type::PIM_WR_Q && type != Request::Type::PIM_MAC_K &&
-             type != Request::Type::PIM_MAC_QK && type != Request::Type::PIM_RD_Q) ||
+             type != Request::Type::PIM_MAC_QK && type != Request::Type::PIM_RD_Q &&
+             type != Request::Type::PIM_ROPE_LOAD && type != Request::Type::PIM_ROPE_EXEC && type != Request::Type::PIM_Q_REMOTE && type != Request::Type::PIM_Z_LOAD) ||
             (buffer != "0" && buffer != "1")) {
           throw std::runtime_error("LoadStoreTrace: BUFFER must be 0/1 on WRGB or MACAB");
         }
         pim_buffer = buffer == "0" ? 0 : 1;
       }
-      if ((type == Request::Type::PIM_LOCAL_GB || type == Request::Type::PIM_RD_Q || (type >= Request::Type::PIM_WR_BG &&
+      if ((type == Request::Type::PIM_Z_LOAD || type == Request::Type::PIM_ROPE_LOAD || type == Request::Type::PIM_ROPE_EXEC || type == Request::Type::PIM_Q_REMOTE || type == Request::Type::PIM_LOCAL_GB || type == Request::Type::PIM_RD_Q || (type >= Request::Type::PIM_WR_BG &&
           type <= Request::Type::PIM_MAC_QK)) && pim_buffer < 0)
         throw std::runtime_error("PIM_LOCAL_GB requires BUFFER=0/1");
       size_t consumed = 0;

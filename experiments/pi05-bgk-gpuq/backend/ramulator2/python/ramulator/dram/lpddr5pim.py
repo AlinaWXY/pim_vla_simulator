@@ -97,12 +97,23 @@ def _pim_constraints(base=LPDDR5):
         TimingConstraint("Bank", ["PREpb", "PREab", "PREHB"], ["LOCALWR"], "nRP"),
         TimingConstraint("Bank", ["REFpb", "REFab"], ["LOCALWR"], "nRFC"),
     ]
+    constraints += [
+        TimingConstraint("Bank", ["ACT2", "ACTAB", "ACTHB"], ["LOCALRD"], "nRCD"),
+        TimingConstraint("Bank", ["LOCALRD"], ["LOCALRD", "MACAB", "MACK", "MACQK", "RD", "RDA"], "nCCDL"),
+        TimingConstraint("Bank", ["MACAB", "MACK", "MACQK", "RD", "RDA"], ["LOCALRD"], "nCCDL"),
+        TimingConstraint("Bank", ["LOCALRD"], ["LOCALWR", "WR", "WRA"], "nCL+nBL_min"),
+        TimingConstraint("Bank", ["LOCALWR"], ["LOCALRD"], "nLOCALWR+nWTRL"),
+        TimingConstraint("Bank", ["WR", "WRA"], ["LOCALRD"], "nCWL+nBL_max+nWTRL"),
+        TimingConstraint("Bank", ["LOCALRD"], ["PREpb", "PREab", "PREHB"], "nRTP"),
+        TimingConstraint("Bank", ["PREpb", "PREab", "PREHB"], ["LOCALRD"], "nRP"),
+        TimingConstraint("Bank", ["REFpb", "REFab"], ["LOCALRD"], "nRFC"),
+    ]
     return constraints
 
 
 class LPDDR5PIM(LPDDR5):
     name = "LPDDR5PIM"
-    commands = LPDDR5.commands + ["ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR"]
+    commands = LPDDR5.commands + ["ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD"]
     command_cycles = {**LPDDR5.command_cycles, "ACTAB": 2, "ACTHB": 2}
     timing_params = LPDDR5.timing_params + [
         "nCCDAB", "nPIMWrLatency", "nPIMRdLatency", "nCCDK", "nCCDQK", "nLOCALWR",
@@ -115,6 +126,10 @@ class LPDDR5PIM(LPDDR5):
         "PIM_WR_BG": "WRGB", "PIM_WR_Q": "WRGB", "PIM_MAC_K": "MACK",
         "PIM_MAC_QK": "MACQK", "PIM_RD_BG": "RDRES", "PIM_LOCAL_WR": "LOCALWR",
         "PIM_RD_Q": "RD",  # Controller expands into ordinary RD then WRGB relay.
+        "PIM_SPILL": "LOCALWR", "PIM_ROPE_COEF": "LOCALRD",
+        "PIM_ROPE_LOAD": "LOCALRD", "PIM_ROPE_EXEC": "LOCALRD",
+        "PIM_ROPE_STORE": "LOCALWR", "PIM_Q_EXPORT": "RD", "PIM_Q_REMOTE": "WRGB",
+        "PIM_Z_STORE": "LOCALWR", "PIM_Z_LOAD": "LOCALRD",
     }
     timing_constraints = _pim_constraints()
 
@@ -141,12 +156,12 @@ class LPDDR5PIM(LPDDR5):
     @classmethod
     def _generate_bus_constraints(cls, cmd_idx, cmd_cycles, tick_mult):
         # LOCALWR is an internal per-bank port event, not a CA transaction.
-        local = cmd_idx["LOCALWR"]
+        local = {cmd_idx["LOCALWR"], cmd_idx["LOCALRD"]}
         constraints = super()._generate_bus_constraints(cmd_idx, cmd_cycles, tick_mult)
-        return [[level, [x for x in preceding if x != local],
-                 [x for x in following if x != local], *rest]
+        return [[level, [x for x in preceding if x not in local],
+                 [x for x in following if x not in local], *rest]
                 for level, preceding, following, *rest in constraints
-                if any(x != local for x in preceding) and any(x != local for x in following)]
+                if any(x not in local for x in preceding) and any(x not in local for x in following)]
 
     def resolve(self):
         # Derive from the FINAL normal timings, including user overrides.
