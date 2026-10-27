@@ -72,6 +72,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_data_path": config.pim_data_path,
                     "pim_local_transfer_cycles": config.pim_local_transfer_cycles,
                     "pim_rank_rope": config.pim_rank_rope,
+                    "pim_horizon": config.pim_horizon,
                     "pim_ffn_dram": config.pim_ffn_dram,
                     "ffn_z_preinstalled": config.ffn_z_preinstalled,
                     "ffn_dram_events_path": str(output / f"ffn_dram_events.csv.ch{channel}") if config.pim_ffn_dram else "",
@@ -281,7 +282,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         result["schema_version"] = 10
         result["rank_rope_model"] = {
             "active_physical_rank": 1, "gpu_reserved_rank": 0,
-            "projection_batch": 8, "qk_batch": 16,
+            "projection_batch": config.pim_horizon // 2, "qk_batch": config.pim_horizon,
             "projection_mac_completion_ck": timings["nCCDAB"],
             "rope_pairs_per_request": 8, "rope_ii_cycles": config.rope_ii_cycles,
             "rope_latency_cycles": config.rope_latency_cycles,
@@ -289,7 +290,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             "cast_cycles_per_32B": config.pim_cast_cycles,
             "rank_reduce_cycles": config.rank_reduce_cycles,
             "input_buffers_bytes_per_bank": 64, "coefficient_buffer_bytes_per_bank": 32,
-            "output_fifo_bytes_per_bank": 64, "query_buffer_bytes_per_bank": 512,
+            "output_fifo_bytes_per_bank": 64, "query_buffer_bytes_per_bank": 32 * config.pim_horizon,
             "local_read_completion": "LOCALRD issue + nCL + nBL_min; native array timing, no external DQ",
             "local_write_completion": "LOCALWR issue + nLOCALWR + nWR; native array timing, no external DQ",
             "query_export": "native RD and local buffer tap; callback after actual read return",
@@ -300,6 +301,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         }
         result["pim_model"]["mac_completion"] = "projection issue+nCCDAB; QK issue+nCCDQK; rank reduction then result export"
         result["bgk_model"]["BG_reduction"] = "rank1 sixteen-bank reduction; explicit configurable latency per 16-query K-vector"
+        if config.pim_horizon != 16:
+            result["bgk_model"]["BG_reduction"] = f"rank1 sixteen-bank reduction; explicit configurable latency per {config.pim_horizon}-query K-vector"
         result["bgk_model"]["RoPE_conversion_packing"] = result["rank_rope_model"]
         result["traffic_bytes"].update({
             "bgk_internal_array_read": counters.get("MACQK", 0) * 16 * transaction_bytes,
@@ -321,10 +324,10 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         result["schema_version"] = 11
         result["ffn_dram_model"] = {
             "active_physical_rank": 1, "z_preinstalled": config.ffn_z_preinstalled,
-            "z_base_bytes_per_bank": 360448, "z_payload_bytes_per_bank": 512,
+            "z_base_bytes_per_bank": 360448, "z_payload_bytes_per_bank": 32 * config.pim_horizon,
             "z_reserved_bytes_per_bank": 2048, "rank_resident_z_sram_bytes": 0,
             "rank_nonlinear_input_staging_bytes": 128, "rank_nonlinear_output_staging_bytes": 32,
-            "bank_staging_bytes": 32, "input_double_buffer_bytes_per_rank": 1024,
+            "bank_staging_bytes": 32, "input_double_buffer_bytes_per_rank": 64 * config.pim_horizon,
             "rank_port_cycles_per_32B": config.pim_local_transfer_cycles,
             "store": "128B G/U gather via rank port, excluded nonlinear value boundary,32B return, native LOCALWR+nWR",
             "store_overlap": "Rank materialization staging released at RETURN completion; independent32B bank staging remains until LOCALWR payload consumed",
@@ -341,8 +344,26 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             "ffn_z_local_load": counters.get("LOCALRD", 0) * transaction_bytes,
             "external_dq_total": sum(counters.get(op, 0) for op in ("RD", "RDA", "WR", "WRA", "WRGB", "RDRES")) * transaction_bytes,
         })
+        if config.pim_horizon != 16:
+            blocks = (config.pim_horizon + 15) // 16
+            result["ffn_dram_model"].update({
+                "z_token_blocks": blocks,
+                "z_physical_payload_bytes_per_bank": 512 * blocks,
+                "store": "Per source column, gather valid FP32 G/U in whole32B rank-port bursts; excluded nonlinear boundary;32B padded return and native LOCALWR+nWR",
+                "load": "Native LOCALRD+nCL+nBL_min and32B rank-port transpose for all16 banks and token blocks; discard tail padding before compact H-query input",
+                "mac_completion": "Legacy issue retirement with explicit workload WAIT H; buffer remains owned for nCCDAB",
+            })
+            def sum_stat(value, key):
+                if isinstance(value, dict):
+                    return sum(int(item) if name == key else sum_stat(item, key) for name, item in value.items())
+                if isinstance(value, list):
+                    return sum(sum_stat(item, key) for item in value)
+                return 0
+            result["traffic_bytes"]["ffn_gu_local_gather"] = sum_stat(stats, "ffn_gu_gather_bytes")
     else:
         result["config"].pop("pim_ffn_dram", None)
         result["config"].pop("ffn_z_preinstalled", None)
+    if config.pim_horizon == 16:
+        result["config"].pop("pim_horizon", None)  # Preserve frozen H16 result schema.
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

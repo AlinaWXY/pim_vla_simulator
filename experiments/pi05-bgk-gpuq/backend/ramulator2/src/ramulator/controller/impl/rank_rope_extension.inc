@@ -11,7 +11,7 @@ struct RopeBank {
   Clk_t coefficient_ready = 0, coefficient_busy = 0, next_pair_issue = 0, cast_busy = 0;
   std::vector<RopeOutput> outputs; // two 32B output FIFO entries, distinct from input buffers
   std::unordered_map<Addr_t, Clk_t> spill_ready, rotated_ready;
-  uint16_t query_mask = 0;
+  uint64_t query_mask = 0;
 };
 std::vector<RopeBank> m_rope_banks;
 
@@ -19,7 +19,15 @@ bool is_rank_rope(const Request& r) const { return r.type_id >= Request::Type::P
 int rr_bank(const Request& r) const {
   return (r.addr_vec[m_rank_level] * m_bgs + r.addr_vec[m_bg_level]) * m_banks_per_bg + r.addr_vec[m_bank_level];
 }
-int rr_column(const Request& r) const { return r.addr_vec[m_device.m_spec->get_level_id("Column")]; }
+// Work storage begins at row40. The logical column may cross a DRAM row;
+// native events and array commands retain the actual Row/Column address.
+int rr_column(const Request& r) const {
+  return (r.addr_vec[m_device.m_spec->get_level_id("Row")]-40)*64 + r.addr_vec[m_device.m_spec->get_level_id("Column")];
+}
+int rr_local_queries() const { return m_pim_horizon/2; }
+uint64_t rr_full_query_mask() const {
+  return m_pim_horizon==64 ? ~uint64_t{0} : (uint64_t{1}<<m_pim_horizon)-1;
+}
 const char* rr_name(int type) const {
   static const char* names[] = {"PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE"};
   return names[type - Request::Type::PIM_SPILL];
@@ -37,15 +45,16 @@ bool send_rank_rope(Request& req) {
   if (req.addr_vec[m_rank_level] != 1 || req.size_bytes != 32)
     throw std::runtime_error("Rank RoPE request requires rank1 and exactly 32B");
   const int col = rr_column(req);
-  if ((req.type_id == Request::Type::PIM_ROPE_COEF && (col < 0 || col >= 8)) ||
-      (req.type_id != Request::Type::PIM_ROPE_COEF && (col < 8 || col >= 24)) ||
-      ((req.type_id == Request::Type::PIM_Q_EXPORT || req.type_id == Request::Type::PIM_Q_REMOTE) && col >= 16))
+  const int local_queries = rr_local_queries();
+  if ((req.type_id == Request::Type::PIM_ROPE_COEF && (col < 0 || col >= local_queries)) ||
+      (req.type_id != Request::Type::PIM_ROPE_COEF && (col < local_queries || col >= 3*local_queries)) ||
+      ((req.type_id == Request::Type::PIM_Q_EXPORT || req.type_id == Request::Type::PIM_Q_REMOTE) && col >= 2*local_queries))
     throw std::runtime_error("Rank RoPE working-row column violates coefficient/Q/K contract");
   if ((req.type_id == Request::Type::PIM_ROPE_LOAD || req.type_id == Request::Type::PIM_ROPE_EXEC ||
        req.type_id == Request::Type::PIM_Q_REMOTE) && req.pim_buffer < 0)
     throw std::runtime_error("Rank RoPE load/execute/remote requires buffer 0/1");
   if (req.type_id == Request::Type::PIM_Q_REMOTE && req.pim_buffer != 0)
-    throw std::runtime_error("Rank Q batch is the bounded 512B buffer0");
+    throw std::runtime_error("Rank Q batch is the bounded " + std::to_string(32*m_pim_horizon) + "B buffer0");
   req.pim_bank_mask = uint64_t{1} << rr_bank(req);
   req.pim_rank_mask = 2;
   req.final_command = spec_command(req.type_id);
@@ -79,9 +88,9 @@ bool rr_export(ReqBuffer::iterator it) {
       if (done.command != m_cmd_rd && done.command != m_cmd_rda)
         throw std::runtime_error("Q export requires a real DRAM RD");
       auto& b = m_rope_banks[rr_bank(*owner)];
-      const int query = 2 * (rr_column(*owner) - 8) + m_channel_id % 2;
-      if (b.query_mask & (1u << query)) throw std::runtime_error("Duplicate local Q fill");
-      b.query_mask |= 1u << query;
+      const int query = 2 * (rr_column(*owner) - rr_local_queries()) + m_channel_id % 2;
+      if (b.query_mask & (uint64_t{1} << query)) throw std::runtime_error("Duplicate local Q fill");
+      b.query_mask |= uint64_t{1} << query;
       auto& input = m_bank_inputs[rr_bank(*owner)][0];
       input.written = true; input.ready_at = std::max(input.ready_at, done.depart);
       owner->pim_q_stage = 2;
@@ -104,9 +113,9 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
     if (!local_port) return false;
     auto& input = bank.inputs[it->pim_buffer];
     if (!input.valid || input.address != it->addr) throw std::runtime_error("RoPE execute needs matching loaded 32B input");
-    if (bank.coefficient_token != col % 8) throw std::runtime_error("RoPE coefficient token mismatch");
+    if (bank.coefficient_token != col % rr_local_queries()) throw std::runtime_error("RoPE coefficient token mismatch");
     if (m_clk < input.ready || m_clk < bank.coefficient_ready || m_clk < bank.next_pair_issue || bank.outputs.size() >= 2) return false;
-    const int use = col < 16 ? 1 : 2;
+    const int use = col < 2*rr_local_queries() ? 1 : 2;
     if (bank.coefficient_uses & use) throw std::runtime_error("Duplicate RoPE vector for coefficients");
     bank.coefficient_uses |= use;
     const Clk_t ready = m_clk + 7 * m_rope_ii + m_rope_latency;
@@ -121,7 +130,7 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
   }
   if (type == Request::Type::PIM_SPILL && it->pim_q_stage == 0) {
     if (m_clk < m_projection_ready || m_clk < bank.cast_busy) return false;
-    if (col == 8) {
+    if (col == rr_local_queries()) {
       if (m_clk < m_bank_inputs[b][0].in_use_until) return false;
       bank.query_mask = 0;
       m_bank_inputs[b][0].written = false;
@@ -172,9 +181,9 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
     out->release = m_clk + m_bank_write_cycles;
   }
   if (type == Request::Type::PIM_Q_REMOTE) {
-    const int query = 2 * (col - 8) + (1 - m_channel_id % 2);
-    if (bank.query_mask & (1u << query)) throw std::runtime_error("Duplicate remote Q fill");
-    bank.query_mask |= 1u << query;
+    const int query = 2 * (col - rr_local_queries()) + (1 - m_channel_id % 2);
+    if (bank.query_mask & (uint64_t{1} << query)) throw std::runtime_error("Duplicate remote Q fill");
+    bank.query_mask |= uint64_t{1} << query;
     auto& input = m_bank_inputs[b][0];
     input.written = true; input.ready_at = std::max(input.ready_at, ready);
   }

@@ -1,0 +1,11 @@
+{
+  "source_snapshot": "runtime-source.tar.gz includes all verified runtime provenance files plus H16 audit/generator dependencies and README",
+  "publication_note": "The repository runner additionally fingerprints the H16 dependency directories in future runs; this run archive preserves the exact executed runner and separately hashes those dependencies. No simulation or statistic changed.",
+  "baseline_commit": "41199cee64c40c55cafb330ed838d7e5c13fc0b8",
+  "H16_exact_timing_cases": 6,
+  "new_source_tests": 16,
+  "audit_tests": 25,
+  "legacy_source_tests": 42,
+  "native_guard_and_smoke_cases": 13,
+  "all_cases_native_audited": 24
+}

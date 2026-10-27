@@ -54,6 +54,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   std::deque<Request> m_pim_pending;
   Clk_t m_normal_ready_at = 0;
   int m_mac_interval = 0;
+  int m_pim_horizon = 16;
   struct InputBuffer {
     Clk_t ready_at = 0;
     Clk_t in_use_until = 0;
@@ -109,6 +110,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_mac_scope, std::string, "pim_mac_scope").default_val("rank");
     RAMULATOR_PARSE_PARAM(m_data_path, std::string, "pim_data_path").default_val("lpddr");
     RAMULATOR_PARSE_PARAM(m_local_cycles, int, "pim_local_transfer_cycles").default_val(2);
+    RAMULATOR_PARSE_PARAM(m_pim_horizon, int, "pim_horizon").default_val(16);
+    if (m_pim_horizon < 2 || m_pim_horizon > 64 || m_pim_horizon % 2)
+      throw std::runtime_error("pim_horizon must be even and in2..64");
     RAMULATOR_PARSE_PARAM(m_local_trace_path, std::string, "local_input_trace_path").default_val("");
     if (m_local_cycles < 1) throw std::runtime_error("Local transfer cycles must be positive");
     if (m_data_path != "lpddr" && m_data_path != "attacc") {
@@ -534,8 +538,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       if (is_bgk_input(req)) {
         if (m_clk < input.in_use_until) return false;
       } else if (actual_mac) {
-        if (m_rank_rope && req.type_id == Request::Type::PIM_MAC_QK && m_rope_banks[b].query_mask != 0xffff)
-          throw std::runtime_error("Rank QK requires all sixteen query slices in every bank");
+        if (m_rank_rope && req.type_id == Request::Type::PIM_MAC_QK && m_rope_banks[b].query_mask != rr_full_query_mask())
+          throw std::runtime_error(m_pim_horizon==16 ? "Rank QK requires all sixteen query slices in every bank" :
+              "Rank QK requires all horizon query slices in every bank");
         if (!input.written) throw std::runtime_error("BG-K MAC references unfilled bank-local input buffer");
         if (m_clk < input.ready_at) return false;
       } else if (req.type_id == Request::Type::PIM_RD_BG || req.type_id == Request::Type::PIM_LOCAL_WR) {

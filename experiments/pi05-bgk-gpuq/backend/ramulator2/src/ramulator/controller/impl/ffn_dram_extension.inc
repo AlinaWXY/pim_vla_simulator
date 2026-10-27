@@ -4,12 +4,12 @@ std::string m_ffn_events_path;
 std::ofstream m_ffn_events;
 struct ZBatch {
   int column = -1, generation = 0, mac_columns = 0;
-  uint16_t requested = 0, delivered = 0;
+  uint64_t requested = 0, delivered = 0;
 };
 std::array<ZBatch, 2> m_z_batches;
 std::array<Request*, 16> m_z_bank_owner{};
 std::array<Clk_t, 16> m_z_bank_free{};
-std::array<std::array<Clk_t, 16>, 16> m_z_written{};
+std::array<std::array<Clk_t, 64>, 16> m_z_written{};
 Request* m_z_material_owner = nullptr;
 Clk_t m_z_material_free = 0, m_ffn_compute_ready = 0;
 size_t s_z_stores = 0, s_z_loads = 0, s_z_gather_bytes = 0, s_z_return_bytes = 0, s_z_load_port_bytes = 0;
@@ -19,6 +19,18 @@ bool is_ffn_z(const Request& req) const {
 }
 int z_bank(const Request& req) const { return req.addr_vec[m_bg_level]*m_banks_per_bg+req.addr_vec[m_bank_level]; }
 int z_column(const Request& req) const { return req.addr_vec[m_device.m_spec->get_level_id("Column")]; }
+int z_token_blocks() const { return (m_pim_horizon+15)/16; }
+uint64_t z_source_mask() const {
+  const int count=16*z_token_blocks();
+  return count==64 ? ~uint64_t{0} : (uint64_t{1}<<count)-1;
+}
+uint64_t z_source_bit(const Request& req) const {
+  return uint64_t{1} << (z_bank(req)*z_token_blocks()+z_column(req)%z_token_blocks());
+}
+int z_gather_bursts(const Request& req) const {
+  const int valid=std::min(16,m_pim_horizon-16*(z_column(req)%z_token_blocks()));
+  return (valid*8+31)/32; // FP32 G/U for valid tokens; charged whole32B port bursts.
+}
 int z_offset(const Request& req) const {
   const auto& a = req.pim_origin_addr_vec.empty() ? req.addr_vec : req.pim_origin_addr_vec;
   return a[m_device.m_spec->get_level_id("Row")]*2048+a[m_device.m_spec->get_level_id("Column")]*32;
@@ -47,8 +59,8 @@ bool send_ffn_z(Request& req) {
   if (!m_ffn_dram) throw std::runtime_error("PIM_Z request requires pim_ffn_dram=true");
   if (req.addr_vec[m_rank_level]!=1 || req.size_bytes!=32)
     throw std::runtime_error("PIM_Z requires physical rank1 and a32B request");
-  if (req.addr_vec[m_device.m_spec->get_level_id("Row")]!=176 || z_column(req)>=16)
-    throw std::runtime_error("PIM_Z address must be row176 column0..15");
+  if (req.addr_vec[m_device.m_spec->get_level_id("Row")]!=176 || z_column(req)>=16*z_token_blocks())
+    throw std::runtime_error("PIM_Z address must be row176 column0.." + std::to_string(16*z_token_blocks()-1));
   if ((req.type_id==Request::Type::PIM_Z_LOAD && req.pim_buffer<0) ||
       (req.type_id==Request::Type::PIM_Z_STORE && req.pim_buffer!=-1))
     throw std::runtime_error("Z_LOAD requires BUFFER0/1; Z_STORE has no input buffer");
@@ -81,7 +93,8 @@ bool z_bypass(const Request& later, const Request& earlier) const {
 bool prepare_z_batch(Request& req) {
   auto& batch=m_z_batches[req.pim_buffer];
   auto& input=m_inputs[1][req.pim_buffer];
-  const int column=z_column(req), bit=1<<z_bank(req);
+  const int column=z_column(req)/z_token_blocks();
+  const uint64_t bit=z_source_bit(req);
   if (m_clk < std::max(input.in_use_until,input.local_in_use_until)) return false;
   if (batch.column<0 || batch.mac_columns==16) {
     const int generation=batch.generation+1;
@@ -102,7 +115,7 @@ bool ffn_mac_ready(const Request& req) {
   const auto& batch=m_z_batches[req.pim_buffer];
   if (batch.column!=fragment || req.pim_buffer!=fragment%2)
     throw std::runtime_error("Down MAC references missing or mismatched Z fragment");
-  if (batch.delivered!=0xffff) {
+  if (batch.delivered!=z_source_mask()) {
     for (const auto& pending:m_pim_buffer)
       if (pending.type_id==Request::Type::PIM_Z_LOAD && pending.pim_buffer==req.pim_buffer) return false;
     throw std::runtime_error("Down MAC requires all16 source banks in Z input fragment");
@@ -130,10 +143,11 @@ bool issue_ffn_z(ReqBuffer::iterator it, bool local) {
     if (m_z_material_owner) return false;
     m_z_bank_owner[bank]=&*it; m_z_material_owner=&*it;
     m_z_material_free=std::numeric_limits<Clk_t>::max();
-    it->depart=port=m_clk+4*m_local_cycles;
+    const int bursts=z_gather_bursts(*it);
+    it->depart=port=m_clk+bursts*m_local_cycles;
     it->pim_q_stage=1;
-    record_ffn(*it,"PIM_Z_GATHER",it->depart,128,4*m_local_cycles,0,bit);
-    s_z_gather_bytes+=128;
+    record_ffn(*it,"PIM_Z_GATHER",it->depart,bursts*32,bursts*m_local_cycles,0,bit);
+    s_z_gather_bytes+=bursts*32;
     return true;
   }
   if (store && it->pim_q_stage==1) {
@@ -154,13 +168,13 @@ bool issue_ffn_z(ReqBuffer::iterator it, bool local) {
     auto& input=m_inputs[1][it->pim_buffer];
     if (m_clk<input.in_use_until) return false;
     const Clk_t ready=port=m_clk+m_local_cycles;
-    batch.delivered |= bit;
+    batch.delivered |= z_source_bit(*it);
     input.ready_at=std::max(input.ready_at,ready);
     input.local_in_use_until=ready;
     record_ffn(*it,"PIM_Z_LOAD_PORT",ready,32,m_local_cycles,batch.generation,bit);
-    if (batch.delivered==0xffff) {
+    if (batch.delivered==z_source_mask()) {
       input.written=true;
-      record_ffn(*it,"PIM_Z_BATCH_READY",input.ready_at,512,m_local_cycles,batch.generation,65535);
+      record_ffn(*it,"PIM_Z_BATCH_READY",input.ready_at,m_pim_horizon*32,m_local_cycles,batch.generation,65535);
     }
     m_z_bank_owner[bank]=nullptr; m_z_bank_free[bank]=ready;
     s_z_load_port_bytes+=32;

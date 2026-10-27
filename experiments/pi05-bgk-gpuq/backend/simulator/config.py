@@ -29,6 +29,7 @@ class MemoryConfig:
     pim_data_path: str = "lpddr"
     pim_local_transfer_cycles: int = 2
     pim_rank_rope: bool = False
+    pim_horizon: int = 16
     pim_ffn_dram: bool = False
     ffn_z_preinstalled: bool = False
     rope_ii_cycles: int = 1
@@ -37,6 +38,8 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
+        if type(self.pim_horizon) is not int or not 2 <= self.pim_horizon <= 64 or self.pim_horizon % 2:
+            raise ValueError("pim_horizon must be an even integer from2 through64")
         if type(self.pim_ffn_dram) is not bool or type(self.ffn_z_preinstalled) is not bool:
             raise ValueError("FFN DRAM flags must be boolean")
         if self.ffn_z_preinstalled and not self.pim_ffn_dram:

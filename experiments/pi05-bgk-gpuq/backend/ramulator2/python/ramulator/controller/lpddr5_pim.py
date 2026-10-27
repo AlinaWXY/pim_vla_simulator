@@ -23,6 +23,7 @@ class LPDDR5PIM(Component):
     pim_mac_scope = Param(str, default='rank')
     pim_data_path = Param(str, default='lpddr')
     pim_local_transfer_cycles = Param(int, default=2)
+    pim_horizon = Param(int, default=16)
     local_input_trace_path = Param(str, default='')
     pim_rank_rope = Param(bool, default=False)
     rope_ii_cycles = Param(int, default=1)
