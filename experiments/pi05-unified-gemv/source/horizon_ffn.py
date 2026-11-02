@@ -1,15 +1,15 @@
-"""Whole-horizon rank-feature FFN with streamed, bank-DRAM Z.
+"""H16 FFN with GPU GeLU/multiply and output-sharded Down weights.
 
-Weights are single-copy and unchanged. H changes token buffers and MAC
-service, not head count or token microbatching. Only Z columns have padding.
+Gate/Up FP32 outputs return to GPU; GPU BF16 Z fills the common GEMV slots.
+All rank-input broadcasts have no extra service beyond the external burst.
 """
 from collections import Counter
 from pathlib import Path
 
 HORIZONS = (16,)
-CASES = ("gate_up_z_store", "down_tiled_dram", "combined_timing_chain")
+CASES = ("gate_up_gpu", "down_gpu_input", "combined_timing_chain")
 CHANNELS, BANKS, BURST, ROW = 16, 16, 32, 2048
-GU_BASE, DOWN_BASE, Z_BASE = 262144, 327680, 360448
+GU_BASE, DOWN_BASE, WEIGHT_END = 262144, 327680, 360448
 
 
 def check_horizon(horizon):
@@ -27,39 +27,96 @@ def address(channel, bank, offset):
     return (row << 20) | (ba << 18) | (bg << 16) | (1 << 15) | (column << 9) | (channel << 5) | byte
 
 
-def z_location(horizon, token, feature):
-    check_horizon(horizon)
-    if not (0 <= token < horizon and 0 <= feature < 4096):
-        raise ValueError("invalid Z token or feature")
-    blocks = (horizon+15)//16
+def check(value, limit, name):
+    if type(value) is not int or not 0 <= value < limit:
+        raise ValueError(f"invalid {name}")
+
+
+def decode_address(value):
+    return (value >> 5 & 15, value >> 15 & 1,
+            (value >> 16 & 3)*4 + (value >> 18 & 3),
+            (value >> 20)*ROW + (value >> 9 & 63)*BURST + (value & 31))
+
+
+def gu_weight_location(projection, reduction, feature):
+    """Gate/Up [input_fragment64][projection2][feature_slot16][lane16]."""
+    if projection not in ("gate", "up"):
+        raise ValueError("invalid Gate/Up projection")
+    check(reduction, 1024, "GU reduction")
+    check(feature, 4096, "GU feature")
     channel, local = divmod(feature, 256)
-    slot, bank = divmod(local, 16)
-    block, lane = divmod(token, 16)
-    return address(channel, bank, Z_BASE+(slot*blocks+block)*32+lane*2)
+    feature_slot, bank = divmod(local, 16)
+    fragment, lane = divmod(reduction, 16)
+    column = (fragment*2 + (projection == "up"))*16 + feature_slot
+    return address(channel, bank, GU_BASE + column*BURST + lane*2)
+
+
+def decode_gu_weight(value):
+    channel, rank, bank, offset = decode_address(value)
+    if rank != 1 or not GU_BASE <= offset < DOWN_BASE or offset % 2:
+        raise ValueError("not a BF16 Gate/Up weight")
+    column, lane_byte = divmod(offset-GU_BASE, BURST)
+    group, feature_slot = divmod(column, 16)
+    fragment, projection = divmod(group, 2)
+    return ("up" if projection else "gate", fragment*16+lane_byte//2,
+            channel*256+feature_slot*16+bank)
+
+
+def down_weight_location(reduction, output):
+    """Output-sharded [input_fragment256][output_slot4][input_lane16]."""
+    check(reduction, 4096, "Down reduction")
+    check(output, 1024, "Down output")
+    channel, local = divmod(output, 64)
+    bank, output_slot = divmod(local, 4)
+    fragment, lane = divmod(reduction, 16)
+    return address(channel, bank, DOWN_BASE+(fragment*4+output_slot)*BURST+lane*2)
+
+
+def decode_down_weight(value):
+    channel, rank, bank, offset = decode_address(value)
+    if rank != 1 or not DOWN_BASE <= offset < WEIGHT_END or offset % 2:
+        raise ValueError("not a BF16 Down weight")
+    column, lane_byte = divmod(offset-DOWN_BASE, BURST)
+    fragment, output_slot = divmod(column, 4)
+    return fragment*16+lane_byte//2, channel*64+bank*4+output_slot
+
+
+def gpu_input_packet(operator, channel, fragment, token):
+    if operator not in ("gate_up", "down"):
+        raise ValueError("invalid GPU input operator")
+    width = 1024 if operator == "gate_up" else 4096
+    check(channel, CHANNELS, "channel")
+    check(fragment, width//16, "input fragment")
+    check(token, 16, "input token")
+    return dict(source_tensor="X" if operator == "gate_up" else "Z_gpu",
+                source_byte_offset=(token*width+fragment*16)*2, bytes=32,
+                destination=address(channel, 0, token*32), slot=fragment%2,
+                target_bank_mask=65535, token=token, feature_first=fragment*16)
 
 
 def layout(horizon):
     h = check_horizon(horizon)
-    blocks = (h+15)//16
-    valid = [min(16, h-16*b) for b in range(blocks)]
-    gather = [((8*n+31)//32)*32 for n in valid]
     return dict(horizon=h, token_microbatches=1, active_physical_rank=1,
         channels=16, active_ranks=16, banks_per_rank=16, hidden=1024, intermediate=4096,
-        local_intermediate=256, weight_copies=1, weight_bytes=24*1024**2,
-        gu_base=GU_BASE, down_base=DOWN_BASE, z_base=Z_BASE,
+        gu_output_features_per_rank=256, gu_output_features_per_bank=16,
+        down_output_features_per_rank=64, down_output_features_per_bank=4,
+        down_reduction_features_per_rank=4096, weight_copies=1, weight_bytes=24*1024**2,
+        gu_base=GU_BASE, down_base=DOWN_BASE, layer_stride_bytes_per_bank=WEIGHT_END,
         gu_weight_bytes_per_bank=65536, down_weight_bytes_per_bank=32768,
-        z_blocks_per_feature=blocks, z_columns_per_bank=16*blocks,
-        z_valid_tokens_per_column=valid, z_gu_gather_port_bytes_per_column=gather,
-        z_bytes_per_bank=512*blocks, z_valid_bytes_per_bank=32*h,
-        z_padding_bytes_per_bank=512*blocks-32*h, z_reserved_bytes_per_bank=2048,
-        layer_stride_bytes_per_bank=Z_BASE+2048,
-        z_layout="[feature_slot16][token_block ceil(H/16)][token_lane16] BF16",
-        z_column_formula="feature_slot*ceil(H/16)+token_block",
+        gu_weight_layout="[input_fragment64][Gate/Up2][feature_slot16][input_lane16] BF16",
+        gu_feature_owner="channel=feature//256; bank=feature%16; feature_slot=(feature%256)//16",
+        down_weight_layout="[input_fragment256][output_slot4][input_lane16] BF16",
+        down_output_owner="channel=output//64; bank=(output%64)//4; output_slot=output%4",
+        gpu_z_layout="[token16][intermediate4096] BF16",
+        gpu_z_unique_bytes=h*4096*2, gpu_z_copies_sent=16,
+        z_residency="GPU; no PIM DRAM Z allocation",
         bank_input_layout="[token16][feature_lane16] BF16 in shared bank GEMV slots",
-        buffers=dict(GU_accumulator_per_bank=128*h, Down_tiled_accumulator_per_bank=64*h,
-            bank_input_double=64*h, separate_rank_input_bytes=0, bank_column_staging=32,
-            rank_nonlinear_input_staging=128, rank_nonlinear_output_staging=32,
-            rank_full_Z=0, rank_full_GU=0))
+        input_broadcast_extra_cycles=0,
+        down_output_layout="rank r returns complete Y[:,64*r:64*(r+1)] FP32",
+        down_rank_partial_reduction=False,
+        buffers=dict(GU_accumulator_per_bank=128*h, Down_accumulator_per_bank=16*h,
+            bank_input_double=64*h, separate_rank_input_bytes=0,
+            bank_Z_column_staging=0, rank_full_Z=0, rank_full_GU=0))
 
 
 class Writer:
@@ -96,113 +153,102 @@ class Writer:
         for channel in range(16):
             self.emit(op, address(channel, 0, offset), buffer)
 
-    def columns(self, op, feature, buffer=None):
-        for block in range((self.horizon+15)//16):
-            column = feature*((self.horizon+15)//16)+block
-            for bank in range(16):
-                for channel in range(16):
-                    self.emit(op, address(channel, bank, Z_BASE+column*32), buffer)
-
     def drain(self, cycles):
         self.fence()
 
 
-def compute(w, tile=None):
-    gu = tile is None
-    fragments, slots = (64, 32) if gu else (16, 16)
-    base = GU_BASE if gu else DOWN_BASE+tile*8192
-    name = "input_and_compute" if gu else f"tile_{tile}_input_and_compute"
+def compute(w, operator):
+    gu = operator == "gate_up"
+    fragments, slots = (64, 32) if gu else (256, 4)
+    base = GU_BASE if gu else DOWN_BASE
+    name = operator+"_input_and_compute"
     def body():
         for fragment in range(fragments):
             buffer, first = fragment%2, w.line_no+1
-            if gu:
-                for token in range(w.horizon):
-                    w.ranks("PIM_WR_GB", token*32, buffer)
-            else:
-                w.columns("PIM_Z_LOAD", fragment, buffer)
+            for token in range(w.horizon):
+                w.ranks("PIM_WR_GB", token*32, buffer)
             last, mac_first = w.line_no, w.line_no+1
             for slot in range(slots):
                 w.ranks("PIM_MAC_AB", base+(fragment*slots+slot)*32, buffer)
-            bursts = w.horizon if gu else 16*((w.horizon+15)//16)
-            w.input_fragments.append(dict(phase=name, tile=tile, fragment=fragment, buffer=buffer,
-                input_source="gpu_wrgb" if gu else "bank_dram_z",
-                input_line_first=first, input_line_last=last, line_start=first, line_end=last,
-                mac_line_first=mac_first, mac_line_last=w.line_no,
-                bursts_per_rank=bursts, bytes_per_rank=bursts*32,
-                useful_input_bytes_per_rank=w.horizon*32,
-                command_count=bursts*16, consumer_mac_count=slots*16, slots_per_fragment=slots))
+            w.input_fragments.append(dict(phase=name, fragment=fragment, buffer=buffer,
+                input_source="gpu_wrgb", source_tensor="X" if gu else "Z_gpu",
+                source_tensor_width=1024 if gu else 4096, source_feature_first=fragment*16,
+                same_source_fragment_all_ranks=True, input_line_first=first, input_line_last=last,
+                line_start=first, line_end=last, mac_line_first=mac_first, mac_line_last=w.line_no,
+                bursts_per_rank=w.horizon, bytes_per_rank=w.horizon*32,
+                useful_input_bytes_per_rank=w.horizon*32, command_count=w.horizon*16,
+                consumer_mac_count=slots*16, slots_per_fragment=slots,
+                input_broadcast_extra_cycles=0))
         w.drain(w.horizon)
-    w.phase(name, body, kind="pipeline", tile=tile, M=w.horizon,
+    w.phase(name, body, kind="pipeline", M=w.horizon,
         fragment_count=fragments, slots_per_fragment=slots, weight_base=base,
-        input_source="gpu_wrgb" if gu else "bank_dram_z")
+        input_source="gpu_wrgb", source_tensor="X" if gu else "Z_gpu")
     def release():
         for slot in (0, 1):
             w.ranks("PIM_GEMV_RELEASE", 0, slot)
     w.phase(name+"_gemv_release", release, kind="gemv_release")
 
 
-def export(w, tile):
-    name = f"tile_{tile}_result_export"
+def export(w, operator):
+    gu = operator == "gate_up"
+    outputs_per_rank = 512 if gu else 64
+    name = operator+"_result_export"
     def body():
         first = w.line_no+1
-        for offset in range(0, w.horizon*256*4, 32):
+        for offset in range(0, w.horizon*outputs_per_rank*4, 32):
             w.ranks("PIM_RD_RES", offset)
-        w.exports.append(dict(phase=name, tile=tile, output_start=tile*256,
-            output_count_per_rank=256, line_start=first, line_end=w.line_no,
-            bytes_fp32=w.horizon*256*4*16, rank_partials=16))
+        w.exports.append(dict(phase=name, line_start=first, line_end=w.line_no,
+            output_count_per_rank=outputs_per_rank, bytes_fp32=w.horizon*outputs_per_rank*4*16,
+            rank_partials=0, destination="GPU", projection_count=2 if gu else 1,
+            output_semantics="complete Gate and Up features" if gu else "complete output features"))
         w.drain(4)
-    w.phase(name, body, kind="export", tile=tile, output_start=tile*256,
-        output_count_per_rank=256, rank_partials=16)
+    w.phase(name, body, kind="export", output_count_per_rank=outputs_per_rank,
+            rank_partials=0, destination="GPU")
 
 
 def generate(path, horizon, case="combined_timing_chain", local_ck=2):
     info = layout(horizon)
     if case not in CASES or type(local_ck) is not int or local_ck <= 0:
         raise ValueError("invalid FFN case or local transfer cycles")
-    gu, down = case != "down_tiled_dram", case != "gate_up_z_store"
+    gu, down = case != "down_gpu_input", case != "gate_up_gpu"
     w = Writer(path, horizon)
     try:
         if gu:
-            compute(w)
-            def stores():
-                for feature in range(16):
-                    w.columns("PIM_Z_STORE", feature)
-            w.phase("z_stream_store", stores, kind="native_z_store",
-                nonlinear_latency_ck=None, z_blocks_per_feature=info["z_blocks_per_feature"])
+            compute(w, "gate_up")
+            export(w, "gate_up")
+        if gu and down:
+            w.phase("gpu_gelu_multiply_boundary", lambda: None, kind="excluded_boundary",
+                measured_latency_us=None, operation="Z=BF16(GeLU(Gate)*Up) on GPU",
+                policy="Input assumed ready after an unmeasured GPU operation; no kernel timing claim")
         if down:
-            for tile in range(4):
-                compute(w, tile)
-                export(w, tile)
+            compute(w, "down")
+            export(w, "down")
     finally:
         w.stream.close()
-    dq = dict(pim_input_write=gu*horizon*32768, pim_result_read=down*horizon*65536,
-        dram_read=0, dram_write=0)
+    dq = dict(GU_input_gpu_to_pim=gu*horizon*1024*2*16,
+        GU_gate_up_pim_to_gpu=gu*horizon*4096*2*4,
+        Down_Z_gpu_to_pim=down*horizon*4096*2*16,
+        Down_output_pim_to_gpu=down*horizon*1024*4)
     dq["total"] = sum(dq.values())
-    physical_z = 256*info["z_bytes_per_bank"]
-    valid_z = horizon*4096*2
-    gu_gather = 4096*sum(info["z_gu_gather_port_bytes_per_column"])
-    internal = dict(GU_gather_to_nonlinear=gu*gu_gather,
-        GU_gather_valid=gu*horizon*4096*8, GU_gather_padding=gu*(gu_gather-horizon*4096*8),
-        Z_return_to_producer_bank=gu*physical_z, Z_dram_write=gu*physical_z,
-        Z_dram_read=down*4*physical_z, Z_scatter_source=down*4*physical_z,
-        Z_multicast_destination_bank_bytes=down*4*physical_z*16,
-        Z_write_valid=gu*valid_z, Z_write_padding=gu*(physical_z-valid_z),
-        Z_read_valid=down*4*valid_z, Z_read_padding=down*4*(physical_z-valid_z))
+    input_bytes = dq["GU_input_gpu_to_pim"]+dq["Down_Z_gpu_to_pim"]
+    internal = dict(input_multicast_source_bytes=input_bytes,
+        input_multicast_destination_bank_bytes=input_bytes*16,
+        input_multicast_additional_service_cycles=0,
+        Z_dram_read=0, Z_dram_write=0, Z_scatter_source=0)
     return dict(case=case, horizon=horizon, action_horizon=horizon,
         whole_batch=True, token_microbatches=1, padded_compute_tokens=horizon,
         layout=info, buffers=info["buffers"], counts=dict(w.counts), segments=w.segments,
         input_fragments=w.input_fragments, exports=w.exports,
         expected_dq_bytes=dq, expected_internal_bytes=internal,
         weight_array_bytes=(gu*16+down*8)*1024**2,
-        mac_service_ck=horizon, local_ck=local_ck,
-        z_base=Z_BASE, z_bytes_per_bank=info["z_bytes_per_bank"],
-        z_blocks_per_feature=info["z_blocks_per_feature"], z_reserved_bytes_per_bank=2048,
+        mac_service_ck=horizon, input_broadcast_extra_cycles=0,
         rank_local_z_sram_bytes=0, rank_bulk_GU_staging_bytes=0,
-        required_backend=dict(pim_horizon=horizon, pim_ffn_dram=True, pim_rank_rope=False,
+        required_backend=dict(pim_horizon=horizon, pim_ffn_dram=False, pim_rank_rope=False,
             pim_mac_scope="rank", pim_input_broadcast=False, nCCDAB=horizon,
-            ffn_z_preinstalled=not gu),
-        nonlinear_latency_ck=None, gpu_partial_reduction_latency_ck=None,
+            ffn_z_preinstalled=False),
+        nonlinear_latency_ck=None, gpu_partial_reduction_required=False,
         timing_chain=gu and down, integrated_chain=False, numeric_compute=False,
-        exclusions=["GELU/multiply/BF16 cast and producer availability", "GPU final rank-partial reduction",
+        exclusions=["GPU GeLU/multiply/BF16 cast and producer availability",
                     "GPU source/arrival and norm/residual/conditioning arithmetic"],
-        padding_policy="Only Z feature columns and GU rank-port bursts pad; all H tokens execute in one MAC batch")
+        standalone_preconditions="X ready on GPU" if gu else "BF16 Z from GPU GeLU(Gate)*Up ready",
+        padding_policy="No FFN padding; all 16 tokens execute in one MAC batch")

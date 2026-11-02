@@ -15,7 +15,7 @@ from pathlib import Path
 
 EXTERNAL = frozenset(("RD", "RDA", "WR", "WRA", "WRGB", "RDRES"))
 CONTROL = frozenset(("BARRIER", "WAIT", "PIM_GEMV_RELEASE"))
-PRIMARY = ("chain", "v", "pv", "gate_up_z_store", "down_tiled_dram")
+PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 
 
 def require(condition, message):

@@ -9,15 +9,20 @@ def read(path):
 
 
 def verify(root):
-    expected = read(Path(__file__).resolve().parent / "reference/expected.json")
+    reference_root = Path(__file__).resolve().parent / "reference"
+    expected = read(reference_root / "expected.json")
+    expected_guards = read(reference_root / "validation.json")["native_guards"]
     summary, channels = read(root / "summary.json"), read(root / "channel-analysis.json")
     if summary["status"] != "passed" or channels["status"] != "passed":
         raise AssertionError("Fresh native run or channel audit did not pass")
     if not summary["tests_executed"]:
         raise AssertionError("Use the default runner, including native guards")
     guards = read(root / "native-guards/summary.json")
-    if not guards["passed"] or guards["case_count"] != 12:
-        raise AssertionError("Expected all 12 native guards to pass")
+    expected_names = {case["case"] for case in expected_guards["native_cases"]}
+    actual_names = {case["case"] for case in guards["native_cases"]}
+    if (not guards["passed"] or guards["case_count"] != len(expected_names)
+            or actual_names != expected_names or not all(case["passed"] for case in guards["native_cases"])):
+        raise AssertionError("Expected every published native guard to pass")
     for case, reference in expected["cases"].items():
         actual = summary["runs"][case]
         for key in ("memory_cycles", "external_DQ_bytes", "trace_sha256"):
@@ -47,7 +52,7 @@ def verify(root):
                 raise AssertionError((case, result["channel"], "window boundaries"))
     if abs(channels["stage_sum_us"] - expected["stage_sum_us"]) > 1e-9:
         raise AssertionError("Five-stage sum differs")
-    return dict(status="passed", native_cases=len(expected["cases"]), native_guards=12,
+    return dict(status="passed", native_cases=len(expected["cases"]), native_guards=len(expected_names),
                 channels=16, exact_cycles_bytes_traces_and_native_CSVs=True,
                 channel_time_partitions_and_windows_match=True,
                 stage_sum_us=channels["stage_sum_us"])

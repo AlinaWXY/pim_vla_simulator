@@ -494,6 +494,10 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       const bool later_result = later.type_id == Request::Type::PIM_RD_RES;
       const bool earlier_result = earlier.type_id == Request::Type::PIM_RD_RES;
       if (later_result || earlier_result) {
+        // Shared-slot traces retain an accumulator until its GPU export.
+        // A ready bank only proves completion of issued MACs, so a result
+        // must not overtake a still-queued MAC (or vice versa).
+        if (m_unified_gemv) return false;
         return later_result ? earlier.type_id == Request::Type::PIM_MAC_AB
                             : later.type_id == Request::Type::PIM_MAC_AB;
       }

@@ -7,7 +7,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source"))
 import workload
-from audit_native import (audit_slot_events, audit_trace, audit_native_commands, audit_mac_order,
+from audit_native import (audit_slot_events, audit_trace, audit_native_commands, audit_mac_order, audit_external_fills,
                           expected_addresses, trace_key, trace_records, decode, GEOMETRY, NATIVE)
 from collections import Counter
 
@@ -20,7 +20,7 @@ def event(op, clock, *, duration=2, slot=0, banks=65535, tokens=1, lanes=65535,
 
 
 def ordinary_fragment():
-    fills = [event("GEMV_MULTICAST", 1+2*t, tokens=1 << t) for t in range(16)]
+    fills = [event("GEMV_MULTICAST", 1+2*t, duration=0, tokens=1 << t) for t in range(16)]
     macs = [event("GEMV_MAC", 33+16*s, duration=16, tokens=65535, columns=s+1) for s in range(8)]
     return fills+macs+[event("GEMV_RELEASE", 161, duration=0, tokens=65535, columns=8)]
 
@@ -37,14 +37,15 @@ class NativeAuditFaultTests(unittest.TestCase):
             audit_slot_events(events, "v")
 
     def test_fill_completion_must_precede_mac(self):
-        events = ordinary_fragment()
-        events[15].update(ready_at=35, service_cycles=4)
+        events = [event("GEMV_Q_LOCAL", 1+2*(b*16+t), banks=1 << b, tokens=1 << t)
+                  for b in range(16) for t in range(16)]
+        events.append(event("GEMV_QK", 512, duration=16, tokens=65535, columns=1))
         with self.assertRaisesRegex(AssertionError, "before fill"):
-            audit_slot_events(events, "v")
+            audit_slot_events(events, "chain", require_final_release=False)
 
     def test_active_consumer_cannot_be_overwritten(self):
         events = ordinary_fragment()
-        events.insert(17, event("GEMV_MULTICAST", 34, generation=2))
+        events.insert(17, event("GEMV_MULTICAST", 34, duration=0, generation=2))
         with self.assertRaisesRegex(AssertionError, "overwrote consuming"):
             audit_slot_events(events, "v")
 
@@ -54,21 +55,44 @@ class NativeAuditFaultTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "incomplete input/weight"):
             audit_slot_events(events, "v")
 
-    def test_distribution_port_conflict_is_detected(self):
-        events = ordinary_fragment()
-        events[1].update(clock=2, ready_at=4)
+    def test_Q_distribution_port_conflict_is_detected(self):
+        events = [event("GEMV_Q_LOCAL", 1, banks=1, tokens=1),
+                  event("GEMV_Q_REMOTE", 2, banks=2, tokens=2)]
         with self.assertRaisesRegex(AssertionError, "distribution port"):
+            audit_slot_events(events, "chain", require_final_release=False)
+
+    def test_external_multicast_cannot_hide_added_latency(self):
+        events = ordinary_fragment()
+        events[0].update(ready_at=3, service_cycles=2)
+        with self.assertRaisesRegex(AssertionError, "zero added internal latency"):
             audit_slot_events(events, "v")
 
-    def test_down_scatter_needs_all_feature_lanes(self):
-        events = [event("GEMV_Z_SCATTER", 1+2*b, tokens=65535, lanes=1 << b) for b in range(15)]
+    def test_external_fill_cannot_precede_DQ_completion(self):
+        native = [dict(command="WRGB", Channel=0, clock=10)]
+        fills = [event("GEMV_MULTICAST", 11, duration=0)]
+        with self.assertRaisesRegex(AssertionError, "DQ completion"):
+            audit_external_fills(native, fills)
+        fills[0].update(clock=12, ready_at=12)
+        self.assertEqual(audit_external_fills(native, fills), 1)
+
+    def test_down_GPU_input_needs_every_token(self):
+        events = [event("GEMV_MULTICAST", 1+2*t, duration=0, tokens=1 << t) for t in range(15)]
         events.append(event("GEMV_MAC", 33, duration=16, tokens=65535, columns=1))
         with self.assertRaisesRegex(AssertionError, "missing bank/token/lane"):
-            audit_slot_events(events, "down_tiled_dram", require_final_release=False)
+            audit_slot_events(events, "down_gpu_input", require_final_release=False)
+
+    def test_down_consumes_exactly_four_weight_columns_per_fragment(self):
+        fills = ordinary_fragment()[:16]
+        macs = [event("GEMV_MAC", 33+16*c, duration=16, tokens=65535, columns=c+1) for c in range(4)]
+        released = event("GEMV_RELEASE", 97, duration=0, tokens=65535, columns=4)
+        audit_slot_events(fills+macs+[released], "down_gpu_input")
+        with self.assertRaisesRegex(AssertionError, "Too many weight columns"):
+            audit_slot_events(fills+macs+[event("GEMV_MAC", 97, duration=16, tokens=65535, columns=5)],
+                              "down_gpu_input", require_final_release=False)
 
     def test_Q_ownership_blocks_ordinary_write_to_same_slot(self):
         events = [event("GEMV_Q_LOCAL", 1, banks=1, tokens=1),
-                  event("GEMV_MULTICAST", 3, tokens=2)]
+                  event("GEMV_MULTICAST", 3, duration=0, tokens=2)]
         with self.assertRaisesRegex(AssertionError, "Different input kinds"):
             audit_slot_events(events, "chain", require_final_release=False)
 
@@ -87,7 +111,8 @@ class IndependentAddressTests(unittest.TestCase):
                     records = trace_records(trace)
                     self.assertFalse(any(e["operation"] == "WAIT" for e in records))
                     actual = Counter(trace_key(e) for e in records if e["operation"] != "BARRIER")
-                    self.assertEqual(actual, expected_addresses(case))
+                    expected = expected_addresses(case)
+                    self.assertTrue(actual == expected, f"{case}: missing {sum((expected-actual).values())}, extra {sum((actual-expected).values())} address records")
                     self.assertEqual(manifest["buffers"]["gemv_total_bytes_per_bank"], 1024)
                     self.assertEqual(manifest["buffers"]["separate_rank_MAC_input_bytes"], 0)
 
@@ -124,8 +149,8 @@ class IndependentAddressTests(unittest.TestCase):
             records = trace_records(trace)
             barriers = [e["address"] for e in records if e["operation"] == "BARRIER"]
             self.assertEqual(barriers, list(range(len(barriers))))
-            self.assertEqual(manifest["expected_dq_bytes"]["total"], 3872*1024)
-            self.assertFalse(manifest["required_backend"]["ffn_z_preinstalled"])
+            self.assertEqual(manifest["expected_dq_bytes"]["total"], 5472*1024)
+            self.assertFalse(manifest["required_backend"]["pim_ffn_dram"])
             for a, b in zip(manifest["parts"], manifest["parts"][1:]):
                 self.assertEqual(a["end_marker"], b["start_marker"])
                 self.assertEqual(a["last_line"]+1, b["first_line"])
@@ -135,6 +160,67 @@ class IndependentAddressTests(unittest.TestCase):
         for call in (horizon_attention.layout_for, horizon_value.layout, horizon_ffn.layout):
             with self.assertRaises(ValueError):
                 call(20)
+
+
+class FFNLayoutTests(unittest.TestCase):
+    def test_down_output_shards_cover_complete_outputs_and_bank_weight_space(self):
+        import horizon_ffn as F
+        ownership = Counter()
+        for output in range(1024):
+            first = F.decode_address(F.down_weight_location(0, output))
+            last = F.decode_address(F.down_weight_location(4095, output))
+            self.assertEqual(first[:3], last[:3])
+            channel, rank, bank, _ = first
+            self.assertEqual(rank, 1)
+            self.assertEqual(channel, output//64)
+            ownership[channel, bank] += 1
+        self.assertEqual(set(ownership.values()), {4})
+        self.assertEqual(len(ownership), 256)
+        # Every sampled bank contains its four full 4096-feature dot products,
+        # with no aliased cells, padding holes or dependence on another rank.
+        for channel, bank in ((0, 0), (0, 15), (7, 9), (15, 15)):
+            offsets = set()
+            for output in range(channel*64+bank*4, channel*64+bank*4+4):
+                for reduction in range(4096):
+                    addr = F.down_weight_location(reduction, output)
+                    owner = F.decode_address(addr)
+                    self.assertEqual(owner[:3], (channel, 1, bank))
+                    self.assertEqual(F.decode_down_weight(addr), (reduction, output))
+                    offsets.add(owner[3])
+            self.assertEqual(offsets, set(range(327680, 360448, 2)))
+
+    def test_gate_up_pair_ownership_matches_for_GPU_elementwise_product(self):
+        import horizon_ffn as F
+        for feature in range(4096):
+            for reduction in (0, 15, 16, 1023):
+                gate = F.gu_weight_location("gate", reduction, feature)
+                up = F.gu_weight_location("up", reduction, feature)
+                self.assertNotEqual(gate, up)
+                g, u = F.decode_address(gate), F.decode_address(up)
+                self.assertEqual(g[:3], u[:3])
+                self.assertEqual(g[0], feature//256)
+                self.assertEqual(F.decode_gu_weight(gate), ("gate", reduction, feature))
+                self.assertEqual(F.decode_gu_weight(up), ("up", reduction, feature))
+
+    def test_every_rank_receives_the_full_GPU_Z_once_without_transpose(self):
+        import horizon_ffn as F
+        expected = set(range(0, 16*4096*2, 32))
+        total = 0
+        for channel in range(16):
+            sources = set()
+            for fragment in range(256):
+                for token in range(16):
+                    packet = F.gpu_input_packet("down", channel, fragment, token)
+                    self.assertEqual(packet["source_tensor"], "Z_gpu")
+                    self.assertEqual(packet["bytes"], 32)
+                    self.assertEqual(packet["target_bank_mask"], 65535)
+                    self.assertEqual(F.decode_address(packet["destination"]), (channel, 1, 0, token*32))
+                    self.assertEqual(packet["source_byte_offset"]//8192, token)
+                    self.assertEqual(packet["source_byte_offset"]%8192//2, packet["feature_first"])
+                    sources.add(packet["source_byte_offset"])
+                    total += packet["bytes"]
+            self.assertEqual(sources, expected)
+        self.assertEqual(total, 2*1024**2)
 
 
 if __name__ == "__main__":

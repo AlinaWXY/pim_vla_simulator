@@ -1,8 +1,8 @@
 {
-  "unit_tests_passed": 25,
+  "unit_tests_passed": 31,
   "native_guards": {
     "passed": true,
-    "case_count": 12,
+    "case_count": 15,
     "subprocess_isolation": true,
     "native_cases": [
       {
@@ -51,12 +51,39 @@
         "worker_returncode": 0
       },
       {
-        "case": "missing_z_source",
+        "case": "Down_missing_GPU_token",
         "passed": true,
         "compiled_backend_invoked": true,
-        "expected_message": "Down MAC requires all16 source banks",
+        "expected_message": "requires every token and lane",
         "exception_type": "RuntimeError",
-        "message": "Down MAC requires all16 source banks in Z input fragment",
+        "message": "Unified GEMV MAC requires every token and lane in every target bank",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_wrong_weight_column",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "column order or operator switch",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC column order or operator switch before release",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_release_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "release of unconsumed input fragment",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV release of unconsumed input fragment",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_overwrite_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "overwrite before full fragment consumption",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV overwrite before full fragment consumption",
         "worker_returncode": 0
       },
       {
@@ -141,15 +168,15 @@
         "worker_returncode": 0
       },
       {
-        "case": "Down_scatter_complete",
+        "case": "Down_GPU_input_complete",
         "passed": true,
         "compiled_backend_invoked": true,
-        "memory_cycles": 407,
+        "memory_cycles": 128,
         "native_audit": {
-          "events_checked": 33,
+          "events_checked": 21,
           "operation_counts": {
-            "GEMV_Z_SCATTER": 16,
-            "GEMV_MAC": 16,
+            "GEMV_MULTICAST": 16,
+            "GEMV_MAC": 4,
             "GEMV_RELEASE": 1
           },
           "bank_generations_checked": 16,
@@ -157,7 +184,8 @@
           "maximum_destination_fanout": 16,
           "input_bytes_per_bank": 1024,
           "rank_full_input_SRAM_bytes": 0,
-          "independent_mask_reconstruction": true
+          "independent_mask_reconstruction": true,
+          "external_fill_checks": 16
         },
         "worker_returncode": 0
       }
@@ -166,20 +194,20 @@
   "serial_continuity": {
     "single_native_simulation": true,
     "continuous_refresh_enabled": true,
-    "native_refresh_commands": 1024,
+    "native_refresh_commands": 896,
     "refresh_observed_before_and_after_QKT": true,
     "global_barriers_without_reset": true,
     "all_five_stages_share_physical_bank_slots": true,
     "excluded_producer_latencies_are_unknown": true,
     "full_AE_end_to_end_latency_us": null
   },
-  "final_native_job": 1901510,
+  "final_native_job": 1901717,
   "native_cases_passed": [
     "chain",
     "v",
     "pv",
-    "gate_up_z_store",
-    "down_tiled_dram",
+    "gate_up_gpu",
+    "down_gpu_input",
     "combined_timing_chain",
     "serial_layer_control"
   ],

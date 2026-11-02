@@ -1,7 +1,8 @@
 """Run fresh H16 native simulations with physically shared bank GEMV slots.
 
 No historical latency is an oracle. Five primary stages retain the prior
-separate-stage aggregation; combined FFN additionally verifies its Z dependency.
+separate-stage aggregation; combined FFN includes the GPU input/output traffic.
+GPU GeLU and multiply arithmetic is an explicitly unmeasured boundary.
 """
 import argparse
 import csv
@@ -14,11 +15,11 @@ import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
-PRIMARY = ("chain", "v", "pv", "gate_up_z_store", "down_tiled_dram")
+PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 CASES = (*PRIMARY, "combined_timing_chain", "serial_layer_control")
 EXTERNAL = {"RD", "RDA", "WR", "WRA", "WRGB", "RDRES"}
 UNKNOWN = ("GPU_V_cast_pack", "GPU_softmax_and_score_scaling", "GPU_O_projection",
-           "GELU_multiply_cast", "GPU_FFN_partial_reduction", "normalization_residual",
+           "GELU_multiply_cast", "normalization_residual",
            "action_input_output_and_step_update", "GPU_Q_forward_kernel_and_dispatch",
            "background_VLM_contention")
 
@@ -44,16 +45,15 @@ def setup(backend):
 def config_for(case, refresh=True, max_cycles=1_000_000):
     from simulator.config import MemoryConfig
     chain = case in ("chain", "serial_layer_control")
-    ffn = case not in ("chain", "v", "pv")
     timings = dict(nCCDAB=8 if chain else 16, nLOCALWR=4)
     if chain:
         timings.update(nCCDK=2, nCCDQK=16)
     return MemoryConfig(model="lpddr5x-8533", channels=16, ranks=2, density_gbit=8,
         refresh=refresh, pim=True, pim_input_broadcast=False, pim_mac_scope="rank",
         pim_data_path="attacc", frontend_ratio=32, max_cycles=max_cycles,
-        pim_horizon=16, pim_rank_rope=chain, pim_ffn_dram=ffn,
+        pim_horizon=16, pim_rank_rope=chain, pim_ffn_dram=False,
         pim_unified_gemv=True, gemv_port_cycles=2,
-        ffn_z_preinstalled=case == "down_tiled_dram",
+        ffn_z_preinstalled=False,
         rope_ii_cycles=1, rope_latency_cycles=4, pim_cast_cycles=1, rank_reduce_cycles=4,
         timing_overrides=timings, pim_local_transfer_cycles=2)
 
@@ -141,6 +141,7 @@ def main():
     complete = all(case in runs for case in PRIMARY)
     summary = dict(status="passed", horizon=16, attention_heads=8,
         unified_bank_gemv=True, primary_cases=list(PRIMARY), runs=runs,
+        down_rank_partial_reduction=False, input_broadcast_extra_cycles=0,
         measured_stage_sum_us_per_layer_step=sum(runs[c]["latency_us"] for c in PRIMARY) if complete else None,
         external_DQ_bytes_per_layer_step=sum(runs[c]["external_DQ_bytes"] for c in PRIMARY) if complete else None,
         FFN_combined_control_us=runs.get("combined_timing_chain", {}).get("latency_us"),

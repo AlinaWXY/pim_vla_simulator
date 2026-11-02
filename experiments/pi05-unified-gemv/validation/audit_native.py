@@ -14,11 +14,10 @@ GEOMETRY = ("Channel", "Rank", "BankGroup", "Bank", "Row", "Column")
 NATIVE = dict(PIM_WR_GB="WRGB", PIM_MAC_AB="MACAB", PIM_RD_RES="RDRES",
     PIM_SPILL="LOCALWR", PIM_ROPE_COEF="LOCALRD", PIM_ROPE_LOAD="LOCALRD",
     PIM_ROPE_STORE="LOCALWR", PIM_Q_EXPORT="RD", PIM_Q_REMOTE="WRGB",
-    PIM_MAC_QK="MACQK", PIM_RD_BG="RDRES", PIM_Z_STORE="LOCALWR",
-    PIM_Z_LOAD="LOCALRD", LD="RD", ST="WR")
+    PIM_MAC_QK="MACQK", PIM_RD_BG="RDRES", LD="RD", ST="WR")
 EXTERNAL = {"RD", "RDA", "WR", "WRA", "WRGB", "RDRES"}
 RANK_COMMANDS = {"WRGB", "MACAB", "MACQK", "RDRES"}
-FILL_OPS = {"GEMV_MULTICAST", "GEMV_Z_SCATTER", "GEMV_Q_LOCAL", "GEMV_Q_REMOTE"}
+FILL_OPS = {"GEMV_MULTICAST", "GEMV_Q_LOCAL", "GEMV_Q_REMOTE"}
 
 
 def require(condition, message):
@@ -70,7 +69,7 @@ def expected_addresses(case):
     """Derive every request independently from matrix dimensions and ownership."""
     if case == "serial_layer_control":
         return sum((expected_addresses(stage) for stage in
-                    ("chain", "v", "pv", "gate_up_z_store", "down_tiled_dram")), Counter())
+                    ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")), Counter())
     expected = Counter()
     def add(op, ch, offset, slot=-1, bank=0):
         expected[op, ch, 1, bank//4, bank%4, offset//2048, offset%2048//32, slot] += 1
@@ -122,25 +121,19 @@ def expected_addresses(case):
                     for block in (60, 61):
                         add("ST", ch, 100352+(block*8+feature_slot)*32, bank=bank)
     else:
-        require(case in ("gate_up_z_store", "down_tiled_dram", "combined_timing_chain"), "Unknown case")
-        if case != "down_tiled_dram":
+        require(case in ("gate_up_gpu", "down_gpu_input", "combined_timing_chain"), "Unknown case")
+        if case != "down_gpu_input":
             ordinary(262144, 64, 32, 16)
             release()
             for ch in range(16):
-                for bank in range(16):
-                    for f in range(16):
-                        add("PIM_Z_STORE", ch, 360448+f*32, bank=bank)
-        if case != "gate_up_z_store":
-            for tile in range(4):
-                for ch in range(16):
-                    for f in range(16):
-                        for bank in range(16):
-                            add("PIM_Z_LOAD", ch, 360448+f*32, f%2, bank)
-                        for column in range(16):
-                            add("PIM_MAC_AB", ch, 327680+((tile*16+f)*16+column)*32, f%2)
-                    for offset in range(0, 16*256*4, 32):
-                        add("PIM_RD_RES", ch, offset)
-                release()
+                for offset in range(0, 16*256*2*4, 32):
+                    add("PIM_RD_RES", ch, offset)
+        if case != "gate_up_gpu":
+            ordinary(327680, 256, 4, 16)
+            release()
+            for ch in range(16):
+                for offset in range(0, 16*64*4, 32):
+                    add("PIM_RD_RES", ch, offset)
     return expected
 
 
@@ -210,17 +203,15 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
         counts[op] += 1
         max_fanout = max(max_fanout, len(banks))
         if op in FILL_OPS:
-            require(event["bytes"] == 32, "GEMV input transaction is not one32B source column")
-            require(start >= port_until[ch], "Overlapping writes on rank GEMV distribution port")
-            port_until[ch] = end
-            require(event["service_cycles"] >= 2, "GEMV multicast/scatter cannot be zero latency")
+            require(event["bytes"] == 32, "GEMV input transaction is not one 32B source burst")
             if op == "GEMV_MULTICAST":
+                require(event["service_cycles"] == 0, "External multicast must have zero added internal latency")
                 require(bank_mask == 65535 and event["token_mask"].bit_count() == 1 and event["lane_mask"] == 65535,
                         "Ordinary multicast must write one complete token row to all16 banks")
-            elif op == "GEMV_Z_SCATTER":
-                require(bank_mask == 65535 and event["token_mask"] == 65535 and event["lane_mask"].bit_count() == 1,
-                        "Down scatter must route one feature column across all16 tokens to every bank")
             else:
+                require(start >= port_until[ch], "Overlapping writes on rank Q distribution port")
+                port_until[ch] = end
+                require(event["service_cycles"] == 2, "Q fill must retain its 2CK internal port service")
                 require(len(banks) == 1 and event["token_mask"].bit_count() == 1 and event["lane_mask"] == 65535,
                         "Q tap/remote must fill exactly one query row in its feature-owning bank")
         else:
@@ -241,7 +232,7 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
             if op in FILL_OPS:
                 require(not state["released"] and start >= state["busy"] and state["macs"] == 0,
                         "Input overwrote consuming/released slot")
-                kind = "Q" if op.startswith("GEMV_Q_") else "Z" if op == "GEMV_Z_SCATTER" else "X"
+                kind = "Q" if op.startswith("GEMV_Q_") else "X"
                 require(state["kind"] in (None, kind), "Different input kinds alias one physical slot")
                 state["kind"] = kind
                 state["held"] = kind == "Q"
@@ -252,7 +243,7 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                 state["ready"] = max(state["ready"], end)
             elif op in ("GEMV_MAC", "GEMV_QK"):
                 rows = 8 if case == "chain" and op == "GEMV_MAC" else 16
-                columns = 16 if state["kind"] == "Z" else 8 if case in ("v", "pv") else 32
+                columns = 4 if case == "down_gpu_input" else 8 if case in ("v", "pv") else 32
                 if op == "GEMV_MAC" and mac_context is not None:
                     row = mac_context[ch, start]
                     if 0 <= row < 32:
@@ -262,7 +253,7 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                     elif 128 <= row < 160:
                         rows, columns, kind = 16, 32, "X"
                     elif 160 <= row < 176:
-                        rows, columns, kind = 16, 16, "Z"
+                        rows, columns, kind = 16, 4, "X"
                     else:
                         raise AssertionError("Native MAC address outside independently defined H16 operators")
                     require(state["kind"] == kind, "Native operator consumes wrong input producer kind")
@@ -292,77 +283,80 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                 rank_full_input_SRAM_bytes=0, independent_mask_reconstruction=True)
 
 
-def audit_ffn_streams(simulation, gemv_events, case):
-    """Join local array reads/writes, bounded nonlinear staging and shared port."""
-    paths = [simulation / f"ffn_dram_events.csv.ch{ch}" for ch in range(16)]
-    require(all(p.is_file() for p in paths), "Missing native FFN movement evidence")
-    events = [e for p in paths for e in read_csv(p)]
-    by_op = defaultdict(list)
-    for e in events:
-        by_op[e["operation"]].append(e)
-    def key(e):
-        return tuple(e[k] for k in GEOMETRY)
-    gu = case != "down_tiled_dram"
-    down = case != "gate_up_z_store"
-    for op in ("PIM_Z_GATHER", "PIM_Z_RETURN", "PIM_Z_STORE"):
-        require(len(by_op[op]) == (4096 if gu else 0), f"Incorrect {op} physical-column count")
-    for op in ("PIM_Z_LOAD", "PIM_Z_LOAD_PORT"):
-        require(len(by_op[op]) == (16384 if down else 0), f"Incorrect {op} physical-column count")
-    producer = defaultdict(int)
-    for e in by_op["PIM_MAC_AB"]:
-        if 128 <= e["Row"] < 160:
-            producer[e["Channel"]] = max(producer[e["Channel"]], e["ready_at"])
-    gathers = {key(e): e for e in by_op["PIM_Z_GATHER"]}
-    returns = {key(e): e for e in by_op["PIM_Z_RETURN"]}
-    stores = {key(e): e for e in by_op["PIM_Z_STORE"]}
-    require(len(gathers) == len(by_op["PIM_Z_GATHER"]), "Repeated or missing GU feature gather")
-    require(gathers.keys() == returns.keys() == stores.keys(), "GU/Z producer and local-store addresses differ")
-    for location, gather in gathers.items():
-        returned, stored = returns[location], stores[location]
-        require(gather["bytes"] == 128 and gather["ready_at"]-gather["clock"] == 8,
-                "GU per-feature bounded gather must transfer128B over4x2CK port service")
-        require(gather["clock"] >= producer[gather["Channel"]], "Nonlinear input gathered before GU accumulation completes")
-        require(returned["bytes"] == 32 and returned["clock"] >= gather["ready_at"] and
-                returned["ready_at"]-returned["clock"] == 2, "Z return precedes its FP32 operands or has wrong port service")
-        require(stored["clock"] >= returned["ready_at"] and stored["ready_at"] > stored["clock"],
-                "Z LOCALWR starts before bounded return or lacks native completion")
-    loads_by_location, ports_by_location = defaultdict(list), defaultdict(list)
-    for e in by_op["PIM_Z_LOAD"]:
-        loads_by_location[key(e)].append(e)
-        if case in ("combined_timing_chain", "serial_layer_control"):
-            require(key(e) in stores and e["clock"] >= stores[key(e)]["ready_at"],
-                    "Combined Down reads a Z column before its native store completes")
-    for e in by_op["PIM_Z_LOAD_PORT"]:
-        ports_by_location[key(e)].append(e)
-    require(loads_by_location.keys() == ports_by_location.keys(), "Down array and transpose source identities differ")
-    for location, loads in loads_by_location.items():
-        loads.sort(key=lambda e: e["clock"])
-        ports = sorted(ports_by_location[location], key=lambda e: e["clock"])
-        require(len(loads) == len(ports) == 4, "Four Down output tiles must reread each Z column four times")
-        for read, port in zip(loads, ports):
-            require(read["bytes"] == port["bytes"] == 32 and port["clock"] >= read["ready_at"],
-                    "Down scatter begins before local DRAM read completion")
-            require(read["buffer"] == port["buffer"] and port["generation"] == read["generation"],
-                    "Down transpose source switches buffer/generation")
-    expected_scatter = Counter((e["Channel"], e["clock"], e["ready_at"], e["buffer"],
-                              1 << (4*e["BankGroup"]+e["Bank"])) for e in by_op["PIM_Z_LOAD_PORT"])
-    actual_scatter = Counter((e["Channel"], e["clock"], e["ready_at"], e["buffer"], e["lane_mask"])
-                            for e in gemv_events if e["operation"] == "GEMV_Z_SCATTER")
-    require(expected_scatter == actual_scatter, "Native source-column transpose is not the shared-bank scatter")
-    # LOAD_PORT is deliberately omitted: it is the same interval as SCATTER.
-    port_events = [e for e in gemv_events if e["operation"] in FILL_OPS]
-    port_events += by_op["PIM_Z_GATHER"]+by_op["PIM_Z_RETURN"]
-    until = defaultdict(int)
-    for e in sorted(port_events, key=lambda e: (e["Channel"], e["clock"])):
-        require(e["clock"] >= until[e["Channel"]], "GU/Z/GEMV overlap the same physical rank distribution port")
-        until[e["Channel"]] = e["ready_at"]
-    return dict(native_local_events_checked=len(events), unified_port_intervals_checked=len(port_events),
-        GU_gather_bytes=len(gathers)*128, Z_local_write_bytes=len(stores)*32,
-        Z_local_read_bytes=len(by_op["PIM_Z_LOAD"])*32,
-        Down_multicast_destination_bytes=len(by_op["PIM_Z_LOAD_PORT"])*32*16,
-        combined_store_to_read_dependencies=case in ("combined_timing_chain", "serial_layer_control"),
-        full_rank_Z_SRAM_bytes=0, full_rank_GU_SRAM_bytes=0,
-        native_sha256={p.name: digest(p) for p in paths})
+def audit_external_fills(native, gemv_events, burst_cycles=2):
+    """Match physical WRGB DQ completion to every ordinary/Q-remote fill."""
+    expected = Counter((e["Channel"], e["clock"]+burst_cycles)
+                       for e in native if e["command"] == "WRGB")
+    actual = Counter((e["Channel"], e["clock"])
+                     for e in gemv_events if e["operation"] in ("GEMV_MULTICAST", "GEMV_Q_REMOTE"))
+    require(actual == expected, "Bank fill must match external WRGB DQ completion exactly")
+    return sum(actual.values())
+
+
+def audit_ffn_streams(native, gemv_events, case):
+    """Reconstruct GPU-fed FFN traffic independently from native events."""
+    require(not any(e["operation"] == "GEMV_Z_SCATTER" for e in gemv_events),
+            "GPU-fed FFN must not use a local Z scatter path")
+    mac_address = {(e["Channel"], e["clock"]): e["Row"]
+                   for e in native if e["command"] == "MACAB"}
+    groups = {"gu": set(), "down": set()}
+    compute_done = {"gu": defaultdict(int), "down": defaultdict(int)}
+    for e in gemv_events:
+        if e["operation"] != "GEMV_MAC":
+            continue
+        row = mac_address[e["Channel"], e["clock"]]
+        stage = "gu" if 128 <= row < 160 else "down" if 160 <= row < 176 else None
+        if stage:
+            groups[stage].add((e["Channel"], e["buffer"], e["generation"]))
+            compute_done[stage][e["Channel"]] = max(compute_done[stage][e["Channel"]], e["ready_at"])
+    gu = case != "down_gpu_input"
+    down = case != "gate_up_gpu"
+    fill_sets = {}
+    for stage, enabled, fragments in (("gu", gu, 64), ("down", down, 256)):
+        require(len(groups[stage]) == (16*fragments if enabled else 0),
+                f"Incorrect {stage} GPU input fragment count")
+        fills = [e for e in gemv_events if e["operation"] == "GEMV_MULTICAST" and
+                 (e["Channel"], e["buffer"], e["generation"]) in groups[stage]]
+        require(len(fills) == (16*fragments*16 if enabled else 0),
+                f"Incorrect {stage} external GPU input row count")
+        fill_sets[stage] = fills
+    gu_reads, down_reads = [], []
+    for ch in range(16):
+        exports = sorted((e for e in native if e["Channel"] == ch and e["command"] == "RDRES"),
+                         key=lambda e: e["clock"])
+        down_fills = [e for e in fill_sets["down"] if e["Channel"] == ch]
+        # Multicast is at DQ completion, so subtract the 2CK burst for WRGB issue.
+        down_begin = min((e["clock"]-2 for e in down_fills), default=float("inf"))
+        if gu:
+            selected = [e for e in exports if compute_done["gu"][ch] <= e["clock"] < down_begin]
+            require(len(selected) == 1024, "Gate/Up must export both full FP32 arrays before Down input")
+            require([e["Row"]*2048+32*e["Column"] for e in selected] == list(range(0, 32768, 32)),
+                    "Gate/Up external output address order differs")
+            if down:
+                require(max(e["clock"]+2 for e in selected) <= down_begin,
+                        "Down GPU input begins before Gate/Up external DQ export completes")
+            gu_reads += selected
+        if down:
+            selected = [e for e in exports if e["clock"] >= compute_done["down"][ch]]
+            require(len(selected) == 128, "Down must export 64 complete FP32 output features per rank")
+            require([e["Row"]*2048+32*e["Column"] for e in selected] == list(range(0, 4096, 32)),
+                    "Down complete-output address order differs")
+            down_reads += selected
+    if gu and down:
+        require(max(e["clock"]+2 for e in gu_reads) <=
+                min(e["clock"]-2 for e in fill_sets["down"]),
+                "Full GPU Z broadcast begins before every rank's Gate/Up export completes")
+    return dict(GU_GPU_input_bytes=len(fill_sets["gu"])*32,
+        GU_GPU_FP32_export_bytes=len(gu_reads)*32,
+        Down_GPU_BF16_input_bytes=len(fill_sets["down"])*32,
+        Down_GPU_FP32_output_bytes=len(down_reads)*32,
+        GPU_input_multicast_destination_bytes=sum(map(len, fill_sets.values()))*32*16,
+        Z_local_read_bytes=0, Z_local_write_bytes=0, separate_Z_staging_bytes=0,
+        direct_GPU_input=True, extra_internal_broadcast_cycles=0,
+        combined_GPU_export_before_Down_input=gu and down,
+        GPU_GeLU_multiply_cast_latency_us=None,
+        Down_output_features_per_rank=64, Down_outputs_are_complete=True,
+        Down_cross_rank_reduction_required=False)
 
 
 def audit_trace(records, case):
@@ -370,12 +364,13 @@ def audit_trace(records, case):
     expected = expected_addresses(case)
     require(actual == expected, f"Trace differs from independent matrix/address oracle: missing={expected-actual}, extra={actual-expected}")
     require(not any(e["operation"] == "WAIT" for e in records), "Artificial legacy completion WAIT retained")
+    require(not any(e["operation"].startswith("PIM_Z_") for e in records), "GPU-fed FFN must not use local Z commands")
     return len(records)
 
 
 def audit_mac_order(native, case):
     """A shared producer/consumer permutation must not evade multiset checks."""
-    stages = ("chain", "v", "pv", "gate_up_z_store", "down_tiled_dram") if case == "serial_layer_control" else (case,)
+    stages = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input") if case == "serial_layer_control" else (case,)
     ab, qk = [], []
     for stage in stages:
         if stage == "chain":
@@ -384,10 +379,10 @@ def audit_mac_order(native, case):
         elif stage in ("v", "pv"):
             base, columns = (83968, 512) if stage == "v" else (100352, 496)
             ab.extend(base+32*i for i in range(columns))
-        elif stage in ("gate_up_z_store", "down_tiled_dram", "combined_timing_chain"):
-            if stage != "down_tiled_dram":
+        elif stage in ("gate_up_gpu", "down_gpu_input", "combined_timing_chain"):
+            if stage != "down_gpu_input":
                 ab.extend(range(262144, 327680, 32))
-            if stage != "gate_up_z_store":
+            if stage != "gate_up_gpu":
                 ab.extend(range(327680, 360448, 32))
     for ch in range(16):
         selected = sorted((e for e in native if e["Channel"] == ch), key=lambda e: e["clock"])
@@ -399,7 +394,7 @@ def audit_mac_order(native, case):
 
 def audit_serial_continuity(manifest, result, simulation, native, events):
     require(result["config"]["refresh"] is True, "Serial resource control must retain enabled refresh")
-    required = ("chain", "v", "pv", "gate_up_z_store", "down_tiled_dram")
+    required = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
     require(tuple(p["stage"] for p in manifest["parts"]) == required, "Serial control stage order differs")
     for first, second in zip(manifest["parts"], manifest["parts"][1:]):
         require(first["end_marker"] == second["start_marker"] and first["last_line"]+1 == second["first_line"],
@@ -423,6 +418,8 @@ def audit_run(directory):
     directory = Path(directory)
     manifest, native_result = read_json(directory / "manifest.json"), read_json(directory / "simulation/result.json")
     case = manifest["case"]
+    require(native_result["config"]["pim_ffn_dram"] is False,
+            "GPU-fed experiment must disable the old local Z/nonlinear path")
     records = trace_records(directory / "workload.trace")
     audit_trace(records, case)
     simulation = directory / "simulation"
@@ -441,7 +438,7 @@ def audit_run(directory):
     require(slots["operation_counts"].get("GEMV_MAC", 0) == counts["PIM_MAC_AB"], "Missing native bank GEMV consume events")
     require(slots["operation_counts"].get("GEMV_QK", 0) == counts["PIM_MAC_QK"], "Missing shared-slot QKT consumes")
     require(slots["operation_counts"].get("GEMV_MULTICAST", 0) == counts["PIM_WR_GB"], "Missing ordinary bank multicast writes")
-    require(slots["operation_counts"].get("GEMV_Z_SCATTER", 0) == counts["PIM_Z_LOAD"], "Missing Down column transpose/multicast")
+    require(not slots["operation_counts"].get("GEMV_Z_SCATTER", 0), "Local Z scatter retained in GPU-fed FFN")
     require(slots["operation_counts"].get("GEMV_RELEASE", 0) == counts["PIM_GEMV_RELEASE"], "Release event count mismatch")
     require(slots["operation_counts"].get("GEMV_Q_LOCAL", 0) == counts["PIM_Q_EXPORT"], "Missing local Q tap writes to shared slots")
     require(slots["operation_counts"].get("GEMV_Q_REMOTE", 0) == counts["PIM_Q_REMOTE"], "Missing peer Q writes to shared slots")
@@ -452,11 +449,13 @@ def audit_run(directory):
     dq = sum(native_counts[c]*32 for c in EXTERNAL)
     require(dq == manifest["expected_dq_bytes"]["total"], "External DQ differs from source contract")
     require(Counter(native_result["issued_commands"]) == native_counts, "Native summary differs from command files")
-    ffn = audit_ffn_streams(simulation, events, case) if case not in ("chain", "v", "pv") else None
+    fill_checks = audit_external_fills(native, events)
+    ffn = audit_ffn_streams(native, events, case) if case not in ("chain", "v", "pv") else None
     continuity = audit_serial_continuity(manifest, native_result, simulation, native, events) if case == "serial_layer_control" else None
     return dict(status="passed", case=case, horizon=16,
         trace_and_native_address_coverage=True, native_data_commands_checked=issued_count,
         array_open_row_checks=row_checks, independent_MAC_order_checks=order_checks,
+        external_DQ_to_bank_fill_checks=fill_checks,
         unified_gemv=slots, ffn_streams=ffn, serial_continuity=continuity,
         native_external_DQ_bytes=dq, native_command_counts=dict(native_counts),
         trace_sha256=digest(directory / "workload.trace"),

@@ -15,13 +15,16 @@ CASES = {
     "overwrite_incomplete_fragment": "overwrite before full fragment consumption",
     "release_incomplete_fragment": "release of unconsumed input fragment",
     "operator_switch_without_release": "Unified GEMV MAC column order or operator switch before release",
-    "missing_z_source": "Down MAC requires all16 source banks",
+    "Down_missing_GPU_token": "requires every token and lane",
+    "Down_wrong_weight_column": "column order or operator switch",
+    "Down_release_incomplete_fragment": "release of unconsumed input fragment",
+    "Down_overwrite_incomplete_fragment": "overwrite before full fragment consumption",
     "Q_held_ordinary_write": "Q slot held until PIM_GEMV_RELEASE",
     "Q_fill_without_projection_release": "Q fill requires explicit release",
     "QKT_missing_query": "Unified QKT missing query/lane coverage",
     "Q_release_before_scan": "Q release requires completed 496-token K scan",
     "QKT_then_V_reuses_same_slot": None,
-    "Down_scatter_complete": None,
+    "Down_GPU_input_complete": None,
 }
 
 
@@ -58,13 +61,18 @@ def trace_for(path, name):
             lines.append(command("PIM_GEMV_RELEASE"))
         else:
             raise ValueError(name)
-    elif name in ("missing_z_source", "Down_scatter_complete"):
-        banks = 15 if name == "missing_z_source" else 16
-        lines = [command("PIM_Z_LOAD", 360448, bank=b) for b in range(banks)]
-        columns = 1 if name == "missing_z_source" else 16
-        lines += [command("PIM_MAC_AB", 327680+s*32) for s in range(columns)]
-        if name == "Down_scatter_complete":
-            lines.append(command("PIM_GEMV_RELEASE"))
+    elif name.startswith("Down_"):
+        tokens = 15 if name == "Down_missing_GPU_token" else 16
+        lines = [command("PIM_WR_GB", t*32) for t in range(tokens)]
+        if name == "Down_wrong_weight_column":
+            lines.append(command("PIM_MAC_AB", 327680+32))
+        else:
+            columns = 4 if name == "Down_GPU_input_complete" else 1
+            lines += [command("PIM_MAC_AB", 327680+s*32) for s in range(columns)]
+            if name in ("Down_GPU_input_complete", "Down_release_incomplete_fragment"):
+                lines.append(command("PIM_GEMV_RELEASE"))
+            elif name == "Down_overwrite_incomplete_fragment":
+                lines.append(command("PIM_WR_GB"))
     else:
         tokens = 15 if name == "missing_token" else 16
         lines = [command("PIM_WR_GB", t*32) for t in range(tokens)]
@@ -85,10 +93,14 @@ def positive_audit(directory, name):
     from audit_native import read_csv, read_json, audit_slot_events
     events = [e for ch in range(16)
               for e in read_csv(directory / "simulation" / f"unified_gemv.csv.ch{ch}")]
-    if name == "Down_scatter_complete":
-        result = audit_slot_events(events, "down_tiled_dram")
-        if result["operation_counts"].get("GEMV_Z_SCATTER") != 16:
-            raise AssertionError("Positive Down control did not scatter every source feature lane")
+    if name == "Down_GPU_input_complete":
+        result = audit_slot_events(events, "down_gpu_input")
+        if result["operation_counts"].get("GEMV_MULTICAST") != 16 or result["operation_counts"].get("GEMV_MAC") != 4:
+            raise AssertionError("Positive Down control did not consume sixteen GPU rows and four weight columns")
+        from audit_native import audit_external_fills
+        native = [e for ch in range(16)
+                  for e in read_csv(directory / "simulation" / f"timeline.csv.ch{ch}")]
+        result["external_fill_checks"] = audit_external_fills(native, events)
         return result
     # The full QK trace releases all banks; channel0 then writes one V fragment
     # into the exact same physical slot. Split only at its native Q release.
@@ -130,8 +142,8 @@ def worker(backend, output, name):
     trace = output / "guard.trace"
     trace_for(trace, name)
     is_q = name.startswith("Q")
-    is_down = name in ("missing_z_source", "Down_scatter_complete")
-    config = config_for("chain" if is_q else "down_tiled_dram" if is_down else "v",
+    is_down = name.startswith("Down_")
+    config = config_for("chain" if is_q else "down_gpu_input" if is_down else "v",
                         refresh=CASES[name] is None, max_cycles=500_000)
     try:
         native = run_trace(config, trace, output / "simulation")

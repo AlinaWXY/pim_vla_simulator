@@ -12,7 +12,7 @@ from pathlib import Path
 import tempfile
 
 HORIZON = 16
-PRIMARY = ("chain", "v", "pv", "gate_up_z_store", "down_tiled_dram")
+PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 CASES = (*PRIMARY, "combined_timing_chain", "serial_layer_control")
 
 
@@ -21,7 +21,8 @@ def unified_buffers(case):
                 gemv_total_bytes_per_bank=1024, gemv_layout="[token16][lane16] BF16",
                 separate_rank_MAC_input_bytes=0, separate_Q_buffer_bytes=0,
                 rank_external_ingress_staging_bytes=32,
-                bank_Z_column_staging_bytes=32 if case not in ("chain", "v", "pv") else 0,
+                bank_Z_column_staging_bytes=0,
+                input_broadcast_extra_cycles=0,
                 input_rows=8 if case == "chain" else 16,
                 QKT_rows=16 if case == "chain" else 0)
     if case == "chain":
@@ -31,8 +32,8 @@ def unified_buffers(case):
     elif case in ("v", "pv"):
         buffers.update(accumulator_per_bank=512)
     else:
-        buffers.update(GU_accumulator_per_bank=2048, Down_tiled_accumulator_per_bank=1024,
-            rank_nonlinear_input_staging=128, rank_nonlinear_output_staging=32,
+        buffers.update(GU_accumulator_per_bank=2048, Down_accumulator_per_bank=256,
+            rank_nonlinear_input_staging=0, rank_nonlinear_output_staging=0,
             rank_full_Z=0, rank_full_GU=0)
     return buffers
 
@@ -103,14 +104,15 @@ def generate_serial(path):
         expected_dq_bytes=dict(total=sum(dq.values()), by_stage=dq), buffers=buffers,
         input_resource="same two512B slots per bank throughout one native simulation",
         required_backend=dict(pim_unified_gemv=True, gemv_port_cycles=2, pim_horizon=16,
-            pim_rank_rope=True, pim_ffn_dram=True, ffn_z_preinstalled=False,
+            pim_rank_rope=True, pim_ffn_dram=False, ffn_z_preinstalled=False,
             pim_mac_scope="rank", pim_input_broadcast=False, nCCDAB=8, nCCDQK=16),
         continuous_refresh_state=True, no_separate_rank_input_SRAM=True,
         additional_control=True, included_in_primary_stage_sum=False,
+        down_rank_partial_reduction=False, input_broadcast_extra_cycles=0,
         numerical_compute=False, complete_ae_latency=False,
         unknown_boundary_latency_us=dict(GPU_V_cast_pack=None, GPU_softmax_and_score_scaling=None,
             GPU_O_projection_norm_residual_FFN_input=None, GELU_multiply_cast=None,
-            GPU_FFN_partial_reduction=None, GPU_Q_forward_dispatch=None),
+            GPU_Q_forward_dispatch=None),
         excluded_boundary_policy="Consumer values are assumed ready at each excluded GPU/nonlinear boundary. No artificial zero-latency kernel or delay is modeled.",
         interpretation="Continuous native memory/resource schedule for modeled work only; not full numerical or end-to-end AE inference")
 

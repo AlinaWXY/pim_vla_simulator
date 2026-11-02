@@ -369,17 +369,46 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
     if config.pim_horizon == 16:
         result["config"].pop("pim_horizon", None)  # Preserve frozen H16 result schema.
     if config.pim_unified_gemv:
-        result["schema_version"] = 12
+        result["schema_version"] = 13
+        result["config"].update(pim_horizon=config.pim_horizon,
+                                pim_ffn_dram=config.pim_ffn_dram,
+                                ffn_z_preinstalled=config.ffn_z_preinstalled)
+        result["local_input_model"]["enabled"] = bool(requests["pim_local_gb"])
+        result["pim_model"].update({
+            "transfer_scheduling": "AttAcc shared WRGB/RDRES movement path with BL/CCDS/CCDL issue constraints; "
+                "ordinary RD/WR retain CL/CWL; WRGB and RDRES complete after nBL_min; "
+                "WRGB fanout has no added latency; RDRES cannot overtake queued MACs and waits for bank compute completion",
+            "mac_completion": "Native completion: eight CK for Q/K projection, sixteen CK for other GEMV operators; "
+                "the bank PE is shared by both input slots",
+            "double_buffer": "One physical pair of 512B GEMV slots per bank; inactive-slot GPU writes may overlap MAC; "
+                "full token/lane coverage and completed consumption required before use/overwrite; explicit release",
+            "result_buffer_read_latency_ck": max(timings.get("nPIMRdLatency", 0), timings["nBL_min"]),
+            "bank_input_multicast": {"enabled": True, "targets_per_addressed_rank": 16,
+                "extra_fanout_latency_ck": 0,
+                "completion": "All selected bank input rows become ready at WRGB issue+nBL_min"},
+        })
         result["unified_gemv_model"] = {
             "bank_slots": 2, "slot_bytes": 512, "input_bytes_per_bank": 1024,
             "rank_full_input_sram_bytes": 0, "rank_ingress_staging_bytes": 32,
             "rank_port_cycles_per_32B": config.gemv_port_cycles,
             "multicast_targets": 16,
-            "port_sharing": "External multicast, local/remote Q writes, Z column scatter and FFN nonlinear movement share one rank port",
-            "z_transpose": "One 32B bank column scatters its sixteen BF16 token values into one lane of every target bank slot; no full rank input transpose SRAM",
+            "external_multicast_extra_cycles": 0,
+            "external_multicast": "One external32B WRGB burst writes the same token row in all16 bank GEMV slots at DQ completion; "
+                "no extra internal-port service or separate source transpose",
+            "port_sharing": "Bank-local/remote Q fills retain one configured rank port; "
+                "ordinary GPU WRGB multicast does not reserve that port. Legacy DRAM-Z movements use it only when pim_ffn_dram is enabled",
+            "z_transpose": ("Legacy DRAM-Z: source-bank column scatter into token rows, charged to rank port"
+                            if config.pim_ffn_dram else None),
+            "ffn_dataflow": ("Legacy DRAM-Z path enabled" if config.pim_ffn_dram else
+                "Gate/Up FP32 outputs return to GPU; GPU GeLU/elementwise multiply/BF16 cast is an excluded value-ready boundary; "
+                "GPU sends full4096-feature Z to each rank, whose banks multiply resident Down weights"),
+            "down_layout": ("Legacy reduction-dimension partition with16 rank partials" if config.pim_ffn_dram else
+                "Output partition:64 complete output features per rank,4 per bank;256 input fragments and4 MAC columns per fragment; "
+                "no PIM Z DRAM allocation and no cross-rank partial-result reduction"),
             "completion": "Native MAC completion covers eight Q/K or sixteen other input rows; slot release is explicit",
             "numerical_compute": False,
-            "assumption": "Configured 32B rank port with sixteen-bank multicast/scatter fanout; not synthesized hardware",
+            "assumption": "Ordinary external WRGB broadcasts to16 banks without extra fanout latency, as specified; "
+                "configured bank-local Q port service remains an architecture parameter, not synthesized hardware",
         }
         if "ffn_dram_model" in result:
             result["ffn_dram_model"]["input_double_buffer_bytes_per_rank"] = 0

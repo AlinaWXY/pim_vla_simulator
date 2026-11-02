@@ -10,8 +10,10 @@ struct GemvSlot {
   int generation = 0, mac_columns = 0, expected_columns = 0, weight_block = -1;
 };
 std::vector<std::array<GemvSlot,2>> m_gemv_slots;
-// A single 32B external ingress staging entry per rank/channel. Its lifetime
-// includes DQ arrival and the subsequent bank multicast/scatter write.
+// A single 32B external ingress staging entry per rank/channel. Ordinary
+// WRGB fills all bank GEMV slots when its DQ burst arrives; the rank broadcast
+// has no additional latency or separately charged internal-port service.
+// Bank-local Q delivery retains its explicitly modeled local-port service.
 Request* m_gemv_ingress_owner = nullptr;
 Clk_t m_gemv_ingress_free = 0;
 
@@ -25,8 +27,10 @@ int gemv_columns(const Request& r) const {
   if (off<65536 || (off>=262144 && off<327680)) return 32;
   if (off>=83968 && off<116736) return 8;
   if (off>=327680 && off<360448) {
-    if(!m_ffn_dram) throw std::runtime_error("Unified GEMV Down requires FFN Z DRAM mode");
-    return 16;
+    // GPU-fed Down shards 1024 output features across16 ranks/banks:
+    // each bank owns4 complete outputs and consumes all256 input fragments.
+    // Preserve the separate legacy DRAM-Z layout only when explicitly enabled.
+    return m_ffn_dram?16:4;
   }
   throw std::runtime_error("Unified GEMV MAC weight/cache address outside H16 layout");
 }
@@ -79,7 +83,7 @@ void gemv_start_bank(int bank,int slot,GemvSlot::Kind kind) {
 }
 bool gemv_external_ready(const Request& req) {
   if(req.pim_buffer<0) throw std::runtime_error("Unified GEMV requires explicit input slot");
-  if(m_gemv_ingress_owner || m_clk<m_gemv_ingress_free || m_clk<m_local_ports[1]) return false;
+  if(m_gemv_ingress_owner || m_clk<m_gemv_ingress_free) return false;
   if(!gemv_slot_idle(req.pim_buffer)) return false;
   const int row=gemv_offset(req)/32;
   if(row<0 || row>=16) throw std::runtime_error("Unified GEMV external row exceeds 512B slot");
@@ -96,14 +100,16 @@ bool gemv_external_ready(const Request& req) {
 }
 Clk_t gemv_external_issued(const Request& req) {
   const int slot=req.pim_buffer,row=gemv_offset(req)/32;
-  const Clk_t start=m_clk+m_bgk_input_cycles,ready=start+m_gemv_port_cycles;
-  m_local_ports[1]=m_gemv_ingress_free=ready;
+  const Clk_t ready=m_clk+m_bgk_input_cycles;
+  m_gemv_ingress_free=ready;
   for(int bank=16;bank<32;++bank) {
     if(row==0) gemv_start_bank(bank,slot,GemvSlot::External);
     auto& state=m_gemv_slots[bank][slot]; state.lanes[row]=65535;
     auto& input=m_bank_inputs[bank][slot]; input.written=true; input.ready_at=ready;
   }
-  record_gemv(req,"GEMV_MULTICAST",start,ready,65535,1<<row,65535,32,m_gemv_slots[16][slot].generation);
+  // This event marks simultaneous destination writes at DQ completion.
+  // The external WRGB timeline already charges the two-cycle data burst.
+  record_gemv(req,"GEMV_MULTICAST",ready,ready,65535,1<<row,65535,32,m_gemv_slots[16][slot].generation);
   return ready;
 }
 bool gemv_mac_ready(const Request& req) {
