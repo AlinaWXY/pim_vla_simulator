@@ -1,0 +1,188 @@
+{
+  "unit_tests_passed": 25,
+  "native_guards": {
+    "passed": true,
+    "case_count": 12,
+    "subprocess_isolation": true,
+    "native_cases": [
+      {
+        "case": "missing_token",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "requires every token and lane",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC requires every token and lane in every target bank",
+        "worker_returncode": 0
+      },
+      {
+        "case": "duplicate_token",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "overwrite before full fragment consumption",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV overwrite before full fragment consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "overwrite_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "overwrite before full fragment consumption",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV overwrite before full fragment consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "release_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "release of unconsumed input fragment",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV release of unconsumed input fragment",
+        "worker_returncode": 0
+      },
+      {
+        "case": "operator_switch_without_release",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Unified GEMV MAC column order or operator switch before release",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC column order or operator switch before release",
+        "worker_returncode": 0
+      },
+      {
+        "case": "missing_z_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Down MAC requires all16 source banks",
+        "exception_type": "RuntimeError",
+        "message": "Down MAC requires all16 source banks in Z input fragment",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Q_held_ordinary_write",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q slot held until PIM_GEMV_RELEASE",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV Q slot held until PIM_GEMV_RELEASE",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Q_fill_without_projection_release",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q fill requires explicit release",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV Q fill requires explicit release of projection slot",
+        "worker_returncode": 0
+      },
+      {
+        "case": "QKT_missing_query",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Unified QKT missing query/lane coverage",
+        "exception_type": "RuntimeError",
+        "message": "Unified QKT missing query/lane coverage",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Q_release_before_scan",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q release requires completed 496-token K scan",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV Q release requires completed 496-token K scan",
+        "worker_returncode": 0
+      },
+      {
+        "case": "QKT_then_V_reuses_same_slot",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 37873,
+        "native_audit": {
+          "QKT": {
+            "events_checked": 53040,
+            "operation_counts": {
+              "GEMV_MULTICAST": 8192,
+              "GEMV_MAC": 32768,
+              "GEMV_RELEASE": 48,
+              "GEMV_Q_LOCAL": 2048,
+              "GEMV_Q_REMOTE": 2048,
+              "GEMV_QK": 7936
+            },
+            "bank_generations_checked": 16640,
+            "physical_bank_releases": 768,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "V": {
+            "events_checked": 25,
+            "operation_counts": {
+              "GEMV_MULTICAST": 16,
+              "GEMV_MAC": 8,
+              "GEMV_RELEASE": 1
+            },
+            "bank_generations_checked": 16,
+            "physical_bank_releases": 16,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "same_bank_slot_reused": true,
+          "generation_continues_without_reset": true,
+          "single_native_simulation": true,
+          "refresh_enabled": true,
+          "native_refresh_commands": 288
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_scatter_complete",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 407,
+        "native_audit": {
+          "events_checked": 33,
+          "operation_counts": {
+            "GEMV_Z_SCATTER": 16,
+            "GEMV_MAC": 16,
+            "GEMV_RELEASE": 1
+          },
+          "bank_generations_checked": 16,
+          "physical_bank_releases": 16,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true
+        },
+        "worker_returncode": 0
+      }
+    ]
+  },
+  "serial_continuity": {
+    "single_native_simulation": true,
+    "continuous_refresh_enabled": true,
+    "native_refresh_commands": 1024,
+    "refresh_observed_before_and_after_QKT": true,
+    "global_barriers_without_reset": true,
+    "all_five_stages_share_physical_bank_slots": true,
+    "excluded_producer_latencies_are_unknown": true,
+    "full_AE_end_to_end_latency_us": null
+  },
+  "final_native_job": 1901510,
+  "native_cases_passed": [
+    "chain",
+    "v",
+    "pv",
+    "gate_up_z_store",
+    "down_tiled_dram",
+    "combined_timing_chain",
+    "serial_layer_control"
+  ],
+  "clean_minimal_build_passed": true,
+  "historical_measurements_reused": false
+}

@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "scope": "Every experiment/backend/vendor file is byte-identical to the clean-built and fully simulated final package",
+  "files_checked": 491,
+  "native_job": 1901510,
+  "changes_after_native_run": "Publication README, reference evidence, manifest, byte-preserving attributes, requirements and verification utility only"
+}
