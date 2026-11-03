@@ -17,6 +17,11 @@ def verify(root):
         raise AssertionError("Fresh native run or channel audit did not pass")
     if expected.get("v_token_sharding") and summary.get("v_token_sharding") is not True:
         raise AssertionError("Expected token-sharded V projection")
+    for flag in ("pv_token_sharding", "qkv_fusion"):
+        if expected.get(flag) and summary.get(flag) is not True:
+            raise AssertionError(f"Expected {flag}")
+    if expected.get("primary_cases") and summary["primary_cases"] != expected["primary_cases"]:
+        raise AssertionError("Primary aggregation differs; standalone V must not be double counted")
     if not summary["tests_executed"]:
         raise AssertionError("Use the default runner, including native guards")
     guards = read(root / "native-guards/summary.json")
@@ -35,7 +40,14 @@ def verify(root):
         audit = read(root / case / "native-audit.json")
         if audit["status"] != "passed" or audit["native_sha256"] != reference["native_sha256"]:
             raise AssertionError((case, "native command/GEMV CSV audit or hash mismatch"))
-        if expected.get("v_token_sharding") and case in ("v", "serial_layer_control"):
+        if expected.get("pv_token_sharding") and case in ("chain", "v", "pv", "serial_layer_control"):
+            if not audit.get("token_pv"):
+                raise AssertionError((case, "Token PV/local cache dataflow audit missing"))
+            if expected.get("qkv_fusion") and case in ("chain", "serial_layer_control"):
+                contract = audit.get("qkv_fusion", {})
+                if contract.get("projection_MAC_commands") != 49152 or contract.get("output_bytes_per_bank") != 1536:
+                    raise AssertionError((case, "Fused QKV coverage or output footprint audit missing"))
+        elif expected.get("v_token_sharding") and case in ("v", "serial_layer_control"):
             contract = audit.get("v_token_projection", {})
             if (not contract.get("legacy_cache_layout_preserved")
                     or contract.get("logical_output_elements_checked") != 32768):
@@ -64,7 +76,7 @@ def verify(root):
             if reference["tail_clear_windows"] != result["tail_clear_windows"]:
                 raise AssertionError((case, result["channel"], "window boundaries"))
     if abs(channels["stage_sum_us"] - expected["stage_sum_us"]) > 1e-9:
-        raise AssertionError("Five-stage sum differs")
+        raise AssertionError("Primary-stage sum differs")
     return dict(status="passed", native_cases=len(expected["cases"]), native_guards=len(expected_names),
                 channels=16, exact_cycles_bytes_traces_and_native_CSVs=True,
                 channel_time_partitions_and_windows_match=True,

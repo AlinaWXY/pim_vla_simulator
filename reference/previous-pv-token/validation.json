@@ -1,0 +1,1129 @@
+{
+  "native_job": 1904020,
+  "unit_tests_passed": 112,
+  "native_guards": {
+    "passed": true,
+    "case_count": 43,
+    "subprocess_isolation": true,
+    "native_cases": [
+      {
+        "case": "missing_token",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "requires every token and lane",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC requires every token and lane in every target bank",
+        "worker_returncode": 0
+      },
+      {
+        "case": "duplicate_token",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "overwrite before full fragment consumption",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV overwrite before full fragment consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "overwrite_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "overwrite before full fragment consumption",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV overwrite before full fragment consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "release_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "release of unconsumed input fragment",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV release of unconsumed input fragment",
+        "worker_returncode": 0
+      },
+      {
+        "case": "operator_switch_without_release",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Unified GEMV MAC column order or operator switch before release",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC column order or operator switch before release",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_missing_GPU_token",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "requires every token and lane",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC requires every token and lane in every target bank",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_wrong_weight_column",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "column order or operator switch",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV MAC column order or operator switch before release",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_release_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "release of unconsumed input fragment",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV release of unconsumed input fragment",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_overwrite_incomplete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "overwrite before full fragment consumption",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV overwrite before full fragment consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Q_held_ordinary_write",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q slot held until PIM_GEMV_RELEASE",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV Q slot held until PIM_GEMV_RELEASE",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Q_fill_without_projection_release",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q fill requires explicit release",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV Q fill requires explicit release of projection slot",
+        "worker_returncode": 0
+      },
+      {
+        "case": "QKT_missing_query",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Unified QKT missing query/lane coverage",
+        "exception_type": "RuntimeError",
+        "message": "Unified QKT missing query/lane coverage",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Q_release_before_scan",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q release requires completed 496-token K scan",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV Q release requires completed 496-token K scan",
+        "worker_returncode": 0
+      },
+      {
+        "case": "QKT_then_V_reuses_same_slot",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 37873,
+        "native_audit": {
+          "QKT": {
+            "events_checked": 53040,
+            "operation_counts": {
+              "GEMV_MULTICAST": 8192,
+              "GEMV_MAC": 32768,
+              "GEMV_RELEASE": 48,
+              "GEMV_Q_LOCAL": 2048,
+              "GEMV_Q_REMOTE": 2048,
+              "GEMV_QK": 7936
+            },
+            "bank_generations_checked": 16640,
+            "physical_bank_releases": 768,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "V": {
+            "events_checked": 25,
+            "operation_counts": {
+              "GEMV_MULTICAST": 16,
+              "GEMV_MAC": 8,
+              "GEMV_RELEASE": 1
+            },
+            "bank_generations_checked": 16,
+            "physical_bank_releases": 16,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "same_bank_slot_reused": true,
+          "generation_continues_without_reset": true,
+          "single_native_simulation": true,
+          "refresh_enabled": true,
+          "native_refresh_commands": 288
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Down_GPU_input_complete",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 128,
+        "native_audit": {
+          "events_checked": 21,
+          "operation_counts": {
+            "GEMV_MULTICAST": 16,
+            "GEMV_MAC": 4,
+            "GEMV_RELEASE": 1
+          },
+          "bank_generations_checked": 16,
+          "physical_bank_releases": 16,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "external_fill_checks": 16
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_missing_write_at_seal",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging seal requires every declared input write",
+        "exception_type": "RuntimeError",
+        "message": "staging seal requires every declared input write",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_load_before_seal",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging load requires sealed input",
+        "exception_type": "RuntimeError",
+        "message": "staging load requires sealed input",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_wrong_source_bank",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging requires rank1 bank0",
+        "exception_type": "RuntimeError",
+        "message": "staging requires rank1 bank0",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_duplicate_write",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "duplicate staging write",
+        "exception_type": "RuntimeError",
+        "message": "duplicate staging write",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_out_of_bounds_load",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging load address outside payload",
+        "exception_type": "RuntimeError",
+        "message": "staging load address outside payload",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_rebegin_before_consume",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging overwrite before full consumption",
+        "exception_type": "RuntimeError",
+        "message": "staging overwrite before full consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_complete_Down_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 304,
+        "native_audit": {
+          "events_checked": 21,
+          "operation_counts": {
+            "GEMV_MULTICAST": 16,
+            "GEMV_MAC": 4,
+            "GEMV_RELEASE": 1
+          },
+          "bank_generations_checked": 16,
+          "physical_bank_releases": 16,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "rank_controller": {
+            "command_intervals_checked": 82,
+            "rank_command_coverage": 56,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 1
+          },
+          "minimum_staged_read_issue_gap_ck": 4,
+          "staged_read_latency_ck": 25,
+          "different_tokens_pipeline_before_prior_read_completion": true,
+          "external_input_bytes": 512,
+          "internal_read_bytes": 512
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_mixed_fragment_rows",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging mixed source fragments",
+        "exception_type": "RuntimeError",
+        "message": "staging mixed source fragments",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_wrong_weight_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging source/weight fragment mismatch",
+        "exception_type": "RuntimeError",
+        "message": "staging source/weight fragment mismatch",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_wrong_token_rows",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging token rows do not match operator",
+        "exception_type": "RuntimeError",
+        "message": "staging token rows do not match operator",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_slot_Down_batch",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 496,
+        "native_audit": {
+          "events_checked": 42,
+          "operation_counts": {
+            "GEMV_MULTICAST": 32,
+            "GEMV_MAC": 8,
+            "GEMV_RELEASE": 2
+          },
+          "bank_generations_checked": 32,
+          "physical_bank_releases": 32,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "rank_controller": {
+            "command_intervals_checked": 156,
+            "rank_command_coverage": 108,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 2
+          },
+          "minimum_staged_read_issue_gap_ck": 4,
+          "staged_read_latency_ck": 25,
+          "different_tokens_pipeline_before_prior_read_completion": true,
+          "external_input_bytes": 1024,
+          "internal_read_bytes": 1024,
+          "input_batching": {
+            "input_batches_checked": 1,
+            "slots_per_bank": 2,
+            "slot_capacity_bytes": 512,
+            "physical_input_capacity_bytes_per_bank": 1024,
+            "maximum_prefetched_input_bytes_per_bank": 1024,
+            "both_slots_ready_before_first_MAC": true,
+            "no_weight_row_switch_between_paired_fills": true,
+            "MAC_counts_and_reduction_order_preserved": true,
+            "row_command_counts": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "input_batches": 1,
+                "source_ACT2": 0,
+                "weight_ACTAB": 1,
+                "refresh_commands": 0
+              }
+            ],
+            "first_two_batches_channel0": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "batch": 0,
+                "source_row": 256,
+                "input_begin_ck": 192,
+                "last_input_issue_ck": 316,
+                "both_slots_ready_ck": 341,
+                "first_MAC_ck": 367,
+                "last_MAC_complete_ck": 495,
+                "input_bytes_per_bank": 1024,
+                "refresh_commands_during_load": 0
+              }
+            ]
+          }
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_three_fragments_overflow",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging overwrite before full consumption",
+        "exception_type": "RuntimeError",
+        "message": "staging overwrite before full consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_Down_batch",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 434,
+        "native_audit": {
+          "events_checked": 42,
+          "operation_counts": {
+            "GEMV_MULTICAST": 32,
+            "GEMV_MAC": 8,
+            "GEMV_RELEASE": 2
+          },
+          "bank_generations_checked": 32,
+          "physical_bank_releases": 32,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "rank_controller": {
+            "command_intervals_checked": 160,
+            "rank_command_coverage": 110,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 2
+          },
+          "minimum_staged_read_issue_gap_ck": 2,
+          "staged_read_latency_ck": 25,
+          "different_tokens_pipeline_before_prior_read_completion": true,
+          "external_input_bytes": 1024,
+          "internal_read_bytes": 1024,
+          "input_batching": {
+            "input_batches_checked": 1,
+            "slots_per_bank": 2,
+            "slot_capacity_bytes": 512,
+            "physical_input_capacity_bytes_per_bank": 1024,
+            "maximum_prefetched_input_bytes_per_bank": 1024,
+            "both_slots_ready_before_first_MAC": true,
+            "no_weight_row_switch_between_paired_fills": true,
+            "MAC_counts_and_reduction_order_preserved": true,
+            "row_command_counts": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "input_batches": 1,
+                "source_ACT2": 0,
+                "weight_ACTAB": 1,
+                "refresh_commands": 0
+              }
+            ],
+            "first_two_batches_channel0": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "batch": 0,
+                "source_row": 256,
+                "input_begin_ck": 132,
+                "last_input_issue_ck": 254,
+                "both_slots_ready_ck": 279,
+                "first_MAC_ck": 305,
+                "last_MAC_complete_ck": 433,
+                "input_bytes_per_bank": 1024,
+                "refresh_commands_during_load": 0,
+                "source_banks": [
+                  0,
+                  4
+                ]
+              }
+            ]
+          },
+          "writer": {
+            "same_BG_spacing_checks": 30,
+            "cross_BG_short_WR_pairs": 30,
+            "minimum_cross_BG_WR_gap_ck": 2,
+            "issue_gap_histogram": [
+              {
+                "kind": "cross_BG",
+                "gap_ck": 2,
+                "count": 30
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 4,
+                "count": 1
+              }
+            ]
+          },
+          "source_fragment_to_MAC_weight_checks": 8
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_same_BG_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging requires rank1 BG0/BG1 bank0",
+        "exception_type": "RuntimeError",
+        "message": "staging requires rank1 BG0/BG1 bank0",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_unreserved_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging requires rank1 BG0/BG1 bank0",
+        "exception_type": "RuntimeError",
+        "message": "staging requires rank1 BG0/BG1 bank0",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_missing_write",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging seal requires every declared input write",
+        "exception_type": "RuntimeError",
+        "message": "staging seal requires every declared input write",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_wrong_weight_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging source/weight fragment mismatch",
+        "exception_type": "RuntimeError",
+        "message": "staging source/weight fragment mismatch",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_bank_capacity",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging source bank capacity exceeded",
+        "exception_type": "RuntimeError",
+        "message": "staging source bank capacity exceeded",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_queue_capacity_one",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 13233,
+        "native_audit": {
+          "channel_ingress": {
+            "requests_checked": 290,
+            "channel_count": 2,
+            "capacity_per_channel": 1,
+            "queue_high_water_by_channel": {
+              "0": 1,
+              "1": 1
+            },
+            "no_channel_FIFO_reordering": true,
+            "one_dispatch_per_channel_per_CK": true,
+            "completion_fences_checked": 2,
+            "global_barriers_checked": 4,
+            "peer_export_dependencies_checked": 0,
+            "peer_wait_events": 0,
+            "all_accepted_requests_complete": true
+          },
+          "native_data_commands_checked": 290,
+          "rank_controller": {
+            "command_intervals_checked": 1932,
+            "rank_command_coverage": 966,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 0
+          },
+          "rank_descriptors": {
+            "parent_descriptors_checked": 0,
+            "fine_children_checked": 0,
+            "children_per_descriptor": 16,
+            "parent_waits_for_all_children": true,
+            "one_global_CA_per_descriptor": true,
+            "fine_bank_operations_preserved": true,
+            "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+          },
+          "other_channel_dispatches_during_channel0_backpressure": 58,
+          "write_barrier_covers_DRAM_recovery": true
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_late_peer",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 45522,
+        "native_audit": {
+          "channel_ingress": {
+            "requests_checked": 67336,
+            "channel_count": 16,
+            "capacity_per_channel": 32,
+            "queue_high_water_by_channel": {
+              "0": 32,
+              "1": 32,
+              "2": 32,
+              "3": 32,
+              "4": 32,
+              "5": 32,
+              "6": 32,
+              "7": 32,
+              "8": 32,
+              "9": 32,
+              "10": 32,
+              "11": 32,
+              "12": 32,
+              "13": 32,
+              "14": 32,
+              "15": 32
+            },
+            "no_channel_FIFO_reordering": true,
+            "one_dispatch_per_channel_per_CK": true,
+            "completion_fences_checked": 70,
+            "global_barriers_checked": 70,
+            "peer_export_dependencies_checked": 128,
+            "peer_wait_events": 127,
+            "all_accepted_requests_complete": true
+          },
+          "native_data_commands_checked": 92032,
+          "rank_controller": {
+            "command_intervals_checked": 181400,
+            "rank_command_coverage": 113248,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 1024
+          },
+          "rank_descriptors": {
+            "parent_descriptors_checked": 1464,
+            "fine_children_checked": 23424,
+            "children_per_descriptor": 16,
+            "parent_waits_for_all_children": true,
+            "one_global_CA_per_descriptor": true,
+            "fine_bank_operations_preserved": true,
+            "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+          },
+          "unified_gemv": {
+            "events_checked": 53040,
+            "operation_counts": {
+              "GEMV_MULTICAST": 8192,
+              "GEMV_MAC": 32768,
+              "GEMV_RELEASE": 48,
+              "GEMV_Q_LOCAL": 2048,
+              "GEMV_Q_REMOTE": 2048,
+              "GEMV_QK": 7936
+            },
+            "bank_generations_checked": 16640,
+            "physical_bank_releases": 768,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "external_fill_checks": 2048,
+          "unrelated_channel_completions_during_peer_wait": 16
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_repeated_peer_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 90507,
+        "native_audit": {
+          "channel_ingress": {
+            "requests_checked": 134616,
+            "channel_count": 16,
+            "capacity_per_channel": 32,
+            "queue_high_water_by_channel": {
+              "0": 32,
+              "1": 32,
+              "2": 32,
+              "3": 32,
+              "4": 32,
+              "5": 32,
+              "6": 32,
+              "7": 32,
+              "8": 32,
+              "9": 32,
+              "10": 32,
+              "11": 32,
+              "12": 32,
+              "13": 32,
+              "14": 32,
+              "15": 32
+            },
+            "no_channel_FIFO_reordering": true,
+            "one_dispatch_per_channel_per_CK": true,
+            "completion_fences_checked": 142,
+            "global_barriers_checked": 141,
+            "peer_export_dependencies_checked": 256,
+            "peer_wait_events": 128,
+            "all_accepted_requests_complete": true
+          },
+          "native_data_commands_checked": 183424,
+          "rank_controller": {
+            "command_intervals_checked": 362584,
+            "rank_command_coverage": 226192,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 2048
+          },
+          "rank_descriptors": {
+            "parent_descriptors_checked": 2872,
+            "fine_children_checked": 45952,
+            "children_per_descriptor": 16,
+            "parent_waits_for_all_children": true,
+            "one_global_CA_per_descriptor": true,
+            "fine_bank_operations_preserved": true,
+            "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 4096
+          },
+          "unified_gemv": {
+            "events_checked": 106080,
+            "operation_counts": {
+              "GEMV_MULTICAST": 16384,
+              "GEMV_MAC": 65536,
+              "GEMV_RELEASE": 96,
+              "GEMV_Q_LOCAL": 4096,
+              "GEMV_Q_REMOTE": 4096,
+              "GEMV_QK": 15872
+            },
+            "bank_generations_checked": 33280,
+            "physical_bank_releases": 1536,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "external_fill_checks": 4096,
+          "unrelated_channel_completions_during_peer_wait": 16,
+          "repeated_address_waits_for_latest_export_instance": true
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_no_peer_export",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q_REMOTE has no preceding peer Q_EXPORT",
+        "exception_type": "RuntimeError",
+        "message": "Q_REMOTE has no preceding peer Q_EXPORT",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Descriptor_noncanonical_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "rank descriptor requires canonical rank1 BG0 bank0",
+        "exception_type": "RuntimeError",
+        "message": "rank descriptor requires canonical rank1 BG0 bank0",
+        "python_trace_precheck_bypassed": true,
+        "native_input_retains_invalid_address": true,
+        "worker_returncode": 0
+      },
+      {
+        "case": "Local_ACT2_spill_rope_refresh",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 10252,
+        "native_audit": {
+          "split_activation": {
+            "status": "passed",
+            "nAAD_ck": 8,
+            "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+            "ACT1_commands": 552,
+            "ACT2_commands": 552,
+            "paired_ACT2": 552,
+            "cancelled_ACT1": 0,
+            "pending_ACT2_at_end": 0,
+            "minimum_gap_ck": 1,
+            "maximum_gap_ck": 3,
+            "gap_histogram_ck": {
+              "1": 464,
+              "2": 82,
+              "3": 6
+            },
+            "maximum_pending_by_channel": {
+              "0": 1
+            },
+            "classifications": {
+              "ordinary": {
+                "ACT1": 256,
+                "paired_ACT2": 256,
+                "late_ACT2": 0,
+                "cancelled": 0,
+                "pending_at_end": 0,
+                "gap_histogram_ck": {
+                  "1": 168,
+                  "2": 82,
+                  "3": 6
+                }
+              },
+              "other_internal": {
+                "ACT1": 296,
+                "paired_ACT2": 296,
+                "late_ACT2": 0,
+                "cancelled": 0,
+                "pending_at_end": 0,
+                "gap_histogram_ck": {
+                  "1": 296
+                }
+              }
+            },
+            "violation_count": 0,
+            "violations": {},
+            "violations_by_kind": {},
+            "examples": [],
+            "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+          },
+          "forced_localwrite_activations": {
+            "PIM_SPILL": {
+              "ACT1_commands": 128,
+              "LOCALWR_commands": 256,
+              "minimum_ACT1_per_bank": 8
+            },
+            "PIM_ROPE_STORE": {
+              "ACT1_commands": 128,
+              "LOCALWR_commands": 256,
+              "minimum_ACT1_per_bank": 8
+            }
+          },
+          "native_data_commands_checked": 1152,
+          "rank_controller": {
+            "command_intervals_checked": 5044,
+            "rank_command_coverage": 3436,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": null
+          },
+          "native_refresh_commands": 39,
+          "conflicting_row_writes": 256,
+          "localwrite_bytes": 16384,
+          "guard_only_nREFI_ck": 512
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "V_token_complete_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 304,
+        "native_audit": {
+          "unified_gemv": {
+            "events_checked": 25,
+            "operation_counts": {
+              "GEMV_MULTICAST": 8,
+              "GEMV_MAC": 16,
+              "GEMV_RELEASE": 1
+            },
+            "bank_generations_checked": 16,
+            "physical_bank_releases": 16,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "token_rows": 8,
+          "weight_columns": 16,
+          "V_to_PV_same_slot": false,
+          "native_data_commands_checked": 32,
+          "split_activation": {
+            "status": "passed",
+            "nAAD_ck": 8,
+            "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+            "ACT1_commands": 1,
+            "ACT2_commands": 1,
+            "paired_ACT2": 1,
+            "cancelled_ACT1": 0,
+            "pending_ACT2_at_end": 0,
+            "minimum_gap_ck": 1,
+            "maximum_gap_ck": 1,
+            "gap_histogram_ck": {
+              "1": 1
+            },
+            "maximum_pending_by_channel": {
+              "0": 1
+            },
+            "classifications": {
+              "ordinary": {
+                "ACT1": 1,
+                "paired_ACT2": 1,
+                "late_ACT2": 0,
+                "cancelled": 0,
+                "pending_at_end": 0,
+                "gap_histogram_ck": {
+                  "1": 1
+                }
+              }
+            },
+            "violation_count": 0,
+            "violations": {},
+            "violations_by_kind": {},
+            "examples": [],
+            "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+          },
+          "rank_controller": {
+            "command_intervals_checked": 74,
+            "rank_command_coverage": 44,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": null
+          }
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "V_token_eight_columns_release",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "release of unconsumed input fragment",
+        "exception_type": "RuntimeError",
+        "message": "Unified GEMV release of unconsumed input fragment",
+        "worker_returncode": 0
+      },
+      {
+        "case": "V_token_wrong_rows",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging token rows do not match operator",
+        "exception_type": "RuntimeError",
+        "message": "staging token rows do not match operator",
+        "worker_returncode": 0
+      },
+      {
+        "case": "V_token_then_PV",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 691,
+        "native_audit": {
+          "unified_gemv": {
+            "events_checked": 50,
+            "operation_counts": {
+              "GEMV_MULTICAST": 24,
+              "GEMV_MAC": 24,
+              "GEMV_RELEASE": 2
+            },
+            "bank_generations_checked": 32,
+            "physical_bank_releases": 32,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "token_rows": 8,
+          "weight_columns": 16,
+          "V_to_PV_same_slot": true,
+          "native_data_commands_checked": 72,
+          "split_activation": {
+            "status": "passed",
+            "nAAD_ck": 8,
+            "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+            "ACT1_commands": 2,
+            "ACT2_commands": 2,
+            "paired_ACT2": 2,
+            "cancelled_ACT1": 0,
+            "pending_ACT2_at_end": 0,
+            "minimum_gap_ck": 1,
+            "maximum_gap_ck": 1,
+            "gap_histogram_ck": {
+              "1": 2
+            },
+            "maximum_pending_by_channel": {
+              "0": 1
+            },
+            "classifications": {
+              "ordinary": {
+                "ACT1": 2,
+                "paired_ACT2": 2,
+                "late_ACT2": 0,
+                "cancelled": 0,
+                "pending_at_end": 0,
+                "gap_histogram_ck": {
+                  "1": 2
+                }
+              }
+            },
+            "violation_count": 0,
+            "violations": {},
+            "violations_by_kind": {},
+            "examples": [],
+            "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+          },
+          "rank_controller": {
+            "command_intervals_checked": 166,
+            "rank_command_coverage": 105,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": null
+          }
+        },
+        "worker_returncode": 0
+      }
+    ]
+  },
+  "native_cases_passed": [
+    "chain",
+    "v",
+    "pv",
+    "gate_up_gpu",
+    "down_gpu_input",
+    "combined_timing_chain",
+    "serial_layer_control"
+  ],
+  "fresh_modes": [
+    "before",
+    "token",
+    "legacy"
+  ],
+  "preservation": {
+    "status": "passed",
+    "native_job": 1904020,
+    "baseline_commit": "23e661478f136f55f11855d23529643cb060b378",
+    "baseline_archive_job": 1903036,
+    "fresh_modes": [
+      "before",
+      "token",
+      "legacy"
+    ],
+    "before_and_new_backend_legacy_exactly_reproduce_archived_baseline": true,
+    "token_and_legacy_same_native_library": true,
+    "all_source_inventories_verified": true,
+    "downloaded_raw_files_checked": 3358,
+    "source_snapshot_sha256": "c319c6f01a76c518e2f18eaaa6e81317b36608be2dfc1eec4b6d9b40f79c9287",
+    "uploaded_source_archive_sha256": "3b70b39b73a800327f23ff7cd2eaa32c70308bbd55a391a4cffd73bed0423a0a",
+    "comparison_source_sha256": {
+      "compare_v_token.py": "4ad6bd3a531dd6aa4704b6538fe211c0b41d29771cb04ddebfe64d66cb766e1d",
+      "compare_localwr_act2.py": "cbe51d9a4183a6835f33411418fc4eb543837e8b5ee44d3b2bbc0bf9f8c0a8b4",
+      "compare_act2_deadline.py": "95618732272fe8f22596bfd9278e8bbdf4caea46996144d37ee80ac547d32673"
+    },
+    "comparison_report_sha256": "9f1aec55ff9e15041d76212d45cd5717d6fb71688680bb9c16397da0bf5974ba",
+    "provenance_sha256": {
+      "before": "18ffdf514cad72e092d9b8a13ccad8df13b008cf8abb6486accd5bc5c5e6b29f",
+      "token": "5ff63184e719dcd07f735ca762e0c8ebe7e65860d7c941134d68da14067c17bf",
+      "legacy": "90ae43ed9471b7675e6bafb2ed8c349c0975f9af3347a6cea3b6b5a9c97d3e57"
+    },
+    "result_evidence_sha256": {
+      "before": {
+        "summary.json": "a5dec2835388ade45e680fd2ae0cad1d8116f9a1b1cf750553f239086bdf800e",
+        "channel-analysis.json": "d53468497d146a831520a68a07c8da122de773cb2c0a3fd1711504003bc6cd4b",
+        "provenance.json": "18ffdf514cad72e092d9b8a13ccad8df13b008cf8abb6486accd5bc5c5e6b29f",
+        "chain/native-audit.json": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4",
+        "v/native-audit.json": "aab1fa66b485e698f3687313c3c2a0a91a7d2314fb26ae270ea7c84d6fd0411e",
+        "pv/native-audit.json": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f",
+        "gate_up_gpu/native-audit.json": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84",
+        "down_gpu_input/native-audit.json": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e",
+        "combined_timing_chain/native-audit.json": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c",
+        "serial_layer_control/native-audit.json": "2776a7a3f1db5d88ba465fcd3b4af114fa992315bb725fb081a85e8836d3ad17"
+      },
+      "token": {
+        "summary.json": "8d74d8f460c3c282f9bb7e703cf49727d0105ded41291c7db594f60ae684bdaa",
+        "channel-analysis.json": "68d21f4f608b0d3d8ba0615de221db164967cc99d07c05972f5eeaa3fb06a015",
+        "provenance.json": "5ff63184e719dcd07f735ca762e0c8ebe7e65860d7c941134d68da14067c17bf",
+        "chain/native-audit.json": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4",
+        "v/native-audit.json": "665ecb96ac863c1280fb1ad5bb0048d9ca87ed2c25e0fec037e63806022aec47",
+        "pv/native-audit.json": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f",
+        "gate_up_gpu/native-audit.json": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84",
+        "down_gpu_input/native-audit.json": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e",
+        "combined_timing_chain/native-audit.json": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c",
+        "serial_layer_control/native-audit.json": "579f48aadef8c4770f73593f5bd0ab922b0184d64f32329334803437aaed1e35"
+      },
+      "legacy": {
+        "summary.json": "a5e7e79d572aae8dd19535f3f418ca3b4c69c09be2a3aa03a2868519ccbbbe08",
+        "channel-analysis.json": "9c210c8a29e476f153f0b4ee0658f987577b0a9187aa8912628fb5dfa6aa9f61",
+        "provenance.json": "90ae43ed9471b7675e6bafb2ed8c349c0975f9af3347a6cea3b6b5a9c97d3e57",
+        "chain/native-audit.json": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4",
+        "v/native-audit.json": "aab1fa66b485e698f3687313c3c2a0a91a7d2314fb26ae270ea7c84d6fd0411e",
+        "pv/native-audit.json": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f",
+        "gate_up_gpu/native-audit.json": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84",
+        "down_gpu_input/native-audit.json": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e",
+        "combined_timing_chain/native-audit.json": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c",
+        "serial_layer_control/native-audit.json": "2776a7a3f1db5d88ba465fcd3b4af114fa992315bb725fb081a85e8836d3ad17"
+      },
+      "archived_baseline": {
+        "summary.json": "17c487a59914ceef7c38283cfad84d7f4e8e1c7658946aa008df0915392b3ebc",
+        "channel-analysis.json": "d53468497d146a831520a68a07c8da122de773cb2c0a3fd1711504003bc6cd4b",
+        "provenance.json": "38a12ceb998338c712349ff3ecedb472195c3be239eff0aecdeb55e1c86a6464",
+        "chain/native-audit.json": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4",
+        "v/native-audit.json": "aab1fa66b485e698f3687313c3c2a0a91a7d2314fb26ae270ea7c84d6fd0411e",
+        "pv/native-audit.json": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f",
+        "gate_up_gpu/native-audit.json": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84",
+        "down_gpu_input/native-audit.json": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e",
+        "combined_timing_chain/native-audit.json": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c",
+        "serial_layer_control/native-audit.json": "2776a7a3f1db5d88ba465fcd3b4af114fa992315bb725fb081a85e8836d3ad17"
+      }
+    }
+  },
+  "v_token_projection": {
+    "logical_input_elements_checked": 131072,
+    "logical_output_elements_checked": 32768,
+    "weight_copies_per_head": 2,
+    "weight_bytes_per_bank": 32768,
+    "export_bytes": 131072,
+    "cache_suffix_elements": 32768,
+    "preserved_prefix_tokens": [
+      960,
+      968
+    ],
+    "masked_padding": [
+      984,
+      992
+    ],
+    "legacy_cache_layout_preserved": true,
+    "numerical_compute": false,
+    "projection_MAC_commands": 16384,
+    "scalar_MACs": 33554432,
+    "V_to_PV_same_slot_generation_transition": null
+  },
+  "serial_v_token_projection": {
+    "logical_input_elements_checked": 131072,
+    "logical_output_elements_checked": 32768,
+    "weight_copies_per_head": 2,
+    "weight_bytes_per_bank": 32768,
+    "export_bytes": 131072,
+    "cache_suffix_elements": 32768,
+    "preserved_prefix_tokens": [
+      960,
+      968
+    ],
+    "masked_padding": [
+      984,
+      992
+    ],
+    "legacy_cache_layout_preserved": true,
+    "numerical_compute": false,
+    "projection_MAC_commands": 16384,
+    "scalar_MACs": 33554432,
+    "V_to_PV_same_slot_generation_transition": true
+  },
+  "full_ACT1_ACT2_protocol_passed": true,
+  "historical_measurements_reused": false,
+  "scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven before, seven token and seven legacy cases, all 16 channels; not verification of all DRAM physical specifications"
+}

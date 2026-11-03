@@ -4,6 +4,8 @@
   "fresh_native_run": true,
   "unified_bank_gemv": true,
   "v_token_sharding": false,
+  "pv_token_sharding": false,
+  "qkv_fusion": false,
   "rank_staging": true,
   "rank_controller": true,
   "rank_descriptors": true,

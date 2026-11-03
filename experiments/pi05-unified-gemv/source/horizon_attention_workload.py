@@ -78,14 +78,19 @@ class Writer:
         self.stream.close()
 
 
-def projection(w, schedule, rank_staging=False, staging_banks=1):
+def projection(w, schedule, rank_staging=False, staging_banks=1, qkv_fusion=False, whole_srf=False):
+    columns, weight_base = (48, 393216) if qkv_fusion else (32, 0)
+    views = 4 if qkv_fusion or whole_srf else 2
     if rank_staging:
-        stage_input(w, "projection", L.LOCAL_QUERIES, L.HIDDEN//L.LANES, staging_banks)
+        stage_input(w, "projection", L.LOCAL_QUERIES, L.HIDDEN//L.LANES, staging_banks, views=views)
+        if qkv_fusion:
+            from v_token_layout import input_contract
+            w.staging_inputs[-1]["logical_input"] = input_contract()
     def compute():
-        for batch in fragment_batches(L.HIDDEN//L.LANES, rank_staging):
+        for batch in fragment_batches(L.HIDDEN//L.LANES, rank_staging or whole_srf or qkv_fusion, views=views):
             inputs = {}
             for fragment in batch:
-                buffer = fragment%2 if rank_staging or schedule == "double" else 0
+                buffer = fragment%views if rank_staging or schedule == "double" else 0
                 first = w.line_no+1
                 if rank_staging:
                     w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, L.LOCAL_QUERIES, staging_banks), buffer,
@@ -97,9 +102,8 @@ def projection(w, schedule, rank_staging=False, staging_banks=1):
             for fragment in batch:
                 buffer, first, last = inputs[fragment]
                 mac_first = w.line_no+1
-                for output_column in range(len(L.PROJECTIONS)*L.FEATURES_PER_BANK):
-                    offset = (fragment*len(L.PROJECTIONS)*L.FEATURES_PER_BANK
-                              + output_column)*L.BURST_BYTES
+                for output_column in range(columns):
+                    offset = weight_base + (fragment*columns + output_column)*L.BURST_BYTES
                     w.ranks("PIM_MAC_AB", offset, buffer)
                 w.input_fragments.append(dict(fragment=fragment, buffer=buffer,
                     line_start=first, line_end=last, mac_line_first=mac_first,
@@ -107,13 +111,17 @@ def projection(w, schedule, rank_staging=False, staging_banks=1):
                     input_source=("bank0_dram_staging" if staging_banks == 1 else "striped_dram_staging") if rank_staging else "gpu_wrgb",
                     command_count=16 if rank_staging else L.LOCAL_QUERIES*16,
                     internal_load_bursts=L.LOCAL_QUERIES*16 if rank_staging else 0,
-                    scope=f"rank1 shared input, {L.LOCAL_QUERIES} local tokens, Q/K reuse",
-                    **(prefetch_metadata(batch, L.LOCAL_QUERIES) if rank_staging else {}),
+                    scope=f"rank1 shared input, {L.LOCAL_QUERIES} local tokens, "+("Q/K/V reuse" if qkv_fusion else "Q/K reuse"),
+                    **(prefetch_metadata(batch, L.LOCAL_QUERIES, views=views) if rank_staging else {}),
                     **(fragment_metadata(fragment, L.LOCAL_QUERIES, staging_banks) if rank_staging else {})))
                 if schedule == "serial":
                     w.fence()
     w.phase("projection_local_input_compute" if rank_staging else "projection_input_compute", compute, kind="projection", mac_service_ck=L.LOCAL_QUERIES,
             native_mac_completion=True)
+
+    if qkv_fusion:
+        from pv_token_workload import local_cache_spill
+        local_cache_spill(w, qkv_fusion=True)
 
     def spill():
         first = w.line_no + 1
@@ -125,7 +133,7 @@ def projection(w, schedule, rank_staging=False, staging_banks=1):
                                    source="FP32 accumulators rounded to BF16", external_bytes=0))
     w.phase("projection_local_spill", spill, kind="local_write")
     def release_projection():
-        for slot in (0, 1):
+        for slot in range(views):
             w.ranks("PIM_GEMV_RELEASE", 0, slot)
     w.phase("projection_gemv_release", release_projection, kind="gemv_release")
 
@@ -206,13 +214,13 @@ def qk(w):
             kind="gemv_release")
 
 
-def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False):
+def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False, qkv_fusion=False, whole_srf=False):
     if case not in OPERATORS or schedule not in ("double", "serial"):
         raise ValueError((case, schedule))
     w = Writer(path, rank_descriptors=rank_descriptors)
     try:
         if case in ("chain", "projection"):
-            projection(w, schedule, rank_staging=rank_staging, staging_banks=staging_banks)
+            projection(w, schedule, rank_staging=rank_staging, staging_banks=staging_banks, qkv_fusion=qkv_fusion, whole_srf=whole_srf)
         if case in ("chain", "rope"):
             rope(w, schedule)
         if case in ("chain", "qk"):
@@ -232,7 +240,7 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
     # EXEC while the preceding completed output waits for its local STORE.
     buffers["rope_output_per_bank"] = 2 * L.BURST_BYTES
     buffers["rope_output_entries_per_bank"] = 2
-    return dict(case=case, variant=f"H={L.QUERIES} bank-local RoPE", schedule=schedule,
+    result = dict(case=case, variant=f"H={L.QUERIES} bank-local RoPE", schedule=schedule,
                 action_horizon=L.QUERIES, attention_heads=L.HEADS,
                 counts=counts, expanded_counts=dict(expanded), rank_batches=w.rank_batches,
                 rank_descriptors=rank_descriptors, segments=w.segments, input_fragments=w.input_fragments,
@@ -261,3 +269,19 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
                                         GPU_source_X_read=None),
                 numeric_compute=False,
                 numeric_scope="Trace validates ownership and timing dependencies, not bitwise model inference")
+    if qkv_fusion:
+        from qkv_token_layout import mapping_contract
+        from pv_token_layout import cache_contract, trace_ranges
+        result.update(qkv_fusion=True, v_token_sharding=True, pv_token_sharding=True,
+            qkv_mapping=mapping_contract(result),
+            pv_token_mapping=dict(schema_version=1,enabled=True,operator="qkv",local_cache=cache_contract(True),
+                trace_ranges=trace_ranges(result),numerical_compute=False))
+        result["required_backend"].update(pim_qkv_fusion=True)
+        result["buffers"]["projection_accumulator_per_bank"]=1536
+        result["initialization_excluded"].pop("weights_qk")
+        result["initialization_excluded"]["weights_qkv"]=256*98304
+        result["initialization_excluded"].update(prefix_v=8*968*256*2,padding_v=8*8*256*2)
+        result["expected_local_bytes"].update(v_cache_rmw_read=16*16*16*32,
+            v_cache_rmw_write=16*16*16*32)
+        result["expected_local_bytes"]["projection_spill"]-=16*16*16*32
+    return result

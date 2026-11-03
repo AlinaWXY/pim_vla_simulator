@@ -1,4 +1,6 @@
-# xinyao_1103 双 bank 输入暂存与 rank controller
+# 810e01e 对照模型：双 bank 输入暂存与 rank controller
+
+本页保留本次修改前 `810e01e` 的模型说明，以下“默认”均指该对照版本。当前默认的 V 本地写回、token 分片 V cache/PV 和 GPU 部分和归约见 [TOKEN-PV.md](TOKEN-PV.md)。当前 runner 以 `--legacy-pv-feature-sharding` 选择本页的 V/cache/PV 布局；channel、rank controller、CA 与 ACT1/ACT2 约束仍沿用本页说明。
 
 本实验从 `xinyao_1102` 的 `cbc1ee4` 派生；其直接输入基线是 `xinyao_1101` 的 `4073452`。1103 将 GPU 广播输入分布到不同 bank group 的两个 DRAM bank，并交错写入，启用 channel 独立派发和 rank 粗粒度描述符。在 `23e6614` 的 LOCALWR 时序修正之上，默认 runner 将 V projection 改为 token 分 rank；V cache/PV、其它算子及每 bank 两个 512 B SRF slot 保持原配置。V 权重副本和投影结果归属的变化见下文。[RoPE 命令说明](ROPE-CONTROL.md) 保留控制路径修改的历史证据。
 

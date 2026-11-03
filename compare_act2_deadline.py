@@ -108,11 +108,11 @@ def validate_partition(metrics, label):
                     f"{label}: {resource} CA exceeds wall")
 
 
-def load_run(root, analyzer):
+def load_run(root, analyzer, primary=PRIMARY):
     root = Path(root).resolve()
     summary = read_json(root / "summary.json")
     require(summary.get("status") == "passed", f"{root}: run did not pass")
-    require(tuple(summary["primary_cases"]) == PRIMARY, f"{root}: primary case set changed")
+    require(tuple(summary["primary_cases"]) == tuple(primary), f"{root}: primary case set changed")
     require(set(summary["runs"]) == set(CASES), f"{root}: expected exactly seven cases")
     stages, natives, traces = {}, {}, {}
     for case in CASES:
@@ -147,9 +147,9 @@ def load_run(root, analyzer):
                 close(values["wall_us"], values["dq_occupied_us"] + values["dq_idle_us"],
                       f"{case}/ch{channel}/{kind}: DQ partition")
         stages[case], natives[case], traces[case] = stage, native, trace_hash
-    primary_wall = sum(summary["runs"][case]["latency_us"] for case in PRIMARY)
+    primary_wall = sum(summary["runs"][case]["latency_us"] for case in primary)
     close(primary_wall, summary["measured_stage_sum_us_per_layer_step"], "Primary stage sum")
-    require(sum(summary["runs"][case]["external_DQ_bytes"] for case in PRIMARY)
+    require(sum(summary["runs"][case]["external_DQ_bytes"] for case in primary)
             == summary["external_DQ_bytes_per_layer_step"], "Primary external byte sum differs")
     return dict(root=root, summary=summary, stages=stages, natives=natives, traces=traces)
 
@@ -261,7 +261,8 @@ def write_csv(path, rows):
 def write_report(result, output):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
-    cases = dict(result["cases"], **{SUM_NAME: result["primary_five_stage_sum"]})
+    total = result.get("primary_stage_sum", result.get("primary_five_stage_sum"))
+    cases = dict(result["cases"], **{result.get("sum_name", SUM_NAME): total})
     latency_rows, channel_rows, phase_rows, kind_rows, command_rows = [], [], [], [], []
     for case, entry in cases.items():
         row = dict(case=case, scope=entry["scope"])

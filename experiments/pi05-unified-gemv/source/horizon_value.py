@@ -26,7 +26,9 @@ def physical_address(channel, rank, bg, bank, offset):
     return row << 20 | bank << 18 | bg << 16 | rank << 15 | column << 9 | channel << 5 | byte
 
 
-def layout(horizon, v_token_sharding=False):
+def layout(horizon, v_token_sharding=False, pv_token_sharding=False):
+    if pv_token_sharding and not v_token_sharding:
+        raise ValueError('PV token sharding requires token-sharded V')
     if horizon not in SUPPORTED_HORIZONS:
         raise ValueError(f'Unsupported horizon: {horizon}')
     padded = align(PREFIX+horizon, 32)
@@ -75,6 +77,22 @@ def layout(horizon, v_token_sharding=False):
             execution='One token-parity shard per rank; all H tokens covered once per head')
         if result['regions']['v_cache']['base'] != token.CACHE_BASE:
             raise ValueError('Token V must preserve the existing PV cache base')
+    if pv_token_sharding:
+        from pv_token_layout import CACHE_BASE, CACHE_BYTES, cache_contract
+        result['regions']['v_cache']=dict(base=CACHE_BASE,used_bytes_per_bank=31*16*32,
+            reserved_bytes_per_bank=CACHE_BYTES,row_first=80,row_last=87)
+        result.update(pv_token_sharding=True,cache_features_per_bank=16,banks_per_head=32,
+            cache_feature_formula=result['feature_formula'],
+            cache_order='[local_KV_fragment31][feature_lane16][local_KV_lane16]',
+            cache_token_owner_formula='channel=2*head+token%2; local_token=token//2',
+            kv_fragments=31,local_cache_tokens=496,end_before_ffn=CACHE_BASE+CACHE_BYTES,
+            cache_mapping=cache_contract(),input_srf_bytes_per_bank=1024,
+            output_pool_bytes_per_bank=2048,cache_writeback='bank-local RMW; no GPU V export/scatter',
+            tail_block_starts=[480],tail_block_coordinates='rank-local token indices',
+            preserved_prefix_tokens=list(range(480,484)),
+            pv_accumulator_bytes_per_bank=1024,pv_query_batches=1,
+            execution='Whole 1KiB SRF batches; V token parity and PV full-query rank-partial outputs')
+        result.pop('input_double_buffer_bytes_per_bank',None)
     return result
 
 
@@ -129,7 +147,13 @@ class Writer:
             self.emit(operation, physical_address(channel, 1, bank//4, bank%4, offset), buffer)
 
 
-def generate(path, horizon, case, rank_staging=False, staging_banks=1, v_token_sharding=False):
+def generate(path, horizon, case, rank_staging=False, staging_banks=1, v_token_sharding=False,
+             pv_token_sharding=False, rank_descriptors=False):
+    if pv_token_sharding:
+        if not v_token_sharding:
+            raise ValueError('PV token sharding requires token-sharded V')
+        from pv_token_workload import generate as token_generate
+        return token_generate(path,horizon,case,rank_staging,staging_banks,rank_descriptors)
     if case not in ('v', 'pv'):
         raise ValueError(case)
     token_sharded = bool(v_token_sharding and case == 'v')

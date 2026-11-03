@@ -51,7 +51,7 @@ def inspect_trace(
             elif len(fields) == 4:
                 raise ValueError(f"Trace line {number}: only STAGE_BEGIN accepts four fields")
             if len(fields) == 3 and (
-                op not in ("PIM_WR_GB", "PIM_MAC_AB", "PIM_LOCAL_GB", "PIM_WR_BG", "PIM_WR_Q", "PIM_MAC_K", "PIM_MAC_QK", "PIM_RD_Q", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_Q_REMOTE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT") or fields[2] not in (b"0", b"1")
+                op not in ("PIM_WR_GB", "PIM_MAC_AB", "PIM_LOCAL_GB", "PIM_WR_BG", "PIM_WR_Q", "PIM_MAC_K", "PIM_MAC_QK", "PIM_RD_Q", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_Q_REMOTE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT") or fields[2] not in (b"0", b"1", b"2", b"3")
             ):
                 raise ValueError(f"Trace line {number}: BUFFER must be 0/1 on WRGB or MACAB")
             if op in ("PIM_LOCAL_GB", "PIM_WR_BG", "PIM_WR_Q", "PIM_MAC_K", "PIM_MAC_QK", "PIM_RD_Q", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_Q_REMOTE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT") and len(fields) != 3:

@@ -81,6 +81,11 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "staging_events_path": str(output / f"staging_events.csv.ch{channel}") if config.pim_rank_staging else "",
                     "gemv_port_cycles": config.gemv_port_cycles,
                     "unified_gemv_events_path": str(output / f"unified_gemv.csv.ch{channel}") if config.pim_unified_gemv else "",
+                    "pim_token_pv": config.pim_token_pv,
+                    "pim_qkv_fusion": config.pim_qkv_fusion,
+                    "pim_whole_srf": config.pim_whole_srf,
+                    "v_cache_preinstalled": config.v_cache_preinstalled,
+                    "v_cache_events_path": str(output / f"v_cache.csv.ch{channel}") if config.pim_token_pv else "",
                     "pim_rank_rope": config.pim_rank_rope,
                     "pim_horizon": config.pim_horizon,
                     "pim_ffn_dram": config.pim_ffn_dram,
@@ -504,5 +509,38 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         result["config"].pop("pim_rank_staging", None)
     if not config.pim_rank_controller:
         result["config"].pop("pim_rank_controller", None)
+    if config.pim_whole_srf:
+        result["unified_gemv_model"].update(bank_slots="dynamic logical views", slot_bytes="256 or 512",
+            input_bytes_per_bank=1024, shared_fp32_output_bytes_per_bank=2048,
+            view_partition={"eight_rows": {"views": 4, "bytes": 256}, "sixteen_rows": {"views": 2, "bytes": 512}},
+            output_capacity_enforced=True, whole_batch_consumption_enforced=True)
+        result["pim_model"]["double_buffer"] = "One 1KiB physical SRF; fill all valid 256B/512B views before compute; consume the complete batch before any overwrite"
+    if config.pim_token_pv:
+        # V local conversion also uses this unit without the RoPE pipeline.
+        result["config"]["pim_cast_cycles"] = config.pim_cast_cycles
+        def v_stat(value, key):
+            if isinstance(value, dict):
+                return (value.get(key, 0) if isinstance(value.get(key, 0), (int, float)) else 0) + sum(v_stat(v, key) for k, v in value.items() if k != key)
+            if isinstance(value, list):
+                return sum(v_stat(v, key) for v in value)
+            return 0
+        result["v_cache_model"] = dict(cache_base_bytes=163840, cache_end_bytes=180224,
+            cache_order="[local_KV_fragment31][feature16][token_lane16] BF16",
+            valid_prefix_tokens_per_rank=484, valid_suffix_tokens_per_rank=8, padded_tokens_per_rank=496,
+            preinstalled=config.v_cache_preinstalled, fused_qkv=config.pim_qkv_fusion,
+            prefix_precondition="Existing prefix resident in token-parity layout",
+            suffix_update="Per bank/feature: LOCALRD32 -> gather8 FP32 (32B) -> cast8 BF16 (16B) -> LOCALWR32 RMW",
+            preserved_mask=15, updated_mask=4080, zero_mask=61440,
+            bank_rmw_staging_bytes=32, gather_cycles=config.gemv_port_cycles, cast_cycles=config.pim_cast_cycles,
+            partial_output_elements_per_rank=16*256, cross_rank_partial_sum="GPU; arithmetic latency excluded",
+            qkv_weight_base_bytes=393216 if config.pim_qkv_fusion else None,
+            qkv_columns=48 if config.pim_qkv_fusion else None, numerical_compute=False)
+        result["traffic_bytes"].update(v_cache_rmw_array_read=v_stat(stats, "v_cache_array_reads")*32,
+            v_cache_array_write=v_stat(stats, "v_cache_array_writes")*32,
+            v_cache_fp32_gather=v_stat(stats, "v_cache_gather_bytes"),
+            v_cache_bf16_cast_output=v_stat(stats, "v_cache_cast_bytes"))
+    for field in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
+        if not getattr(config, field):
+            result["config"].pop(field, None)
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

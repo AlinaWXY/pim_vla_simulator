@@ -69,7 +69,8 @@ bool send_rank_descriptor(Request& parent) {
     m_addr_mapper->apply(child);child.addr_vec[0]=m_channel_id;
     if(child.addr_vec!=expected) throw std::runtime_error("rank descriptor child address mapping mismatch");
     child.pim_origin_addr_vec=child.addr_vec;
-    prepare_rank_rope(child); // Validate every child before enqueuing any of them.
+    if(is_v_cache_spill(child)) prepare_v_cache_spill(child);
+    else prepare_rank_rope(child); // Validate every child before enqueuing any of them.
   }
   auto completion=std::make_shared<RankDescriptorCompletion>();
   completion->parent=parent;completion->parent.arrive=m_clk;

@@ -53,6 +53,15 @@ CASES = {
     "V_token_eight_columns_release": "release of unconsumed input fragment",
     "V_token_wrong_rows": "staging token rows do not match operator",
     "V_token_then_PV": None,
+    "Token_cache_missing_projection": "V cache spill requires complete V projection",
+    "Token_cache_wrong_tail": "V cache spill requires final KV block",
+    "Token_cache_duplicate_spill": "duplicate V cache spill",
+    "Token_PV_missing_cache": "PV requires complete local V cache",
+    "Token_PV_wrong_export": "Output export address/count mismatch",
+    "Whole_SRF_early_compute": "Whole SRF compute before full batch fill",
+    "Whole_SRF_early_refill": "Whole SRF overwrite before complete batch consumption",
+    "Whole_SRF_four_views": None,
+    "Whole_SRF_legal_row_preparation": None,
 }
 
 
@@ -66,7 +75,50 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
-    if name.startswith("V_token_"):
+    if name in ("Whole_SRF_four_views", "Whole_SRF_legal_row_preparation"):
+        import workload
+        preparation = name == "Whole_SRF_legal_row_preparation"
+        manifest=workload.generate(path,"gate_up_gpu" if preparation else "chain",
+            staging_banks=2 if preparation else 1,rank_descriptors=True,
+            channel_independent_dispatch=True,v_token_sharding=True,pv_token_sharding=True,qkv_fusion=not preparation)
+        (path.parent/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
+        (path.parent/"workload.trace").write_bytes(path.read_bytes())
+        return
+    elif name in ("Token_cache_missing_projection","Token_cache_wrong_tail"):
+        lines=[f"PIM_RANK_SPILL {address(163840 if name.endswith('wrong_tail') else 179200)}"]
+    elif name in ("Token_cache_duplicate_spill","Token_PV_wrong_export"):
+        import workload
+        case="v" if name.startswith("Token_cache") else "pv"
+        manifest=workload.generate(path,case,staging_banks=1,rank_descriptors=True,
+            v_token_sharding=True,pv_token_sharding=True)
+        lines=path.read_text(encoding="ascii").splitlines()
+        if case=="v":
+            end=next(e["line_end"] for e in manifest["segments"] if e["name"]=="v_local_cache_spill")
+            lines=lines[:end]+[f"PIM_RANK_SPILL {address(179200)}"]
+        else:
+            index=next(i for i,line in enumerate(lines) if line.startswith("PIM_RD_RES "))
+            lines[index]=f"PIM_RD_RES {address(32)}"
+    elif name == "Token_PV_missing_cache" or name.startswith("Whole_SRF_"):
+        rows,fragments=(16,2) if name.startswith("Token_PV") else (8,4 if name.endswith("early_compute") else 8)
+        lines=[f"PIM_STAGE_BEGIN {address(524288)} {rows*fragments*32} {rows}"]
+        lines += [f"ST {address(524288+p*32)}" for p in range(rows*fragments)]
+        lines.append(f"PIM_STAGE_SEAL {address(524288)}")
+        if name == "Token_PV_missing_cache":
+            lines += [command("PIM_STAGE_FRAGMENT",524288+f*512,f) for f in range(2)]
+            lines.append(command("PIM_MAC_AB",163840))
+        elif name.endswith("early_compute"):
+            lines += [command("PIM_STAGE_FRAGMENT",524288),command("PIM_MAC_AB",131072)]
+        else:
+            for first in (0,4):
+                lines += [command("PIM_STAGE_FRAGMENT",524288+f*256,f%4) for f in range(first,first+4)]
+                if name.endswith("early_refill"):
+                    lines += [command("PIM_MAC_AB",131072+c*32) for c in range(16)]
+                    lines.append(command("PIM_STAGE_FRAGMENT",524288+4*256,0))
+                    break
+                lines += [command("PIM_MAC_AB",393216+(f*48+c)*32,f%4) for f in range(first,first+4) for c in range(48)]
+            if name.endswith("four_views"):
+                lines += [command("PIM_GEMV_RELEASE",slot=s) for s in range(4)]
+    elif name.startswith("V_token_"):
         rows = 16 if name == "V_token_wrong_rows" else 8
         columns = 8 if name == "V_token_eight_columns_release" else 16
         lines = [f"PIM_STAGE_BEGIN {address(524288)} {rows*32} {rows}"]
@@ -300,6 +352,18 @@ def dispatch_positive_audit(directory, name):
 
 
 def positive_audit(directory, name):
+    if name in ("Whole_SRF_four_views", "Whole_SRF_legal_row_preparation"):
+        from audit_native import audit_run, read_csv, read_json
+        audit = audit_run(directory)
+        if name == "Whole_SRF_legal_row_preparation":
+            simulation = directory / "simulation"
+            config = read_json(simulation / "result.json")["config"]
+            if not config.get("pim_whole_srf") or config.get("pim_staging_banks") != 2:
+                raise AssertionError("Row-preparation guard requires whole SRF and both source banks")
+            logs = lambda stem: [e for ch in range(16) for e in read_csv(simulation / f"{stem}.csv.ch{ch}")]
+            audit["whole_SRF_row_preparation"] = audit_whole_srf_row_preparation(
+                logs("timeline"), logs("staging_events"), logs("unified_gemv"))
+        return audit
     if name.startswith("V_token_"):
         return v_token_positive_audit(directory, name)
     if name == "Local_ACT2_spill_rope_refresh":
@@ -465,6 +529,63 @@ def local_act2_positive_audit(directory):
         localwrite_bytes=512*32, guard_only_nREFI_ck=result["resolved_timings_ck"]["nREFI"])
 
 
+
+def audit_whole_srf_row_preparation(native, staged, gemv):
+    """Distinguish legal array preparation from actual whole-SRF replacement.
+
+    The complete GU guard supplies normal refresh and real PRE/ACT commands.
+    Physical addresses reconstruct its 32 batches independently of manifest
+    batching metadata; native GEMV completions determine each ownership end.
+    """
+    from collections import Counter, defaultdict
+    from staging_audit import require, offset, source_packet
+    completion = {(e["Channel"], e["clock"]): e["ready_at"]
+                  for e in gemv if e["operation"] == "GEMV_MAC"}
+    macs, reads, preparations = defaultdict(list), defaultdict(list), defaultdict(list)
+    address_key = lambda e: tuple(e[k] for k in ("Channel", "Rank", "BankGroup", "Bank", "Row", "Column"))
+    for e in native:
+        if e["command"] == "MACAB" and 262144 <= offset(e) < 327680:
+            batch = (offset(e)-262144)//(32*32*2)
+            macs[e["Channel"], batch].append((e["clock"], completion[e["Channel"], e["clock"]]))
+        elif e["command"] in ("PREpb", "ACT1", "ACT2") and e.get("type") == 27:
+            preparations[address_key(e)].append(e)
+    for e in staged:
+        if e["operation"] == "LOCALRD":
+            require(e["stage_generation"] == 1, "GU preparation guard unexpectedly changes input stage")
+            batch = source_packet(e, 16, 2)//32
+            reads[e["Channel"], batch].append(e)
+    expected = {(ch, batch) for ch in range(16) for batch in range(32)}
+    require(set(macs) == set(reads) == expected, "GU preparation guard omits physical input/compute batches")
+    overlaps, lead, read_gaps, witnesses = Counter(), [], [], []
+    for ch, batch in sorted(expected):
+        if batch == 0:
+            continue
+        previous = macs[ch, batch-1]
+        previous_last_issue = max(start for start, end in previous)
+        previous_ready = max(end for start, end in previous)
+        first_read = min(reads[ch, batch], key=lambda e: e["clock"])
+        gap = first_read["clock"]-previous_ready
+        require(gap >= 0, "Next batch LOCALRD precedes whole previous batch MAC completion")
+        read_gaps.append(gap)
+        candidates = [e for e in preparations[address_key(first_read)]
+                      if previous_last_issue <= e["clock"] < previous_ready]
+        for e in candidates:
+            overlaps[ch] += 1
+            lead.append(previous_ready-e["clock"])
+        if candidates and not any(e["channel"] == ch for e in witnesses):
+            e = min(candidates, key=lambda e: e["clock"])
+            witnesses.append(dict(channel=ch, next_batch=batch, last_MAC_issue_ck=previous_last_issue,
+                whole_batch_MAC_ready_ck=previous_ready, preparation_command=e["command"],
+                preparation_issue_ck=e["clock"], next_LOCALRD_ck=first_read["clock"]))
+    require(set(overlaps) == set(range(16)),
+            "Guard never overlaps legal PRE/ACT row preparation with the preceding compute tail on every channel")
+    return dict(batch_transitions_checked=len(read_gaps), all_next_LOCALRD_wait_for_whole_batch=True,
+        channels_with_legal_row_preparation_overlap=len(overlaps),
+        overlapped_preparation_commands=sum(overlaps.values()),
+        minimum_next_LOCALRD_after_MAC_ready_ck=min(read_gaps),
+        maximum_row_preparation_lead_ck=max(lead), first_witness_per_channel=witnesses)
+
+
 def worker(backend, output, name):
     from reproduce import setup, config_for, dump
     setup(backend)
@@ -481,6 +602,15 @@ def worker(backend, output, name):
                         refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged,
                         staging_banks=2 if name.startswith("Stage_two_bank_") or independent else 1,
                         rank_descriptors=independent, channel_independent_dispatch=independent)
+    if name.startswith(("Token_","Whole_SRF_")):
+        preparation = name == "Whole_SRF_legal_row_preparation"
+        case="gate_up_gpu" if preparation else "chain" if name=="Whole_SRF_four_views" else "pv" if name.startswith("Token_PV") else "v"
+        config=config_for(case,refresh=CASES[name] is None,max_cycles=500_000,rank_staging=True,
+            staging_banks=2 if preparation else 1,rank_descriptors=True,channel_independent_dispatch=True,
+            v_token_sharding=True,pv_token_sharding=True,qkv_fusion=case=="chain")
+        if name=="Token_PV_missing_cache":
+            from dataclasses import replace
+            config=replace(config,v_cache_preinstalled=False)
     if token_v:
         from dataclasses import replace
         config = replace(config, timing_overrides={**config.timing_overrides, "nCCDAB": 8})

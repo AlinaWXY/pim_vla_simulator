@@ -358,10 +358,10 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
              type != Request::Type::PIM_WR_Q && type != Request::Type::PIM_MAC_K &&
              type != Request::Type::PIM_MAC_QK && type != Request::Type::PIM_RD_Q &&
              type != Request::Type::PIM_ROPE_LOAD && type != Request::Type::PIM_ROPE_EXEC && type != Request::Type::PIM_Q_REMOTE && type != Request::Type::PIM_Z_LOAD && type != Request::Type::PIM_GEMV_RELEASE && type != Request::Type::PIM_STAGE_LOAD && type != Request::Type::PIM_STAGE_FRAGMENT) ||
-            (buffer != "0" && buffer != "1")) {
-          throw std::runtime_error("LoadStoreTrace: BUFFER must be 0/1 on WRGB or MACAB");
+            (buffer != "0" && buffer != "1" && buffer != "2" && buffer != "3")) {
+          throw std::runtime_error("LoadStoreTrace: BUFFER must be 0..3; controller validates physical SRF views");
         }
-        pim_buffer = buffer == "0" ? 0 : 1;
+        pim_buffer = std::stoi(buffer);
       }
       if ((type == Request::Type::PIM_STAGE_FRAGMENT || type == Request::Type::PIM_STAGE_LOAD || type == Request::Type::PIM_GEMV_RELEASE || type == Request::Type::PIM_Z_LOAD || type == Request::Type::PIM_ROPE_LOAD || type == Request::Type::PIM_ROPE_EXEC || type == Request::Type::PIM_Q_REMOTE || type == Request::Type::PIM_LOCAL_GB || type == Request::Type::PIM_RD_Q || (type >= Request::Type::PIM_WR_BG &&
           type <= Request::Type::PIM_MAC_QK)) && pim_buffer < 0)

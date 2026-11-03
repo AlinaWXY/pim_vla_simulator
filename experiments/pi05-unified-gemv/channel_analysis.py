@@ -273,9 +273,10 @@ def analyze_stage(directory, case):
 def analyze(root):
     root = Path(root)
     summary = read_json(root/"summary.json")
-    require(tuple(summary["primary_cases"]) == PRIMARY, "Aggregate exactly the five primary cases")
-    stages = {case: analyze_stage(root/case, case) for case in PRIMARY}
-    first = stages[PRIMARY[0]]
+    primary = ("chain", "pv", "gate_up_gpu", "down_gpu_input") if summary.get("qkv_fusion") else PRIMARY
+    require(tuple(summary["primary_cases"]) == primary, "Primary stages must match the selected fused or separate projection schedule")
+    stages = {case: analyze_stage(root/case, case) for case in primary}
+    first = stages[primary[0]]
     count = len(first["channels"])
     require(all(len(s["channels"]) == count for s in stages.values()), "Channel counts differ by stage")
     fields = ("stage_us", "external_DQ_bytes", "modelled_dq_occupied_us", "modelled_dq_idle_us",
@@ -298,7 +299,7 @@ def analyze(root):
     if summary.get("measured_stage_sum_us_per_layer_step") is not None:
         require(abs(summary["measured_stage_sum_us_per_layer_step"]-wall) < 1e-8, "Stage sum differs from runner")
     return dict(status="passed", units="microseconds per channel, per layer, per denoising step",
-        stage_sum_us=wall, stage_sum_ms_18x10=wall*.18, primary_cases=list(PRIMARY),
+        stage_sum_us=wall, stage_sum_ms_18x10=wall*.18, primary_cases=list(primary),
         channels=channels, stages=stages,
         complete_zero_external_phase_us_all_channels=sum(s["complete_zero_external_phase_us_all_channels"] for s in stages.values()),
         tail_clear_complete_zero_external_phase_us_all_channels=sum(s["tail_clear_complete_zero_external_phase_us_all_channels"] for s in stages.values()),
@@ -311,7 +312,8 @@ def analyze(root):
             "complete zero-external-work phases = tail-clear suffix windows + removed incoming data tails"],
         limitations=["AttAcc movement timing is an abstraction; no validated LPDDR electrical DQ waveform",
             "No concurrent rank0 GPU workload or GPU dispatch simulation; global CA and DQ idle intersection is a resource upper bound, not achieved GPU service time",
-            "Five independent native stages; no invented time between stages or double-counted combined FFN",
+            ("Four primary stages with fused QKV; standalone V and combined FFN are excluded" if summary.get("qkv_fusion") else
+             "Five independent native stages; no invented time between stages or double-counted combined FFN"),
             "Transfer-phase idle fragments and release/WAIT-only phases are excluded from whole-phase candidate windows",
             "GPU/nonlinear arithmetic and background VLM contention remain unmeasured"])
 
@@ -372,7 +374,8 @@ def write_report(root, output=None):
         values = lambda key: [r[key] for r in stage["channels"]]
         span = lambda key: f"{min(values(key)):.6f}–{max(values(key)):.6f}"
         lines.append(f"| {case} | {stage['stage_us']:.6f} | {span('modelled_dq_occupied_us')} | {span('modelled_dq_idle_us')} | {stage['complete_zero_external_phase_us_all_channels']:.6f} | {stage['tail_clear_complete_zero_external_phase_us_all_channels']:.6f} |")
-    lines += ["", f"Five-stage sum: {report['stage_sum_us']:.6f} us; x18x10: {report['stage_sum_ms_18x10']:.6f} ms. This is a sum of measured stages, not complete AE end-to-end latency.", "",
+    stage_label = "Four-stage sum (fused QKV)" if len(report["primary_cases"]) == 4 else "Five-stage sum"
+    lines += ["", f"{stage_label}: {report['stage_sum_us']:.6f} us; x18x10: {report['stage_sum_ms_18x10']:.6f} ms. This is a sum of measured stages, not complete AE end-to-end latency.", "",
         "Each channel closes exactly as wall = model DQ occupied + model DQ idle. Whole-phase candidate windows exclude transfer-phase fragments and release-only control phases. Incoming delayed data is removed before counting each remaining suffix. Actual concurrent GPU request admission and service are not simulated.", "",
         "The JSON and CSV files retain every channel and semantic phase, including boundary overhead and any data tail beyond stage completion.", ""]
     if all(row.get("command_bus") for row in report["channels"]):

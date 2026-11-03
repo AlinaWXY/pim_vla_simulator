@@ -150,6 +150,7 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
     return true;
   }
   if (type == Request::Type::PIM_SPILL && it->pim_q_stage == 0) {
+    if(!output_qk_spill_ready(*it)) return false;
     if (m_clk < m_projection_ready || m_clk < bank.cast_busy) return false;
     if (col == rr_local_queries()) {
       if (m_clk < m_bank_inputs[b][0].in_use_until) return false;
@@ -191,7 +192,7 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
       ? m_device.m_spec->get_timing_value("nCL") + m_bgk_input_cycles
       : type == Request::Type::PIM_Q_REMOTE ? m_bgk_input_cycles : m_bank_write_cycles + m_local_recovery;
   Clk_t ready = m_clk + service;
-  if (type == Request::Type::PIM_SPILL) bank.spill_ready[it->addr] = ready;
+  if (type == Request::Type::PIM_SPILL) { bank.spill_ready[it->addr] = ready; output_qk_spill_issued(*it,ready); }
   if (type == Request::Type::PIM_ROPE_COEF) {
     bank.coefficient_token = col; bank.coefficient_ready = ready; bank.coefficient_uses = 0;
   }
@@ -220,7 +221,7 @@ void issue_rank_rope_local() {
   if (!m_rank_rope) return;
   for (auto it = m_pim_buffer.begin(); it != m_pim_buffer.end();) {
     auto current = it++;
-    if (!is_rank_rope(*current)) continue;
+    if (!is_rank_rope(*current) || is_v_cache_spill(*current)) continue;
     bool independent = true;
     for (auto before = m_pim_buffer.begin(); before != current; ++before)
       if (!can_bypass(*current, *before, false)) { independent = false; break; }

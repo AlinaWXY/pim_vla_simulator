@@ -1,18 +1,18 @@
 {
   "schema_version": 3,
   "native_build": "minimal",
-  "dataflow": "Independent bounded channel ingress -> external CA descriptor dispatch -> rank micro-operations; two-bank whole-input staging",
-  "parent_revision": "23e661478f136f55f11855d23529643cb060b378",
+  "dataflow": "Fused QKV from one whole-input X payload; whole 1KiB SRF batches; local V RMW; KV-sharded P and PV; GPU partial-sum reduction",
+  "parent_revision": "810e01e8422dcf811fcfaa15c75f39bfd82e30f7",
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
   "branch": "xinyao_1103",
-  "file_count_excluding_manifest": 663,
-  "bytes_excluding_manifest": 19777660,
-  "MiB": 18.861446380615234,
+  "file_count_excluding_manifest": 699,
+  "bytes_excluding_manifest": 23491146,
+  "MiB": 22.402902603149414,
   "categories": {
     "publication": {
-      "files": 26,
-      "bytes": 169633,
-      "MiB": 0.1617746353149414
+      "files": 35,
+      "bytes": 247730,
+      "MiB": 0.2362537384033203
     },
     "backend_metadata": {
       "files": 2,
@@ -21,8 +21,8 @@
     },
     "native_metadata": {
       "files": 177,
-      "bytes": 638164,
-      "MiB": 0.6086006164550781
+      "bytes": 641442,
+      "MiB": 0.6117267608642578
     },
     "vendored": {
       "files": 209,
@@ -31,23 +31,23 @@
     },
     "python_codegen": {
       "files": 87,
-      "bytes": 314909,
-      "MiB": 0.3003206253051758
+      "bytes": 315397,
+      "MiB": 0.30078601837158203
     },
     "simulator": {
       "files": 4,
-      "bytes": 51320,
-      "MiB": 0.04894256591796875
+      "bytes": 55305,
+      "MiB": 0.052742958068847656
     },
     "experiment": {
       "files": 22,
-      "bytes": 282265,
-      "MiB": 0.26918888092041016
+      "bytes": 308607,
+      "MiB": 0.2943105697631836
     },
     "reference_evidence": {
-      "files": 136,
-      "bytes": 16066913,
-      "MiB": 15.322602272033691
+      "files": 163,
+      "bytes": 19668209,
+      "MiB": 18.757065773010254
     }
   },
   "compiled_native_translation_units": [
@@ -76,7 +76,7 @@
     "controller/plugin/impl/cmd_trace_recorder.cpp"
   ],
   "clean_native_build_passed": true,
-  "final_native_job": 1904020,
+  "final_native_job": 1904762,
   "source_snapshot": "reference/publish-byte-verification.json",
   "exclusions": [
     "Precompiled native libraries",
@@ -84,8 +84,8 @@
     "Raw generated results"
   ],
   "preservation": {
-    "before_commit": "23e6614",
-    "evidence": "reference/v-token/source-result-binding.json"
+    "before_commit": "810e01e8422dcf811fcfaa15c75f39bfd82e30f7",
+    "evidence": "reference/pv-token/source-result-binding.json"
   },
   "files": {
     ".gitattributes": {
@@ -105,8 +105,8 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 6693,
-      "output_sha256": "0d9d2dac0f53a046265ecbcf378322ef4c12d66ef7f1a9ec6038d9ff53192082"
+      "output_bytes": 5742,
+      "output_sha256": "b422188d2fb7f1d2862b5082ec1b8de99b2464fc5b7fbcf18d82f0b2ae1c4851"
     },
     "analyze_localwr_schedule.py": {
       "category": "publication",
@@ -115,13 +115,18 @@
     },
     "compare_act2_deadline.py": {
       "category": "publication",
-      "output_bytes": 18482,
-      "output_sha256": "95618732272fe8f22596bfd9278e8bbdf4caea46996144d37ee80ac547d32673"
+      "output_bytes": 18585,
+      "output_sha256": "2576bea014ccd1849e50000facd202e0b482a3a878c3d83ff5e28a75f78a2fad"
     },
     "compare_localwr_act2.py": {
       "category": "publication",
       "output_bytes": 8306,
       "output_sha256": "cbe51d9a4183a6835f33411418fc4eb543837e8b5ee44d3b2bbc0bf9f8c0a8b4"
+    },
+    "compare_pv_token.py": {
+      "category": "publication",
+      "output_bytes": 11512,
+      "output_sha256": "6cc16335fffd14f31c8a8128f214783c6007de4b48e103d702b268716d423fcb"
     },
     "compare_rank_dispatch.py": {
       "category": "publication",
@@ -1320,13 +1325,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5.py": {
       "category": "python_codegen",
-      "output_bytes": 2259,
-      "output_sha256": "f9956cbb5f3652c331347c648d7501056ef25e721da8f76804f8e32b67d99d06"
+      "output_bytes": 2503,
+      "output_sha256": "09d27ccaa9655f9f34eb0526824b7ee77b0a02a471840e5b3a77ac771ae41d5c"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": {
       "category": "python_codegen",
-      "output_bytes": 2265,
-      "output_sha256": "ee1a8cb0058b14a67e08e7c252c9643db42f823b5828e35beac8dbc75fd275e9"
+      "output_bytes": 2509,
+      "output_sha256": "95d0c21aeebe51636e5279911affa94f743cca6f7cafbdc5e237bd3d3adbc72b"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr6.py": {
       "category": "python_codegen",
@@ -1855,8 +1860,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp": {
       "category": "native_metadata",
-      "output_bytes": 48175,
-      "output_sha256": "18a32a02cd5afa72267565e92af513ce11fd61b5264ba2bd94e053b88d38b22f"
+      "output_bytes": 50155,
+      "output_sha256": "e4e6a0610416edf707692303f69118fcd8cb024fb35ee2622e3bdcec1d23fb26"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr6_controller.cpp": {
       "category": "native_metadata",
@@ -1885,23 +1890,33 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_descriptor_extension.inc": {
       "category": "publication",
-      "output_bytes": 6017,
-      "output_sha256": "f2d947ab250c3f33cb86494aa238fbfab08850c05b76d7ba5dcbf85bf3c1ed22"
+      "output_bytes": 6084,
+      "output_sha256": "77b96712647ed6de46447f59abe2dbbc96ddf0b5ae41774b506e36b18003c974"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_rope_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 12459,
-      "output_sha256": "32fb4e131a298ad99479f230356aa44118efe75105fb5306d446e5bb13226fd1"
+      "output_bytes": 12579,
+      "output_sha256": "81521d67af5a48a2528e77dd40ab54af0192825c637029b2e982d7ed07a34a65"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 12966,
-      "output_sha256": "2e0cd784a1f5a4c79ad31590a0cc548ed0d01b48e8281d75edea903e5ceebcd2"
+      "output_bytes": 13517,
+      "output_sha256": "b5f905b208cae21c8c5f80bacbfd1539ae1df99e3d95600794afd0d53cb2e6bc"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 11245,
-      "output_sha256": "b919261c17036de67d186712e8f85f248d2e6255a8e8077c5150d491edc01937"
+      "output_bytes": 11817,
+      "output_sha256": "64e040e85c944601bf722a8b6b87416769aebdda4eb8af0644d2a23f3dce052a"
+    },
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/v_cache_extension.inc": {
+      "category": "publication",
+      "output_bytes": 10077,
+      "output_sha256": "ebb5edf819750595b939eb846eefe14f8e5cd9e00d99c4032adcf78de089f9d1"
+    },
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/whole_srf_extension.inc": {
+      "category": "publication",
+      "output_bytes": 3077,
+      "output_sha256": "d4f60fc8bd81157a88c385760cc7310c5da459a05c38f347380ddf73b367b564"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/plugin/controller_validation_hook.h": {
       "category": "native_metadata",
@@ -2400,8 +2415,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/loadstore_trace.cpp": {
       "category": "native_metadata",
-      "output_bytes": 18628,
-      "output_sha256": "cdb93842658654720283282c804308cd356bca61429d608b9346f67f892a5d5b"
+      "output_bytes": 18683,
+      "output_sha256": "dc5e9ebf70c18693a520d771d3ecb27bc7357f50c167f6585eb3a89ce168170b"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/partition_trace.cpp": {
       "category": "native_metadata",
@@ -2535,28 +2550,33 @@
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/backend.py": {
       "category": "simulator",
-      "output_bytes": 35332,
-      "output_sha256": "c8d78d8edcce756791eedab70bfef168eaa3a65cc930ed15567cbe7d1c72cb96"
+      "output_bytes": 38352,
+      "output_sha256": "b4f7bbbcb4db122712958a324699c9608377dffe6cde558f7c83b19958c7c022"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/config.py": {
       "category": "simulator",
-      "output_bytes": 8375,
-      "output_sha256": "f9dfbededc7c8a94d277c314dbd4f95914e78223e79fb9b4cc3b322e9c28ddb3"
+      "output_bytes": 9328,
+      "output_sha256": "21079e0a3b182b4f9e29dc76a441aef2429f55269326dd6386f95ffdea794b5e"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/trace.py": {
       "category": "simulator",
-      "output_bytes": 7437,
-      "output_sha256": "a59a282f14a27d76530f5a626702136d6f3481ccfd2a0f5e4ce658aed7e9c9d1"
+      "output_bytes": 7449,
+      "output_sha256": "1e877bf0bf7782d8fc0b8c27afb5659456e01e922a3883c72225d4fb41659884"
     },
     "experiments/pi05-unified-gemv/MODEL.md": {
       "category": "experiment",
-      "output_bytes": 14435,
-      "output_sha256": "cbd5d7f1866d0367a21adb3a646b6afbd13a1125d7a68573e229ab70af6d30a4"
+      "output_bytes": 14819,
+      "output_sha256": "5688539886d228d1affd49751376a180b9b9a70d40e0ef83fb51a95dee56a182"
     },
     "experiments/pi05-unified-gemv/ROPE-CONTROL.md": {
       "category": "experiment",
       "output_bytes": 10278,
       "output_sha256": "08f2266b3dcf7970a65a7b511cdcf78d0ca019a8f318a5f0f5891fc89c1cd68d"
+    },
+    "experiments/pi05-unified-gemv/TOKEN-PV.md": {
+      "category": "publication",
+      "output_bytes": 6453,
+      "output_sha256": "ea676606cdcf04733995e1295f6e4f3c5b82f92a9571156a691db8ee03224ea9"
     },
     "experiments/pi05-unified-gemv/build.sh": {
       "category": "experiment",
@@ -2565,8 +2585,8 @@
     },
     "experiments/pi05-unified-gemv/channel_analysis.py": {
       "category": "experiment",
-      "output_bytes": 24476,
-      "output_sha256": "f84f9f67961cb6f36bb2a5cda367cdcd80bd42266e9a47f655b01b46b977da06"
+      "output_bytes": 24852,
+      "output_sha256": "e16d01878e9f2d347db8c9e7b2c67dce8e188fedb87cac93c79f4407c12c2983"
     },
     "experiments/pi05-unified-gemv/plot_comparison.py": {
       "category": "experiment",
@@ -2575,13 +2595,13 @@
     },
     "experiments/pi05-unified-gemv/reproduce.py": {
       "category": "experiment",
-      "output_bytes": 12687,
-      "output_sha256": "3f75f05dcf9ce24489b905006a9f28024f7b2b26cf70ac098a9c371567653ecc"
+      "output_bytes": 14628,
+      "output_sha256": "dc243002c18a9961bec8763f8fe72bd3d536c4ef1be1034cd2d6dc1c6f0bcfb9"
     },
     "experiments/pi05-unified-gemv/source/horizon_attention.py": {
       "category": "experiment",
-      "output_bytes": 1097,
-      "output_sha256": "607fec8a25ce302c8bbf04c13056fdb4959f78f12db5c2bd15e8a34f3f6cd08b"
+      "output_bytes": 1348,
+      "output_sha256": "6d1bedb1686dc66162d83c7b61dc8c51ee38e885c6d03ccfbb4ad0f63a5e8331"
     },
     "experiments/pi05-unified-gemv/source/horizon_attention_layout.py": {
       "category": "experiment",
@@ -2590,8 +2610,8 @@
     },
     "experiments/pi05-unified-gemv/source/horizon_attention_workload.py": {
       "category": "experiment",
-      "output_bytes": 14322,
-      "output_sha256": "8d2f50062390adcd017799a9b554b93bf5e9ec731dfc69387a5793d4f7ba5eea"
+      "output_bytes": 15876,
+      "output_sha256": "12470f03a7b92a279239d508b394ffcbce25659080a7c20862ee4c7dfb5184ec"
     },
     "experiments/pi05-unified-gemv/source/horizon_ffn.py": {
       "category": "experiment",
@@ -2600,13 +2620,28 @@
     },
     "experiments/pi05-unified-gemv/source/horizon_value.py": {
       "category": "experiment",
-      "output_bytes": 14021,
-      "output_sha256": "b1d5db8eef34ffc7d32d67c4a1ab1ccfb2dd4da9b635a4e7a6a236c28a9a6359"
+      "output_bytes": 15750,
+      "output_sha256": "c2adbf906b29492d02f4edfb0b109448665caca0a236c820447f1ce76fef3957"
+    },
+    "experiments/pi05-unified-gemv/source/pv_token_layout.py": {
+      "category": "publication",
+      "output_bytes": 7595,
+      "output_sha256": "b584c281de1b9a9820a51025c7df59abb18e0cc0183c73ced7dfa48bde48a178"
+    },
+    "experiments/pi05-unified-gemv/source/pv_token_workload.py": {
+      "category": "publication",
+      "output_bytes": 9999,
+      "output_sha256": "a32750bb4560f097a983f8dcbd97179e9ce7c8b806539def8bf9e7508fe200d9"
+    },
+    "experiments/pi05-unified-gemv/source/qkv_token_layout.py": {
+      "category": "publication",
+      "output_bytes": 3032,
+      "output_sha256": "68935e93d5fd1421e6a567bfb535877cb536c0312785c6ee6e181eaadc43e390"
     },
     "experiments/pi05-unified-gemv/source/rank_staging.py": {
       "category": "experiment",
-      "output_bytes": 5476,
-      "output_sha256": "155b368548fb6cd55e3798b4a63abfc91ebd6b2c1604def45954192b27843e4a"
+      "output_bytes": 5713,
+      "output_sha256": "addd115f5407d359c1e3c58e780936a1574aa20d3ce5f20fa104a743193bdb69"
     },
     "experiments/pi05-unified-gemv/source/v_token_layout.py": {
       "category": "publication",
@@ -2615,8 +2650,8 @@
     },
     "experiments/pi05-unified-gemv/source/workload.py": {
       "category": "experiment",
-      "output_bytes": 11822,
-      "output_sha256": "6be512428286a08fbf4b7a01524241485355776cd451925ccd2d8e0e3ddf94f3"
+      "output_bytes": 16255,
+      "output_sha256": "8cffbeaaeecd4011e91d1fd8555e325ca70e52fa9ac7836d19f9e3bd38b9a545"
     },
     "experiments/pi05-unified-gemv/validation/act2_audit.py": {
       "category": "publication",
@@ -2625,8 +2660,8 @@
     },
     "experiments/pi05-unified-gemv/validation/audit_native.py": {
       "category": "experiment",
-      "output_bytes": 34780,
-      "output_sha256": "f9b292d9f357575e9b0e80d34cf3e8eb2bcccec9a65079c21a405f21df3e46b9"
+      "output_bytes": 38837,
+      "output_sha256": "37a7228ebe127e560c7eded594d488944e05c58a7c2f05e47088822f347ffb96"
     },
     "experiments/pi05-unified-gemv/validation/dispatch_audit.py": {
       "category": "publication",
@@ -2635,18 +2670,18 @@
     },
     "experiments/pi05-unified-gemv/validation/native_guards.py": {
       "category": "experiment",
-      "output_bytes": 35184,
-      "output_sha256": "397b0560c8eca1e496410b2ce3e1a4823693b989d75d2a6c4915b37039cfa6d2"
+      "output_bytes": 43551,
+      "output_sha256": "ad40c7b6abeeb316f41f2a6cbaf18ebb4091b43bf5a31f80720bca9322c2bcbb"
     },
     "experiments/pi05-unified-gemv/validation/paired_audit.py": {
       "category": "experiment",
-      "output_bytes": 9245,
-      "output_sha256": "207cfe1c9541baea883a21dbf215512e48c480de79b2ecda22f4052140b534f9"
+      "output_bytes": 10934,
+      "output_sha256": "419034f0fb0d651242429dd826971aafc1467940a1047a1ec78458cc5b2c3e36"
     },
     "experiments/pi05-unified-gemv/validation/staging_audit.py": {
       "category": "experiment",
-      "output_bytes": 18548,
-      "output_sha256": "18fbb71d6ccfbfd72d710ff61eae39306cf444a7ebb4e10226a2e07629f2094c"
+      "output_bytes": 19872,
+      "output_sha256": "4f1ddc001d932cd62e242834ef6b4f23d15c8285bec6b3fa974861b9ee4447e1"
     },
     "experiments/pi05-unified-gemv/validation/test_act2_audit.py": {
       "category": "publication",
@@ -2678,6 +2713,11 @@
       "output_bytes": 8940,
       "output_sha256": "988a6c6dbf0f4a149ffd88eadf8579be3563f662e9690d06d95a6d2a1bbbedbe"
     },
+    "experiments/pi05-unified-gemv/validation/test_token_pv_audit.py": {
+      "category": "publication",
+      "output_bytes": 12793,
+      "output_sha256": "1a67b5f578fffbf833af687e4dd34c19e467df3fde867bf8ac8cd30f132ff49c"
+    },
     "experiments/pi05-unified-gemv/validation/test_two_bank_audit.py": {
       "category": "experiment",
       "output_bytes": 6176,
@@ -2688,6 +2728,11 @@
       "output_bytes": 7243,
       "output_sha256": "03550e2057e3d7687c29493e490782e31716376db93a30f2eb7ff9aabd6ccab4"
     },
+    "experiments/pi05-unified-gemv/validation/token_pv_audit.py": {
+      "category": "publication",
+      "output_bytes": 13363,
+      "output_sha256": "1a89eeafa5a90bec24f5f49c011fbbfc3c731fab1097f4a3a85127bb8ea63a43"
+    },
     "experiments/pi05-unified-gemv/validation/v_token_audit.py": {
       "category": "publication",
       "output_bytes": 9474,
@@ -2695,8 +2740,8 @@
     },
     "reference/CHANNEL-ANALYSIS.md": {
       "category": "reference_evidence",
-      "output_bytes": 2878,
-      "output_sha256": "e2432ec251a287a47baf7687d616b0ddca3ff912924caa6d36b037792bc346c5"
+      "output_bytes": 2802,
+      "output_sha256": "6f691da253021684017d2668ca7e255fb53940dcefe523602424fb7b2c24c001"
     },
     "reference/RANK-DISPATCH-COMPARISON.md": {
       "category": "reference_evidence",
@@ -2765,18 +2810,18 @@
     },
     "reference/chain/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 19296,
-      "output_sha256": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4"
+      "output_bytes": 22445,
+      "output_sha256": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7"
     },
     "reference/chain/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 4429,
-      "output_sha256": "0cd834828232504ed4fd1b076a6ae6b7557b1dcec3017c4ded0f7c020992bf58"
+      "output_bytes": 4683,
+      "output_sha256": "caa91b0a371e81109f60a176841e5be38f9b10a5771916649391c4ac3f1d7cde"
     },
     "reference/channel-analysis.json": {
       "category": "reference_evidence",
-      "output_bytes": 1051007,
-      "output_sha256": "68d21f4f608b0d3d8ba0615de221db164967cc99d07c05972f5eeaa3fb06a015"
+      "output_bytes": 954751,
+      "output_sha256": "a0de0e1d2d014010a65c6a5907b2c18a6e43ba4dc0bafbb5e4fe2b84d30cc036"
     },
     "reference/channel-breakdown.png": {
       "category": "reference_evidence",
@@ -2785,58 +2830,58 @@
     },
     "reference/channel-command-bus.csv": {
       "category": "reference_evidence",
-      "output_bytes": 7216,
-      "output_sha256": "65d69d9823592a1dad194d79f8ad29008f2320cf708156bfd77417bec2855eb2"
+      "output_bytes": 5786,
+      "output_sha256": "2dafa237e0486ad0cd137e177f79accd0f130501e10f39285c2dc4b2402a227f"
     },
     "reference/channel-partitions.csv": {
       "category": "reference_evidence",
-      "output_bytes": 11573,
-      "output_sha256": "1865e2e46e3783215d924e4e03cbfb9440052111052019285807f0d957d0e95e"
+      "output_bytes": 9759,
+      "output_sha256": "eef02cc2d4a4ae486b4ef429522df21eafa9cd313591a9d445247b2ec577f881"
     },
     "reference/channel-phase-kind-breakdown.csv": {
       "category": "reference_evidence",
-      "output_bytes": 31082,
-      "output_sha256": "0457883ec1b262716e5d34006d6eb3df73c0ed2be0824f9a1cf9e6cc3dc80e82"
+      "output_bytes": 24230,
+      "output_sha256": "21d59f1b72be5aac93e827ec2bd6781ba84b01cd52743ee853a5481c5332674b"
     },
     "reference/channel-phase-windows.csv": {
       "category": "reference_evidence",
-      "output_bytes": 173631,
-      "output_sha256": "130a5959bc8a581be18c2ec9790234fb2a4e9c441e3d0757334734c3808afbe9"
+      "output_bytes": 164337,
+      "output_sha256": "d18a7a6a812d061aa5f7b68c8d7ecc05c212b452f123ba252d7362466cae61ea"
     },
     "reference/combined_timing_chain/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 23657,
-      "output_sha256": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c"
+      "output_bytes": 24221,
+      "output_sha256": "ea7ecfb41e9ee376e2413685553d074abb34d2713d2ceab5025a069e5cec01b9"
     },
     "reference/combined_timing_chain/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1850,
-      "output_sha256": "534d363bc69162122e890f9eed52206cce2c81e6349f760779a68b16028a0952"
+      "output_bytes": 1903,
+      "output_sha256": "b8107e2621268d091de77d78c06efe0277c220662ab75b440c3f7df6305a539c"
     },
     "reference/down_gpu_input/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 19802,
-      "output_sha256": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e"
+      "output_bytes": 20162,
+      "output_sha256": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134"
     },
     "reference/down_gpu_input/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1588,
-      "output_sha256": "d278d89c74941ace2aa41ee9c2a3324d9528c50a0ff06388d437b034ca20cea0"
+      "output_bytes": 1641,
+      "output_sha256": "a565782c56f067e669f975c00fe612f01a82ed17f0fc1ac2f6e7254339e4c0ec"
     },
     "reference/expected.json": {
       "category": "reference_evidence",
-      "output_bytes": 539069,
-      "output_sha256": "6df043d0e102fa7e2c2b87c009e1c567a2278e191a190f37540351a73e391fa1"
+      "output_bytes": 487419,
+      "output_sha256": "c7ba5f9e362dfe4f23c768259b619c75850f14e7601f90aa72217d874149fb36"
     },
     "reference/gate_up_gpu/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 19615,
-      "output_sha256": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84"
+      "output_bytes": 19975,
+      "output_sha256": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2"
     },
     "reference/gate_up_gpu/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1591,
-      "output_sha256": "39a755faaa3bb1b21180f81fdebd43eb1e8d11c5a651a5816fca82794dff5ad1"
+      "output_bytes": 1644,
+      "output_sha256": "b51d3d4cca02b360ab8dce39dba7b15cc45ac2095d5ecaf16ed6ac31dd70ca4c"
     },
     "reference/generator-batch-validation.json": {
       "category": "reference_evidence",
@@ -3108,6 +3153,106 @@
       "output_bytes": 27950,
       "output_sha256": "2a8835a9a3915f58b226990398abf1c81f51fa42e1ea9ed2934456886201ca7f"
     },
+    "reference/previous-pv-token/README.md": {
+      "category": "reference_evidence",
+      "output_bytes": 6693,
+      "output_sha256": "0d9d2dac0f53a046265ecbcf378322ef4c12d66ef7f1a9ec6038d9ff53192082"
+    },
+    "reference/previous-pv-token/chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19296,
+      "output_sha256": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4"
+    },
+    "reference/previous-pv-token/chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 4429,
+      "output_sha256": "0cd834828232504ed4fd1b076a6ae6b7557b1dcec3017c4ded0f7c020992bf58"
+    },
+    "reference/previous-pv-token/channel-analysis.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1051007,
+      "output_sha256": "68d21f4f608b0d3d8ba0615de221db164967cc99d07c05972f5eeaa3fb06a015"
+    },
+    "reference/previous-pv-token/combined_timing_chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 23657,
+      "output_sha256": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c"
+    },
+    "reference/previous-pv-token/combined_timing_chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1850,
+      "output_sha256": "534d363bc69162122e890f9eed52206cce2c81e6349f760779a68b16028a0952"
+    },
+    "reference/previous-pv-token/down_gpu_input/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19802,
+      "output_sha256": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e"
+    },
+    "reference/previous-pv-token/down_gpu_input/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1588,
+      "output_sha256": "d278d89c74941ace2aa41ee9c2a3324d9528c50a0ff06388d437b034ca20cea0"
+    },
+    "reference/previous-pv-token/expected.json": {
+      "category": "reference_evidence",
+      "output_bytes": 539069,
+      "output_sha256": "6df043d0e102fa7e2c2b87c009e1c567a2278e191a190f37540351a73e391fa1"
+    },
+    "reference/previous-pv-token/gate_up_gpu/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19615,
+      "output_sha256": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84"
+    },
+    "reference/previous-pv-token/gate_up_gpu/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1591,
+      "output_sha256": "39a755faaa3bb1b21180f81fdebd43eb1e8d11c5a651a5816fca82794dff5ad1"
+    },
+    "reference/previous-pv-token/provenance.json": {
+      "category": "reference_evidence",
+      "output_bytes": 59854,
+      "output_sha256": "5ff63184e719dcd07f735ca762e0c8ebe7e65860d7c941134d68da14067c17bf"
+    },
+    "reference/previous-pv-token/pv/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 18907,
+      "output_sha256": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f"
+    },
+    "reference/previous-pv-token/pv/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1556,
+      "output_sha256": "da610d733dd7ae82ccfdc918a281b423758119b0ff2cf24750a4202fd7d5f965"
+    },
+    "reference/previous-pv-token/serial_layer_control/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 36624,
+      "output_sha256": "579f48aadef8c4770f73593f5bd0ab922b0184d64f32329334803437aaed1e35"
+    },
+    "reference/previous-pv-token/serial_layer_control/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5786,
+      "output_sha256": "96cadd5e421b79880ef6f05ce8806435442b41cbe916e01921ce3d5408f05a80"
+    },
+    "reference/previous-pv-token/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 39460,
+      "output_sha256": "8d74d8f460c3c282f9bb7e703cf49727d0105ded41291c7db594f60ae684bdaa"
+    },
+    "reference/previous-pv-token/v/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19626,
+      "output_sha256": "665ecb96ac863c1280fb1ad5bb0048d9ca87ed2c25e0fec037e63806022aec47"
+    },
+    "reference/previous-pv-token/v/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1618,
+      "output_sha256": "d3faf971d6e5af0c565f36cbd7e9b53241b7d3a77835106b09197094f253381b"
+    },
+    "reference/previous-pv-token/validation.json": {
+      "category": "reference_evidence",
+      "output_bytes": 42462,
+      "output_sha256": "3f965b61c6fb8f0203411d06c06d80c59bd13f0db2afed4cee47da438fa29f8a"
+    },
     "reference/previous-rank-dispatch/channel-analysis.json": {
       "category": "reference_evidence",
       "output_bytes": 1052441,
@@ -3245,23 +3390,58 @@
     },
     "reference/provenance.json": {
       "category": "reference_evidence",
-      "output_bytes": 59854,
-      "output_sha256": "5ff63184e719dcd07f735ca762e0c8ebe7e65860d7c941134d68da14067c17bf"
+      "output_bytes": 61543,
+      "output_sha256": "7a8de61c7f244024c114ff08807caf0446a4c7d48f99fe44b6e38d11cffd490f"
     },
     "reference/publish-byte-verification.json": {
       "category": "reference_evidence",
-      "output_bytes": 80931,
-      "output_sha256": "0d8d639c66213d07b2c478be99841895849898d49b556b01dedf585df7812ff4"
+      "output_bytes": 82063,
+      "output_sha256": "816fa4b1d72245a0e954532df26cb138cd7c44139c0d0d1e37ab71144f4e20bd"
+    },
+    "reference/pv-token/case-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 1071,
+      "output_sha256": "fc9a9ef6ad8fa47b4a2240b8d6efe5b4c8780619fe572998b82645df6a2f8d01"
+    },
+    "reference/pv-token/channel-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 192075,
+      "output_sha256": "079215275481417595504d17395588db4db719b7683e06f752485f0e396ad367"
+    },
+    "reference/pv-token/native-command-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 7185,
+      "output_sha256": "44d6749f837c084611ccd2671ca875ad718cafc64ed0411d64c1dc374c09803f"
+    },
+    "reference/pv-token/phase-kind-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 258704,
+      "output_sha256": "b36c3f4a80615aca0f8d378f7eb3061161afbcd9ee2bb5a7bb08e3977e66b42a"
+    },
+    "reference/pv-token/phase-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 17010,
+      "output_sha256": "feb9366d5c0cca7c29deac9de3d2e5670204c867e847c5372171970f70c3c004"
+    },
+    "reference/pv-token/pv-token-comparison.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1099308,
+      "output_sha256": "1916755a7a93e0f0343f79c71a61916f5bb8e49d0f4a078df2d46876b7ff9507"
+    },
+    "reference/pv-token/source-result-binding.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5558,
+      "output_sha256": "ed78d09c73b801d8690f3f94e56469cbe2fbd95aaa3537849184971317018afe"
     },
     "reference/pv/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 18907,
-      "output_sha256": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f"
+      "output_bytes": 21390,
+      "output_sha256": "da1b0624ef94398e462f3a04760b1255c9a8a42d325524ecb6f3ca1781065f5b"
     },
     "reference/pv/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1556,
-      "output_sha256": "da610d733dd7ae82ccfdc918a281b423758119b0ff2cf24750a4202fd7d5f965"
+      "output_bytes": 1728,
+      "output_sha256": "f5db414127acf04d39de75609d9231a72cd4aa9684e7ab062a48bd6794b51d8c"
     },
     "reference/rank-dispatch-channel-comparison.csv": {
       "category": "reference_evidence",
@@ -3290,13 +3470,13 @@
     },
     "reference/serial_layer_control/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 36624,
-      "output_sha256": "579f48aadef8c4770f73593f5bd0ab922b0184d64f32329334803437aaed1e35"
+      "output_bytes": 36308,
+      "output_sha256": "2a3bfa9219f8c9edac9de8e278e65ddb9b8fa64460fc6e19ac08d8d6fff6a064"
     },
     "reference/serial_layer_control/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 5786,
-      "output_sha256": "96cadd5e421b79880ef6f05ce8806435442b41cbe916e01921ce3d5408f05a80"
+      "output_bytes": 5809,
+      "output_sha256": "0dd04d11397584ee12d0034085142e2e1824fbb79aeee3a29eaf2325bf43acf3"
     },
     "reference/single-bank-verification.json": {
       "category": "reference_evidence",
@@ -3315,13 +3495,13 @@
     },
     "reference/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 39460,
-      "output_sha256": "8d74d8f460c3c282f9bb7e703cf49727d0105ded41291c7db594f60ae684bdaa"
+      "output_bytes": 200710,
+      "output_sha256": "b7511e116bdf4ed2ce579cf20992248d9b5e08fbddba96d492e5d202a2a6ae26"
     },
     "reference/unit-tests.log": {
       "category": "reference_evidence",
-      "output_bytes": 17321,
-      "output_sha256": "879e8ad9570a1f0729a99e7fdc3231876b677b8be7999f734bb3bb1cf8df83d5"
+      "output_bytes": 18861,
+      "output_sha256": "f982124f6165a99e76dc508c4f63a26037b4e8afbbdb4fc562a6b4d64c90a2b2"
     },
     "reference/v-token/case-latency.csv": {
       "category": "reference_evidence",
@@ -3360,18 +3540,18 @@
     },
     "reference/v/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 19626,
-      "output_sha256": "665ecb96ac863c1280fb1ad5bb0048d9ca87ed2c25e0fec037e63806022aec47"
+      "output_bytes": 21942,
+      "output_sha256": "866a86129ad3c03829f9967aa1bcfe93aa4c9df08bf7611a85a7f6ca8e27776e"
     },
     "reference/v/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1618,
-      "output_sha256": "d3faf971d6e5af0c565f36cbd7e9b53241b7d3a77835106b09197094f253381b"
+      "output_bytes": 1749,
+      "output_sha256": "f991ffd970043e6bdc8f34db3ef24e24c836158be06b3608866c8f8071183576"
     },
     "reference/validation.json": {
       "category": "reference_evidence",
-      "output_bytes": 42462,
-      "output_sha256": "3f965b61c6fb8f0203411d06c06d80c59bd13f0db2afed4cee47da438fa29f8a"
+      "output_bytes": 140463,
+      "output_sha256": "85ed11618ac286749f4943f0acd67a1815f933c4d88d0f13808f92f862b6f257"
     },
     "requirements.txt": {
       "category": "publication",
@@ -3395,8 +3575,8 @@
     },
     "verify_reference.py": {
       "category": "publication",
-      "output_bytes": 4702,
-      "output_sha256": "259b14e4ccf95fa83cb5290da073dc89efbef3fe03a98d3ebbbcf68102cda8db"
+      "output_bytes": 5679,
+      "output_sha256": "10a5e31dbed471d9a91a15e675676c38c8f3cbbb4167fce0e53d89c0ba1e8086"
     },
     "verify_single_bank.py": {
       "category": "publication",
@@ -3405,15 +3585,20 @@
     }
   },
   "staging_banks": 2,
-  "input_prefetch_slots": 2,
   "rank_descriptors": true,
   "channel_independent_dispatch": true,
   "channel_queue_capacity": 32,
   "staging_split_activation_deadline_enforced": true,
   "full_split_activation_deadline_enforced": true,
   "measured_logs_ACT1_ACT2_checks_passed": true,
-  "split_activation_audit_scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven before, seven token and seven legacy cases, all 16 channels; not verification of all DRAM physical specifications",
+  "split_activation_audit_scope": "Strict ACT1/ACT2 owner/deadline/interference checks over all measured commands in 21 fresh cases and 16 channels; not a proof of every DRAM physical specification",
   "v_token_sharding": true,
-  "V_cache_and_PV_feature_sharded": true,
-  "V_weight_copies_per_head": 2
+  "V_cache_and_PV_feature_sharded": false,
+  "V_weight_copies_per_head": 2,
+  "pv_token_sharding": true,
+  "qkv_fusion": true,
+  "physical_SRF_bytes_per_bank": 1024,
+  "shared_output_buffer_bytes_per_bank": 2048,
+  "whole_srf": true,
+  "V_cache_and_PV_token_sharded": true
 }

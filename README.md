@@ -1,88 +1,74 @@
-# xinyao_1103：V projection 按 token 分 rank
+# xinyao_1103：QKV融合、V本地写回、token分片PV
 
-五阶段总 latency **187.293274 → 183.857380 µs/层/step**。修改前后和新 backend 的旧布局控制均重新运行，共21案例；旧布局与归档23e6614逐周期、trace、native CSV和DQ分区完全一致。
+测得主路径latency **183.857380 → 171.282552 µs/层/step**。基线为810e01e；修改前、新版、新backend旧模式各重新运行7案例。GPU对PV部分结果的求和尚未计时，所报时间包含两边结果的DQ导出。
 
-## V 与 PV 的数据流
+GPU X一次性交错写入每rank两个bank，QKV共同使用每个SRF输入片段；V经本地cast、打包及读改写进入token分片cache。GPU已完成softmax的P按KV列分片并整批存入两bank，seal后再逐批读入SRF、广播、计算PV。两rank的部分结果回GPU相加。每bank独立1KiB SRF与2KiB共享FP32 output；整块SRF消费完成后才覆盖，QKV输出占1.5KiB、PV1KiB。完整布局与约束见[TOKEN-PV.md](experiments/pi05-unified-gemv/TOKEN-PV.md)。
 
-```text
-GPU X → 奇偶token分别送每head的两个rank → 各算8token×256feature的V
-    → 原有FP32输出回GPU → BF16转换、按feature重排 → 原有V cache写回
-GPU P → 同head两rank各接收完整P → 与各自128feature的V cache相乘
-    → 各自产生完整KV归约结果 → 按feature拼接，无跨rank partial-sum reduction
-```
+## Latency对照
 
-以一个 head 为例，A、B 是不同 channel 中的两个 PIM rank（均为各自 channel 的物理 rank1）：
+单位µs；attention块的“修改前”为原Q/K链与独立V之和，修改后为融合chain。新独立V仅为诊断，未重复计入总和。
 
-| 步骤 | rank A | rank B |
-|---|---|---|
-| GPU 供应 X | 偶数 token，X[8,1024] | 奇数 token，X[8,1024] |
-| V projection | X[8,1024] × Wv[1024,256] → V[8,256] | 同样计算另 8 个 token 的全部 256 个 feature |
-| GPU 重排后 V cache | 全部 KV token 的 feature 集合 A，Vcache[992,128] | 全部 KV token 的 feature 集合 B，Vcache[992,128] |
-| GPU 供应 P | 完整 P[16,992] | 相同的完整 P[16,992] |
-| PV | P × Vcache → O[16,128] | P × Vcache → O[16,128] |
-
-cache 的 feature 集合沿用旧交错布局：A 为 0–15、32–47、…、224–239，B 为 16–31、48–63、…、240–255，并非连续的前后 128 维。GPU 按原 feature 索引组合两个 PV 结果，得到 O[16,256]。992 个物理 KV 位置含 968 个已有 prefix、16 个新 token 和 8 个 padding；新 V 写入位置为 968–983。GPU 重排同时调整 rank、bank 和列地址，保留 prefix 并处理 padding。
-
-X 和 P 都先经外部 DQ 整批交错写入各 rank 的 bank0、bank4，写完成后再由 rank controller 分片读取到 SRF、广播到本 rank 的全部 16 个 bank。V 每 rank 的 X 为 16 KiB，PV 每 rank 的 P 为 31 KiB；这些输入分别装载，V 计算时的 token 归属不会限制 PV 的 query 行数。
-
-V每rank输入32→16KiB；Wv由每head两rank分片改为各自完整副本，总4→8MiB，新权重区为每bank[131072,163840)。V cache仍为[100352,116736)，PV trace完全不变。全部算子继续使用16个计算bank，SRF仍2×512B/bank；新V每slot只用8×16 BF16=256B，16个输出列全部消费后才释放。accumulator仍8×16×4=512B/bank。
-
-V MACAB条数翻倍、每条服务16→8CK，scalar MAC总数保持33554432；standalone V的nCCDAB同步16→8，其余普通DRAM时序、CA约束及ACT owner/deadline检查保留。V外部输入少256KiB，FP32导出仍128KiB，cache写回仍走原prefix-tail合并与padding路径。GPU cast/pack/reorder算术尚未计时，本模型核验映射/时序和流量，不执行BF16神经网络数值运算。
-
-## 各阶段 latency
-
-单位µs/层/denoising step，H16、batch1。
-
-| 阶段 | 修改前 | token分片后 | 变化 |
+| 阶段 | 修改前 | 修改后 | 变化 |
 |---|---:|---:|---:|
-| Q/K + RoPE + QKT | 41.886390 | 41.886390 | +0.000000 |
-| V | 20.592852 | 17.156958 | -3.435894 |
-| PV | 18.994500 | 18.994500 | +0.000000 |
+| QKV + RoPE + QKT + V 本地写回 | 59.043348 | 50.511300 | -8.532048 |
+| PV | 18.994500 | 14.951720 | -4.042780 |
 | Gate/Up | 47.127934 | 47.127934 | +0.000000 |
 | Down | 58.691598 | 58.691598 | +0.000000 |
-| **五阶段合计** | **187.293274** | **183.857380** | **-3.435894** |
+| **主路径合计** | **183.857380** | **171.282552** | **-12.574828** |
 
-单层连续控制：187.887966 → 184.809450µs；该控制不重复计入五阶段总和。下游连续运行的phase变化可能受行状态与refresh相位影响，不能解释成PV布局改变。
+单层串联控制：184.809450 → 171.960726µs；单独列示，不重复计入上述总和。逐phase值与边界余量见[phase对照](reference/pv-token/phase-latency.csv)，新stage详细值见[summary](reference/summary.json)。
 
-| V 子阶段 | 修改前 | 修改后 | 变化 |
-|---|---:|---:|---:|
-| v_gpu_input_stage | 2.502613 | 1.245693 | -1.256920 |
-| v_local_input_compute | 16.065126 | 14.092512 | -1.972614 |
-| v_gemv_release | 0.002814 | 0.002814 | +0.000000 |
-| v_result_export | 0.983024 | 0.982086 | -0.000938 |
-| v_prefix_tail_read | 0.505582 | 0.300160 | -0.205422 |
-| v_suffix_write | 0.532784 | 0.532784 | +0.000000 |
-| phase 外边界计时余量 | 0.000909 | 0.000909 | +0.000000 |
+attention 与 PV 的子阶段墙钟时间如下，等待和行切换计入所在阶段；它们不是可与 DQ/CA 忙时再次相加的独立资源开销。
 
-## DQ 空闲 breakdown
+| 路径 | 子阶段类别 | 修改前 | 修改后 | 变化 |
+|---|---|---:|---:|---:|
+| attention | dram_read | 0.300160 | 0.000000 | -0.300160 |
+| attention | dram_write | 0.532784 | 0.000000 | -0.532784 |
+| attention | 外部读出 | 8.687756 | 7.746004 | -0.941752 |
+| attention | 外部写入 | 0.481194 | 0.481194 | +0.000000 |
+| attention | gemv_release | 0.007504 | 0.006566 | -0.000938 |
+| attention | GPU 输入整批暂存 | 2.491387 | 1.245693 | -1.245693 |
+| attention | 内部补数与 MAC（含行切换等待） | 36.626086 | 29.840594 | -6.785492 |
+| attention | 本地写回 | 0.347998 | 1.704346 | +1.356348 |
+| attention | QKT 计算与归约 | 8.681190 | 8.600522 | -0.080668 |
+| attention | RoPE | 0.885472 | 0.885472 | +0.000000 |
+| attention | 阶段边界余量 | 0.001817 | 0.000909 | -0.000909 |
+| PV | 外部读出 | 0.959574 | 1.920086 | +0.960512 |
+| PV | gemv_release | 0.002814 | 0.002814 | +0.000000 |
+| PV | GPU 输入整批暂存 | 2.442581 | 1.243817 | -1.198764 |
+| PV | 内部补数与 MAC（含行切换等待） | 15.588622 | 11.784094 | -3.804528 |
+| PV | 阶段边界余量 | 0.000909 | 0.000909 | +0.000000 |
 
-下表为channel0，全部16channel独立核验；完整无传输窗口已扣除边界数据尾部。
+## DQ空闲breakdown
 
-| 阶段 | 原DQ占用 | 新DQ占用 | 原DQ空闲 | 新DQ空闲 | 新完整无传输窗口 | 新其它空闲 |
-|---|---:|---:|---:|---:|---:|---:|
-| Q/K + RoPE + QKT | 3.301760 | 3.301760 | 38.584630 | 38.584630 | 32.448234 | 6.136396 |
-| V | 3.121664 | 2.161152 | 17.471188 | 14.995806 | 14.092512 | 0.903294 |
-| PV | 2.341248 | 2.341248 | 16.653252 | 16.653252 | 15.588622 | 1.064630 |
-| Gate/Up | 3.842048 | 3.842048 | 43.285886 | 43.285886 | 40.757038 | 2.528848 |
-| Down | 7.924224 | 7.924224 | 50.767374 | 50.767374 | 47.638206 | 3.129168 |
-| **合计** | **20.530944** | **19.570432** | **166.762330** | **164.286948** | **150.524612** | **13.762336** |
+下表为channel0，全部16channel均独立审计。完整无传输窗口扣除了边界传输尾部。
 
-五阶段外部流量5472 → 5216KiB（16channel总和）。DQ与总CA同时空闲：158.591412 → 155.684550µs/channel。单层连续控制DQ空闲：167.357022 → 165.239018µs，DQ/总CA同时空闲：159.121382 → 156.575650µs。空闲是多个窗口累计，未注入并发Thor请求，不能等同已测得的可用带宽。
+| 阶段 | 原DQ空闲 | 新DQ空闲 | 新DQ占用 | 新完整无传输工作窗口 | 新其它空闲 |
+|---|---:|---:|---:|---:|---:|
+| QKV + RoPE + QKT + V 本地写回 | 53.580436 | 47.209540 | 3.301760 | 41.030934 | 6.178606 |
+| PV | 16.653252 | 13.060712 | 1.891008 | 11.784094 | 1.276618 |
+| Gate/Up | 43.285886 | 43.285886 | 3.842048 | 40.757038 | 2.528848 |
+| Down | 50.767374 | 50.767374 | 7.924224 | 47.638206 | 3.129168 |
+| **合计** | **164.286948** | **154.323512** | **16.959040** | **141.210272** | **13.113240** |
 
-[逐phase对照](reference/v-token/phase-latency.csv)、[所有channel DQ/CA对照](reference/v-token/channel-dq-comparison.csv)、[phase类别](reference/v-token/phase-kind-dq-comparison.csv)、[完整比较及ACT审计](reference/v-token/v-token-comparison.json)。
+外部DQ总量5216→4520KiB；输入X减少256KiB，V GPU导出及cache读写减少320KiB，P输入减少248KiB，PV部分结果导出增加128KiB，净减少696KiB。DQ与总CA同时空闲：155.684550 → 145.953738µs/channel。这些是多个窗口累计，未注入并发Thor请求，不等于已测得的GPU可用带宽。
 
-## 验证、备份与复现
+单层连续控制的DQ空闲：165.239018 → 155.001686µs/channel；DQ与总CA同时空闲：156.575650 → 146.599082µs/channel。
 
-原生job 1904020通过112项Python测试、43项native guards。独立映射审计覆盖32768个V输出、实际RDRES/cache包和旧cache地址；serial还检查V→PV共享SRF的阶段切换。before、token、legacy各7案例的全部16channel测量日志均通过ACT1/ACT2 owner、deadline和干扰检查；这不等同所有DRAM物理规格验证。[验证记录](reference/validation.json)、[源码和原始结果绑定](reference/v-token/source-result-binding.json)、[修改前结果](reference/previous-v-token/summary.json)。
+[全部channel对照](reference/pv-token/channel-dq-comparison.csv)、[phase类别](reference/pv-token/phase-kind-dq-comparison.csv)、[原生命令数](reference/pv-token/native-command-comparison.csv)、[完整比较](reference/pv-token/pv-token-comparison.json)。
 
-修改前Git bundle、source.zip和job1903036原始日志备份在本地`backups/xinyao_1103_before_v_token_23e6614/`，附SHA256；新原始结果保存为`results/token-1904020/`。
+## 证据与复现
+
+原生job 1904762：121项Python测试、52项native guards通过；21案例全部16channel的ACT1/ACT2 owner/deadline/干扰检查通过。独立审计核对QKV权重与输入覆盖、SRF整批生命周期、output容量、V本地RMW的prefix/suffix/padding、P分片和PV部分结果映射。旧模式逐周期、trace、流量与native CSV精确复现归档1904020；[源码—结果绑定](reference/pv-token/source-result-binding.json)、[验证](reference/validation.json)、[旧结果](reference/previous-pv-token/summary.json)。
+
+修改前完整备份位于本地`../backups/xinyao_1103_before_pv_token_810e01e/`，新raw结果位于`results/token-1904762/`（路径相对于本仓库）。全部文件绑定SHA256。
 
 ```bash
 PYTHON="$(command -v python)" JOBS=4 bash experiments/pi05-unified-gemv/build.sh
 python experiments/pi05-unified-gemv/reproduce.py --output results/fresh
 python verify_reference.py results/fresh
-python experiments/pi05-unified-gemv/reproduce.py --legacy-v-feature-sharding --output results/legacy
-python compare_v_token.py --before results/legacy --after results/fresh
+python experiments/pi05-unified-gemv/reproduce.py --legacy-pv-feature-sharding --output results/legacy
+python compare_pv_token.py --before results/legacy --after results/fresh
 ```
 
-GPU softmax、cast/packing/reorder、GeLU/multiply、O projection、norm/residual和背景VLM未计时，所报总和不是完整AE端到端latency。详细模型见[MODEL.md](experiments/pi05-unified-gemv/MODEL.md)。
+这是时序、容量和数据映射模型，未执行完整BF16神经网络数值推理。GPU softmax、PV部分和求和、其它GPU算术及后台竞争未计时；prefix按所选布局预置，初始cache迁移不计入每step时间。当前结果不是完整AE端到端latency。历史模型见[MODEL.md](experiments/pi05-unified-gemv/MODEL.md)。

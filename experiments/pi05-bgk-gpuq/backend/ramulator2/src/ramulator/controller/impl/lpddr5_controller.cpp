@@ -62,8 +62,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     bool written = false;
     Clk_t local_in_use_until = 0;
   };
-  std::vector<std::array<InputBuffer, 2>> m_inputs;
-  std::vector<std::array<InputBuffer, 2>> m_bank_inputs;
+  std::vector<std::array<InputBuffer, 4>> m_inputs;
+  std::vector<std::array<InputBuffer, 4>> m_bank_inputs;
   std::vector<Clk_t> m_bank_compute_ready;
   int m_bgs = 0, m_banks_per_bg = 0, m_mack = -1, m_macqk = -1, m_localwr = -1;
   int m_k_cycles = 2, m_qk_cycles = 20, m_bank_write_cycles = 4, m_local_recovery = 0;
@@ -105,6 +105,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "rank_staging_extension.inc"
 #include "pim_activation_extension.inc"
 #include "rank_descriptor_extension.inc"
+#include "whole_srf_extension.inc"
+#include "v_cache_extension.inc"
 
  public:
   void init() override {
@@ -185,6 +187,12 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_rank_descriptors, bool, "pim_rank_descriptors").default_val(false);
     RAMULATOR_PARSE_PARAM(m_rank_descriptor_path, std::string, "rank_descriptor_events_path").default_val("");
     init_rank_descriptors();
+    RAMULATOR_PARSE_PARAM(m_token_pv, bool, "pim_token_pv").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_qkv_fusion, bool, "pim_qkv_fusion").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_whole_srf, bool, "pim_whole_srf").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_v_cache_preinstalled, bool, "v_cache_preinstalled").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_v_cache_path, std::string, "v_cache_events_path").default_val("");
+    init_v_cache();
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -202,6 +210,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       m_staging_events<<"clock,ready_at,operation,Channel,Rank,BankGroup,Bank,Row,Column,buffer,bytes,stage_generation\n";
     }
     setup_rank_descriptors();
+    setup_v_cache();
     m_stats.add("num_pim_requests", s_pim_requests);
     m_stats.add("num_pim_completed", s_pim_completed);
     m_stats.add("pim_request_latency_cycles", s_pim_latency);
@@ -262,7 +271,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     return accepted;
   }
   bool send_impl(Request& req) {
-    if (req.pim_buffer < -1 || req.pim_buffer > 1 ||
+    if (req.pim_buffer < -1 || req.pim_buffer > (m_whole_srf?3:1) ||
         (req.pim_buffer >= 0 && req.type_id != Request::Type::PIM_WR_GB &&
          req.type_id != Request::Type::PIM_MAC_AB && req.type_id != Request::Type::PIM_LOCAL_GB &&
          req.type_id != Request::Type::PIM_WR_BG && req.type_id != Request::Type::PIM_WR_Q &&
@@ -272,6 +281,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
          req.type_id != Request::Type::PIM_Z_LOAD && req.type_id != Request::Type::PIM_GEMV_RELEASE && req.type_id != Request::Type::PIM_STAGE_LOAD && req.type_id != Request::Type::PIM_STAGE_FRAGMENT)) {
       throw std::runtime_error("PIM buffer annotation requires WRGB/MACAB and slot 0/1");
     }
+    if(req.pim_buffer>1 && req.type_id!=Request::Type::PIM_MAC_AB && req.type_id!=Request::Type::PIM_STAGE_LOAD &&
+       req.type_id!=Request::Type::PIM_STAGE_FRAGMENT && req.type_id!=Request::Type::PIM_GEMV_RELEASE)
+      throw std::runtime_error("Extended SRF views require staged eight-row input");
     // Map before admission so overlapping-bank requests can apply backpressure
     // without blocking independent reads behind a global PIM completion fence.
     m_addr_mapper->apply(req);
@@ -330,6 +342,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (m_unified_gemv && (req.type_id == Request::Type::PIM_LOCAL_GB || req.type_id == Request::Type::PIM_MAC_HB || req.type_id == Request::Type::PIM_RD_Q || req.type_id == Request::Type::PIM_WR_BG || req.type_id == Request::Type::PIM_WR_Q || req.type_id == Request::Type::PIM_MAC_K))
       throw std::runtime_error("Legacy input path is forbidden in unified GEMV mode");
     if (is_ffn_z(req)) return send_ffn_z(req);
+    if (is_v_cache_spill(req)) return send_v_cache_spill(req);
     if (is_rank_rope(req)) return send_rank_rope(req);
     if ((m_rank_rope || m_unified_gemv) && (req.type_id == Request::Type::PIM_MAC_AB || req.type_id == Request::Type::PIM_WR_GB))
       req.pim_bank_mask = ((uint64_t{1} << (m_bgs*m_banks_per_bg)) - 1) << (m_bgs*m_banks_per_bg);
@@ -492,6 +505,17 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     }
   }
 
+  void finalize() override {
+    if(m_whole_srf) {
+      if(!output_retired() || m_clk<m_output_ready)
+        throw std::runtime_error("Incomplete shared output at end of trace");
+      for(int b=16;b<32;++b) for(int slot=0;slot<4;++slot)
+        if(m_gemv_slots[b][slot].kind!=GemvSlot::Empty)
+          throw std::runtime_error("Unreleased SRF view at end of trace");
+    }
+    LPDDR5Controller::finalize();
+  }
+
   void reset_stats() override {
     LPDDR5Controller::reset_stats();
     s_pim_requests = s_pim_completed = s_pim_latency = 0;
@@ -499,6 +523,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     s_bank_local_writes = s_bgk_requests = 0;
     s_q_dram_reads = s_q_relays = 0;
     s_z_stores = s_z_loads = s_z_gather_bytes = s_z_return_bytes = s_z_load_port_bytes = 0;
+    s_v_cache_reads = s_v_cache_writes = s_v_gather_bytes = s_v_cast_bytes = 0;
   }
 
  private:
@@ -521,6 +546,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       auto& done = m_pim_pending.front();
       s_pim_completed++;
       s_pim_latency += done.depart - done.arrive;
+      output_complete(done);
       if (done.callback) done.callback(done);
       m_pim_pending.pop_front();
     }
@@ -534,6 +560,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   bool can_bypass(const Request& later, const Request& earlier, bool preparing_row) const {
     if (is_stage(later) || is_stage(earlier)) return false;
     if (is_gemv_release(later) || is_gemv_release(earlier)) return false;
+    if(is_v_cache_spill(later) || is_v_cache_spill(earlier))
+      return is_v_cache_spill(later) && is_v_cache_spill(earlier) && !(later.pim_bank_mask & earlier.pim_bank_mask);
     if (m_ffn_dram && (is_ffn_z(later) || is_ffn_z(earlier))) return z_bypass(later, earlier);
     if (m_rank_rope && (is_rank_rope(later) || is_rank_rope(earlier))) return rr_bypass(later, earlier);
     // RD_Q uses the ordinary bank scheduler before its multicast. Keep its
@@ -660,6 +688,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     // Payload issues through independent local ports; only ACT/PRE uses CA.
     if (it->command == m_localwr) return false;
     const bool actual_mac = is_bgk_mac(*it) && it->command == it->final_command;
+    if (actual_mac && !output_other_ready()) return false;
     if (!bgk_targets_ready(*it,actual_mac) || !issue_internal_array_command(it)) return false;
     if (it->command != it->final_command) return true;
     int service = is_bgk_mac(*it) ? (it->type_id == Request::Type::PIM_MAC_K ? m_k_cycles : m_qk_cycles)
@@ -842,6 +871,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
   bool issue_pim(ReqBuffer::iterator it) {
     if (is_ffn_z(*it)) return issue_ffn_z(it, false);
+    if (is_v_cache_spill(*it)) return issue_v_cache_spill(it);
     if (is_rank_rope(*it)) return issue_rank_rope(it, false);
     if (is_bgk(*it)) return issue_bgk(it);
     it->command = get_preq_command(it->final_command, it->addr_vec);
@@ -859,6 +889,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (it->command == m_macab) {
       if (!ffn_mac_ready(*it)) return false;
       if (m_unified_gemv && !gemv_mac_ready(*it)) return false;
+      if (!output_mac_ready(*it)) return false;
       for (size_t rank = 0; rank < m_inputs.size(); ++rank) {
         if (m_unified_gemv || !(it->pim_rank_mask & (1 << rank))) continue;
         const auto& input = m_inputs[rank][slot];
@@ -873,6 +904,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       if (m_clk < std::max(buffers[0].in_use_until, buffers[1].in_use_until)) return false;
     }
     if (m_unified_gemv && it->final_command==m_rdres) {
+      if(!output_export_ready(*it)) return false;
       for(int bank=16;bank<32;++bank) if(m_clk<m_bank_compute_ready[bank]) return false;
     }
     if (!check_timing(it->command, it->addr_vec)) return false;
@@ -904,12 +936,13 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         }
       }
       if (m_unified_gemv && it->final_command==m_macab) gemv_mac_issued(*it,m_clk+gemv_service(*it));
-      if (it->final_command == m_macab) ffn_mac_issued(*it);
+      if (it->final_command == m_macab) { ffn_mac_issued(*it); output_mac_issued(*it); }
       if (m_rank_rope && it->final_command == m_macab) m_projection_ready = m_clk + gemv_service(*it);
       int latency = (it->final_command == m_macab || it->final_command == m_machb) ? (m_rank_rope ? m_mac_interval : 0) :
           (it->final_command == m_wrgb ? m_pim_wr_latency : m_pim_rd_latency);
       if(m_unified_gemv) latency=it->final_command==m_macab?gemv_service(*it):it->final_command==m_wrgb?unified_ready-m_clk:std::max(m_pim_rd_latency,m_bgk_input_cycles);
       it->depart = m_clk + latency;
+      if(it->final_command==m_rdres) output_export_issued(*it);
       if (m_rank_rope) record_bgk(*it, it->depart, latency, it->final_command == m_macab ? "PIM_MAC_AB" : it->final_command == m_wrgb ? "PIM_WR_GB" : "PIM_RD_RES", -1, 16);
       auto pos = std::upper_bound(m_pim_pending.begin(), m_pim_pending.end(), it->depart,
           [](Clk_t clk, const Request& pending) { return clk < pending.depart; });

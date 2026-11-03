@@ -36,6 +36,10 @@ class MemoryConfig:
     channel_independent_dispatch: bool = False
     channel_queue_capacity: int = 32
     gemv_port_cycles: int = 2
+    pim_token_pv: bool = False
+    pim_qkv_fusion: bool = False
+    pim_whole_srf: bool = False
+    v_cache_preinstalled: bool = False
     pim_rank_rope: bool = False
     pim_horizon: int = 16
     pim_ffn_dram: bool = False
@@ -46,6 +50,17 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
+        for name in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError(f"{name} must be boolean")
+        if self.pim_whole_srf and (not self.pim_unified_gemv or not self.pim_rank_staging):
+            raise ValueError("Whole SRF requires unified GEMV and rank staging")
+        if self.pim_token_pv and not self.pim_whole_srf:
+            raise ValueError("Token PV requires whole SRF")
+        if self.pim_qkv_fusion and (not self.pim_token_pv or not self.pim_rank_rope):
+            raise ValueError("QKV fusion requires token PV and rank RoPE")
+        if self.v_cache_preinstalled and not self.pim_token_pv:
+            raise ValueError("Preinstalled token V cache requires token PV")
         if type(self.pim_rank_descriptors) is not bool or type(self.channel_independent_dispatch) is not bool:
             raise ValueError("Rank descriptor/channel dispatch flags must be boolean")
         if self.pim_rank_descriptors and (not self.pim_rank_controller or not self.pim_unified_gemv):

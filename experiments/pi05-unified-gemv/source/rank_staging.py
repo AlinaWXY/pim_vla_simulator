@@ -34,22 +34,22 @@ def fragment_metadata(fragment, rows, staging_banks=1):
         offset_bytes=offset, bytes=rows*32))
 
 
-def fragment_batches(fragments, rank_staging):
+def fragment_batches(fragments, rank_staging, views=2):
     """Use both physical SRF slots before returning source banks to weights."""
-    width = 2 if rank_staging else 1
+    width = views if rank_staging else 1
     for first in range(0, fragments, width):
         yield tuple(range(first, min(first+width, fragments)))
 
 
-def prefetch_metadata(batch, rows):
-    return dict(prefetch_batch=batch[0]//2, prefetch_fragments=list(batch),
+def prefetch_metadata(batch, rows, views=2):
+    return dict(prefetch_batch=batch[0]//views, prefetch_fragments=list(batch),
                 prefetched_bytes_per_bank=len(batch)*rows*32)
 
 
-def stage_input(writer, name, rows, fragments, staging_banks=1):
+def stage_input(writer, name, rows, fragments, staging_banks=1, views=2):
     check_staging_banks(staging_banks)
     payload = rows*fragments*32
-    if rows not in (8, 16) or not 0 < payload <= CAPACITY:
+    if rows not in (8, 16) or not 0 < payload <= CAPACITY or views not in (2,4) or views*rows*32>1024:
         raise ValueError("Invalid staged input geometry")
     if not hasattr(writer, "staging_inputs"):
         writer.staging_inputs = []
@@ -81,9 +81,10 @@ def stage_input(writer, name, rows, fragments, staging_banks=1):
                 offset_end=BASE+len(range(s, fragments, staging_banks))*rows*32,
                 bytes_per_rank=len(range(s, fragments, staging_banks))*rows*32)
                 for s in range(staging_banks)],
-            srf_fragments_per_batch=2, srf_batch_bytes_per_bank=rows*64,
-            srf_slots_per_bank=2, srf_slot_bytes=512,
-            consumption_order="load both slots, then compute both fragments in order"))
+            srf_fragments_per_batch=views, srf_batch_bytes_per_bank=rows*32*views,
+            srf_slots_per_bank=views, srf_slot_bytes=1024//views,
+            consumption_order=("load both slots, then compute both fragments in order" if views == 2 else
+                "fill all valid views of the whole 1KiB SRF batch, then consume the entire batch before overwrite")))
     writer.phase(name+"_gpu_input_stage", body, kind="input_staging",
         bytes_per_rank=payload, source_bank=0 if staging_banks == 1 else None,
         source_banks=[4*i for i in range(staging_banks)], staging_banks=staging_banks, source_base=BASE,

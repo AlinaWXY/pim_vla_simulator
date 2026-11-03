@@ -18,17 +18,30 @@ WEIGHT_INPUTS = {
     "serial_layer_control": [0, 83968, 100352, 262144, 327680],
 }
 WEIGHTS = ((0, 65536, 32), (83968, 100352, 8), (100352, 116736, 8),
-           (131072, 163840, 16),
-           (262144, 327680, 32), (327680, 360448, 4))
+           (131072, 163840, 16), (163840, 180224, 16),
+           (262144, 327680, 32), (327680, 360448, 4), (393216, 491520, 48))
 
 
-def input_geometry(case, v_token_sharding=False):
+def input_geometry(case, v_token_sharding=False, pv_token_sharding=False, qkv_fusion=False):
     """Independent per-operator geometry; never change legacy global tables."""
     inputs, weights = list(INPUTS[case]), list(WEIGHT_INPUTS[case])
     if v_token_sharding and case in ("v", "serial_layer_control"):
         index = 0 if case == "v" else 1
         inputs[index], weights[index] = (16384, 8), 131072
+    if pv_token_sharding and case in ("pv", "serial_layer_control"):
+        index = 0 if case == "pv" else 2
+        inputs[index], weights[index] = (15872, 16), 163840
+    if qkv_fusion and case in ("chain", "serial_layer_control"):
+        weights[0] = 393216
+        if case == "serial_layer_control":
+            del inputs[1]
+            del weights[1]
     return inputs, weights
+
+
+def srf_views(rows, whole_srf=False):
+    require(rows in (8, 16), "Unsupported physical input row geometry")
+    return 1024//(rows*32) if whole_srf else 2
 
 
 def require(condition, message):
@@ -99,9 +112,10 @@ def audit_write_timing(writes, timings, staging_banks=1, require_short_gap=False
         issue_gap_histogram=[dict(kind=kind, gap_ck=gap, count=count) for (kind, gap), count in sorted(gaps.items())])
 
 
-def audit_source_identity(staging, native, gemv, case, staging_banks=1, v_token_sharding=False):
+def audit_source_identity(staging, native, gemv, case, staging_banks=1, v_token_sharding=False,
+                          pv_token_sharding=False, qkv_fusion=False):
     """A correct address multiset alone cannot detect permuted input fragments."""
-    inputs, weights = input_geometry(case, v_token_sharding)
+    inputs, weights = input_geometry(case, v_token_sharding, pv_token_sharding, qkv_fusion)
     source_at_fill = {}
     for e in staging:
         if e["operation"] != "BROADCAST":
@@ -143,10 +157,11 @@ def audit_source_identity(staging, native, gemv, case, staging_banks=1, v_token_
     return checks
 
 
-def audit_staging(events, native, gemv, case, timings, staging_banks=1, v_token_sharding=False):
+def audit_staging(events, native, gemv, case, timings, staging_banks=1, v_token_sharding=False,
+                  pv_token_sharding=False, qkv_fusion=False, whole_srf=False):
     """Prove full array residency before the first bank->SRF transfer."""
     require(case in INPUTS, "Unknown staging geometry")
-    inputs, _ = input_geometry(case, v_token_sharding)
+    inputs, _ = input_geometry(case, v_token_sharding, pv_token_sharding, qkv_fusion)
     groups = defaultdict(list)
     allowed = {"BEGIN", "WR", "SEAL", "LOCALRD", "BROADCAST"}
     for event in events:
@@ -192,7 +207,7 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1, v_token_
             require(e["ready_at"] == e["clock"]+read_latency,
                     "Internal input read must charge DRAM column read latency")
             packet = source_packet(e, rows, staging_banks)
-            require(e["buffer"] == (packet//rows)%2, "Staged read targets the wrong shared slot")
+            require(e["buffer"] == (packet//rows)%srf_views(rows, whole_srf), "Staged read targets the wrong shared slot")
         for e in by_op["BROADCAST"]:
             source = read_map[source_bank(e), offset(e)]
             require(e["clock"] >= source["clock"], "Broadcast dispatch precedes its source read")
@@ -239,7 +254,8 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1, v_token_
     actual_fills = Counter((e["Channel"], e["clock"], e["buffer"], e["token_mask"], e["lane_mask"], e["bank_mask"])
                           for e in gemv if e["operation"] == "GEMV_MULTICAST")
     require(actual_fills == expected_fills, "Staged source reads do not exactly cover physical SRF multicast completions")
-    identity_checks = audit_source_identity(events, native, gemv, case, staging_banks, v_token_sharding)
+    identity_checks = audit_source_identity(events, native, gemv, case, staging_banks, v_token_sharding,
+                                            pv_token_sharding, qkv_fusion)
     result = dict(stages_checked=len(groups), source_bank=0, staging_base_row=256,
         external_input_bytes=input_bytes, internal_read_bytes=len(reads)*32,
         multicast_destination_bytes=len(broadcasts)*32*16,
@@ -251,21 +267,24 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1, v_token_
         SRAM_bytes_per_bank=1024,
         maximum_DRAM_staging_bytes_per_rank=max(size for size, _ in inputs),
         reserved_DRAM_staging_bytes_per_rank=131072)
-    if v_token_sharding and case in ("v", "serial_layer_control"):
+    if pv_token_sharding or qkv_fusion:
+        result.update(external_input_bytes_unchanged=False,
+                      external_input_matches_independent_geometry=True)
+    elif v_token_sharding and case in ("v", "serial_layer_control"):
         result.update(external_input_bytes_unchanged=False,
                       V_input_bytes_saved_vs_feature_sharding=16*16384,
                       external_input_matches_independent_geometry=True)
     if staging_banks == 2:
         result.update(source_banks=[0, 4], source_bank_groups=[0, 1], staging_banks=2,
             reserved_DRAM_staging_bytes_per_source_bank=65536,
-            maximum_DRAM_staging_bytes_per_source_bank=max(size for size, _ in inputs)//2,
+            maximum_DRAM_staging_bytes_per_source_bank=max(((size//(rows*32)+1)//2)*rows*32 for size, rows in inputs),
             source_last_reserved_row=287,
             writer=audit_write_timing(writes, timings, staging_banks, require_short_gap=True))
         result.pop("source_bank")
     return result
 
 
-def audit_rank_ca(events, native, staging, controller_events=(), records=None, gemv_events=()):
+def audit_rank_ca(events, native, staging, controller_events=(), records=None, gemv_events=(), cache_events=()):
     """Check command intervals and coverage independently on each physical bus."""
     resources = defaultdict(list)
     fine = Counter()
@@ -303,6 +322,9 @@ def audit_rank_ca(events, native, staging, controller_events=(), records=None, g
     for e in gemv_events:
         if e["operation"] == "GEMV_Q_LOCAL":
             expected[e["Channel"], e["clock"], e["Rank"], "Q_LOCAL_FILL"] += 1
+    for e in cache_events:
+        if e["operation"] in ("GATHER","CAST"):
+            expected[e["Channel"],e["clock"],e["Rank"],"V_GATHER" if e["operation"] == "GATHER" else "V_CAST"] += 1
     require(fine == expected,
             "Rank CA log must account for every native command and broadcast: "+counter_difference(expected, fine))
     coarse_count = None

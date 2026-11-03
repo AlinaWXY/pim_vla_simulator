@@ -79,8 +79,6 @@
   },
   "input_batching": {
     "input_batches_checked": 2048,
-    "slots_per_bank": 2,
-    "slot_capacity_bytes": 512,
     "physical_input_capacity_bytes_per_bank": 1024,
     "maximum_prefetched_input_bytes_per_bank": 1024,
     "both_slots_ready_before_first_MAC": true,
@@ -229,6 +227,11 @@
         "last_MAC_complete_ck": 11628,
         "input_bytes_per_bank": 1024,
         "refresh_commands_during_load": 0,
+        "view_count": 2,
+        "view_bytes": 512,
+        "source_rows": [
+          256
+        ],
         "source_banks": [
           0,
           4
@@ -246,12 +249,24 @@
         "last_MAC_complete_ck": 12001,
         "input_bytes_per_bank": 1024,
         "refresh_commands_during_load": 0,
+        "view_count": 2,
+        "view_bytes": 512,
+        "source_rows": [
+          256
+        ],
         "source_banks": [
           0,
           4
         ]
       }
-    ]
+    ],
+    "whole_SRF_bytes_per_bank": 1024,
+    "view_bytes_by_rows": {
+      "8": 256,
+      "16": 512
+    },
+    "full_batch_consumption_before_any_view_overwrite": true,
+    "all_views_ready_before_first_MAC": true
   },
   "split_activation": {
     "status": "passed",

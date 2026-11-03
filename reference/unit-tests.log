@@ -94,6 +94,15 @@ test_second_source_bank_is_rejected (test_staging_audit.StagingAuditTests.test_s
 test_source_precharge_must_respect_read_recovery (test_staging_audit.StagingAuditTests.test_source_precharge_must_respect_read_recovery) ... ok
 test_valid_full_payload_once_in_one_bank (test_staging_audit.StagingAuditTests.test_valid_full_payload_once_in_one_bank) ... ok
 test_write_cannot_omit_array_recovery_time (test_staging_audit.StagingAuditTests.test_write_cannot_omit_array_recovery_time) ... ok
+test_PV_P_ownership_and_partial_sum_reconstruct_dense_dot_product (test_token_pv_audit.TokenPVTests.test_PV_P_ownership_and_partial_sum_reconstruct_dense_dot_product) ... ok
+test_QKV_operators_and_feature_lanes_have_disjoint_complete_weight_cells (test_token_pv_audit.TokenPVTests.test_QKV_operators_and_feature_lanes_have_disjoint_complete_weight_cells) ... ok
+test_RMW_evidence_requires_dependencies_byte_masks_and_real_array_issues (test_token_pv_audit.TokenPVTests.test_RMW_evidence_requires_dependencies_byte_masks_and_real_array_issues) ... ok
+test_all_new_traces_match_independent_geometry (test_token_pv_audit.TokenPVTests.test_all_new_traces_match_independent_geometry) ... ok
+test_cache_all_tokens_and_features_match_independent_parity_addresses (test_token_pv_audit.TokenPVTests.test_cache_all_tokens_and_features_match_independent_parity_addresses) ... ok
+test_local_cache_RMW_preserves_four_prefix_and_inserts_eight_then_zeroes_four (test_token_pv_audit.TokenPVTests.test_local_cache_RMW_preserves_four_prefix_and_inserts_eight_then_zeroes_four) ... ok
+test_row_preparation_can_overlap_but_next_whole_SRF_read_cannot (test_token_pv_audit.TokenPVTests.test_row_preparation_can_overlap_but_next_whole_SRF_read_cannot) ... ok
+test_sixteen_row_operator_cannot_use_third_512B_view (test_token_pv_audit.TokenPVTests.test_sixteen_row_operator_cannot_use_third_512B_view) ... ok
+test_whole_SRF_four_views_fit_and_all_wait_before_refill (test_token_pv_audit.TokenPVTests.test_whole_SRF_four_views_fit_and_all_wait_before_refill) ... ok
 test_matching_wrong_native_and_staging_bank_still_fails_fixed_oracle (test_two_bank_audit.TwoBankAuditTests.test_matching_wrong_native_and_staging_bank_still_fails_fixed_oracle) ... ok
 test_missing_second_bank_packet_cannot_alias_first_bank_address (test_two_bank_audit.TwoBankAuditTests.test_missing_second_bank_packet_cannot_alias_first_bank_address) ... ok
 test_pair_uses_two_source_banks_at_same_row_before_weight_activation (test_two_bank_audit.TwoBankAuditTests.test_pair_uses_two_source_banks_at_same_row_before_weight_activation) ... ok
@@ -112,6 +121,6 @@ test_token_X_coverage_is_complete_without_pair_duplication (test_v_token_audit.T
 test_weight_copies_cover_every_BF16_cell_and_all_features (test_v_token_audit.TokenVTests.test_weight_copies_cover_every_BF16_cell_and_all_features) ... ok
 
 ----------------------------------------------------------------------
-Ran 112 tests in 36.966s
+Ran 121 tests in 44.017s
 
 OK

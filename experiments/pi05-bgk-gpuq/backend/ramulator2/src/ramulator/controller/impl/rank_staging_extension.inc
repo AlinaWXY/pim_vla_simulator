@@ -17,7 +17,7 @@ struct StagePayload {
   std::unordered_map<int,Clk_t> writes;
   std::unordered_map<int,int> loads;
 } m_stage;
-std::array<int,2> m_stage_slot_fragment{-1,-1},m_stage_slot_generation{0,0};
+std::array<int,4> m_stage_slot_fragment{-1,-1,-1,-1},m_stage_slot_generation{0,0,0,0};
 bool is_stage(const Request& req) const {
   return req.type_id>=Request::Type::PIM_STAGE_BEGIN && req.type_id<=Request::Type::PIM_STAGE_FRAGMENT;
 }
@@ -134,6 +134,7 @@ bool send_stage(Request& req) {
 }
 bool stage_fill_ready(const Request& req) {
   const int row=((stage_logical_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
+  if(!whole_fill_ready(req,row)) return false;
   // Distinct rows pipeline at native nCCDL. Only a new fragment waits for
   // the previous slot consumer; earlier reads of this fragment may be in flight.
   if(row==0 && !gemv_slot_idle(slot)) return false;
@@ -154,6 +155,7 @@ bool stage_fill_ready(const Request& req) {
 void stage_fill(const Request& req,Clk_t ready) {
   const int row=((stage_logical_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
   if(row==0) {
+    whole_fill_start(req);
     m_stage_slot_fragment[slot]=(stage_logical_offset(req)-m_stage.base)/(m_stage.rows*32);
     m_stage_slot_generation[slot]=m_stage.generation;
   }
@@ -174,13 +176,14 @@ bool issue_stage(ReqBuffer::iterator it) {
     if(m_stage.active) {
       if(!m_stage.sealed || m_stage.loads.size()!=static_cast<size_t>(m_stage.bytes/32))
         throw std::runtime_error("staging overwrite before full consumption");
-      for(int slot=0;slot<2;++slot) for(int bank=16;bank<32;++bank) {
+      for(int slot=0;slot<(m_whole_srf?4:2);++slot) for(int bank=16;bank<32;++bank) {
         const auto& state=m_gemv_slots[bank][slot];
         if(state.kind==GemvSlot::External && (!state.expected_columns || state.mac_columns!=state.expected_columns))
           throw std::runtime_error("staging overwrite before full consumption");
       }
     }
     if(!gemv_slot_idle(0) || !gemv_slot_idle(1)) return false;
+    whole_stage_begin(it->pim_stage_rows);
     const int generation=m_stage.generation+1;
     m_stage=StagePayload{};m_stage.active=true;m_stage.base=physical_offset;m_stage.bytes=it->pim_stage_bytes;m_stage.rows=it->pim_stage_rows;m_stage.generation=generation;
     record_stage(*it,"BEGIN",m_clk,m_clk,m_stage.bytes);enqueue_bgk_done(it,m_clk);return true;
@@ -218,8 +221,11 @@ bool issue_stage(ReqBuffer::iterator it) {
     return true;
   }
   if(m_stage.loads.count(offset)) throw std::runtime_error("duplicate staging load");
-  if(!stage_fill_ready(*it)) return false;
+  if(!m_whole_srf && !stage_fill_ready(*it)) return false;
   it->command=get_preq_command(m_localrd,it->addr_vec);
+  // MAC weights are latched at issue: legal PRE/ACT can prepare the source
+  // row during the PE tail. Only the data read must wait for the entire SRF.
+  if(m_whole_srf && it->command==m_localrd && !stage_fill_ready(*it)) return false;
   if(!issue_internal_array_command(it)) return false;
   if(it->command!=m_localrd) return true;
   it->depart=m_clk+m_device.m_spec->get_timing_value("nCL")+m_bgk_input_cycles;
@@ -230,6 +236,8 @@ bool issue_stage(ReqBuffer::iterator it) {
 void stage_mac_identity(const Request& req) const {
   if(!m_rank_staging) return;
   const int slot=req.pim_buffer,offset=gemv_offset(req);
+  if(m_whole_srf && (m_stage.rows<=0 || slot<0 || slot>=1024/(m_stage.rows*32)))
+    throw std::runtime_error("SRF view exceeds physical 1KiB capacity");
   if(slot<0 || m_stage_slot_generation[slot]!=m_stage.generation)
     throw std::runtime_error("staging source/weight fragment mismatch");
   const int fragment=(offset-gemv_weight_base(req))/(gemv_columns(req)*32);

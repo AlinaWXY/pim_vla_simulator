@@ -16,20 +16,24 @@ def configure(horizon):
     L.configure(horizon)
 
 
-def layout_for(horizon):
+def layout_for(horizon, qkv_fusion=False):
     previous = L.QUERIES
     try:
         configure(horizon)
-        return deepcopy(L.manifest())
+        result = deepcopy(L.manifest())
+        if qkv_fusion:
+            from qkv_token_layout import layout
+            result = layout(result)
+        return result
     finally:
         configure(previous)
 
 
-def generate(path, horizon=None, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False):
+def generate(path, horizon=None, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False, qkv_fusion=False, whole_srf=False):
     if horizon is not None:
         configure(horizon)
-    result = W.generate(path, case=case, schedule=schedule, rank_staging=rank_staging, staging_banks=staging_banks, rank_descriptors=rank_descriptors)
-    result["layout"] = layout_for(L.QUERIES)
+    result = W.generate(path, case=case, schedule=schedule, rank_staging=rank_staging, staging_banks=staging_banks, rank_descriptors=rank_descriptors, qkv_fusion=qkv_fusion, whole_srf=whole_srf)
+    result["layout"] = layout_for(L.QUERIES, qkv_fusion=qkv_fusion)
     if rank_staging:
         from rank_staging import reservation
         result["layout"]["input_staging"] = reservation(staging_banks)
