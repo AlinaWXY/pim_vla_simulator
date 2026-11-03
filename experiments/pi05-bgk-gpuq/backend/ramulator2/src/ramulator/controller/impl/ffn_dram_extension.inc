@@ -193,8 +193,7 @@ bool issue_ffn_z(ReqBuffer::iterator it, bool local) {
   const bool final=it->command==it->final_command;
   if (local!=final || !check_timing(it->command,it->addr_vec)) return false;
   if (final && !store && !prepare_z_batch(*it)) return false;
-  m_device.issue_command(it->command,it->addr_vec,m_clk);
-  rr_notify_command(*it);
+  if (!issue_internal_array_command(it)) return false;
   if (!final) return true;
   if (store) {
     const int service=m_bank_write_cycles+m_local_recovery;

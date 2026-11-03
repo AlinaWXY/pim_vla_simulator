@@ -1,0 +1,3761 @@
+{
+  "status": "passed",
+  "title": "LOCALWR spill scheduling: baseline a987650 versus corrected run",
+  "units": "DRAM CK; absolute command clocks; half-open CA intervals; phase boundaries retain fractional CK",
+  "before": {
+    "case_directory": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1103\\results\\before-1903036\\chain",
+    "channel": 0,
+    "frontend_ratio": 32,
+    "tCK_ns": 0.938,
+    "timings_ck": {
+      "nAAD": 8,
+      "nRP": 20,
+      "nRCDWR": 9
+    },
+    "memory_cycles": 44744,
+    "latency_us": 41.969872,
+    "phase_order": [
+      "projection_gpu_input_stage",
+      "projection_local_input_compute",
+      "projection_local_spill",
+      "projection_gemv_release",
+      "rope_local",
+      "q_export_to_gpu",
+      "q_remote_buffer_fill",
+      "qk_tile_0_compute",
+      "qk_tile_0_export",
+      "qk_tile_1_compute",
+      "qk_tile_1_export",
+      "qk_tile_2_compute",
+      "qk_tile_2_export",
+      "qk_tile_3_compute",
+      "qk_tile_3_export",
+      "qk_tile_4_compute",
+      "qk_tile_4_export",
+      "qk_tile_5_compute",
+      "qk_tile_5_export",
+      "qk_tile_6_compute",
+      "qk_tile_6_export",
+      "qk_tile_7_compute",
+      "qk_tile_7_export",
+      "qk_tile_8_compute",
+      "qk_tile_8_export",
+      "qk_tile_9_compute",
+      "qk_tile_9_export",
+      "qk_tile_10_compute",
+      "qk_tile_10_export",
+      "qk_tile_11_compute",
+      "qk_tile_11_export",
+      "qk_tile_12_compute",
+      "qk_tile_12_export",
+      "qk_tile_13_compute",
+      "qk_tile_13_export",
+      "qk_tile_14_compute",
+      "qk_tile_14_export",
+      "qk_tile_15_compute",
+      "qk_tile_15_export",
+      "qk_tile_16_compute",
+      "qk_tile_16_export",
+      "qk_tile_17_compute",
+      "qk_tile_17_export",
+      "qk_tile_18_compute",
+      "qk_tile_18_export",
+      "qk_tile_19_compute",
+      "qk_tile_19_export",
+      "qk_tile_20_compute",
+      "qk_tile_20_export",
+      "qk_tile_21_compute",
+      "qk_tile_21_export",
+      "qk_tile_22_compute",
+      "qk_tile_22_export",
+      "qk_tile_23_compute",
+      "qk_tile_23_export",
+      "qk_tile_24_compute",
+      "qk_tile_24_export",
+      "qk_tile_25_compute",
+      "qk_tile_25_export",
+      "qk_tile_26_compute",
+      "qk_tile_26_export",
+      "qk_tile_27_compute",
+      "qk_tile_27_export",
+      "qk_tile_28_compute",
+      "qk_tile_28_export",
+      "qk_tile_29_compute",
+      "qk_tile_29_export",
+      "qk_tile_30_compute",
+      "qk_tile_30_export",
+      "qk_gemv_release"
+    ],
+    "phases": {
+      "projection_gpu_input_stage": {
+        "begin_tick": 1,
+        "end_tick": 42498,
+        "duration_ck": 1328.03125
+      },
+      "projection_local_input_compute": {
+        "begin_tick": 42498,
+        "end_tick": 811234,
+        "duration_ck": 24023.0
+      },
+      "projection_local_spill": {
+        "begin_tick": 811234,
+        "end_tick": 824386,
+        "duration_ck": 411.0
+      },
+      "projection_gemv_release": {
+        "begin_tick": 824386,
+        "end_tick": 824482,
+        "duration_ck": 3.0
+      },
+      "rope_local": {
+        "begin_tick": 824482,
+        "end_tick": 854690,
+        "duration_ck": 944.0
+      },
+      "q_export_to_gpu": {
+        "begin_tick": 854690,
+        "end_tick": 992162,
+        "duration_ck": 4296.0
+      },
+      "q_remote_buffer_fill": {
+        "begin_tick": 992162,
+        "end_tick": 1008578,
+        "duration_ck": 513.0
+      },
+      "qk_tile_0_compute": {
+        "begin_tick": 1008578,
+        "end_tick": 1018306,
+        "duration_ck": 304.0
+      },
+      "qk_tile_0_export": {
+        "begin_tick": 1018306,
+        "end_tick": 1022370,
+        "duration_ck": 127.0
+      },
+      "qk_tile_1_compute": {
+        "begin_tick": 1022370,
+        "end_tick": 1030722,
+        "duration_ck": 261.0
+      },
+      "qk_tile_1_export": {
+        "begin_tick": 1030722,
+        "end_tick": 1034786,
+        "duration_ck": 127.0
+      },
+      "qk_tile_2_compute": {
+        "begin_tick": 1034786,
+        "end_tick": 1043138,
+        "duration_ck": 261.0
+      },
+      "qk_tile_2_export": {
+        "begin_tick": 1043138,
+        "end_tick": 1047202,
+        "duration_ck": 127.0
+      },
+      "qk_tile_3_compute": {
+        "begin_tick": 1047202,
+        "end_tick": 1055554,
+        "duration_ck": 261.0
+      },
+      "qk_tile_3_export": {
+        "begin_tick": 1055554,
+        "end_tick": 1059618,
+        "duration_ck": 127.0
+      },
+      "qk_tile_4_compute": {
+        "begin_tick": 1059618,
+        "end_tick": 1077730,
+        "duration_ck": 566.0
+      },
+      "qk_tile_4_export": {
+        "begin_tick": 1077730,
+        "end_tick": 1081794,
+        "duration_ck": 127.0
+      },
+      "qk_tile_5_compute": {
+        "begin_tick": 1081794,
+        "end_tick": 1090146,
+        "duration_ck": 261.0
+      },
+      "qk_tile_5_export": {
+        "begin_tick": 1090146,
+        "end_tick": 1094210,
+        "duration_ck": 127.0
+      },
+      "qk_tile_6_compute": {
+        "begin_tick": 1094210,
+        "end_tick": 1102562,
+        "duration_ck": 261.0
+      },
+      "qk_tile_6_export": {
+        "begin_tick": 1102562,
+        "end_tick": 1106626,
+        "duration_ck": 127.0
+      },
+      "qk_tile_7_compute": {
+        "begin_tick": 1106626,
+        "end_tick": 1114978,
+        "duration_ck": 261.0
+      },
+      "qk_tile_7_export": {
+        "begin_tick": 1114978,
+        "end_tick": 1119042,
+        "duration_ck": 127.0
+      },
+      "qk_tile_8_compute": {
+        "begin_tick": 1119042,
+        "end_tick": 1128770,
+        "duration_ck": 304.0
+      },
+      "qk_tile_8_export": {
+        "begin_tick": 1128770,
+        "end_tick": 1132834,
+        "duration_ck": 127.0
+      },
+      "qk_tile_9_compute": {
+        "begin_tick": 1132834,
+        "end_tick": 1141186,
+        "duration_ck": 261.0
+      },
+      "qk_tile_9_export": {
+        "begin_tick": 1141186,
+        "end_tick": 1145250,
+        "duration_ck": 127.0
+      },
+      "qk_tile_10_compute": {
+        "begin_tick": 1145250,
+        "end_tick": 1153602,
+        "duration_ck": 261.0
+      },
+      "qk_tile_10_export": {
+        "begin_tick": 1153602,
+        "end_tick": 1157666,
+        "duration_ck": 127.0
+      },
+      "qk_tile_11_compute": {
+        "begin_tick": 1157666,
+        "end_tick": 1166018,
+        "duration_ck": 261.0
+      },
+      "qk_tile_11_export": {
+        "begin_tick": 1166018,
+        "end_tick": 1170082,
+        "duration_ck": 127.0
+      },
+      "qk_tile_12_compute": {
+        "begin_tick": 1170082,
+        "end_tick": 1179810,
+        "duration_ck": 304.0
+      },
+      "qk_tile_12_export": {
+        "begin_tick": 1179810,
+        "end_tick": 1183874,
+        "duration_ck": 127.0
+      },
+      "qk_tile_13_compute": {
+        "begin_tick": 1183874,
+        "end_tick": 1192226,
+        "duration_ck": 261.0
+      },
+      "qk_tile_13_export": {
+        "begin_tick": 1192226,
+        "end_tick": 1196290,
+        "duration_ck": 127.0
+      },
+      "qk_tile_14_compute": {
+        "begin_tick": 1196290,
+        "end_tick": 1213026,
+        "duration_ck": 523.0
+      },
+      "qk_tile_14_export": {
+        "begin_tick": 1213026,
+        "end_tick": 1217090,
+        "duration_ck": 127.0
+      },
+      "qk_tile_15_compute": {
+        "begin_tick": 1217090,
+        "end_tick": 1225442,
+        "duration_ck": 261.0
+      },
+      "qk_tile_15_export": {
+        "begin_tick": 1225442,
+        "end_tick": 1229506,
+        "duration_ck": 127.0
+      },
+      "qk_tile_16_compute": {
+        "begin_tick": 1229506,
+        "end_tick": 1239234,
+        "duration_ck": 304.0
+      },
+      "qk_tile_16_export": {
+        "begin_tick": 1239234,
+        "end_tick": 1243298,
+        "duration_ck": 127.0
+      },
+      "qk_tile_17_compute": {
+        "begin_tick": 1243298,
+        "end_tick": 1251650,
+        "duration_ck": 261.0
+      },
+      "qk_tile_17_export": {
+        "begin_tick": 1251650,
+        "end_tick": 1255714,
+        "duration_ck": 127.0
+      },
+      "qk_tile_18_compute": {
+        "begin_tick": 1255714,
+        "end_tick": 1264066,
+        "duration_ck": 261.0
+      },
+      "qk_tile_18_export": {
+        "begin_tick": 1264066,
+        "end_tick": 1268130,
+        "duration_ck": 127.0
+      },
+      "qk_tile_19_compute": {
+        "begin_tick": 1268130,
+        "end_tick": 1276482,
+        "duration_ck": 261.0
+      },
+      "qk_tile_19_export": {
+        "begin_tick": 1276482,
+        "end_tick": 1280546,
+        "duration_ck": 127.0
+      },
+      "qk_tile_20_compute": {
+        "begin_tick": 1280546,
+        "end_tick": 1290274,
+        "duration_ck": 304.0
+      },
+      "qk_tile_20_export": {
+        "begin_tick": 1290274,
+        "end_tick": 1294338,
+        "duration_ck": 127.0
+      },
+      "qk_tile_21_compute": {
+        "begin_tick": 1294338,
+        "end_tick": 1302690,
+        "duration_ck": 261.0
+      },
+      "qk_tile_21_export": {
+        "begin_tick": 1302690,
+        "end_tick": 1306754,
+        "duration_ck": 127.0
+      },
+      "qk_tile_22_compute": {
+        "begin_tick": 1306754,
+        "end_tick": 1315106,
+        "duration_ck": 261.0
+      },
+      "qk_tile_22_export": {
+        "begin_tick": 1315106,
+        "end_tick": 1319170,
+        "duration_ck": 127.0
+      },
+      "qk_tile_23_compute": {
+        "begin_tick": 1319170,
+        "end_tick": 1327522,
+        "duration_ck": 261.0
+      },
+      "qk_tile_23_export": {
+        "begin_tick": 1327522,
+        "end_tick": 1331586,
+        "duration_ck": 127.0
+      },
+      "qk_tile_24_compute": {
+        "begin_tick": 1331586,
+        "end_tick": 1350658,
+        "duration_ck": 596.0
+      },
+      "qk_tile_24_export": {
+        "begin_tick": 1350658,
+        "end_tick": 1354722,
+        "duration_ck": 127.0
+      },
+      "qk_tile_25_compute": {
+        "begin_tick": 1354722,
+        "end_tick": 1363074,
+        "duration_ck": 261.0
+      },
+      "qk_tile_25_export": {
+        "begin_tick": 1363074,
+        "end_tick": 1367138,
+        "duration_ck": 127.0
+      },
+      "qk_tile_26_compute": {
+        "begin_tick": 1367138,
+        "end_tick": 1375490,
+        "duration_ck": 261.0
+      },
+      "qk_tile_26_export": {
+        "begin_tick": 1375490,
+        "end_tick": 1379554,
+        "duration_ck": 127.0
+      },
+      "qk_tile_27_compute": {
+        "begin_tick": 1379554,
+        "end_tick": 1387906,
+        "duration_ck": 261.0
+      },
+      "qk_tile_27_export": {
+        "begin_tick": 1387906,
+        "end_tick": 1391970,
+        "duration_ck": 127.0
+      },
+      "qk_tile_28_compute": {
+        "begin_tick": 1391970,
+        "end_tick": 1401698,
+        "duration_ck": 304.0
+      },
+      "qk_tile_28_export": {
+        "begin_tick": 1401698,
+        "end_tick": 1405762,
+        "duration_ck": 127.0
+      },
+      "qk_tile_29_compute": {
+        "begin_tick": 1405762,
+        "end_tick": 1414114,
+        "duration_ck": 261.0
+      },
+      "qk_tile_29_export": {
+        "begin_tick": 1414114,
+        "end_tick": 1418178,
+        "duration_ck": 127.0
+      },
+      "qk_tile_30_compute": {
+        "begin_tick": 1418178,
+        "end_tick": 1427650,
+        "duration_ck": 296.0
+      },
+      "qk_tile_30_export": {
+        "begin_tick": 1427650,
+        "end_tick": 1431714,
+        "duration_ck": 127.0
+      },
+      "qk_gemv_release": {
+        "begin_tick": 1431714,
+        "end_tick": 1431778,
+        "duration_ck": 2.0
+      }
+    },
+    "boundary_ck": 0.96875,
+    "spill_command_counts": {
+      "PREpb": 16,
+      "ACT1": 16,
+      "ACT2": 16,
+      "LOCALWR": 256
+    },
+    "native_command_counts": {
+      "ACT1": 1696,
+      "ACT2": 1696,
+      "PREpb": 1360,
+      "PREab": 800,
+      "CAS_RD": 0,
+      "CAS_WR": 0,
+      "RD": 2048,
+      "WR": 8192,
+      "RDA": 0,
+      "WRA": 0,
+      "REFab": 320,
+      "REFpb": 0,
+      "ACTAB": 752,
+      "MACAB": 32768,
+      "WRGB": 2048,
+      "RDRES": 15872,
+      "ACTHB": 0,
+      "MACHB": 0,
+      "PREHB": 0,
+      "MACK": 0,
+      "MACQK": 7936,
+      "LOCALWR": 8192,
+      "LOCALRD": 14336
+    },
+    "trace_sha256": "c7a55c2c2a5ff42c518c8a12a0d5c9c9619707bf58825e7e155b0f56b416d3cb",
+    "spill_banks": [
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25353,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25354,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25373,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25382,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25638,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25355,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25356,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25377,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25386,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25639,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25357,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25358,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25381,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25390,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25640,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25359,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25360,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25385,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25394,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25641,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25361,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25370,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25389,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25398,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25642,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25363,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25372,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25393,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25402,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25643,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25365,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25374,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25397,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25406,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25644,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25367,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25376,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25401,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25410,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25645,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25369,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25388,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25405,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25414,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25646,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25371,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25392,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25409,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25418,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25647,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25375,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25396,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25413,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25422,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25648,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25378,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25400,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25443,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25452,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25649,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25380,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25404,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25447,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25456,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25650,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25383,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25408,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25451,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25460,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25651,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25412,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25444,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25455,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25464,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25652,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25445,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25446,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25653,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25662,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25722,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      }
+    ],
+    "activation_pairs": [
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25354,
+        "ACT2_ck": 25373,
+        "gap_ck": 19,
+        "deadline_ck": 25362,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25356,
+        "ACT2_ck": 25377,
+        "gap_ck": 21,
+        "deadline_ck": 25364,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25358,
+        "ACT2_ck": 25381,
+        "gap_ck": 23,
+        "deadline_ck": 25366,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25360,
+        "ACT2_ck": 25385,
+        "gap_ck": 25,
+        "deadline_ck": 25368,
+        "other_bank_LOCALWR_ca_ck": 1,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25382,
+          "end_ck_exclusive": 25383,
+          "command_count": 1,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            }
+          ],
+          "duration_ck": 1
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25370,
+        "ACT2_ck": 25389,
+        "gap_ck": 19,
+        "deadline_ck": 25378,
+        "other_bank_LOCALWR_ca_ck": 3,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25386,
+          "end_ck_exclusive": 25388,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25372,
+        "ACT2_ck": 25393,
+        "gap_ck": 21,
+        "deadline_ck": 25380,
+        "other_bank_LOCALWR_ca_ck": 5,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25386,
+          "end_ck_exclusive": 25388,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25374,
+        "ACT2_ck": 25397,
+        "gap_ck": 23,
+        "deadline_ck": 25382,
+        "other_bank_LOCALWR_ca_ck": 7,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25386,
+          "end_ck_exclusive": 25388,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25376,
+        "ACT2_ck": 25401,
+        "gap_ck": 25,
+        "deadline_ck": 25384,
+        "other_bank_LOCALWR_ca_ck": 9,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25386,
+          "end_ck_exclusive": 25388,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25388,
+        "ACT2_ck": 25405,
+        "gap_ck": 17,
+        "deadline_ck": 25396,
+        "other_bank_LOCALWR_ca_ck": 8,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25390,
+          "end_ck_exclusive": 25392,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 2
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25392,
+        "ACT2_ck": 25409,
+        "gap_ck": 17,
+        "deadline_ck": 25400,
+        "other_bank_LOCALWR_ca_ck": 8,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25394,
+          "end_ck_exclusive": 25396,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 3
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25396,
+        "ACT2_ck": 25413,
+        "gap_ck": 17,
+        "deadline_ck": 25404,
+        "other_bank_LOCALWR_ca_ck": 8,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25398,
+          "end_ck_exclusive": 25400,
+          "command_count": 2,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 0
+            }
+          ],
+          "duration_ck": 2
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25400,
+        "ACT2_ck": 25443,
+        "gap_ck": 43,
+        "deadline_ck": 25408,
+        "other_bank_LOCALWR_ca_ck": 35,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25414,
+          "end_ck_exclusive": 25443,
+          "command_count": 29,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 2
+            }
+          ],
+          "duration_ck": 29
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25404,
+        "ACT2_ck": 25447,
+        "gap_ck": 43,
+        "deadline_ck": 25412,
+        "other_bank_LOCALWR_ca_ck": 33,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25414,
+          "end_ck_exclusive": 25443,
+          "command_count": 29,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 2
+            }
+          ],
+          "duration_ck": 29
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25408,
+        "ACT2_ck": 25451,
+        "gap_ck": 43,
+        "deadline_ck": 25416,
+        "other_bank_LOCALWR_ca_ck": 31,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25414,
+          "end_ck_exclusive": 25443,
+          "command_count": 29,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 2
+            }
+          ],
+          "duration_ck": 29
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25444,
+        "ACT2_ck": 25455,
+        "gap_ck": 11,
+        "deadline_ck": 25452,
+        "other_bank_LOCALWR_ca_ck": 1,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25452,
+          "end_ck_exclusive": 25453,
+          "command_count": 1,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 3
+            }
+          ],
+          "duration_ck": 1
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25446,
+        "ACT2_ck": 25653,
+        "gap_ck": 207,
+        "deadline_ck": 25454,
+        "other_bank_LOCALWR_ca_ck": 196,
+        "longest_continuous_other_bank_LOCALWR_ca": {
+          "begin_ck": 25460,
+          "end_ck_exclusive": 25653,
+          "command_count": 193,
+          "source_banks": [
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 0,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 1,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 2
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 2,
+              "Bank": 3
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 3,
+              "Bank": 0
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 3,
+              "Bank": 1
+            },
+            {
+              "Rank": 1,
+              "BankGroup": 3,
+              "Bank": 2
+            }
+          ],
+          "duration_ck": 193
+        }
+      }
+    ],
+    "longest_pending_other_bank_LOCALWR_ca": {
+      "Rank": 1,
+      "BankGroup": 3,
+      "Bank": 3,
+      "Row": 40,
+      "ACT1_ck": 25446,
+      "ACT2_ck": 25653,
+      "gap_ck": 207,
+      "deadline_ck": 25454,
+      "other_bank_LOCALWR_ca_ck": 196,
+      "longest_continuous_other_bank_LOCALWR_ca": {
+        "begin_ck": 25460,
+        "end_ck_exclusive": 25653,
+        "command_count": 193,
+        "source_banks": [
+          {
+            "Rank": 1,
+            "BankGroup": 0,
+            "Bank": 0
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 0,
+            "Bank": 1
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 0,
+            "Bank": 2
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 0,
+            "Bank": 3
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 1,
+            "Bank": 0
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 1,
+            "Bank": 1
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 1,
+            "Bank": 2
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 1,
+            "Bank": 3
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 2,
+            "Bank": 0
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 2,
+            "Bank": 1
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 2,
+            "Bank": 2
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 2,
+            "Bank": 3
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 3,
+            "Bank": 0
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 3,
+            "Bank": 1
+          },
+          {
+            "Rank": 1,
+            "BankGroup": 3,
+            "Bank": 2
+          }
+        ],
+        "duration_ck": 193
+      }
+    },
+    "source_sha256": {
+      "summary.json": "2796c7799e61c21bcc80d5a08c06fbc2d7b9cf1c6bcdd56bcf80f60749b1a478",
+      "manifest.json": "44ae2b844e997433d6f69d36b4a8ead9c61e97bc7976a5a4337348d39b327e0f",
+      "simulation\\result.json": "6ac4a20158858f207a07e43425e74d709db5ca9caeef032756a14884a02d704f",
+      "simulation\\barriers.csv": "caf5c04f3c45d5d546e07d3c574ff4b207fc327b5ce0194ff528c61868bc78fc",
+      "simulation\\timeline.csv.ch0": "170493697bc7e5088f6f92f8d804f28b222dfbcbf17ea8350d3a8931cfc8a2aa",
+      "simulation\\rank_ca_events.csv.ch0": "4a9cc3746b5dcacbdfcfce6fb0a5c20801c807691e60e6377bbf6d38165043b6"
+    }
+  },
+  "after": {
+    "case_directory": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1103\\results\\corrected-1903036\\chain",
+    "channel": 0,
+    "frontend_ratio": 32,
+    "tCK_ns": 0.938,
+    "timings_ck": {
+      "nAAD": 8,
+      "nRP": 20,
+      "nRCDWR": 9
+    },
+    "memory_cycles": 44655,
+    "latency_us": 41.88639,
+    "phase_order": [
+      "projection_gpu_input_stage",
+      "projection_local_input_compute",
+      "projection_local_spill",
+      "projection_gemv_release",
+      "rope_local",
+      "q_export_to_gpu",
+      "q_remote_buffer_fill",
+      "qk_tile_0_compute",
+      "qk_tile_0_export",
+      "qk_tile_1_compute",
+      "qk_tile_1_export",
+      "qk_tile_2_compute",
+      "qk_tile_2_export",
+      "qk_tile_3_compute",
+      "qk_tile_3_export",
+      "qk_tile_4_compute",
+      "qk_tile_4_export",
+      "qk_tile_5_compute",
+      "qk_tile_5_export",
+      "qk_tile_6_compute",
+      "qk_tile_6_export",
+      "qk_tile_7_compute",
+      "qk_tile_7_export",
+      "qk_tile_8_compute",
+      "qk_tile_8_export",
+      "qk_tile_9_compute",
+      "qk_tile_9_export",
+      "qk_tile_10_compute",
+      "qk_tile_10_export",
+      "qk_tile_11_compute",
+      "qk_tile_11_export",
+      "qk_tile_12_compute",
+      "qk_tile_12_export",
+      "qk_tile_13_compute",
+      "qk_tile_13_export",
+      "qk_tile_14_compute",
+      "qk_tile_14_export",
+      "qk_tile_15_compute",
+      "qk_tile_15_export",
+      "qk_tile_16_compute",
+      "qk_tile_16_export",
+      "qk_tile_17_compute",
+      "qk_tile_17_export",
+      "qk_tile_18_compute",
+      "qk_tile_18_export",
+      "qk_tile_19_compute",
+      "qk_tile_19_export",
+      "qk_tile_20_compute",
+      "qk_tile_20_export",
+      "qk_tile_21_compute",
+      "qk_tile_21_export",
+      "qk_tile_22_compute",
+      "qk_tile_22_export",
+      "qk_tile_23_compute",
+      "qk_tile_23_export",
+      "qk_tile_24_compute",
+      "qk_tile_24_export",
+      "qk_tile_25_compute",
+      "qk_tile_25_export",
+      "qk_tile_26_compute",
+      "qk_tile_26_export",
+      "qk_tile_27_compute",
+      "qk_tile_27_export",
+      "qk_tile_28_compute",
+      "qk_tile_28_export",
+      "qk_tile_29_compute",
+      "qk_tile_29_export",
+      "qk_tile_30_compute",
+      "qk_tile_30_export",
+      "qk_gemv_release"
+    ],
+    "phases": {
+      "projection_gpu_input_stage": {
+        "begin_tick": 1,
+        "end_tick": 42498,
+        "duration_ck": 1328.03125
+      },
+      "projection_local_input_compute": {
+        "begin_tick": 42498,
+        "end_tick": 811234,
+        "duration_ck": 24023.0
+      },
+      "projection_local_spill": {
+        "begin_tick": 811234,
+        "end_tick": 823106,
+        "duration_ck": 371.0
+      },
+      "projection_gemv_release": {
+        "begin_tick": 823106,
+        "end_tick": 823202,
+        "duration_ck": 3.0
+      },
+      "rope_local": {
+        "begin_tick": 823202,
+        "end_tick": 853410,
+        "duration_ck": 944.0
+      },
+      "q_export_to_gpu": {
+        "begin_tick": 853410,
+        "end_tick": 990306,
+        "duration_ck": 4278.0
+      },
+      "q_remote_buffer_fill": {
+        "begin_tick": 990306,
+        "end_tick": 1006722,
+        "duration_ck": 513.0
+      },
+      "qk_tile_0_compute": {
+        "begin_tick": 1006722,
+        "end_tick": 1016450,
+        "duration_ck": 304.0
+      },
+      "qk_tile_0_export": {
+        "begin_tick": 1016450,
+        "end_tick": 1020514,
+        "duration_ck": 127.0
+      },
+      "qk_tile_1_compute": {
+        "begin_tick": 1020514,
+        "end_tick": 1028866,
+        "duration_ck": 261.0
+      },
+      "qk_tile_1_export": {
+        "begin_tick": 1028866,
+        "end_tick": 1032930,
+        "duration_ck": 127.0
+      },
+      "qk_tile_2_compute": {
+        "begin_tick": 1032930,
+        "end_tick": 1041282,
+        "duration_ck": 261.0
+      },
+      "qk_tile_2_export": {
+        "begin_tick": 1041282,
+        "end_tick": 1045346,
+        "duration_ck": 127.0
+      },
+      "qk_tile_3_compute": {
+        "begin_tick": 1045346,
+        "end_tick": 1053698,
+        "duration_ck": 261.0
+      },
+      "qk_tile_3_export": {
+        "begin_tick": 1053698,
+        "end_tick": 1057762,
+        "duration_ck": 127.0
+      },
+      "qk_tile_4_compute": {
+        "begin_tick": 1057762,
+        "end_tick": 1075778,
+        "duration_ck": 563.0
+      },
+      "qk_tile_4_export": {
+        "begin_tick": 1075778,
+        "end_tick": 1079842,
+        "duration_ck": 127.0
+      },
+      "qk_tile_5_compute": {
+        "begin_tick": 1079842,
+        "end_tick": 1088194,
+        "duration_ck": 261.0
+      },
+      "qk_tile_5_export": {
+        "begin_tick": 1088194,
+        "end_tick": 1092258,
+        "duration_ck": 127.0
+      },
+      "qk_tile_6_compute": {
+        "begin_tick": 1092258,
+        "end_tick": 1100610,
+        "duration_ck": 261.0
+      },
+      "qk_tile_6_export": {
+        "begin_tick": 1100610,
+        "end_tick": 1104674,
+        "duration_ck": 127.0
+      },
+      "qk_tile_7_compute": {
+        "begin_tick": 1104674,
+        "end_tick": 1113026,
+        "duration_ck": 261.0
+      },
+      "qk_tile_7_export": {
+        "begin_tick": 1113026,
+        "end_tick": 1117090,
+        "duration_ck": 127.0
+      },
+      "qk_tile_8_compute": {
+        "begin_tick": 1117090,
+        "end_tick": 1126818,
+        "duration_ck": 304.0
+      },
+      "qk_tile_8_export": {
+        "begin_tick": 1126818,
+        "end_tick": 1130882,
+        "duration_ck": 127.0
+      },
+      "qk_tile_9_compute": {
+        "begin_tick": 1130882,
+        "end_tick": 1139234,
+        "duration_ck": 261.0
+      },
+      "qk_tile_9_export": {
+        "begin_tick": 1139234,
+        "end_tick": 1143298,
+        "duration_ck": 127.0
+      },
+      "qk_tile_10_compute": {
+        "begin_tick": 1143298,
+        "end_tick": 1151650,
+        "duration_ck": 261.0
+      },
+      "qk_tile_10_export": {
+        "begin_tick": 1151650,
+        "end_tick": 1155714,
+        "duration_ck": 127.0
+      },
+      "qk_tile_11_compute": {
+        "begin_tick": 1155714,
+        "end_tick": 1164066,
+        "duration_ck": 261.0
+      },
+      "qk_tile_11_export": {
+        "begin_tick": 1164066,
+        "end_tick": 1168130,
+        "duration_ck": 127.0
+      },
+      "qk_tile_12_compute": {
+        "begin_tick": 1168130,
+        "end_tick": 1177858,
+        "duration_ck": 304.0
+      },
+      "qk_tile_12_export": {
+        "begin_tick": 1177858,
+        "end_tick": 1181922,
+        "duration_ck": 127.0
+      },
+      "qk_tile_13_compute": {
+        "begin_tick": 1181922,
+        "end_tick": 1190274,
+        "duration_ck": 261.0
+      },
+      "qk_tile_13_export": {
+        "begin_tick": 1190274,
+        "end_tick": 1194338,
+        "duration_ck": 127.0
+      },
+      "qk_tile_14_compute": {
+        "begin_tick": 1194338,
+        "end_tick": 1210978,
+        "duration_ck": 520.0
+      },
+      "qk_tile_14_export": {
+        "begin_tick": 1210978,
+        "end_tick": 1215042,
+        "duration_ck": 127.0
+      },
+      "qk_tile_15_compute": {
+        "begin_tick": 1215042,
+        "end_tick": 1223394,
+        "duration_ck": 261.0
+      },
+      "qk_tile_15_export": {
+        "begin_tick": 1223394,
+        "end_tick": 1227458,
+        "duration_ck": 127.0
+      },
+      "qk_tile_16_compute": {
+        "begin_tick": 1227458,
+        "end_tick": 1237186,
+        "duration_ck": 304.0
+      },
+      "qk_tile_16_export": {
+        "begin_tick": 1237186,
+        "end_tick": 1241250,
+        "duration_ck": 127.0
+      },
+      "qk_tile_17_compute": {
+        "begin_tick": 1241250,
+        "end_tick": 1249602,
+        "duration_ck": 261.0
+      },
+      "qk_tile_17_export": {
+        "begin_tick": 1249602,
+        "end_tick": 1253666,
+        "duration_ck": 127.0
+      },
+      "qk_tile_18_compute": {
+        "begin_tick": 1253666,
+        "end_tick": 1262018,
+        "duration_ck": 261.0
+      },
+      "qk_tile_18_export": {
+        "begin_tick": 1262018,
+        "end_tick": 1266082,
+        "duration_ck": 127.0
+      },
+      "qk_tile_19_compute": {
+        "begin_tick": 1266082,
+        "end_tick": 1274434,
+        "duration_ck": 261.0
+      },
+      "qk_tile_19_export": {
+        "begin_tick": 1274434,
+        "end_tick": 1278498,
+        "duration_ck": 127.0
+      },
+      "qk_tile_20_compute": {
+        "begin_tick": 1278498,
+        "end_tick": 1288226,
+        "duration_ck": 304.0
+      },
+      "qk_tile_20_export": {
+        "begin_tick": 1288226,
+        "end_tick": 1292290,
+        "duration_ck": 127.0
+      },
+      "qk_tile_21_compute": {
+        "begin_tick": 1292290,
+        "end_tick": 1300642,
+        "duration_ck": 261.0
+      },
+      "qk_tile_21_export": {
+        "begin_tick": 1300642,
+        "end_tick": 1304706,
+        "duration_ck": 127.0
+      },
+      "qk_tile_22_compute": {
+        "begin_tick": 1304706,
+        "end_tick": 1313058,
+        "duration_ck": 261.0
+      },
+      "qk_tile_22_export": {
+        "begin_tick": 1313058,
+        "end_tick": 1317122,
+        "duration_ck": 127.0
+      },
+      "qk_tile_23_compute": {
+        "begin_tick": 1317122,
+        "end_tick": 1325474,
+        "duration_ck": 261.0
+      },
+      "qk_tile_23_export": {
+        "begin_tick": 1325474,
+        "end_tick": 1329538,
+        "duration_ck": 127.0
+      },
+      "qk_tile_24_compute": {
+        "begin_tick": 1329538,
+        "end_tick": 1347810,
+        "duration_ck": 571.0
+      },
+      "qk_tile_24_export": {
+        "begin_tick": 1347810,
+        "end_tick": 1351874,
+        "duration_ck": 127.0
+      },
+      "qk_tile_25_compute": {
+        "begin_tick": 1351874,
+        "end_tick": 1360226,
+        "duration_ck": 261.0
+      },
+      "qk_tile_25_export": {
+        "begin_tick": 1360226,
+        "end_tick": 1364290,
+        "duration_ck": 127.0
+      },
+      "qk_tile_26_compute": {
+        "begin_tick": 1364290,
+        "end_tick": 1372642,
+        "duration_ck": 261.0
+      },
+      "qk_tile_26_export": {
+        "begin_tick": 1372642,
+        "end_tick": 1376706,
+        "duration_ck": 127.0
+      },
+      "qk_tile_27_compute": {
+        "begin_tick": 1376706,
+        "end_tick": 1385058,
+        "duration_ck": 261.0
+      },
+      "qk_tile_27_export": {
+        "begin_tick": 1385058,
+        "end_tick": 1389122,
+        "duration_ck": 127.0
+      },
+      "qk_tile_28_compute": {
+        "begin_tick": 1389122,
+        "end_tick": 1398850,
+        "duration_ck": 304.0
+      },
+      "qk_tile_28_export": {
+        "begin_tick": 1398850,
+        "end_tick": 1402914,
+        "duration_ck": 127.0
+      },
+      "qk_tile_29_compute": {
+        "begin_tick": 1402914,
+        "end_tick": 1411266,
+        "duration_ck": 261.0
+      },
+      "qk_tile_29_export": {
+        "begin_tick": 1411266,
+        "end_tick": 1415330,
+        "duration_ck": 127.0
+      },
+      "qk_tile_30_compute": {
+        "begin_tick": 1415330,
+        "end_tick": 1424802,
+        "duration_ck": 296.0
+      },
+      "qk_tile_30_export": {
+        "begin_tick": 1424802,
+        "end_tick": 1428866,
+        "duration_ck": 127.0
+      },
+      "qk_gemv_release": {
+        "begin_tick": 1428866,
+        "end_tick": 1428930,
+        "duration_ck": 2.0
+      }
+    },
+    "boundary_ck": 0.96875,
+    "spill_command_counts": {
+      "PREpb": 16,
+      "ACT1": 16,
+      "ACT2": 16,
+      "LOCALWR": 256
+    },
+    "native_command_counts": {
+      "ACT1": 1696,
+      "ACT2": 1696,
+      "PREpb": 1360,
+      "PREab": 800,
+      "CAS_RD": 0,
+      "CAS_WR": 0,
+      "RD": 2048,
+      "WR": 8192,
+      "RDA": 0,
+      "WRA": 0,
+      "REFab": 320,
+      "REFpb": 0,
+      "ACTAB": 752,
+      "MACAB": 32768,
+      "WRGB": 2048,
+      "RDRES": 15872,
+      "ACTHB": 0,
+      "MACHB": 0,
+      "PREHB": 0,
+      "MACK": 0,
+      "MACQK": 7936,
+      "LOCALWR": 8192,
+      "LOCALRD": 14336
+    },
+    "trace_sha256": "c7a55c2c2a5ff42c518c8a12a0d5c9c9619707bf58825e7e155b0f56b416d3cb",
+    "spill_banks": [
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25353,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25372,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25373,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25382,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25667,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25355,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25376,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25377,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25386,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25668,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25357,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25380,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25381,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25390,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25669,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25359,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25384,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25385,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25394,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25670,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25361,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25388,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25389,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25398,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25671,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25363,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25392,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25393,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25402,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25672,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25365,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25396,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25397,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25406,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25673,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25367,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25400,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25401,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25410,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25674,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25369,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25404,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25405,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25414,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25675,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25371,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25408,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25409,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25418,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25676,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25374,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25412,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25413,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25422,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25677,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25378,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25443,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25444,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25453,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25678,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 0,
+        "PREpb": [
+          {
+            "clock": 25383,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25447,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25448,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25457,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25679,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 1,
+        "PREpb": [
+          {
+            "clock": 25445,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25492,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25493,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25502,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25680,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 2,
+        "PREpb": [
+          {
+            "clock": 25449,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25496,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25497,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25506,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25681,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 3,
+        "PREpb": [
+          {
+            "clock": 25451,
+            "command": "PREpb",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT1": [
+          {
+            "clock": 25500,
+            "command": "ACT1",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "ACT2": [
+          {
+            "clock": 25501,
+            "command": "ACT2",
+            "Row": 40,
+            "Column": 8
+          }
+        ],
+        "LOCALWR_count": 16,
+        "first_LOCALWR": {
+          "clock": 25510,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 8
+        },
+        "last_LOCALWR": {
+          "clock": 25682,
+          "command": "LOCALWR",
+          "Row": 40,
+          "Column": 23
+        }
+      }
+    ],
+    "activation_pairs": [
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25372,
+        "ACT2_ck": 25373,
+        "gap_ck": 1,
+        "deadline_ck": 25380,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25376,
+        "ACT2_ck": 25377,
+        "gap_ck": 1,
+        "deadline_ck": 25384,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25380,
+        "ACT2_ck": 25381,
+        "gap_ck": 1,
+        "deadline_ck": 25388,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 0,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25384,
+        "ACT2_ck": 25385,
+        "gap_ck": 1,
+        "deadline_ck": 25392,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25388,
+        "ACT2_ck": 25389,
+        "gap_ck": 1,
+        "deadline_ck": 25396,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25392,
+        "ACT2_ck": 25393,
+        "gap_ck": 1,
+        "deadline_ck": 25400,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25396,
+        "ACT2_ck": 25397,
+        "gap_ck": 1,
+        "deadline_ck": 25404,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 1,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25400,
+        "ACT2_ck": 25401,
+        "gap_ck": 1,
+        "deadline_ck": 25408,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25404,
+        "ACT2_ck": 25405,
+        "gap_ck": 1,
+        "deadline_ck": 25412,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25408,
+        "ACT2_ck": 25409,
+        "gap_ck": 1,
+        "deadline_ck": 25416,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25412,
+        "ACT2_ck": 25413,
+        "gap_ck": 1,
+        "deadline_ck": 25420,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 2,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25443,
+        "ACT2_ck": 25444,
+        "gap_ck": 1,
+        "deadline_ck": 25451,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 0,
+        "Row": 40,
+        "ACT1_ck": 25447,
+        "ACT2_ck": 25448,
+        "gap_ck": 1,
+        "deadline_ck": 25455,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 1,
+        "Row": 40,
+        "ACT1_ck": 25492,
+        "ACT2_ck": 25493,
+        "gap_ck": 1,
+        "deadline_ck": 25500,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 2,
+        "Row": 40,
+        "ACT1_ck": 25496,
+        "ACT2_ck": 25497,
+        "gap_ck": 1,
+        "deadline_ck": 25504,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      },
+      {
+        "Rank": 1,
+        "BankGroup": 3,
+        "Bank": 3,
+        "Row": 40,
+        "ACT1_ck": 25500,
+        "ACT2_ck": 25501,
+        "gap_ck": 1,
+        "deadline_ck": 25508,
+        "other_bank_LOCALWR_ca_ck": 0,
+        "longest_continuous_other_bank_LOCALWR_ca": null
+      }
+    ],
+    "longest_pending_other_bank_LOCALWR_ca": null,
+    "source_sha256": {
+      "summary.json": "9609cb20fd8a6bdbab5df37cb560b596d3b63c59569f93e38223bfe4589b6bdb",
+      "manifest.json": "44ae2b844e997433d6f69d36b4a8ead9c61e97bc7976a5a4337348d39b327e0f",
+      "simulation\\result.json": "09e58c48bb975b60fba26ba9fd1449d0fd53dd686c97eb77b7ad34527419c4b4",
+      "simulation\\barriers.csv": "c8762eb36805504c9e07f986617b89051fb2e2bd7978dc0d3e014df39d96e0d5",
+      "simulation\\timeline.csv.ch0": "b34eab57aca27293033413b6cca7df07ca1fdc38938409ce24fd9cf2a34ae1fa",
+      "simulation\\rank_ca_events.csv.ch0": "3ba50bdc76ef39abb4d0b79723096b46927bdab4bad6521914020006f2fc6e2d"
+    }
+  },
+  "latency_ck": {
+    "before": 44744,
+    "after": 44655,
+    "after_minus_before": -89
+  },
+  "phase_differences_ck": {
+    "projection_gpu_input_stage": {
+      "before": 1328.03125,
+      "after": 1328.03125,
+      "after_minus_before": 0.0
+    },
+    "projection_local_input_compute": {
+      "before": 24023.0,
+      "after": 24023.0,
+      "after_minus_before": 0.0
+    },
+    "projection_local_spill": {
+      "before": 411.0,
+      "after": 371.0,
+      "after_minus_before": -40.0
+    },
+    "projection_gemv_release": {
+      "before": 3.0,
+      "after": 3.0,
+      "after_minus_before": 0.0
+    },
+    "rope_local": {
+      "before": 944.0,
+      "after": 944.0,
+      "after_minus_before": 0.0
+    },
+    "q_export_to_gpu": {
+      "before": 4296.0,
+      "after": 4278.0,
+      "after_minus_before": -18.0
+    },
+    "q_remote_buffer_fill": {
+      "before": 513.0,
+      "after": 513.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_0_compute": {
+      "before": 304.0,
+      "after": 304.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_0_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_1_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_1_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_2_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_2_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_3_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_3_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_4_compute": {
+      "before": 566.0,
+      "after": 563.0,
+      "after_minus_before": -3.0
+    },
+    "qk_tile_4_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_5_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_5_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_6_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_6_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_7_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_7_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_8_compute": {
+      "before": 304.0,
+      "after": 304.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_8_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_9_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_9_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_10_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_10_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_11_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_11_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_12_compute": {
+      "before": 304.0,
+      "after": 304.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_12_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_13_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_13_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_14_compute": {
+      "before": 523.0,
+      "after": 520.0,
+      "after_minus_before": -3.0
+    },
+    "qk_tile_14_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_15_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_15_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_16_compute": {
+      "before": 304.0,
+      "after": 304.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_16_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_17_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_17_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_18_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_18_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_19_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_19_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_20_compute": {
+      "before": 304.0,
+      "after": 304.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_20_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_21_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_21_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_22_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_22_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_23_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_23_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_24_compute": {
+      "before": 596.0,
+      "after": 571.0,
+      "after_minus_before": -25.0
+    },
+    "qk_tile_24_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_25_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_25_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_26_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_26_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_27_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_27_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_28_compute": {
+      "before": 304.0,
+      "after": 304.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_28_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_29_compute": {
+      "before": 261.0,
+      "after": 261.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_29_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_30_compute": {
+      "before": 296.0,
+      "after": 296.0,
+      "after_minus_before": 0.0
+    },
+    "qk_tile_30_export": {
+      "before": 127.0,
+      "after": 127.0,
+      "after_minus_before": 0.0
+    },
+    "qk_gemv_release": {
+      "before": 2.0,
+      "after": 2.0,
+      "after_minus_before": 0.0
+    },
+    "phase_boundary_overhead": {
+      "before": 0.96875,
+      "after": 0.96875,
+      "after_minus_before": 0.0
+    }
+  },
+  "changes_only_ck": {
+    "projection_local_spill": {
+      "before": 411.0,
+      "after": 371.0,
+      "after_minus_before": -40.0
+    },
+    "q_export_to_gpu": {
+      "before": 4296.0,
+      "after": 4278.0,
+      "after_minus_before": -18.0
+    },
+    "qk_tile_4_compute": {
+      "before": 566.0,
+      "after": 563.0,
+      "after_minus_before": -3.0
+    },
+    "qk_tile_14_compute": {
+      "before": 523.0,
+      "after": 520.0,
+      "after_minus_before": -3.0
+    },
+    "qk_tile_24_compute": {
+      "before": 596.0,
+      "after": 571.0,
+      "after_minus_before": -25.0
+    }
+  },
+  "savings_breakdown_ck": {
+    "total_saved_ck": 89,
+    "pre_spill_saved_ck": -0.0,
+    "observed_spill_saved_ck": 40.0,
+    "downstream_saved_ck": 49.0,
+    "boundary_saved_ck": -0.0
+  },
+  "command_count_comparison": {
+    "spill_command_counts": {
+      "ACT1": {
+        "before": 16,
+        "after": 16,
+        "after_minus_before": 0
+      },
+      "ACT2": {
+        "before": 16,
+        "after": 16,
+        "after_minus_before": 0
+      },
+      "LOCALWR": {
+        "before": 256,
+        "after": 256,
+        "after_minus_before": 0
+      },
+      "PREpb": {
+        "before": 16,
+        "after": 16,
+        "after_minus_before": 0
+      }
+    },
+    "native_command_counts": {
+      "ACT1": {
+        "before": 1696,
+        "after": 1696,
+        "after_minus_before": 0
+      },
+      "ACT2": {
+        "before": 1696,
+        "after": 1696,
+        "after_minus_before": 0
+      },
+      "ACTAB": {
+        "before": 752,
+        "after": 752,
+        "after_minus_before": 0
+      },
+      "ACTHB": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "CAS_RD": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "CAS_WR": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "LOCALRD": {
+        "before": 14336,
+        "after": 14336,
+        "after_minus_before": 0
+      },
+      "LOCALWR": {
+        "before": 8192,
+        "after": 8192,
+        "after_minus_before": 0
+      },
+      "MACAB": {
+        "before": 32768,
+        "after": 32768,
+        "after_minus_before": 0
+      },
+      "MACHB": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "MACK": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "MACQK": {
+        "before": 7936,
+        "after": 7936,
+        "after_minus_before": 0
+      },
+      "PREHB": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "PREab": {
+        "before": 800,
+        "after": 800,
+        "after_minus_before": 0
+      },
+      "PREpb": {
+        "before": 1360,
+        "after": 1360,
+        "after_minus_before": 0
+      },
+      "RD": {
+        "before": 2048,
+        "after": 2048,
+        "after_minus_before": 0
+      },
+      "RDA": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "RDRES": {
+        "before": 15872,
+        "after": 15872,
+        "after_minus_before": 0
+      },
+      "REFab": {
+        "before": 320,
+        "after": 320,
+        "after_minus_before": 0
+      },
+      "REFpb": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "WR": {
+        "before": 8192,
+        "after": 8192,
+        "after_minus_before": 0
+      },
+      "WRA": {
+        "before": 0,
+        "after": 0,
+        "after_minus_before": 0
+      },
+      "WRGB": {
+        "before": 2048,
+        "after": 2048,
+        "after_minus_before": 0
+      }
+    }
+  },
+  "first_spill_LOCALWR_ck": {
+    "before": 25382,
+    "after": 25382,
+    "after_minus_before": 0
+  },
+  "last_spill_LOCALWR_ck": {
+    "before": 25722,
+    "after": 25682,
+    "after_minus_before": -40
+  },
+  "evidence": {
+    "observed_spill_change": "Spill wall time changes by -40 CK; its last channel-0 LOCALWR issue changes by -40 CK.",
+    "downstream_change": "Downstream phases save 49 CK in total. This is an observed downstream scheduling change; refresh, row-state and CA contributions have not been independently attributed.",
+    "occupancy_method": "Each other-bank LOCALWR is matched to its rank1 CA reservation. Only exactly adjacent reservations within that bank's ACT1-to-ACT2 interval are merged.",
+    "causal_limit": "Continuous LOCALWR occupancy proves the shared rank CA was unavailable during those CKs. It does not prove ACT2 was timing-eligible for every CK or that all latency changes are ACT stalls."
+  },
+  "command_count_scope": {
+    "spill_command_counts": "channel 0 spill phase",
+    "native_command_counts": "whole chain, all channels"
+  },
+  "scope": "Chain latency/phases; detailed spill command scheduling is channel 0 only. No simulation rerun."
+}

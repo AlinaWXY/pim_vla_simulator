@@ -527,14 +527,11 @@ def audit_run(directory):
     require(dq == manifest["expected_dq_bytes"]["total"], "External DQ differs from source contract")
     require(Counter(native_result["issued_commands"]) == native_counts, "Native summary differs from command files")
     fill_checks = audit_external_fills(native, events, rank_staging=rank_staging)
-    staging, ca, batching, staging_act2 = None, None, None, None
+    from act2_audit import audit_act2
+    split_activation = audit_act2(native, native_result["resolved_timings_ck"],
+                                 staging_events=stage_events or ())
+    staging, ca, batching = None, None, None
     if rank_staging:
-        from act2_audit import audit_staging_act2
-        # Enforce the corrected staging path using the complete command log.
-        # The report retains the separate, unfiltered all-path verdict so
-        # pre-existing spill violations are never presented as compliant.
-        staging_act2 = audit_staging_act2(native, native_result["resolved_timings_ck"],
-                                        staging_events=stage_events)
         from staging_audit import audit_staging, audit_rank_ca
         staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"], staging_banks)
         from paired_audit import audit_paired_staging
@@ -564,7 +561,7 @@ def audit_run(directory):
         array_open_row_checks=row_checks, independent_MAC_order_checks=order_checks,
         external_DQ_to_bank_fill_checks=fill_checks,
         unified_gemv=slots, staging=staging, input_batching=batching,
-        staging_split_activation=staging_act2,
+        split_activation=split_activation,
         rank_controller=ca, ffn_streams=ffn, serial_continuity=continuity,
         native_external_DQ_bytes=dq, native_command_counts=dict(native_counts),
         trace_sha256=digest(directory / "workload.trace"),

@@ -48,6 +48,7 @@ CASES = {
     "Dispatch_repeated_peer_source": None,
     "Dispatch_no_peer_export": "Q_REMOTE has no preceding peer Q_EXPORT",
     "Descriptor_noncanonical_source": "rank descriptor requires canonical rank1 BG0 bank0",
+    "Local_ACT2_spill_rope_refresh": None,
 }
 
 
@@ -61,7 +62,33 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
-    if name == "Dispatch_queue_capacity_one":
+    if name == "Local_ACT2_spill_rope_refresh":
+        # Control-path guard: spills use the initialized accumulator state.
+        # Every token deliberately moves all banks off row40 before SPILL
+        # and again before STORE; neither activation check can pass on row hits.
+        lines = ["BARRIER 0"]
+        marker = 0
+        def fence():
+            nonlocal marker
+            marker += 1
+            lines.append(f"BARRIER {marker}")
+        for token in range(8):
+            q, k = 82176+token*32, 82432+token*32
+            lines += [f"ST {address(83968, bank=bank)}" for bank in range(16)]
+            fence()
+            lines += [f"PIM_RANK_SPILL {address(offset)}" for offset in (q, k)]
+            fence()
+            lines += [f"PIM_RANK_ROPE_COEF {address(81920+token*32)}",
+                      command("PIM_RANK_ROPE_LOAD", q, 0),
+                      command("PIM_RANK_ROPE_EXEC", q, 0),
+                      command("PIM_RANK_ROPE_LOAD", k, 1),
+                      command("PIM_RANK_ROPE_EXEC", k, 1)]
+            fence()
+            lines += [f"ST {address(83968, bank=bank)}" for bank in range(16)]
+            fence()
+            lines += [f"PIM_RANK_ROPE_STORE {address(offset)}" for offset in (q, k)]
+            fence()
+    elif name == "Dispatch_queue_capacity_one":
         lines = ["BARRIER 0"]+[f"LD {address(2048*(20+i))}" for i in range(192)]
         lines += [f"LD {address(2048*20+(i%64)*32, ch=1)}" for i in range(96)]
         lines += ["BARRIER 1", f"ST {address(409600, ch=1)}", "BARRIER 2",
@@ -255,6 +282,8 @@ def dispatch_positive_audit(directory, name):
 
 
 def positive_audit(directory, name):
+    if name == "Local_ACT2_spill_rope_refresh":
+        return local_act2_positive_audit(directory)
     if name.startswith("Dispatch_"):
         return dispatch_positive_audit(directory, name)
     from audit_native import read_csv, read_json, audit_slot_events
@@ -350,6 +379,45 @@ def positive_audit(directory, name):
         refresh_enabled=True, native_refresh_commands=len(refresh))
 
 
+def local_act2_positive_audit(directory):
+    """Require real split activations on both LOCALWR users under refresh."""
+    from collections import Counter
+    from act2_audit import audit_act2
+    from audit_native import read_csv, read_json, trace_records, audit_native_commands
+    from staging_audit import audit_rank_ca, require
+    simulation = directory / "simulation"
+    read_channels = lambda name: [e for ch in range(16) for e in read_csv(simulation / f"{name}.csv.ch{ch}")]
+    native, ca, fine = map(read_channels, ("timeline", "rank_ca_events", "bgk_events"))
+    result = read_json(simulation / "result.json")
+    split = audit_act2(native, result["resolved_timings_ck"])
+    activations = {}
+    for type_id, operation in ((14, "PIM_SPILL"), (18, "PIM_ROPE_STORE")):
+        writes = [e for e in native if e["command"] == "LOCALWR" and e["type"] == type_id]
+        starts = [e for e in native if e["command"] == "ACT1" and e["type"] == type_id]
+        expected = {(0, 1, bg, bank) for bg in range(4) for bank in range(4)}
+        key = lambda e: tuple(e[k] for k in ("Channel", "Rank", "BankGroup", "Bank"))
+        require(Counter(map(key, writes)) == Counter({bank: 16 for bank in expected}),
+                f"{operation} guard lacks exact sixteen 32B writes per bank")
+        counts = Counter(map(key, starts))
+        require(set(counts) == expected and min(counts.values()) >= 8,
+                f"{operation} guard failed to force activation for every token and bank")
+        require(all(e["Row"] == 40 for e in starts+writes), f"{operation} used wrong working row")
+        activations[operation] = dict(ACT1_commands=len(starts), LOCALWR_commands=len(writes),
+                                      minimum_ACT1_per_bank=min(counts.values()))
+    refresh = [e for e in native if e["command"].startswith("REF") and e["Channel"] == 0]
+    internal = [e for e in native if e["type"] in (14, 18)]
+    require(result["config"]["refresh"] and any(
+        min(e["clock"] for e in internal) < r["clock"] < max(e["clock"] for e in internal)
+        for r in refresh), "LOCALWR guard never encounters refresh during its active sequence")
+    conflicting = [e for e in native if e["command"] in ("WR", "WRA") and e["Row"] == 41]
+    require(len(conflicting) == 256, "LOCALWR guard omitted forced conflicting-row stores")
+    return dict(split_activation=split, forced_localwrite_activations=activations,
+        native_data_commands_checked=audit_native_commands(trace_records(directory / "guard.trace"), native),
+        rank_controller=audit_rank_ca(ca, native, (), fine),
+        native_refresh_commands=len(refresh), conflicting_row_writes=len(conflicting),
+        localwrite_bytes=512*32, guard_only_nREFI_ck=result["resolved_timings_ck"]["nREFI"])
+
+
 def worker(backend, output, name):
     from reproduce import setup, config_for, dump
     setup(backend)
@@ -359,7 +427,7 @@ def worker(backend, output, name):
     trace_for(trace, name)
     is_q = name.startswith("Q")
     is_down = name.startswith("Down_")
-    independent = name.startswith(("Dispatch_", "Descriptor_"))
+    independent = name.startswith(("Dispatch_", "Descriptor_", "Local_ACT2_"))
     staged = name.startswith("Stage_") or independent
     config = config_for("chain" if is_q or independent else "down_gpu_input" if is_down or staged else "v",
                         refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged,
@@ -368,6 +436,9 @@ def worker(backend, output, name):
     if name == "Dispatch_queue_capacity_one":
         from dataclasses import replace
         config = replace(config, channel_queue_capacity=1)
+    if name == "Local_ACT2_spill_rope_refresh":
+        from dataclasses import replace
+        config = replace(config, timing_overrides={**config.timing_overrides, "nREFI": 512})
     try:
         if name == "Descriptor_noncanonical_source":
             # Exercise the compiled controller rather than stopping in the

@@ -78,7 +78,9 @@ MAC fragment 2p+1
 
 内部 staging 的 ACT1/ACT2 与 ordinary RD/WR 使用相同的 `can_start_act1` lookahead：只有下一命令周期的 ACT2 已满足 DRAM 与 rank CA 约束，才发出 ACT1。fragment 请求保留在 PIM FIFO 队首，并登记普通控制器的 bank owner 与 `ACT1_clock+nAAD` deadline。已开始的激活优先完成 ACT2，刷新和其它命令随后恢复调度；ACT2 仍占 rank CA，并保留 nRP、nRFC、nRCD 等时序。超时或 owner 丢失会报错。SRF、数据布局、预取批量及所有时序参数均不改变。
 
-本项修正仅覆盖 `PIM_STAGE_LOAD/FRAGMENT` 的内部激活。完整命令日志另行审计其它内部路径，并显式报告尚未修正的非 staging 协议问题；staging 专项通过不能等同于所有内部路径均满足 ACT 协议。
+后续 LOCALWR 修正将这套管理提取为 `pim_activation_extension.inc`，供 staging、projection spill/RoPE 的 LOCALRD/LOCALWR、BGK 本地写入的行准备及 FFN Z 内部读写共用。所有入口沿用 ordinary 的 `can_start_act1`、bank owner 和 deadline；内部 owner 保存原 PIM 请求 iterator，按其真实 final command 完成 ACT2。ACT2 只释放激活 owner，数据读写及父描述符仍等待原 service/recovery 完成。
+
+spill/RoPE 的不同 bank 请求允许 bypass，因此 ACT2 pending 时显式暂停 `issue_local_ready` 的本地扫描，避免其它 bank 的 LOCALWR/EXEC 抢走 owner 的 CA 周期。普通 pending ACT2 同样受到保护。ACT2 本身仍经过原 DRAM/rank CA 准入；刷新可以继续入队，已开始的激活完成后再派发维护命令。完整 native 命令流严格审计所有 ACT1/ACT2，不再豁免 projection spill。SRF、布局、数据量、CA 容量和时序参数不变。
 
 总 controller 对输入装载继续采用 256/512 B fragment 描述符；内部 PRE/ACT、LOCALRD、BCAST 由 rank controller 发出。新默认模式还把 projection spill、RoPE COEF/LOAD/EXEC/STORE、Q_EXPORT/Q_REMOTE 合为 rank 级描述符，每个描述符占用 1 CK global CA，再在 rank controller 内展开 16 个原有单 bank 操作。所有实际 bank 操作继续竞争 rank CA；原有 `PIM_MAC_AB`、`PIM_MAC_QK` 等 GEMV 计算指令不改变。
 
@@ -110,7 +112,7 @@ QKT 的 Q 按 feature 定向送到对应 bank，并非同一数据对所有 bank
 
 legacy 模式的 7 cases × 单/双 bank × staged/direct 共 28 个生成 trace 已与 `786842a` 逐字节核对一致。新描述符展开成原 16 个 bank 操作后，同样逐字节恢复原指令、地址、slot 与次序，DQ 总量一致；native 时序与日志是否一致由实际重新运行的验证结果判定，不由 trace 一致直接推断。
 
-ACT1/ACT2 修正对所有启用 staging 的模式生效，包括 `--legacy-rank-dispatch`；该开关只恢复旧派发方式，不能撤销 deadline 修正。需要逐字节重现修正前时序或日志时，应检出 `14fb3bf`（或对应历史 commit），并使用该版本的独立 backend。历史 verify_legacy/单 bank 脚本的旧事件哈希不作为本版修正后的验收标准。
+ACT1/ACT2 修正对相应内部访问路径的所有模式生效，包括 `--legacy-rank-dispatch` 与 `--direct-input-baseline`；这些开关只改变派发或输入路径，不能撤销 deadline 修正。需要逐字节重现旧时序或日志时，应检出对应历史 commit 并使用独立 backend。LOCALWR 修正前为 `a987650`，staging deadline 修正前为 `14fb3bf`；历史 verify_baseline/verify_legacy/单 bank 脚本的旧事件哈希不作为本版修正后的验收标准。
 
 `--direct-input-baseline` 无论附带哪种 bank/派发选项都使用旧控制路径。有效 `staging_banks=0` 表示没有暂存，backend 的兼容参数为 1。summary、manifest、provenance 记录有效 bank 数及两个派发开关。
 

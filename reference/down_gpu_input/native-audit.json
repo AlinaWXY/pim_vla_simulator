@@ -253,82 +253,65 @@
       }
     ]
   },
-  "staging_split_activation": {
+  "split_activation": {
     "status": "passed",
-    "acceptance_scope": "staging only",
-    "violations": {},
-    "violation_count": 0,
-    "staging": {
-      "ACT1": 4160,
-      "paired_ACT2": 4160,
-      "late_ACT2": 0,
-      "cancelled": 0,
-      "pending_at_end": 0,
-      "gap_histogram_ck": {
-        "1": 4160
-      }
+    "nAAD_ck": 8,
+    "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+    "ACT1_commands": 5216,
+    "ACT2_commands": 5216,
+    "paired_ACT2": 5216,
+    "cancelled_ACT1": 0,
+    "pending_ACT2_at_end": 0,
+    "minimum_gap_ck": 1,
+    "maximum_gap_ck": 1,
+    "gap_histogram_ck": {
+      "1": 5216
     },
-    "global_audit": {
-      "status": "passed",
-      "nAAD_ck": 8,
-      "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
-      "ACT1_commands": 5216,
-      "ACT2_commands": 5216,
-      "paired_ACT2": 5216,
-      "cancelled_ACT1": 0,
-      "pending_ACT2_at_end": 0,
-      "minimum_gap_ck": 1,
-      "maximum_gap_ck": 1,
-      "gap_histogram_ck": {
-        "1": 5216
-      },
-      "maximum_pending_by_channel": {
-        "0": 1,
-        "1": 1,
-        "2": 1,
-        "3": 1,
-        "4": 1,
-        "5": 1,
-        "6": 1,
-        "7": 1,
-        "8": 1,
-        "9": 1,
-        "10": 1,
-        "11": 1,
-        "12": 1,
-        "13": 1,
-        "14": 1,
-        "15": 1
-      },
-      "classifications": {
-        "ordinary": {
-          "ACT1": 1056,
-          "paired_ACT2": 1056,
-          "late_ACT2": 0,
-          "cancelled": 0,
-          "pending_at_end": 0,
-          "gap_histogram_ck": {
-            "1": 1056
-          }
-        },
-        "staging": {
-          "ACT1": 4160,
-          "paired_ACT2": 4160,
-          "late_ACT2": 0,
-          "cancelled": 0,
-          "pending_at_end": 0,
-          "gap_histogram_ck": {
-            "1": 4160
-          }
+    "maximum_pending_by_channel": {
+      "0": 1,
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1
+    },
+    "classifications": {
+      "ordinary": {
+        "ACT1": 1056,
+        "paired_ACT2": 1056,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 1056
         }
       },
-      "violation_count": 0,
-      "violations": {},
-      "violations_by_kind": {},
-      "examples": [],
-      "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      "staging": {
+        "ACT1": 4160,
+        "paired_ACT2": 4160,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 4160
+        }
+      }
     },
-    "known_other_internal_violations": {}
+    "violation_count": 0,
+    "violations": {},
+    "violations_by_kind": {},
+    "examples": [],
+    "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
   },
   "rank_controller": {
     "command_intervals_checked": 327136,

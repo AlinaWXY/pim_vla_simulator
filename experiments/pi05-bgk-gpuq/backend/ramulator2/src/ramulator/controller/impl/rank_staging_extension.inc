@@ -2,11 +2,6 @@
 // Only coverage/timing metadata is kept here; payloads reside in source-bank DRAM.
 bool m_rank_staging=false, m_rank_controller=false, m_rank_fine_context=false;
 int m_staging_banks=1;
-// The fragment remains in the PIM FIFO while its split activation owns the
-// bank. Use the ordinary controller's owner/deadline state so maintenance
-// cannot cancel ACT1 before the corresponding ACT2 is issued.
-bool m_stage_act2_pending=false;
-ReqBuffer::iterator m_stage_act2_owner;
 Clk_t m_global_ca_ready=0;
 std::vector<Clk_t> m_rank_ca_ready;
 std::string m_rank_ca_path, m_staging_path;
@@ -169,28 +164,6 @@ void stage_fill(const Request& req,Clk_t ready) {
   }
   record_gemv(req,"GEMV_MULTICAST",ready,ready,65535,1<<row,65535,32,m_gemv_slots[16][slot].generation);
 }
-void issue_stage_act2() {
-  RankFineScope fine(m_rank_fine_context,m_rank_controller);
-  auto it=m_stage_act2_owner;
-  const int bank=m_device.get_flat_bank_id(it->addr_vec);
-  if(!m_stage_act2_pending || !m_act2_owner_valid[bank] ||
-     get_preq_command(m_localrd,it->addr_vec)!=m_cmd_act2)
-    throw std::runtime_error("staging ACT2 lost its activation owner");
-  if(m_clk>m_act2_deadline[bank])
-    throw std::runtime_error("staging ACT2 deadline exceeded");
-  if(!check_timing(m_cmd_act2,it->addr_vec)) {
-    if(m_clk==m_act2_deadline[bank])
-      throw std::runtime_error("staging ACT2 cannot meet its deadline");
-    return;
-  }
-  it->command=m_cmd_act2;
-  m_device.issue_command(m_cmd_act2,it->addr_vec,m_clk);
-  rr_notify_command(*it);
-  m_act2_owner_valid[bank]=false;
-  m_act2_deadline[bank]=-1;
-  m_stage_act2_pending=false;
-}
-
 bool issue_stage(ReqBuffer::iterator it) {
   stage_address(*it);
   const int physical_offset=stage_offset(*it);
@@ -247,20 +220,7 @@ bool issue_stage(ReqBuffer::iterator it) {
   if(m_stage.loads.count(offset)) throw std::runtime_error("duplicate staging load");
   if(!stage_fill_ready(*it)) return false;
   it->command=get_preq_command(m_localrd,it->addr_vec);
-  if(it->command==m_cmd_act2)
-    throw std::runtime_error("staging ACT2 without its activation owner");
-  // Same lookahead as ordinary RD/WR: do not launch ACT1 while ACT2 would
-  // still be blocked by nRP, nRFC, or any other DRAM/rank-CA constraint.
-  if(it->command==m_cmd_act1 && (has_pending_act2() || !can_start_act1(*it))) return false;
-  if(!check_timing(it->command,it->addr_vec)) return false;
-  m_device.issue_command(it->command,it->addr_vec,m_clk);rr_notify_command(*it);
-  if(it->command==m_cmd_act1) {
-    const int bank=m_device.get_flat_bank_id(it->addr_vec);
-    m_stage_act2_owner=it;
-    m_stage_act2_pending=true;
-    m_act2_owner_valid[bank]=true;
-    m_act2_deadline[bank]=m_clk+m_nAAD;
-  }
+  if(!issue_internal_array_command(it)) return false;
   if(it->command!=m_localrd) return true;
   it->depart=m_clk+m_device.m_spec->get_timing_value("nCL")+m_bgk_input_cycles;
   it->pim_q_stage=1;record_stage(*it,"LOCALRD",m_clk,it->depart);

@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "baseline_commit": "a9876505575f7cfc01716c98f0520eaa546cc24b",
+  "archived_native_job": 1902838,
+  "fresh_native_job": 1903036,
+  "cases": 7,
+  "exact_source_inventory_and_native_library": true,
+  "exact_cycles_bytes_traces_phases_native_CSVs_and_channel_partitions": true
+}

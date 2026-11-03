@@ -2,17 +2,17 @@
   "schema_version": 3,
   "native_build": "minimal",
   "dataflow": "Independent bounded channel ingress -> external CA descriptor dispatch -> rank micro-operations; two-bank whole-input staging",
-  "parent_revision": "14fb3bfea5998012fc1be518821cf356edb6979e",
+  "parent_revision": "a9876505575f7cfc01716c98f0520eaa546cc24b",
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
   "branch": "xinyao_1103",
-  "file_count_excluding_manifest": 598,
-  "bytes_excluding_manifest": 12796560,
-  "MiB": 12.203750610351562,
+  "file_count_excluding_manifest": 632,
+  "bytes_excluding_manifest": 16334101,
+  "MiB": 15.577412605285645,
   "categories": {
     "publication": {
-      "files": 19,
-      "bytes": 106766,
-      "MiB": 0.10181999206542969
+      "files": 22,
+      "bytes": 137781,
+      "MiB": 0.13139820098876953
     },
     "backend_metadata": {
       "files": 2,
@@ -21,8 +21,8 @@
     },
     "native_metadata": {
       "files": 177,
-      "bytes": 639706,
-      "MiB": 0.6100711822509766
+      "bytes": 637884,
+      "MiB": 0.6083335876464844
     },
     "vendored": {
       "files": 209,
@@ -41,13 +41,13 @@
     },
     "experiment": {
       "files": 22,
-      "bytes": 265074,
-      "MiB": 0.2527942657470703
+      "bytes": 269981,
+      "MiB": 0.2574739456176758
     },
     "reference_evidence": {
-      "files": 78,
-      "bytes": 9164793,
-      "MiB": 8.740227699279785
+      "files": 109,
+      "bytes": 12668234,
+      "MiB": 12.081369400024414
     }
   },
   "compiled_native_translation_units": [
@@ -76,7 +76,7 @@
     "controller/plugin/impl/cmd_trace_recorder.cpp"
   ],
   "clean_native_build_passed": true,
-  "final_native_job": 1902838,
+  "final_native_job": 1903036,
   "source_snapshot": "reference/publish-byte-verification.json",
   "exclusions": [
     "Precompiled native libraries",
@@ -84,10 +84,9 @@
     "Raw generated results"
   ],
   "preservation": {
-    "before_commit": "14fb3bf",
-    "before_regression": "reference/act2-deadline/before-regression.json",
-    "direct_baseline_commit": "4073452",
-    "direct_baseline_regression": "reference/baseline-verification.json"
+    "before_commit": "a987650",
+    "before_regression": "reference/localwr-act2/before-regression.json",
+    "corrected_direct_input_control": "reference/localwr-act2/direct-input-control.json"
   },
   "files": {
     ".gitattributes": {
@@ -107,13 +106,23 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 5920,
-      "output_sha256": "6a82c18ff9fe4ed108426de89188267db5f400a3103209b7e9f1153c615a3474"
+      "output_bytes": 10560,
+      "output_sha256": "a3c626a9e4af033f12e83a07dd2e51cdd7228be47ed52f3f9e5efbc1642a0d10"
+    },
+    "analyze_localwr_schedule.py": {
+      "category": "publication",
+      "output_bytes": 13597,
+      "output_sha256": "6a2ce89f7305dfe771443a4385429e9f08fe2da9fe4d2e41d20f53ef93180800"
     },
     "compare_act2_deadline.py": {
       "category": "publication",
       "output_bytes": 18482,
       "output_sha256": "95618732272fe8f22596bfd9278e8bbdf4caea46996144d37ee80ac547d32673"
+    },
+    "compare_localwr_act2.py": {
+      "category": "publication",
+      "output_bytes": 8306,
+      "output_sha256": "cbe51d9a4183a6835f33411418fc4eb543837e8b5ee44d3b2bbc0bf9f8c0a8b4"
     },
     "compare_rank_dispatch.py": {
       "category": "publication",
@@ -1807,8 +1816,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/ffn_dram_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 11728,
-      "output_sha256": "41ce802615b1d24dc1932812b7cefaf4ffa7a26ea0999063fe9296896417354e"
+      "output_bytes": 11698,
+      "output_sha256": "10c9af3dc5585a63a8bc997eeb145a9bfc48e30fee150ef4924c25f072a281db"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/gddr7_controller.cpp": {
       "category": "native_metadata",
@@ -1842,8 +1851,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp": {
       "category": "native_metadata",
-      "output_bytes": 48083,
-      "output_sha256": "75954e0c82e431c110f8aa8abf613f72c91356abce9b111903afe0f1073f01f4"
+      "output_bytes": 48175,
+      "output_sha256": "18a32a02cd5afa72267565e92af513ce11fd61b5264ba2bd94e053b88d38b22f"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr6_controller.cpp": {
       "category": "native_metadata",
@@ -1860,6 +1869,11 @@
       "output_bytes": 3093,
       "output_sha256": "dd847536b69af3fdbb95af7dbd9e4e4c14d964a2974a375ffd986bfa2c831393"
     },
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/pim_activation_extension.inc": {
+      "category": "publication",
+      "output_bytes": 1954,
+      "output_sha256": "100a5948c769a01debb859dbbaf2a18297a2c34d4d7fcdb84d41a3f09ba367e5"
+    },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/prac_controller.cpp": {
       "category": "native_metadata",
       "output_bytes": 13290,
@@ -1872,13 +1886,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_rope_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 12554,
-      "output_sha256": "79681c63297b66bfb6a2fbd332df0c7d416ffeeff794fb41ff8c47d8080b3ed6"
+      "output_bytes": 12459,
+      "output_sha256": "32fb4e131a298ad99479f230356aa44118efe75105fb5306d446e5bb13226fd1"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 14840,
-      "output_sha256": "7de2b7f4b579ca58b2f8a05f1f74f277d419ef4007db447e152dd721617a9a45"
+      "output_bytes": 13051,
+      "output_sha256": "ffe596e10229bde515cca851285fddbd36ab7ea601692b1c3cc478f82350e42e"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc": {
       "category": "native_metadata",
@@ -2532,8 +2546,8 @@
     },
     "experiments/pi05-unified-gemv/MODEL.md": {
       "category": "experiment",
-      "output_bytes": 11791,
-      "output_sha256": "30c6b5d257eb817f9e718450c22100a2693a6f76d9d3e9c5f2f28b4e601dffb7"
+      "output_bytes": 12594,
+      "output_sha256": "15587bf359b041844408fd5299d65932be648d609e1c8edf08fb8f14c19416a4"
     },
     "experiments/pi05-unified-gemv/ROPE-CONTROL.md": {
       "category": "experiment",
@@ -2597,13 +2611,13 @@
     },
     "experiments/pi05-unified-gemv/validation/act2_audit.py": {
       "category": "publication",
-      "output_bytes": 11623,
-      "output_sha256": "b2d39bd63085b00f9ad85d03e63041aa74f0dc0f177f88767c3a18a0f67ad95a"
+      "output_bytes": 11693,
+      "output_sha256": "ffaf055c96bc560448e696c0a7d68eacef56aadf3f821f83845778f601257556"
     },
     "experiments/pi05-unified-gemv/validation/audit_native.py": {
       "category": "experiment",
-      "output_bytes": 33753,
-      "output_sha256": "bfdab44e4f9c230157665de5e3ffd88a2599de31aae121eaf0c0401eb117a76a"
+      "output_bytes": 33483,
+      "output_sha256": "31899a81afaeb28a7381c8098cf1847e64fe6bb983f285b893aa67321ba4228f"
     },
     "experiments/pi05-unified-gemv/validation/dispatch_audit.py": {
       "category": "publication",
@@ -2612,8 +2626,8 @@
     },
     "experiments/pi05-unified-gemv/validation/native_guards.py": {
       "category": "experiment",
-      "output_bytes": 27422,
-      "output_sha256": "ca7a5b49c18f9b5a4f30ef5c89fed536e37839e920bdd9fd108db721cc998ad2"
+      "output_bytes": 31796,
+      "output_sha256": "f972d8feff6373d3e830fa15e35c53dd1d5a59f61eddf76a5af431982e7ef191"
     },
     "experiments/pi05-unified-gemv/validation/paired_audit.py": {
       "category": "experiment",
@@ -2627,8 +2641,8 @@
     },
     "experiments/pi05-unified-gemv/validation/test_act2_audit.py": {
       "category": "publication",
-      "output_bytes": 6743,
-      "output_sha256": "6c51c52531b50005bc8345ec305e802dbf792eafa517477b1392cbf8e1e71e40"
+      "output_bytes": 8950,
+      "output_sha256": "44b4d38cd6dea00be1e52ffe596df85a835ef9083ecc92d1b729f581cb96df49"
     },
     "experiments/pi05-unified-gemv/validation/test_audit.py": {
       "category": "experiment",
@@ -2663,7 +2677,7 @@
     "reference/CHANNEL-ANALYSIS.md": {
       "category": "reference_evidence",
       "output_bytes": 2878,
-      "output_sha256": "5695426cb4ca925de762fee2e01d54e2062a8ce5b6ae071ef4c5aab75402a405"
+      "output_sha256": "ddb9996580679b7f0b47c1f9f32b9a14032f54fec75015868ff7957392668855"
     },
     "reference/RANK-DISPATCH-COMPARISON.md": {
       "category": "reference_evidence",
@@ -2732,18 +2746,18 @@
     },
     "reference/chain/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 24233,
-      "output_sha256": "1e4de292a4b74f1e8d8e0319f312d15fe46f1cbcb2d7b606940434013741b3e7"
+      "output_bytes": 19296,
+      "output_sha256": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4"
     },
     "reference/chain/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 4402,
-      "output_sha256": "2796c7799e61c21bcc80d5a08c06fbc2d7b9cf1c6bcdd56bcf80f60749b1a478"
+      "output_bytes": 4400,
+      "output_sha256": "9609cb20fd8a6bdbab5df37cb560b596d3b63c59569f93e38223bfe4589b6bdb"
     },
     "reference/channel-analysis.json": {
       "category": "reference_evidence",
-      "output_bytes": 1052937,
-      "output_sha256": "ee3600a1adfcc402114e346dc7ddbf18f7be00ec2525b1156d1cd1cffdd0599a"
+      "output_bytes": 1050484,
+      "output_sha256": "d53468497d146a831520a68a07c8da122de773cb2c0a3fd1711504003bc6cd4b"
     },
     "reference/channel-breakdown.png": {
       "category": "reference_evidence",
@@ -2752,28 +2766,28 @@
     },
     "reference/channel-command-bus.csv": {
       "category": "reference_evidence",
-      "output_bytes": 6512,
-      "output_sha256": "b3aab6a994f751cfcec3c895b89a85b7033d6eb77a872396c81bc2f0acc9c80d"
+      "output_bytes": 6528,
+      "output_sha256": "edbaf099ba49718b0ccf85f23896071ff2606f2b590db35b1d1a895714c38564"
     },
     "reference/channel-partitions.csv": {
       "category": "reference_evidence",
-      "output_bytes": 11877,
-      "output_sha256": "8ebab4817e248b382b64e1ca6f9def7033e53108554e7e9179c27c256cba9f4b"
+      "output_bytes": 11813,
+      "output_sha256": "bbbb44f52b3d4a04bbf9b1e7a7dcce77c02c376fbc6c368094cae899d6b058ca"
     },
     "reference/channel-phase-kind-breakdown.csv": {
       "category": "reference_evidence",
-      "output_bytes": 31674,
-      "output_sha256": "27a4ece09f7a4b0357d7b0fb137e0b9f2963a04daac991ef63bbc97c6e0a3ae6"
+      "output_bytes": 30986,
+      "output_sha256": "dc5e8594b8e18a66df180b1c7bb5238580cfa027e8b6d6eaba3e5edb122364e5"
     },
     "reference/channel-phase-windows.csv": {
       "category": "reference_evidence",
-      "output_bytes": 174239,
-      "output_sha256": "54984a1d2af89cdbee8d881ba15b17d9969ce0101d368eb87c374edf7db2b6af"
+      "output_bytes": 173551,
+      "output_sha256": "6b5e37d625cfdf408652a81aa70e4ecf03c4466dcad77d1643d142cd18328f34"
     },
     "reference/combined_timing_chain/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 24160,
-      "output_sha256": "496ad7ff12f3ae6c69b8f787d16b8757d95e75ec29f5c07fc46d493dba7149ca"
+      "output_bytes": 23657,
+      "output_sha256": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c"
     },
     "reference/combined_timing_chain/summary.json": {
       "category": "reference_evidence",
@@ -2782,8 +2796,8 @@
     },
     "reference/down_gpu_input/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 20305,
-      "output_sha256": "48abd22562cd2c253585db84b335d0fc2298dc4b5fb117be8e93c665aee15a75"
+      "output_bytes": 19802,
+      "output_sha256": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e"
     },
     "reference/down_gpu_input/summary.json": {
       "category": "reference_evidence",
@@ -2792,13 +2806,13 @@
     },
     "reference/expected.json": {
       "category": "reference_evidence",
-      "output_bytes": 540143,
-      "output_sha256": "2b3305952d4b1db713bf870aff99ac541406d44b2309b33431202ea4a2060784"
+      "output_bytes": 538520,
+      "output_sha256": "767dde96f477bcb1555396eafbf3fbc7e69ed8b80c23fc3e9e52e6328f6f4515"
     },
     "reference/gate_up_gpu/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 20118,
-      "output_sha256": "633e0bc629b0cc11ab9c50ddd204ac83b372d257a28bea2d7fc31c3b488a30ed"
+      "output_bytes": 19615,
+      "output_sha256": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84"
     },
     "reference/gate_up_gpu/summary.json": {
       "category": "reference_evidence",
@@ -2824,6 +2838,66 @@
       "category": "reference_evidence",
       "output_bytes": 210,
       "output_sha256": "7e4dcaa21e183b51497b1c96622d905297ba91971f05b623de1426c260a718c9"
+    },
+    "reference/localwr-act2/LOCALWR-ACT2-COMPARISON.md": {
+      "category": "reference_evidence",
+      "output_bytes": 1545,
+      "output_sha256": "c2f772ca935520aa2b326c04ff75462f5ae13c013a71b3f694e40c5f3c9434c3"
+    },
+    "reference/localwr-act2/before-regression.json": {
+      "category": "reference_evidence",
+      "output_bytes": 301,
+      "output_sha256": "ec99fb3b235bd88fe6c84c8172fe09a9e9118ae5e93b51b4a26bbb48deed2375"
+    },
+    "reference/localwr-act2/case-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 954,
+      "output_sha256": "0134e8b3273264a71fe2e8326468641d0086b2b041e50bd7e5d7cb26fe61cfca"
+    },
+    "reference/localwr-act2/channel-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 180459,
+      "output_sha256": "e9824e51f9cb1403f4904b347d914335295bf8c76a33e3b1a42f8c8e4ba14d66"
+    },
+    "reference/localwr-act2/direct-input-control.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1674,
+      "output_sha256": "8343bbd654a9d0b98dc057ec42fb2a1c575bb32fabcbecbb9d21b211b5405846"
+    },
+    "reference/localwr-act2/localwr-act2-comparison.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1036720,
+      "output_sha256": "af67c17112ed5e1b3049f06763dcdb69024aaf7ccc0b93c573ba779243938927"
+    },
+    "reference/localwr-act2/localwr-act2-protocol-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 30194,
+      "output_sha256": "98987286d5248260a9b4bb2b6e9043ab67d5b451b3bc5a92752b45eecd21fead"
+    },
+    "reference/localwr-act2/native-command-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 6670,
+      "output_sha256": "46ab3b6487c54a6a9b8050b1fdbd007d93cefd5c5b6cd03a9ee1c880fa6571eb"
+    },
+    "reference/localwr-act2/phase-kind-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 241208,
+      "output_sha256": "141c9b1e8bde130f061b2835bf4df1124459ec733fec038ea4ac4d605176034d"
+    },
+    "reference/localwr-act2/phase-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 16468,
+      "output_sha256": "c89648a8d5507520eaef934a614ea6b7c3b4467154fc7bedc1656b36f3d1cb16"
+    },
+    "reference/localwr-act2/source-result-binding.json": {
+      "category": "reference_evidence",
+      "output_bytes": 989,
+      "output_sha256": "a129128b9107d821894fd81e8251447d4ed6997a899f7d718b9de7935f8bd13d"
+    },
+    "reference/localwr-act2/spill-scheduling.json": {
+      "category": "reference_evidence",
+      "output_bytes": 90489,
+      "output_sha256": "8e76ba2b01f7ff68160449ef02eb5e8d9e8742dd7993a2c1b59cfdf8b5d74187"
     },
     "reference/previous-act2-deadline/chain/native-audit.json": {
       "category": "reference_evidence",
@@ -2920,6 +2994,101 @@
       "output_bytes": 29681,
       "output_sha256": "a80d2d602a8a44f53045458c17f75f98a9726ad60911329531af8867bc02db0e"
     },
+    "reference/previous-localwr-act2/chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 24233,
+      "output_sha256": "1e4de292a4b74f1e8d8e0319f312d15fe46f1cbcb2d7b606940434013741b3e7"
+    },
+    "reference/previous-localwr-act2/chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 4402,
+      "output_sha256": "2796c7799e61c21bcc80d5a08c06fbc2d7b9cf1c6bcdd56bcf80f60749b1a478"
+    },
+    "reference/previous-localwr-act2/channel-analysis.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1052937,
+      "output_sha256": "ee3600a1adfcc402114e346dc7ddbf18f7be00ec2525b1156d1cd1cffdd0599a"
+    },
+    "reference/previous-localwr-act2/combined_timing_chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 24160,
+      "output_sha256": "496ad7ff12f3ae6c69b8f787d16b8757d95e75ec29f5c07fc46d493dba7149ca"
+    },
+    "reference/previous-localwr-act2/combined_timing_chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1821,
+      "output_sha256": "d30ec8fe0f92bcae463a40436329a0a7265398c818eaafe61305681d4ef8ae85"
+    },
+    "reference/previous-localwr-act2/down_gpu_input/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 20305,
+      "output_sha256": "48abd22562cd2c253585db84b335d0fc2298dc4b5fb117be8e93c665aee15a75"
+    },
+    "reference/previous-localwr-act2/down_gpu_input/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1559,
+      "output_sha256": "056537c09e8b8e7ac8728417fab05371102586e3d8e5a4f70d4b9e6ea0304f25"
+    },
+    "reference/previous-localwr-act2/expected.json": {
+      "category": "reference_evidence",
+      "output_bytes": 540143,
+      "output_sha256": "2b3305952d4b1db713bf870aff99ac541406d44b2309b33431202ea4a2060784"
+    },
+    "reference/previous-localwr-act2/gate_up_gpu/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 20118,
+      "output_sha256": "633e0bc629b0cc11ab9c50ddd204ac83b372d257a28bea2d7fc31c3b488a30ed"
+    },
+    "reference/previous-localwr-act2/gate_up_gpu/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1562,
+      "output_sha256": "bba0619cf19535c03e16731289492973928430eee3eaaedbc0ad3681a8ac9d07"
+    },
+    "reference/previous-localwr-act2/provenance.json": {
+      "category": "reference_evidence",
+      "output_bytes": 60756,
+      "output_sha256": "0b20f1ed2bf39e4ad23b302d528b395bf27a9c2a1cb0238d77d0f9bdf6da7c3a"
+    },
+    "reference/previous-localwr-act2/pv/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19410,
+      "output_sha256": "3e9643d2cb353537068422ad5cb55287795cfe44603d58692da3d0eb0398a5b4"
+    },
+    "reference/previous-localwr-act2/pv/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1527,
+      "output_sha256": "e517f8797b5fa22cbf67afc4f6756a5571857b8e44ade0b9002b083919e7fb35"
+    },
+    "reference/previous-localwr-act2/serial_layer_control/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 40889,
+      "output_sha256": "057fafb24eeb14ca2547184a347289aab1938a205e77811d05960c95ea6ba9ce"
+    },
+    "reference/previous-localwr-act2/serial_layer_control/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5777,
+      "output_sha256": "c667ecd404ba470b848b873c9d48a6eb67489e625f51aa0320fc05693d8e709d"
+    },
+    "reference/previous-localwr-act2/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 38819,
+      "output_sha256": "e885ae3ee49ae277a0adbc5da7f450a015604ef54d094d88efa08e0995855861"
+    },
+    "reference/previous-localwr-act2/v/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19467,
+      "output_sha256": "e03c0f61cf3cbeaa1d6777d61866224e00b219613a8f26760b715704661ee229"
+    },
+    "reference/previous-localwr-act2/v/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1585,
+      "output_sha256": "842b7661257668392d8ee5698aab65f024a31ea3a4115b17c61b4a270a29cb97"
+    },
+    "reference/previous-localwr-act2/validation.json": {
+      "category": "reference_evidence",
+      "output_bytes": 27950,
+      "output_sha256": "2a8835a9a3915f58b226990398abf1c81f51fa42e1ea9ed2934456886201ca7f"
+    },
     "reference/previous-rank-dispatch/channel-analysis.json": {
       "category": "reference_evidence",
       "output_bytes": 1052441,
@@ -2957,18 +3126,18 @@
     },
     "reference/provenance.json": {
       "category": "reference_evidence",
-      "output_bytes": 60756,
-      "output_sha256": "0b20f1ed2bf39e4ad23b302d528b395bf27a9c2a1cb0238d77d0f9bdf6da7c3a"
+      "output_bytes": 60704,
+      "output_sha256": "38a12ceb998338c712349ff3ecedb472195c3be239eff0aecdeb55e1c86a6464"
     },
     "reference/publish-byte-verification.json": {
       "category": "reference_evidence",
-      "output_bytes": 80457,
-      "output_sha256": "9d37c1a59cec08d9dd84b9888551f9a617f10804d24a3d5e5e73f4cecf5c9180"
+      "output_bytes": 80636,
+      "output_sha256": "7dd311132f9d1c4af0dd13bd3b178e61d85ce4412edf0c5b2f7334714970422a"
     },
     "reference/pv/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 19410,
-      "output_sha256": "3e9643d2cb353537068422ad5cb55287795cfe44603d58692da3d0eb0398a5b4"
+      "output_bytes": 18907,
+      "output_sha256": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f"
     },
     "reference/pv/summary.json": {
       "category": "reference_evidence",
@@ -3002,13 +3171,13 @@
     },
     "reference/serial_layer_control/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 40889,
-      "output_sha256": "057fafb24eeb14ca2547184a347289aab1938a205e77811d05960c95ea6ba9ce"
+      "output_bytes": 35948,
+      "output_sha256": "2776a7a3f1db5d88ba465fcd3b4af114fa992315bb725fb081a85e8836d3ad17"
     },
     "reference/serial_layer_control/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 5777,
-      "output_sha256": "c667ecd404ba470b848b873c9d48a6eb67489e625f51aa0320fc05693d8e709d"
+      "output_bytes": 5764,
+      "output_sha256": "1c24f19ab94eb19f609701338a27f62408a8cde88b51a157ce72389088a27416"
     },
     "reference/single-bank-verification.json": {
       "category": "reference_evidence",
@@ -3027,18 +3196,18 @@
     },
     "reference/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 38819,
-      "output_sha256": "e885ae3ee49ae277a0adbc5da7f450a015604ef54d094d88efa08e0995855861"
+      "output_bytes": 38812,
+      "output_sha256": "17c487a59914ceef7c38283cfad84d7f4e8e1c7658946aa008df0915392b3ebc"
     },
     "reference/unit-tests.log": {
       "category": "reference_evidence",
-      "output_bytes": 15401,
-      "output_sha256": "fcbfd65ba3fe5b49e4f464afcdb33f474acbc2df66b26703b2f1ad4d007e21e2"
+      "output_bytes": 16061,
+      "output_sha256": "67a0b4b4ba2c3c25b2216135721c1cfc601a2f35f3298d0b3c2288b948dd8f63"
     },
     "reference/v/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 19467,
-      "output_sha256": "e03c0f61cf3cbeaa1d6777d61866224e00b219613a8f26760b715704661ee229"
+      "output_bytes": 18960,
+      "output_sha256": "aab1fa66b485e698f3687313c3c2a0a91a7d2314fb26ae270ea7c84d6fd0411e"
     },
     "reference/v/summary.json": {
       "category": "reference_evidence",
@@ -3047,8 +3216,8 @@
     },
     "reference/validation.json": {
       "category": "reference_evidence",
-      "output_bytes": 27950,
-      "output_sha256": "2a8835a9a3915f58b226990398abf1c81f51fa42e1ea9ed2934456886201ca7f"
+      "output_bytes": 33432,
+      "output_sha256": "b08cc3cdde7c798a39473b20f10cc9ca67b1434dfda6824f703e6a53ebd937cc"
     },
     "requirements.txt": {
       "category": "publication",
@@ -3072,8 +3241,8 @@
     },
     "verify_reference.py": {
       "category": "publication",
-      "output_bytes": 3910,
-      "output_sha256": "4d96071caaf74e7b2f554bbfd6a55d81432e563aa28717af450a8cf91f73a42f"
+      "output_bytes": 4151,
+      "output_sha256": "3ed9a29abd88156dcec8f5b987e90fa393715fe955a758292f4d6a5b256d805c"
     },
     "verify_single_bank.py": {
       "category": "publication",
@@ -3087,5 +3256,7 @@
   "channel_independent_dispatch": true,
   "channel_queue_capacity": 32,
   "staging_split_activation_deadline_enforced": true,
-  "whole_internal_ACT_protocol_compliant": false
+  "full_split_activation_deadline_enforced": true,
+  "measured_logs_ACT1_ACT2_checks_passed": true,
+  "split_activation_audit_scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven corrected and seven direct cases, all 16 channels; not verification of all DRAM physical specifications"
 }

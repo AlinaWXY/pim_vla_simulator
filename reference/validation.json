@@ -1,8 +1,8 @@
 {
-  "unit_tests_passed": 100,
+  "unit_tests_passed": 104,
   "native_guards": {
     "passed": true,
-    "case_count": 38,
+    "case_count": 39,
     "subprocess_isolation": true,
     "native_cases": [
       {
@@ -605,8 +605,8 @@
           },
           "native_data_commands_checked": 92032,
           "rank_controller": {
-            "command_intervals_checked": 181352,
-            "rank_command_coverage": 113216,
+            "command_intervals_checked": 181400,
+            "rank_command_coverage": 113248,
             "global_CA_resources": 16,
             "rank_CA_resources": 32,
             "transfer_broadcast_compute_share_rank_CA": true,
@@ -741,10 +741,94 @@
         "python_trace_precheck_bypassed": true,
         "native_input_retains_invalid_address": true,
         "worker_returncode": 0
+      },
+      {
+        "case": "Local_ACT2_spill_rope_refresh",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 10252,
+        "native_audit": {
+          "split_activation": {
+            "status": "passed",
+            "nAAD_ck": 8,
+            "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+            "ACT1_commands": 552,
+            "ACT2_commands": 552,
+            "paired_ACT2": 552,
+            "cancelled_ACT1": 0,
+            "pending_ACT2_at_end": 0,
+            "minimum_gap_ck": 1,
+            "maximum_gap_ck": 3,
+            "gap_histogram_ck": {
+              "1": 464,
+              "2": 82,
+              "3": 6
+            },
+            "maximum_pending_by_channel": {
+              "0": 1
+            },
+            "classifications": {
+              "ordinary": {
+                "ACT1": 256,
+                "paired_ACT2": 256,
+                "late_ACT2": 0,
+                "cancelled": 0,
+                "pending_at_end": 0,
+                "gap_histogram_ck": {
+                  "1": 168,
+                  "2": 82,
+                  "3": 6
+                }
+              },
+              "other_internal": {
+                "ACT1": 296,
+                "paired_ACT2": 296,
+                "late_ACT2": 0,
+                "cancelled": 0,
+                "pending_at_end": 0,
+                "gap_histogram_ck": {
+                  "1": 296
+                }
+              }
+            },
+            "violation_count": 0,
+            "violations": {},
+            "violations_by_kind": {},
+            "examples": [],
+            "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+          },
+          "forced_localwrite_activations": {
+            "PIM_SPILL": {
+              "ACT1_commands": 128,
+              "LOCALWR_commands": 256,
+              "minimum_ACT1_per_bank": 8
+            },
+            "PIM_ROPE_STORE": {
+              "ACT1_commands": 128,
+              "LOCALWR_commands": 256,
+              "minimum_ACT1_per_bank": 8
+            }
+          },
+          "native_data_commands_checked": 1152,
+          "rank_controller": {
+            "command_intervals_checked": 5044,
+            "rank_command_coverage": 3436,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": null
+          },
+          "native_refresh_commands": 39,
+          "conflicting_row_writes": 256,
+          "localwrite_bytes": 16384,
+          "guard_only_nREFI_ck": 512
+        },
+        "worker_returncode": 0
       }
     ]
   },
-  "native_job": 1902838,
+  "native_job": 1903036,
   "native_cases_passed": [
     "chain",
     "v",
@@ -755,28 +839,94 @@
     "serial_layer_control"
   ],
   "fresh_modes": [
-    "before_14fb3bf",
-    "staging_ACT2_corrected",
-    "direct_1101"
+    "before_a987650",
+    "LOCALWR_ACT2_corrected",
+    "direct_input_ACT2_corrected"
   ],
   "before_regression": {
     "status": "passed",
-    "baseline_commit": "14fb3bfea5998012fc1be518821cf356edb6979e",
-    "archived_native_job": 1902756,
-    "fresh_native_job": 1902838,
+    "baseline_commit": "a9876505575f7cfc01716c98f0520eaa546cc24b",
+    "archived_native_job": 1902838,
+    "fresh_native_job": 1903036,
     "cases": 7,
+    "exact_source_inventory_and_native_library": true,
     "exact_cycles_bytes_traces_phases_native_CSVs_and_channel_partitions": true
   },
-  "direct_input_baseline_regression": {
+  "corrected_direct_input_control": {
     "status": "passed",
-    "baseline_commit": "4073452",
-    "cases": 7,
-    "native_cycles_bytes_traces_and_event_hashes_identical": true,
-    "all_channel_partitions_identical": true,
-    "stage_sum_us": 109.76288399999999
+    "historical_commit": "a987650",
+    "historical_native_job": 1902838,
+    "interpretation": "Direct input with corrected internal ACT scheduling; not byte-identical historical 1101",
+    "same_corrected_source_inventory_and_native_library": true,
+    "audit_scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven corrected and seven direct cases, all 16 channels; not verification of all DRAM physical specifications",
+    "cases": {
+      "chain": {
+        "before_us": 35.273489999999995,
+        "after_us": 35.273489999999995,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      },
+      "v": {
+        "before_us": 10.283294,
+        "after_us": 10.283294,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      },
+      "pv": {
+        "before_us": 9.190524,
+        "after_us": 9.190524,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      },
+      "gate_up_gpu": {
+        "before_us": 37.620366000000004,
+        "after_us": 37.620366000000004,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      },
+      "down_gpu_input": {
+        "before_us": 17.39521,
+        "after_us": 17.39521,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      },
+      "combined_timing_chain": {
+        "before_us": 55.037150000000004,
+        "after_us": 55.037150000000004,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      },
+      "serial_layer_control": {
+        "before_us": 110.18686,
+        "after_us": 110.18686,
+        "delta_us": 0.0,
+        "full_ACT_protocol_passed": true
+      }
+    },
+    "primary_before_us": 109.762884,
+    "primary_after_us": 109.76288399999999
   },
-  "staging_ACT2_deadline_checks": "all seven cases, all sixteen channels",
-  "whole_internal_ACT_protocol_compliant": false,
-  "known_remaining_issue": "projection spill LOCALWR split activation; unchanged and separately reported",
+  "full_ACT1_ACT2_protocol_passed": true,
+  "measured_logs_only": true,
+  "scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven corrected and seven direct cases, all 16 channels; not verification of all DRAM physical specifications",
+  "source_result_binding": {
+    "status": "passed",
+    "before_matches_archived_a987650_sources_and_native_library": true,
+    "direct_matches_corrected_sources_and_native_library": true,
+    "comparison_auditor_helper_and_analyzer_hashes_verified": true,
+    "provenance_sha256": {
+      "before": "1e09a91ab6731e5191e3ede0b7527026c5e0ba9aa0975d4df6a83b230a5ef1ef",
+      "after": "38a12ceb998338c712349ff3ecedb472195c3be239eff0aecdeb55e1c86a6464",
+      "direct": "edc26348cff2cbe4b1550d05b3697dda3be3c8960a13d3abb543e3a3ca4a15f3",
+      "historical": "0b20f1ed2bf39e4ad23b302d528b395bf27a9c2a1cb0238d77d0f9bdf6da7c3a"
+    },
+    "native_library_sha256": {
+      "before": "1ece2045ce68b56633289a91bb4969553c2f10a322af714c4b35326d66473199",
+      "after": "4e0ebf1fd9b4de53c0220bad0658ec39139def8050118f96d7e14613fa6afbbc",
+      "direct": "4e0ebf1fd9b4de53c0220bad0658ec39139def8050118f96d7e14613fa6afbbc",
+      "historical": "1ece2045ce68b56633289a91bb4969553c2f10a322af714c4b35326d66473199"
+    },
+    "downloaded_raw_files_verified": 2585
+  },
   "historical_measurements_reused": false
 }

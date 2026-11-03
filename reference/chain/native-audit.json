@@ -251,296 +251,75 @@
       }
     ]
   },
-  "staging_split_activation": {
+  "split_activation": {
     "status": "passed",
-    "acceptance_scope": "staging only",
-    "violations": {},
-    "violation_count": 0,
-    "staging": {
-      "ACT1": 1056,
-      "paired_ACT2": 1056,
-      "late_ACT2": 0,
-      "cancelled": 0,
-      "pending_at_end": 0,
-      "gap_histogram_ck": {
-        "1": 1056
+    "nAAD_ck": 8,
+    "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+    "ACT1_commands": 1696,
+    "ACT2_commands": 1696,
+    "paired_ACT2": 1696,
+    "cancelled_ACT1": 0,
+    "pending_ACT2_at_end": 0,
+    "minimum_gap_ck": 1,
+    "maximum_gap_ck": 1,
+    "gap_histogram_ck": {
+      "1": 1696
+    },
+    "maximum_pending_by_channel": {
+      "0": 1,
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1
+    },
+    "classifications": {
+      "ordinary": {
+        "ACT1": 384,
+        "paired_ACT2": 384,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 384
+        }
+      },
+      "other_internal": {
+        "ACT1": 256,
+        "paired_ACT2": 256,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 256
+        }
+      },
+      "staging": {
+        "ACT1": 1056,
+        "paired_ACT2": 1056,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 1056
+        }
       }
     },
-    "global_audit": {
-      "status": "failed",
-      "nAAD_ck": 8,
-      "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
-      "ACT1_commands": 1696,
-      "ACT2_commands": 1696,
-      "paired_ACT2": 1696,
-      "cancelled_ACT1": 0,
-      "pending_ACT2_at_end": 0,
-      "minimum_gap_ck": 1,
-      "maximum_gap_ck": 207,
-      "gap_histogram_ck": {
-        "1": 1440,
-        "11": 16,
-        "17": 48,
-        "19": 32,
-        "21": 32,
-        "23": 32,
-        "25": 32,
-        "43": 48,
-        "207": 16
-      },
-      "maximum_pending_by_channel": {
-        "0": 7,
-        "1": 7,
-        "2": 7,
-        "3": 7,
-        "4": 7,
-        "5": 7,
-        "6": 7,
-        "7": 7,
-        "8": 7,
-        "9": 7,
-        "10": 7,
-        "11": 7,
-        "12": 7,
-        "13": 7,
-        "14": 7,
-        "15": 7
-      },
-      "classifications": {
-        "ordinary": {
-          "ACT1": 384,
-          "paired_ACT2": 384,
-          "late_ACT2": 0,
-          "cancelled": 0,
-          "pending_at_end": 0,
-          "gap_histogram_ck": {
-            "1": 384
-          }
-        },
-        "other_internal": {
-          "ACT1": 256,
-          "paired_ACT2": 256,
-          "late_ACT2": 256,
-          "cancelled": 0,
-          "pending_at_end": 0,
-          "gap_histogram_ck": {
-            "11": 16,
-            "17": 48,
-            "19": 32,
-            "21": 32,
-            "23": 32,
-            "25": 32,
-            "43": 48,
-            "207": 16
-          }
-        },
-        "staging": {
-          "ACT1": 1056,
-          "paired_ACT2": 1056,
-          "late_ACT2": 0,
-          "cancelled": 0,
-          "pending_at_end": 0,
-          "gap_histogram_ck": {
-            "1": 1056
-          }
-        }
-      },
-      "violation_count": 496,
-      "violations": {
-        "ACT1_while_channel_ACT2_pending": 240,
-        "late_ACT2": 256
-      },
-      "violations_by_kind": {
-        "other_internal": {
-          "ACT1_while_channel_ACT2_pending": 240,
-          "late_ACT2": 256
-        }
-      },
-      "examples": [
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25356,
-          "bank": [
-            0,
-            1,
-            0,
-            1
-          ],
-          "row": 40,
-          "ACT1_clock": 25354,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25362
-        },
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25358,
-          "bank": [
-            0,
-            1,
-            0,
-            2
-          ],
-          "row": 40,
-          "ACT1_clock": 25354,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25362
-        },
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25360,
-          "bank": [
-            0,
-            1,
-            0,
-            3
-          ],
-          "row": 40,
-          "ACT1_clock": 25354,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25362
-        },
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25370,
-          "bank": [
-            0,
-            1,
-            1,
-            0
-          ],
-          "row": 40,
-          "ACT1_clock": 25354,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25362
-        },
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25372,
-          "bank": [
-            0,
-            1,
-            1,
-            1
-          ],
-          "row": 40,
-          "ACT1_clock": 25354,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25362
-        },
-        {
-          "violation": "late_ACT2",
-          "gap_ck": 19,
-          "command": "ACT2",
-          "clock": 25373,
-          "bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "row": 40,
-          "ACT1_clock": 25354,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            0
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25362
-        },
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25374,
-          "bank": [
-            0,
-            1,
-            1,
-            2
-          ],
-          "row": 40,
-          "ACT1_clock": 25356,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            1
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25364
-        },
-        {
-          "violation": "ACT1_while_channel_ACT2_pending",
-          "command": "ACT1",
-          "clock": 25376,
-          "bank": [
-            0,
-            1,
-            1,
-            3
-          ],
-          "row": 40,
-          "ACT1_clock": 25356,
-          "ACT1_row": 40,
-          "ACT1_bank": [
-            0,
-            1,
-            0,
-            1
-          ],
-          "request_kind": "other_internal",
-          "ACT2_deadline": 25364
-        }
-      ],
-      "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
-    },
-    "known_other_internal_violations": {
-      "ACT1_while_channel_ACT2_pending": 240,
-      "late_ACT2": 256
-    }
+    "violation_count": 0,
+    "violations": {},
+    "violations_by_kind": {},
+    "examples": [],
+    "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
   },
   "rank_controller": {
     "command_intervals_checked": 180448,
@@ -572,38 +351,38 @@
   },
   "trace_sha256": "c7a55c2c2a5ff42c518c8a12a0d5c9c9619707bf58825e7e155b0f56b416d3cb",
   "native_sha256": {
-    "timeline.csv.ch0": "170493697bc7e5088f6f92f8d804f28b222dfbcbf17ea8350d3a8931cfc8a2aa",
-    "timeline.csv.ch1": "4b01cd5fab0d950535901b6eb4a30c6bc61ce8f2fef9b72df1823c9ecc03bf1d",
-    "timeline.csv.ch2": "bb67a352471271c4408c601dccf894b74623041eb37e01228670814037e1d001",
-    "timeline.csv.ch3": "df9a57ff3f1404330995f73b8c51bc0e7592886b69a9f37720471df11d1afe2a",
-    "timeline.csv.ch4": "3f378998348c0e92816a98e56f2471462d8069bf5d0492a7d695aabb3feaf65b",
-    "timeline.csv.ch5": "59def1470154102de5a3714639f0acca252d2daf25c14ab0f62c92e3ef90a2e1",
-    "timeline.csv.ch6": "c039c8e5ee948b96d46621aa80f93657fd3818b97c4734dbe6b91d5ffa316b2a",
-    "timeline.csv.ch7": "a8f4a1b0bafedebe73661e236f59fb2653ca05fec479721620245dff23d03269",
-    "timeline.csv.ch8": "284a41032ed5071a2953e52d247311bf04b788cfbd357fd0f7429e5deb2266ba",
-    "timeline.csv.ch9": "b38e7dabd316586b065d2accedf792e70d224ae622e0c06d9ce4a1ac50f83d5c",
-    "timeline.csv.ch10": "12eff5e94ddd6c3f9f64ed3b802b9366a870f8ccf3acd7f6b9fc6ea5c3f8b24e",
-    "timeline.csv.ch11": "bdd6fc611095759df2c30a791b6ffa6142995dad868d165cac0a10cedd0c87e1",
-    "timeline.csv.ch12": "02823c4c6267e47729ce5078e0705d90ba114f639d58a144ee0e6b2660c2eef4",
-    "timeline.csv.ch13": "e1386b727fe60843e10b71ad1f0bb43012f8ac92c65bebef2ad9483690270229",
-    "timeline.csv.ch14": "48fc21147a960e05f6cde8fcf39e3b21588ae8dbca0a409882e2b3c159a70711",
-    "timeline.csv.ch15": "97a332e09b0eacfb8d656feef06d0f093ee9650b60a9f446e1e27738f8ca6625",
-    "unified_gemv.csv.ch0": "7f3fa2927171ffa08e00b21f76e6009b96fc23579c239174f6867fe2af5c5f52",
-    "unified_gemv.csv.ch1": "c5be884e69440085f6f4c938073ebebb30382b350ddd6241c27bf43c9fdcb2ec",
-    "unified_gemv.csv.ch2": "4258fd51dc215d940db5c5502d5fb1a9f5220aaef1ab703b3f5549260148055a",
-    "unified_gemv.csv.ch3": "15b0d94eed3225d236355ae59ad09ea5ca1b47e9d1136c627a6be1ad4c893b84",
-    "unified_gemv.csv.ch4": "2f23c9ac5fb167b7d76b058f13526ede34293a5f3e41896fb5b4ed49a24bced9",
-    "unified_gemv.csv.ch5": "1ff52d70af9cb820c4a2d3a18f7ae7c33aa0ff56d1925f306aaee7492c378646",
-    "unified_gemv.csv.ch6": "c8452422928346a16b57b33c08dfd59c2f9618fb19cb48d66604e1b1d0982b5f",
-    "unified_gemv.csv.ch7": "5e3b2bd0dd928ff331010baa56dadecb6f7465e8cfe0209550c08789f9825352",
-    "unified_gemv.csv.ch8": "64d72a53fc7154389712bf4ff53813634b7fdb892780513e7c2e55930ac2c58d",
-    "unified_gemv.csv.ch9": "f04e29880fd4797d018633a42219bad0e4b358c863c108340c81cef226486c3a",
-    "unified_gemv.csv.ch10": "85bd5b2ad298d4820c3b75a5c26eaf973a6ee65be853f1d464c36105d473524e",
-    "unified_gemv.csv.ch11": "2c4fda3bb8d8e5e18d5ee463cced9b28b34a9f62285645d4e60ec277dc15fc16",
-    "unified_gemv.csv.ch12": "3cd2da42733944df8f2cd968794a0eb10d328f83c6ed886a97e90211b9b4798f",
-    "unified_gemv.csv.ch13": "39a6017c6c8939ba1a0b970fb11c9e52628f3c653e173eaaf0ca8c0bc4651904",
-    "unified_gemv.csv.ch14": "7c0555d0799815ed9180be52329bd4081de8293c79475141108d4e3ef8fa1f99",
-    "unified_gemv.csv.ch15": "31bac104009a3aecdd1729108e9788e2e147217e02736b811c7494570ca01ed1",
+    "timeline.csv.ch0": "b34eab57aca27293033413b6cca7df07ca1fdc38938409ce24fd9cf2a34ae1fa",
+    "timeline.csv.ch1": "07412c2960477f2568f9d696058491c9c76dd72fd7d2c9887ce01997db29b3e4",
+    "timeline.csv.ch2": "140a78e216c804d7c0b00912e61333d832eec7c1c8d15b06255113370128488a",
+    "timeline.csv.ch3": "d90e046a330ea88f55f5d6bf152b3e5180bd7948444dd83cafb25780c6cbc295",
+    "timeline.csv.ch4": "41febd0657695c14cb8388b713712b5fd009a47ba81c49b18644953376cee865",
+    "timeline.csv.ch5": "29f463f253148e6e1ad5f9d0a3cf7b23129196b2f0a65c1f6c8c5bdbcc59866f",
+    "timeline.csv.ch6": "c58aed1354f3de3e7d659ba9648341afef54f9ec3ce17db1a95bc1a397fffd79",
+    "timeline.csv.ch7": "01f3891eaa2b29652d73fa2905fb340c479fc460067e9c603599a6c271e21f2b",
+    "timeline.csv.ch8": "b0ba9fbd41d91653759006d7ba13f51c8c40094d9311389df03af17dab429e28",
+    "timeline.csv.ch9": "39846e46bd011e293903d517c452aa2c1cd5b58b2fee8604d969bddaa83181cb",
+    "timeline.csv.ch10": "f149a281afdc3fca591a9aaa9fbffd90d65632f7338e00e0eaa33490e8abc8b2",
+    "timeline.csv.ch11": "23943152026fd1e290a8b007c6e393d42ba3e26817ff3c9d7bf027516ca546c3",
+    "timeline.csv.ch12": "987e7b975c7ae89ec82f01dbb2465520e8d2cb6859ded72410638a8b1bfc0fed",
+    "timeline.csv.ch13": "dd4f82f4adcf5b43352f41b58fdaf0c9c41e4a062b6011386f7f28be3c97f6f4",
+    "timeline.csv.ch14": "ba79ef625a2882e80d0519090a69122184b80b91b6d32d0ba8e0995435d87eac",
+    "timeline.csv.ch15": "3e0c399c2b28443cfa0b86ae42426fe6239a8e05f6b0730335a071dd259923e6",
+    "unified_gemv.csv.ch0": "facc793d09184b9846129e1c5f64a3fe5e6fa211a179319accb9f5e15b7b9a4e",
+    "unified_gemv.csv.ch1": "eb92870673dd80fb515fe0ae9a5556130a5e78e867e9b9b758acb6679de56324",
+    "unified_gemv.csv.ch2": "1f3c8be841af5be4dd39869c98829a0fe963f4a041fb30e49e18861dd309bf5c",
+    "unified_gemv.csv.ch3": "1ad499c2fe2c1b48837468c13480f3c786974daf4193d5db60cd1c012be2b3d1",
+    "unified_gemv.csv.ch4": "f3a5412d6bbae7faca020b674babea0a974a02ec01401980d85f7b826accb135",
+    "unified_gemv.csv.ch5": "9a84ebe2a0846e98f675939e8ebf9b38c945192575a988e56f86ffe30caa1a2f",
+    "unified_gemv.csv.ch6": "03aac249cf12809b449f221c7219928686db38b0beb2f7f98e0f9f05a71df906",
+    "unified_gemv.csv.ch7": "2c068a581fd322037b7b13ae87a0f193d49500e34ef5f57ac439abaf056e764f",
+    "unified_gemv.csv.ch8": "70a50ab79478764b601eb2c6f89c8c805f9d17b3837ebcba1b3c69622af99529",
+    "unified_gemv.csv.ch9": "f44611fe8f542106a02a2cb126291c9b65dbd395e4fa42cd3b483bc649fc1e86",
+    "unified_gemv.csv.ch10": "ace5cb5b2a7adec8a357603f9e9043bac697cdb2cb981595ac2056eb94dbc8ec",
+    "unified_gemv.csv.ch11": "12c9d5cfc363fb9eb938f921ecfd134c7cd6c7e0eb70b7bcc656d6765578237c",
+    "unified_gemv.csv.ch12": "65c73545924d828e42d7339d8ac0dad5e677730b8a43b7765761a7d540a634bd",
+    "unified_gemv.csv.ch13": "c0db2f9c598bae077ce718f6fdcae55a91269dcafcf28855836d95e3e88e9d83",
+    "unified_gemv.csv.ch14": "3a65b274762497415c17880a00dc28d81c0ae8235f21f3129aef05b61b3281d0",
+    "unified_gemv.csv.ch15": "77cda56902f16d88f438b20b7001f9d2b943ce892a446e0592a85bc4684a3566",
     "staging_events.csv.ch0": "11b6aff499c1b56ee7cb2fbaa220d5ad7303c69cefac5c0dbee642866198b79b",
     "staging_events.csv.ch1": "fcb449b7495b92313ee20645d398a97971e201623192b8e971a13de471b9e29c",
     "staging_events.csv.ch2": "5bf5642e2fe92d57efc8f865d00c07a7925d28c18cb587acd7122bfab54e48bb",
@@ -620,56 +399,56 @@
     "staging_events.csv.ch13": "09b0746a7e4c7c88dda3407c1240ed49b954f4d9899f5bcddbd8f71135cda137",
     "staging_events.csv.ch14": "956218ddb81acaab0543eec11c2148b3caadec851e3794dabc5cb6fe4436db99",
     "staging_events.csv.ch15": "554de8989de888c7a86445e4d8b6f1f3ca56dfda71c881e4d0b54b6806cec5ff",
-    "rank_ca_events.csv.ch0": "4a9cc3746b5dcacbdfcfce6fb0a5c20801c807691e60e6377bbf6d38165043b6",
-    "rank_ca_events.csv.ch1": "dbfe4999cac2ea8044f5756beb4264c5c77f981b3cbbf89f15c6d111518248bc",
-    "rank_ca_events.csv.ch2": "77dfe0bf09e1889122e158f5b7790689241fa93a25e0888f573a7ad128863d29",
-    "rank_ca_events.csv.ch3": "7be062fe9e10efced5f14baca6fa3d0283436a15edae205da93a3c547a7e61b4",
-    "rank_ca_events.csv.ch4": "9e381752d86f5b1f0b1730ff93e9faf304278fdd70b3d90e4e231dcd748b3b38",
-    "rank_ca_events.csv.ch5": "16c2c9f0b2bab8084f5578aee4598feffa3815129a39419c76d28add7fc7fee5",
-    "rank_ca_events.csv.ch6": "f0ae19e562f1fdfcefd2db6b01bbc7aa02502a08845ff71291e1adc3eb680c8b",
-    "rank_ca_events.csv.ch7": "1702c58cf734fa5acc88739f7920cdfa3c7c268e50a4d09ce8b4b83650e404ac",
-    "rank_ca_events.csv.ch8": "64d72d039c9d1a882d56473ad0de901e11ee164151afd72823ce0d18db06be63",
-    "rank_ca_events.csv.ch9": "45bec82b408eccffc9067b8efb9f30276dfdd6486492961df397e74619661bc4",
-    "rank_ca_events.csv.ch10": "bfc7981e319d5d05c9985547f519bef7d6e3a2d9900e1e95e5d22448a6cf6c0f",
-    "rank_ca_events.csv.ch11": "e31648e2ca05dbb668dea22cf66b395974fa9c583a7ece0cc5eee69ca0586490",
-    "rank_ca_events.csv.ch12": "2bd5a7c709599e2a10b2ad82296a1a25a456e75f1b8c3f1baace237a9e8bf3c0",
-    "rank_ca_events.csv.ch13": "39baee2bebd6a707ef93349ad180a4438d1b08dfc765511062965558eb8b3554",
-    "rank_ca_events.csv.ch14": "e5c080c07e0d888decbf2f9c89762a12bcfd1c8d0cd421053361b935ae4ce32c",
-    "rank_ca_events.csv.ch15": "f9fddbd27b7ab4ce494ba4a55e72d56c968ba12255620119754429ec3381f6f2",
-    "bgk_events.csv.ch0": "5d7486f258858ac1634c070594bb0bd5f4111329e211326f08309d3eb0722693",
-    "bgk_events.csv.ch1": "3603a7e6a0bb0b2e5197683920ef1cc8b389e3f3e4294e8efa37e2d21f6819f8",
-    "bgk_events.csv.ch2": "47060976c03d2f5ce05fc5d50bddc37855a1847b7da3898acf65dcd751bbeab5",
-    "bgk_events.csv.ch3": "7466283057dba3ad2d0570030427bf080476b99b977a3eac94c2fee0b7e16c75",
-    "bgk_events.csv.ch4": "484c7c3563bb737f0f0e6ae813373fe3dd4bbad080e45ea6a447a12bc81b7a16",
-    "bgk_events.csv.ch5": "9856992fffe59c3218d9c453733ca8e9cb0df70e1f0797064c7c4829f12febcb",
-    "bgk_events.csv.ch6": "68c455c91f85957898b4a285405525fdf8d6523a7e15199d47f07c0cf8d9bc22",
-    "bgk_events.csv.ch7": "9cda1a6b9c168f169da1c14221be34af71c21fa863baec97d9e3d69723215e2c",
-    "bgk_events.csv.ch8": "9feb17b6ac59699c2129bba1c33ca3c7d64545899b90ce411b2552969b344c07",
-    "bgk_events.csv.ch9": "d9d439263e408d7b78685ec714ce9aaa4da87e9a8667f67f1050b462d64d1ed7",
-    "bgk_events.csv.ch10": "409dd6aceed4122c493fa4b107fdd8a804f74715cc117944d76c8936806448fd",
-    "bgk_events.csv.ch11": "db8da7897e455ed6a42c1bd44ee21374c3fa4285f287a5fe74ea04530aebf801",
-    "bgk_events.csv.ch12": "bddedebe1537aed890e52a07c8121fdb3d43f5e72d8e611489b564b40e6e6d64",
-    "bgk_events.csv.ch13": "3ea8de601f0b01e4f9efbeffa29f7c5ddb70f2332877f0ed8e6d3b25fadfa407",
-    "bgk_events.csv.ch14": "4cc7cfd3345efec789da0bb4e412275e3bdd9da099ba03259a8937c581c02681",
-    "bgk_events.csv.ch15": "8574275cc2b155708de42ee2bc6caba98cd2e26d9ed65f20a0c977ebe03cff9f",
-    "frontend_dispatch.csv": "1dc9cd8ea80f392f9a1cbcc3172486510b7212293b100ffb023f4669e14c4c29",
-    "channel_ingress.csv": "9f83a754d709e49b3548ee54e466fa1ed124d5685d50570f410e64f13201d79c",
-    "rank_descriptors.csv.ch0": "65e37883a1b4618283d4d7f825bb3849de5d57b89c16b9f38683abb09ca94764",
-    "rank_descriptors.csv.ch1": "4aa6cbb30fcb61b114063acdb12c1be1c16cab0d46e5739202411045709e1cf6",
-    "rank_descriptors.csv.ch2": "1182b23c0471e1eda2764d46a687a278692b66af1bb05df8e13e600a04f2dba5",
-    "rank_descriptors.csv.ch3": "45272df6d9d20924d3ac73c51da61308c968e9302717a2e6fd2e87f5fc9559e5",
-    "rank_descriptors.csv.ch4": "bb02dbb284f37accd7692648d73c8a7cb4adff9406ecde74426fb74d4d3524f9",
-    "rank_descriptors.csv.ch5": "ffdcc79b261344072dbd724a96a8979641916a428186619879675b91ac0a934a",
-    "rank_descriptors.csv.ch6": "6165115fe1897fc223336e49f157dbea0b93c23959618a9d0bd318a0e705af1c",
-    "rank_descriptors.csv.ch7": "843a94ab34c8081037eb4fbd62a0dd8e83d2ba5d4d9ab15fcc43aa4512c3691e",
-    "rank_descriptors.csv.ch8": "bb90657c159512f18692be8c55af1a7dd6b56f491e942ba5b3b5e21dcf852173",
-    "rank_descriptors.csv.ch9": "8e2ba091ec69c845b3c71fca864b8ec533fc57bfad76fe054ece0bab8a55b024",
-    "rank_descriptors.csv.ch10": "7d7fbd1a25f19e5fd486a00025726e1f5fe7282e4f526b486479df7a3f3ea731",
-    "rank_descriptors.csv.ch11": "b2f9b32a3f193ba38c7c16cf2ff454e61bb9d627e8ff953374127045330fe2d8",
-    "rank_descriptors.csv.ch12": "f0266d77b10d017be03ef2291b5ec3a98107bbbea36c80aba3605fac25726b23",
-    "rank_descriptors.csv.ch13": "c6e50537d8d77b12454665c67423d27978f6d2578d518ae7a763fe531756ebe9",
-    "rank_descriptors.csv.ch14": "c4604cb6e2879fc7dabcf45e31c581f7460347958a4e30ede44b95e3d8120e7c",
-    "rank_descriptors.csv.ch15": "c5618ad6f1642fcea5062e4b2c78562eab7353a2f772ff11d01811556a07c088"
+    "rank_ca_events.csv.ch0": "3ba50bdc76ef39abb4d0b79723096b46927bdab4bad6521914020006f2fc6e2d",
+    "rank_ca_events.csv.ch1": "519a19a8715b4ccf4e55682f9a3a456ac90e6d22aaec982beabc787b310a0f21",
+    "rank_ca_events.csv.ch2": "aaa0f0437f47d21c92d7fe78bcf2541c6c9fd57d513e7bb4cc7b10909d202374",
+    "rank_ca_events.csv.ch3": "1787826c5a86abb2dc5a5917448d025ef392dc4bc2425f17968c129ee2cc0744",
+    "rank_ca_events.csv.ch4": "fde0306c9e190d60fde914c1138262595ce3041795da26c55539eba0b41054c7",
+    "rank_ca_events.csv.ch5": "2972c98536fc45c5d4444c2be8415795172105f0e3eb9771b349681941835fb4",
+    "rank_ca_events.csv.ch6": "76391f8fb8ad18bbc36aa8cfa4dce268f623fc2899e17ddc4ee30db088db2b6f",
+    "rank_ca_events.csv.ch7": "864eec95f529bff05af31edbccfc548604d499ba9ff26515e3b4307a03697f84",
+    "rank_ca_events.csv.ch8": "87f61b72ef775cce5a6d4c1da1b3121aab80a9c9f9fd555ba0f4106f76a36f64",
+    "rank_ca_events.csv.ch9": "283baeb290efbe1042a2ab0dad69490fef111da74245d45c9bf2dbd9f0a9d619",
+    "rank_ca_events.csv.ch10": "f67eda3ef0a42d14c9ad1e626b33984e4a294bdb0cd158d0076adad5530941d7",
+    "rank_ca_events.csv.ch11": "b30ebd64c1845e0a3caabffe4a1a2236f80a10c83b87ddfaa810ef368bb2a0e0",
+    "rank_ca_events.csv.ch12": "f134f3a26637e10ddcb33627852269a8f71cd36867100cf2dcf77f2d71cf58dc",
+    "rank_ca_events.csv.ch13": "da6668c6bda18ee5b5432dc9ee92cb84c4a608ec45a61e60abfe388de095e74e",
+    "rank_ca_events.csv.ch14": "ee87689eb860afa77b5e8ff629acdcd4ca8648aaa4e92f15b0b1a435ba2d2d02",
+    "rank_ca_events.csv.ch15": "f9c50ad0aac67674ba11927f7ae942e160f1ca9d4637b767feae793eccf9f62d",
+    "bgk_events.csv.ch0": "bd70114b1ef3adf6a52b938c605f03491eaef97e903b1138beab86770685a282",
+    "bgk_events.csv.ch1": "a64d10d2d8a13bbd5e33b38433e4e2b57c89d57a729dffbd992b71f182f686be",
+    "bgk_events.csv.ch2": "3c86b294355b2b588950f62db59547429b6da97a374936612de083a01b630af5",
+    "bgk_events.csv.ch3": "ba9cbfd12d34bba6326fc6e8403dd454daa018ec632ea2f1678e9c6ce39c8c9b",
+    "bgk_events.csv.ch4": "97daac25b35d2300a1a8044d741336f69fbbce083bc9ed4472135e122862bf88",
+    "bgk_events.csv.ch5": "e6418cf29aa64a5af632d816f07480c38ff7cb9eeabeca5ce566fef7b450a06e",
+    "bgk_events.csv.ch6": "3cddbd2dc40e1755e4d8dedf58a76be3223738cd63f5f27e94daea2fb35eeb25",
+    "bgk_events.csv.ch7": "007bd0f78c26b6c6e004148dbcb51c44b15dc3cb58b0cfa6093fd34c38e72693",
+    "bgk_events.csv.ch8": "29341a6dd22f3b8e473f9b4b4dc40cd8613060bcb8428ff31775aa13cf38606c",
+    "bgk_events.csv.ch9": "11ad8f23e937378285c3f9199fe18c7ea42d913ed07067b79ae36371e57cd3d9",
+    "bgk_events.csv.ch10": "2bd4d20f9192e4fd10fb10ff602bd4cf033444c739ebf7d00bc9556708cf47f1",
+    "bgk_events.csv.ch11": "7f9f1e8fc65b6895220e9c080652affafb44f0d7f57e83dfb3ad970b192827ee",
+    "bgk_events.csv.ch12": "f680ab60d3bd67e73953fc8ae8dc91665f3bc5ccd08c3a0f1d48e8906f996e66",
+    "bgk_events.csv.ch13": "736b1787f4d252b46bdfe19bf9c2ae53b66b532b474d789aa3f2f64bb0c64630",
+    "bgk_events.csv.ch14": "daaa49ab328d800cbea448a5d7bd13c404a53682ba4aa0e515fdb9f020ce44c7",
+    "bgk_events.csv.ch15": "8bb33357caeacd2f6af5149b439d5186a3248945dd1b7d3425d16c1747ba7175",
+    "frontend_dispatch.csv": "6fdd2380e986ed6de5851feb354aace9bea430628d660acaf69a367df65e7ed8",
+    "channel_ingress.csv": "fcca0fbdf7dd420adf5b16522365668cc0f660f6fac295124fcc8f5fcb491143",
+    "rank_descriptors.csv.ch0": "207728771ccf1b85035c4e3b307d1b7d0940f634817fdeeda5767a4ee6457b60",
+    "rank_descriptors.csv.ch1": "ea67ffa3f7da035309733d4740b4239b8f02a95d628c195871c029b9504f1b65",
+    "rank_descriptors.csv.ch2": "fb04d40569119c4507c849cd404519ad2cc33277347e0448da39369718539c06",
+    "rank_descriptors.csv.ch3": "ae7d79ed212df3bf9419389791f83fd5063958e3b20a4fc588a9a595baf6f097",
+    "rank_descriptors.csv.ch4": "a117d97f53bdb71ce32d91aa58016e8de34609359c122580bad1e3a56f38dd6c",
+    "rank_descriptors.csv.ch5": "5f03ace4d08cac2a9c3503834afaf9137be5d60d0f3df9806fdaec0dfe205385",
+    "rank_descriptors.csv.ch6": "5174402e70f85288324d4534811ab1034ce8a77da407058a960afb1d0f99cfe6",
+    "rank_descriptors.csv.ch7": "c0fe8d2f37f6309427390922311d2dae8bd1907aeded7d364c44971ca9d932ff",
+    "rank_descriptors.csv.ch8": "13c80e45f0a21e577a6e380b557ab3b5181afbdea25192b91487fdf73023bed4",
+    "rank_descriptors.csv.ch9": "e6d44f01be24174daedca28fd3942115a12e557fa22c664c1c78beeacb4a9a84",
+    "rank_descriptors.csv.ch10": "bdcd3b30b5925128e395309affaeacd5df00cc55c6a9084e9a5f7499140582b9",
+    "rank_descriptors.csv.ch11": "f51f7e60b298be6eb7f661447a79c66fb8ed780dabd05033563f789c48045e59",
+    "rank_descriptors.csv.ch12": "de5856dfbb877987af240cd637f9b474d1d65f96fc028d673af5857cdca8a6c8",
+    "rank_descriptors.csv.ch13": "554ff30d3517572c533b6476703d6f8f45b3e917dd8eda59e921c60e20bdea4e",
+    "rank_descriptors.csv.ch14": "ba09bd79fef9f47e29760bc24c5788afc8b3dbf45e941fc04382fc5ca00c6ad6",
+    "rank_descriptors.csv.ch15": "fcaba42422c71373e10ad095e748f66fec5a4b26a361c9a3c6e6f7a055aac18a"
   },
   "numerical_compute": false,
   "unmeasured": "GPU/nonlinear arithmetic and GPU contention",

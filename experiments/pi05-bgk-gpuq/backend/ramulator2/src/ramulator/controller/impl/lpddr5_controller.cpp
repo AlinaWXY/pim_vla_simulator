@@ -103,6 +103,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "ffn_dram_extension.inc"
 #include "unified_gemv_extension.inc"
 #include "rank_staging_extension.inc"
+#include "pim_activation_extension.inc"
 #include "rank_descriptor_extension.inc"
 
  public:
@@ -445,14 +446,14 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void tick() override {
-    if (!m_stage_act2_pending &&
+    if (!m_internal_act2_pending &&
         ((m_pim_buffer.size() && m_pim_buffer.begin()->type_id == Request::Type::PIM_MAC_HB) ||
          (!m_pim_pending.empty() && m_pim_pending.front().type_id == Request::Type::PIM_MAC_HB))) {
       LPDDR5Controller::tick();
       complete_pim();
       return;
     }
-    if (!m_stage_act2_pending &&
+    if (!m_internal_act2_pending &&
         (m_read_buffer.size() || m_write_buffer.size() || m_active_buffer.size() || m_activating_buffer.size() ||
         !m_pending.empty() || m_cas_issued || m_clk < m_normal_ready_at ||
         (!m_pim_buffer.size() && m_pim_pending.empty()))) {
@@ -472,11 +473,11 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
     // Weights are latched when MAC issues; refresh obeys the normal array
     // recovery rules. SRAM ownership is tracked independently below.
-    if(m_stage_act2_pending) {
+    if(m_internal_act2_pending) {
       // Finish an owned split activation before refresh/PRE or another PIM
       // command can disturb it. The ACT2 still consumes the rank CA and must
       // satisfy all ordinary DRAM timing constraints.
-      issue_stage_act2();
+      issue_internal_act2();
     } else {
       Candidate cand = pick_priority_if();
       if (cand.valid) {
@@ -659,10 +660,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     // Payload issues through independent local ports; only ACT/PRE uses CA.
     if (it->command == m_localwr) return false;
     const bool actual_mac = is_bgk_mac(*it) && it->command == it->final_command;
-    if (!bgk_targets_ready(*it,actual_mac) || !check_timing(it->command,it->addr_vec)) return false;
-    m_device.issue_command(it->command,it->addr_vec,m_clk);
-    m_rowpolicy->on_issue(*it);
-    for (auto* p:m_plugins) p->on_issue(*it);
+    if (!bgk_targets_ready(*it,actual_mac) || !issue_internal_array_command(it)) return false;
     if (it->command != it->final_command) return true;
     int service = is_bgk_mac(*it) ? (it->type_id == Request::Type::PIM_MAC_K ? m_k_cycles : m_qk_cycles)
                                 : m_bgk_input_cycles;
@@ -766,6 +764,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void issue_local_ready() {
+    // Unlike staging, spill/RoPE requests for other banks may bypass the
+    // owner. Reserve this tick's CA for an outstanding split activation.
+    if(has_pending_act2()) return;
     RankFineScope fine(m_rank_fine_context,m_rank_controller);
     issue_ffn_z_local();
     issue_rank_rope_local();

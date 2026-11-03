@@ -81,6 +81,41 @@ class SplitActivationTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "target_bank_access_before_ACT2"):
             self.audit([event(10, "ACT1"), event(11, "LOCALRD"), event(12, "ACT2")])
 
+    def test_compute_access_covers_all_target_banks_before_ACT2(self):
+        for command in ("MACAB", "MACK", "MACQK", "MACHB"):
+            # The command's encoded bank is not the complete physical target.
+            events = [event(10, "ACT1", bg=1, bank=3, type_id=14),
+                      event(11, command, bg=0, bank=0, type_id=4),
+                      event(12, "ACT2", bg=1, bank=3, type_id=14)]
+            with self.subTest(command=command), self.assertRaisesRegex(AssertionError, "target_bank_access_before_ACT2"):
+                self.audit(events)
+
+    def test_compute_in_other_half_or_rank_does_not_touch_pending_bank(self):
+        report = self.audit([event(10, "ACT1", bg=1, type_id=18),
+                             event(11, "MACHB", bg=2),
+                             event(12, "MACAB", rank=0),
+                             event(13, "ACT2", bg=1, type_id=18)])
+        self.assertEqual(report["status"], "passed")
+
+    def test_activation_owner_kind_survives_stage_window_boundary(self):
+        stage = [dict(Channel=0, stage_generation=1, operation="SEAL", clock=5),
+                 dict(Channel=0, stage_generation=1, operation="BROADCAST", ready_at=12)]
+        events = [event(10, "ACT1", type_id=-1), event(20, "ACT2", type_id=-1)]
+        report = audit_staging_act2(events, {"nAAD": 8}, staging_events=stage, strict=False)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["staging"]["late_ACT2"], 1)
+        self.assertEqual(report["global_audit"]["violations_by_kind"]["staging"]["late_ACT2"], 1)
+
+    def test_internal_owner_and_staging_conflict_are_both_attributed(self):
+        events = [event(10, "ACT1", type_id=18), event(11, "MACAB"),
+                  event(12, "ACT2", type_id=18)]
+        report = self.audit(events, strict=False)
+        for category in ("other_internal", "staging"):
+            self.assertEqual(report["violations_by_kind"][category]["target_bank_access_before_ACT2"], 1)
+        self.assertEqual(report["classifications"]["other_internal"]["paired_ACT2"], 1)
+        with self.assertRaisesRegex(AssertionError, "target_bank_access_before_ACT2"):
+            audit_staging_act2(events, {"nAAD": 8})
+
     def test_channel_protocol_is_shared_by_both_ranks(self):
         for command in ("ACT1", "REFpb", "REFab"):
             with self.subTest(command=command), self.assertRaisesRegex(AssertionError, "channel_ACT2_pending"):

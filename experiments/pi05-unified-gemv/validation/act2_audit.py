@@ -17,10 +17,10 @@ def _targets(event, bank):
     if int(event["Channel"]) != channel or int(event["Rank"]) not in (-1, rank):
         return False
     command = event["command"]
-    if command in ("PREab", "REFab", "ACTAB"):
+    if command in ("PREab", "REFab", "ACTAB", "MACAB", "MACK", "MACQK"):
         return True
     bg, b = int(event["BankGroup"]), int(event["Bank"])
-    if command in ("PREHB", "ACTHB"):
+    if command in ("PREHB", "ACTHB", "MACHB"):
         return bg == -1 or bg//2 == group//2
     return bg in (-1, group) and b in (-1, local_bank)
 
@@ -151,7 +151,7 @@ def audit_act2(native, timings, *, staging_events=(), strict=True, max_examples=
                     fail("pending_ACT1_cancelled", event, owner)
                     counts["cancelled"] += 1
                     by_kind[owner["kind"]]["cancelled"] += 1
-                elif command in ("RD", "WR", "LOCALRD", "LOCALWR"):
+                elif command in ("RD", "WR", "LOCALRD", "LOCALWR", "MACAB", "MACHB", "MACK", "MACQK"):
                     fail("target_bank_access_before_ACT2", event, pending[target])
     for owner in pending.values():
         fail("pending_ACT2_at_end", owner=owner)

@@ -1,64 +1,143 @@
-# xinyao_1103：内部 staging ACT1/ACT2 deadline 修正
+# xinyao_1103：LOCALWR ACT1/ACT2 调度修正
 
-本次主五阶段 latency 为 **187.376756 → 187.376756 µs**，变化 **+0.000000 µs**；channel0 DQ 空闲为 **166.845812 → 166.845812 µs**。这是两套backend重新模拟的结果。
+主五阶段 latency：**187.376756 → 187.293274 µs**，变化 **-0.083482 µs**。本轮完整 ACT1/ACT2 审计通过，前版 projection spill 的违规已消除。结果来自修改前后两套独立 backend 的重新运行。
 
-在 `14fb3bf` 上修正 `PIM_STAGE_LOAD/FRAGMENT` 的内部 split-activation 调度。SRF 仍为每 bank 2×512 B，源 bank 仍为 rank1/BG0/B0 与 BG1/B0，各 64 KiB；输入布局、trace、计算量、时序参数、CA/DQ 竞争和 barrier 均保留。
+## 修复范围与保留条件
 
-ACT1 发出前复用 ordinary RD/WR 的 `can_start_act1` lookahead；发出后登记 bank owner 与 `ACT1_clock+nAAD` deadline，并优先完成 ACT2，防止 PRE/refresh 取消未完成激活。ACT2 仍检查真实 DRAM/rank CA 时序，超时或 owner 丢失会报错。nRP、nRFC、nRCD 等等待未删除。
+在 `a987650` 的 staging 修复之上，共用内部激活管理 `pim_activation_extension.inc`：staging、projection spill/RoPE 的 LOCALRD/LOCALWR、BGK 本地写的行准备及 FFN Z 内部访问均接入相同的 ordinary lookahead、bank owner 与 deadline。ACT1 只有在 ACT2 能及时跟上时发出；ACT2 pending 时阻止其它本地扫描抢占 CA，维护请求继续排队。ACT2 完成不提前结束数据请求，原读写 service、写恢复、子请求和父描述符完成依赖保留。
 
-## 修正前后 latency
+SRF仍为每bank 2×512 B；输入暂存仍为BG0/B0与BG1/B0、各64 KiB；trace、地址、计算/数据量和所有生产DRAM时序参数均不变。rank CA、外层CA、DQ和bank阵列约束继续执行。新增guard使用更频繁刷新仅用于对抗测试，不改变七个工作负载的nREFI。
 
-两套独立 backend 均重新运行。单位 µs/层/denoising step，H16、batch1、16 channel、每 channel 两 rank。
+## 各阶段 latency
 
-| 阶段 | 修正前 14fb3bf | 修正后 | 变化 |
+单位µs/层/denoising step，H16、batch1、16 channel。
+
+| 阶段 | 修正前 a987650 | 修正后 | 变化 |
 |---|---:|---:|---:|
-| Q/K + RoPE + QKT | 41.969872 | 41.969872 | +0.000000 |
+| Q/K + RoPE + QKT | 41.969872 | 41.886390 | -0.083482 |
 | V | 20.592852 | 20.592852 | +0.000000 |
 | PV | 18.994500 | 18.994500 | +0.000000 |
 | Gate/Up | 47.127934 | 47.127934 | +0.000000 |
 | Down | 58.691598 | 58.691598 | +0.000000 |
-| **主五阶段合计** | **187.376756** | **187.376756** | **+0.000000** |
+| **主五阶段合计** | **187.376756** | **187.293274** | **-0.083482** |
 
-combined FFN 控制：105.910518 → 105.910518 µs；单层连续控制：188.328826 → 188.328826 µs。这两个控制实验不重复计入主五阶段合计。完整各子阶段见 [phase-latency.csv](reference/act2-deadline/phase-latency.csv)。
+combined FFN控制：105.910518 → 105.910518 µs；单层连续控制：188.328826 → 187.887966 µs。两个控制实验不重复计入主五阶段。
+
+## Q/K链的子阶段
+
+| 子阶段 | 修正前 | 修正后 | 变化 |
+|---|---:|---:|---:|
+| projection_gpu_input_stage | 1.245693 | 1.245693 | +0.000000 |
+| projection_local_input_compute | 22.533574 | 22.533574 | +0.000000 |
+| projection_local_spill | 0.385518 | 0.347998 | -0.037520 |
+| projection_gemv_release | 0.002814 | 0.002814 | +0.000000 |
+| rope_local | 0.885472 | 0.885472 | +0.000000 |
+| q_export_to_gpu | 4.029648 | 4.012764 | -0.016884 |
+| q_remote_buffer_fill | 0.481194 | 0.481194 | +0.000000 |
+| qk_tile_0_compute | 0.285152 | 0.285152 | +0.000000 |
+| qk_tile_0_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_1_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_1_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_2_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_2_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_3_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_3_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_4_compute | 0.530908 | 0.528094 | -0.002814 |
+| qk_tile_4_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_5_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_5_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_6_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_6_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_7_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_7_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_8_compute | 0.285152 | 0.285152 | +0.000000 |
+| qk_tile_8_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_9_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_9_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_10_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_10_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_11_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_11_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_12_compute | 0.285152 | 0.285152 | +0.000000 |
+| qk_tile_12_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_13_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_13_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_14_compute | 0.490574 | 0.487760 | -0.002814 |
+| qk_tile_14_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_15_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_15_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_16_compute | 0.285152 | 0.285152 | +0.000000 |
+| qk_tile_16_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_17_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_17_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_18_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_18_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_19_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_19_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_20_compute | 0.285152 | 0.285152 | +0.000000 |
+| qk_tile_20_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_21_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_21_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_22_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_22_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_23_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_23_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_24_compute | 0.559048 | 0.535598 | -0.023450 |
+| qk_tile_24_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_25_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_25_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_26_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_26_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_27_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_27_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_28_compute | 0.285152 | 0.285152 | +0.000000 |
+| qk_tile_28_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_29_compute | 0.244818 | 0.244818 | +0.000000 |
+| qk_tile_29_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_tile_30_compute | 0.277648 | 0.277648 | +0.000000 |
+| qk_tile_30_export | 0.119126 | 0.119126 | +0.000000 |
+| qk_gemv_release | 0.001876 | 0.001876 | +0.000000 |
+
+其余阶段及边界时间见 [完整phase对照](reference/localwr-act2/phase-latency.csv)。子阶段取barrier之间的墙钟时间，不把重叠请求延迟相加；变化包括调度、行状态及refresh相位的相互影响。
+
+本次Q/K链共缩短89 CK，其中spill本身缩短40 CK，下游Q export/QKT合计缩短49 CK。旧日志中，最后一个bank的ACT2 pending期间，channel0其它bank的LOCALWR连续占用rank CA 193 CK（[25460, 25653)）；修复后由已登记的owner优先发ACT2。这个区间证明了CA竞争，但其中仍可能有DRAM恢复等待，不能把整段都当作ACT2已ready后的stall，也不能把下游变化全归因于ACT开销。[逐bank调度证据及因果边界](reference/localwr-act2/spill-scheduling.json)。
 
 ## DQ 空闲时间 breakdown
 
-下表为 channel0；全部16个channel均独立重算并检查时间闭合。完整无外部传输窗口已扣除边界数据尾部，其它空闲包括传输阶段内部间隙。
+下表为channel0，全部16channel均独立重算并闭合；完整无传输窗口已扣除边界数据尾部。
 
-| 阶段 | DQ占用 | 修正前DQ空闲 | 修正后DQ空闲 | 修正后完整无传输窗口 | 修正后其它空闲 |
+| 阶段 | DQ占用 | 修正前DQ空闲 | 修正后DQ空闲 | 修正后完整无传输窗口 | 修正后其它DQ空闲 |
 |---|---:|---:|---:|---:|---:|
-| Q/K + RoPE + QKT | 3.301760 | 38.668112 | 38.668112 | 32.514832 | 6.153280 |
+| Q/K + RoPE + QKT | 3.301760 | 38.668112 | 38.584630 | 32.448234 | 6.136396 |
 | V | 3.121664 | 17.471188 | 17.471188 | 16.065126 | 1.406062 |
 | PV | 2.341248 | 16.653252 | 16.653252 | 15.588622 | 1.064630 |
 | Gate/Up | 3.842048 | 43.285886 | 43.285886 | 40.757038 | 2.528848 |
 | Down | 7.924224 | 50.767374 | 50.767374 | 47.638206 | 3.129168 |
-| **合计** | **20.530944** | **166.845812** | **166.845812** | **152.563824** | **14.281988** |
+| **合计** | **20.530944** | **166.845812** | **166.762330** | **152.497226** | **14.265104** |
 
-外部流量仍为 5472 KiB/层/步（16channel合计）。[逐channel DQ与CA对比](reference/act2-deadline/channel-dq-comparison.csv)、[按阶段类别的DQ分解](reference/act2-deadline/phase-kind-dq-comparison.csv)、[全部结果JSON](reference/act2-deadline/act2-deadline-comparison.json)。DQ空闲窗口未注入真实GPU竞争，不能直接当作GPU已测得的可用带宽收益。
+外部流量仍为5472 KiB/层/步（16channel合计）。[逐channel DQ/CA前后对照](reference/localwr-act2/channel-dq-comparison.csv)、[按阶段类别分解](reference/localwr-act2/phase-kind-dq-comparison.csv)、[完整JSON](reference/localwr-act2/localwr-act2-comparison.json)。DQ空闲是模型中的资源窗口，尚未注入并发GPU请求。
 
-## 协议修复与性能影响
+完整无传输窗口合计152.563824 → 152.497226 µs；其它DQ空闲14.281988 → 14.265104 µs。两者之和为DQ空闲总时间。
 
-主五阶段、全部16channel的 8272 对 staging ACT1/ACT2 通过专项审计；旧日志中 staging 超过 nAAD=8 CK 的 8160 对已消除。普通请求与 staging 的列时序、数据量和依赖保持不变。详细间隔分布、取消次数与分类见 [protocol-audit.json](reference/act2-deadline/protocol-audit.json)。
+另按总CA状态拆分：DQ空闲且总CA也空闲的时间为158.674894 → 158.591412 µs；DQ空闲但总CA忙的时间为8.170918 → 8.170918 µs。这是另一种分区方式，不与上述两项叠加；即使DQ/总CA同时空闲，GPU实际可服务性仍受目标rank/bank时序和请求内容约束。
 
-修正把过早的 ACT1 推迟到合法窗口，保留 ACT2 之前的预充电或刷新恢复等待。不能把旧 ACT1→ACT2 超出的间隔从 latency 中直接扣除。前后原始命令差异见 [native-command-comparison.csv](reference/act2-deadline/native-command-comparison.csv)。
+## 完整协议审计与控制实验
 
-各case去除ACT1后的完整命令序列是否逐事件一致：`{"chain": true, "v": true, "pv": true, "gate_up_gpu": true, "down_gpu_input": true, "combined_timing_chain": true, "serial_layer_control": true}`。Down channel0 的刷新与激活示例已保存于同一协议审计JSON，直接展示ACT1后移是否改变ACT2与LOCALRD时刻。
+主五阶段全部16channel共10992对ACT1/ACT2通过严格检查，零超期、孤立、取消或末尾未完成owner。两个控制案例也通过相同检查。检查范围为本轮测量日志中的ACT1/ACT2 owner、deadline及干扰，不代表全部DRAM物理规格验证。旧主流程违规为 `{"chain": {"ACT1_while_channel_ACT2_pending": 240, "late_ACT2": 256}}`，新结果对应计数均为0。[完整协议前后证据](reference/localwr-act2/localwr-act2-protocol-audit.json)。
 
-本次只修复 staging。专项审计另发现 projection spill 的内部 LOCALWR 路径仍有 split-activation 违规，保留原调度以隔离本轮影响。修正后全协议审计仍未通过的案例及计数：`{"chain": {"ACT1_while_channel_ACT2_pending": 240, "late_ACT2": 256}, "serial_layer_control": {"ACT1_while_channel_ACT2_pending": 240, "late_ACT2": 256}}`。这是明确保留的模型限制；staging专项通过不代表全部内部路径合规。旧日志中这些非staging违规位于projection spill，RoPE阶段没有该问题。
+新增 `Local_ACT2_spill_rope_refresh` guard 对每个bank强制spill和RoPE STORE换行，通过真实REF和16bank细请求检验CA互斥、完整LOCALWR数量、owner及deadline。原生job 1903036通过 **104项Python测试、39项native guards、21个完整案例**（before/corrected/direct各7个）。修正前重跑与归档a987650的周期、phase、trace、字节、原始事件CSV哈希和channel分区完全一致。
 
-## 备份、验证与复现
+共同内部路径的修正也适用于direct-input模式；它不是保留旧非法调度的开关。该模式主五阶段 109.762884 → 109.762884 µs，工作量不变且完整ACT检查通过：[direct控制对比](reference/localwr-act2/direct-input-control.json)。需要复现历史1101或a987650日志时必须使用对应历史checkout/backend。
 
-修正前完整 Git bundle、source.zip 和原始 job1902756 证据位于本地 `backups/xinyao_1103_before_act2_deadline_14fb3bf/`，附SHA256清单；紧凑旧结果见 [previous-act2-deadline](reference/previous-act2-deadline/summary.json)。
+## 备份与复现
 
-原生 job 1902838：100 项 Python 测试、38 项原生 guards、21个完整案例（修正前7、修正后7、1101直接输入7）。修正前重跑与归档结果的周期、流量、trace、各phase、原始事件CSV哈希及channel分区完全一致；1101直接输入回归也一致。[修正前回归证明](reference/act2-deadline/before-regression.json)、[完整验证记录](reference/validation.json)。
+修正前完整Git bundle、source.zip及job1902838原始结果备份于本地 `backups/xinyao_1103_before_localwr_act2_a987650/`，附SHA256；紧凑旧结果位于 [previous-localwr-act2](reference/previous-localwr-act2/summary.json)。[修改前复现校验](reference/localwr-act2/before-regression.json)、[验证记录](reference/validation.json)、[源码字节校验](reference/publish-byte-verification.json)。
 
 ```bash
 PYTHON="$(command -v python)" JOBS=4 bash experiments/pi05-unified-gemv/build.sh
 python experiments/pi05-unified-gemv/reproduce.py --output results/fresh
 python verify_reference.py results/fresh
-python compare_act2_deadline.py --before /path/to/14fb3bf-run --after results/fresh
+python compare_localwr_act2.py --before /path/to/a987650-run --after results/fresh
 ```
 
-对比必须使用修正前独立 checkout/backend 或归档原始结果。`--legacy-rank-dispatch`只恢复旧派发策略，仍执行本版staging deadline修正，不能替代旧backend。完整模型见 [MODEL.md](experiments/pi05-unified-gemv/MODEL.md)。
-
-GPU softmax、GeLU/multiply、packing、O projection、norm/residual及背景VLM竞争未计时；模型不执行BF16数值计算。主阶段合计不等于完整AE端到端latency。历史channel派发对照保留在 [rank-dispatch-comparison.json](reference/rank-dispatch-comparison.json)。
+GPU softmax、GeLU/multiply、packing、O projection、norm/residual与背景VLM竞争未计时；模型不执行BF16数值计算，主阶段合计不等于完整AE端到端latency。模型说明见 [MODEL.md](experiments/pi05-unified-gemv/MODEL.md)。此前staging-only的零latency变化结果保留在 [act2-deadline](reference/act2-deadline/act2-deadline-comparison.json)。

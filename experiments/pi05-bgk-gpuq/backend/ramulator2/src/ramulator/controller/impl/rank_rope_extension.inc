@@ -185,9 +185,7 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
     const int q=2*(col-rr_local_queries())+(1-m_channel_id%2);
     if(m_gemv_ingress_owner || m_clk<m_gemv_ingress_free || m_clk<m_local_ports[1] || !gemv_q_ready(b,q)) return false;
   }
-  if (!check_timing(it->command, it->addr_vec)) return false;
-  m_device.issue_command(it->command, it->addr_vec, m_clk);
-  rr_notify_command(*it);
+  if (!issue_internal_array_command(it)) return false;
   if (!final) return true;
   int service = (type == Request::Type::PIM_ROPE_COEF || type == Request::Type::PIM_ROPE_LOAD)
       ? m_device.m_spec->get_timing_value("nCL") + m_bgk_input_cycles
