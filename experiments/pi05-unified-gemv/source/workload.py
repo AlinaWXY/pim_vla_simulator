@@ -46,14 +46,17 @@ def unified_buffers(case, rank_staging=True, staging_banks=1):
     return buffers
 
 
-def generate(path, case, rank_staging=True, staging_banks=1):
+def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False):
+    rank_descriptors = bool(rank_descriptors and rank_staging)
+    channel_independent_dispatch = bool(channel_independent_dispatch and rank_staging)
     check_staging_banks(staging_banks)
     if case not in CASES:
         raise ValueError(case)
     if case == "serial_layer_control":
-        return generate_serial(path, rank_staging=rank_staging, staging_banks=staging_banks)
+        return generate_serial(path, rank_staging=rank_staging, staging_banks=staging_banks,
+            rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
     if case == "chain":
-        result = attention.generate(path, horizon=16, case="chain", schedule="double", rank_staging=rank_staging, staging_banks=staging_banks)
+        result = attention.generate(path, horizon=16, case="chain", schedule="double", rank_staging=rank_staging, staging_banks=staging_banks, rank_descriptors=rank_descriptors)
     elif case in ("v", "pv"):
         result = value.generate(path, 16, case, rank_staging=rank_staging, staging_banks=staging_banks)
     else:
@@ -64,27 +67,36 @@ def generate(path, case, rank_staging=True, staging_banks=1):
     result.setdefault("required_backend", {}).update(pim_unified_gemv=True,
         gemv_port_cycles=2, pim_horizon=16,
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
-        pim_staging_banks=staging_banks if rank_staging else 1)
+        pim_staging_banks=staging_banks if rank_staging else 1,
+        pim_rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
+    result["rank_descriptors"] = rank_descriptors
+    result["channel_independent_dispatch"] = channel_independent_dispatch
+    result.setdefault("expanded_counts", result["counts"].copy())
+    result.setdefault("rank_batches", [])
     result["input_resource"] = "same two 512B slots in each physical PIM bank"
     result["no_separate_rank_input_SRAM"] = True
     result["complete_ae_latency"] = False
     return result
 
 
-def generate_serial(path, rank_staging=True, staging_banks=1):
+def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False):
     """One controller lifetime across all modeled stages; no invented GPU wait."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     lines, segments, parts, boundary = [], [], [], 0
-    staging_inputs = []
+    staging_inputs, rank_batches = [], []
+    expanded_counts = Counter()
     dq = {}
     with tempfile.TemporaryDirectory(prefix="serial-parts-", dir=path.parent) as scratch:
         for case in PRIMARY:
             part_path = Path(scratch) / f"{case}.trace"
-            manifest = generate(part_path, case, rank_staging=rank_staging, staging_banks=staging_banks)
+            manifest = generate(part_path, case, rank_staging=rank_staging, staging_banks=staging_banks,
+                rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
+            expanded_counts.update(manifest["expanded_counts"])
             source = part_path.read_text(encoding="ascii").splitlines()
             skip = bool(lines)
             line_shift = len(lines)-int(skip)
+            expanded_counts["BARRIER"] -= int(skip)
             for number, line in enumerate(source):
                 if skip and number == 0:
                     if line != "BARRIER 0":
@@ -109,6 +121,11 @@ def generate_serial(path, rank_staging=True, staging_banks=1):
                     store["first_line"] += line_shift
                     store["last_line"] += line_shift
                 staging_inputs.append(staged)
+            for original in manifest.get("rank_batches", []):
+                batch = deepcopy(original)
+                batch.update(stage=case, line_start=batch["line_start"]+line_shift,
+                    line_end=batch["line_end"]+line_shift)
+                rank_batches.append(batch)
             parts.append(dict(stage=case, start_marker=boundary,
                 end_marker=segments[-1]["end"], first_line=2+line_shift, last_line=len(lines)))
             boundary = segments[-1]["end"]
@@ -122,6 +139,8 @@ def generate_serial(path, rank_staging=True, staging_banks=1):
     buffers.pop("input_rows", None)
     return dict(case="serial_layer_control", horizon=16, action_horizon=16,
         segments=segments, counts=dict(Counter(line.split()[0] for line in lines)), parts=parts,
+        expanded_counts=dict(expanded_counts), rank_batches=rank_batches,
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
         staging_inputs=staging_inputs, rank_staging=rank_staging,
         staging_banks=staging_banks if rank_staging else 0,
         expected_dq_bytes=dict(total=sum(dq.values()), by_stage=dq), buffers=buffers,
@@ -129,6 +148,7 @@ def generate_serial(path, rank_staging=True, staging_banks=1):
         required_backend=dict(pim_unified_gemv=True, gemv_port_cycles=2, pim_horizon=16,
             pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
             pim_staging_banks=staging_banks if rank_staging else 1,
+            pim_rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
             pim_rank_rope=True, pim_ffn_dram=False, ffn_z_preinstalled=False,
             pim_mac_scope="rank", pim_input_broadcast=False, nCCDAB=8, nCCDQK=16),
         continuous_refresh_state=True, no_separate_rank_input_SRAM=True,

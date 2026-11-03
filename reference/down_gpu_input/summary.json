@@ -5,13 +5,15 @@
   "unified_bank_gemv": true,
   "rank_staging": true,
   "rank_controller": true,
+  "rank_descriptors": true,
+  "channel_independent_dispatch": true,
   "staging_banks": 2,
   "latency_us": 58.691598,
   "memory_cycles": 62571,
   "tCK_ns": 0.938,
   "phase_us": {
-    "down_gpu_input_stage": 10.548777312499999,
-    "down_local_input_and_compute": 47.637268,
+    "down_gpu_input_stage": 10.5478393125,
+    "down_local_input_and_compute": 47.638206,
     "down_local_input_and_compute_gemv_release": 0.002814,
     "down_result_export": 0.50183
   },

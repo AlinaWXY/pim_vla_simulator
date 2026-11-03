@@ -13,5 +13,8 @@ from ramulator.param import Param, Child, ChildList
 class GenericDRAM(Component):
     impl = "GenericDRAM"
     clock_ratio = Param(int, required=True, cpp_type="unsigned int")
+    channel_independent_dispatch = Param(bool, default=False)
+    channel_queue_capacity = Param(int, default=32)
+    ingress_events_path = Param(str, default='')
     channel_mapper = Child("channel_mapper")
     controllers = ChildList("controller")

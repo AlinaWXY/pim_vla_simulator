@@ -24,6 +24,14 @@ bool ControllerBase::check_timing(int command, const AddrVec_t& addr_vec) {
   return m_device.check_timing(command, addr_vec, m_clk);
 }
 
+bool ControllerBase::check_request_timing(const Request& req, int command, Clk_t clock) {
+  return m_device.check_timing(command, req.addr_vec, clock < 0 ? m_clk : clock);
+}
+
+void ControllerBase::issue_request_command(const Request& req, int command) {
+  m_device.issue_command(command, req.addr_vec, m_clk);
+}
+
 int ControllerBase::get_preq_command(int command, const AddrVec_t& addr_vec) {
   return m_device.get_preq_command(command, addr_vec, m_clk);
 }
@@ -279,7 +287,7 @@ ControllerBase::Candidate ControllerBase::pick_best_ready_from(
   if (it == buffer.end()) {
     return c;
   }
-  if (!check_timing(it->command, it->addr_vec)) {
+  if (!check_request_timing(*it, it->command)) {
     return c;
   }
   c.valid = true;
@@ -296,7 +304,7 @@ ControllerBase::Candidate ControllerBase::pick_priority_if(RequestFilterRef filt
 
   auto it = m_priority_buffer.begin();
   it->command = get_preq_command(it->final_command, it->addr_vec);
-  if (!check_timing(it->command, it->addr_vec)) {
+  if (!check_request_timing(*it, it->command)) {
     return c;
   }
   if (would_close_active(*it)) {

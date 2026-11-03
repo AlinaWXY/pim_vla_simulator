@@ -1,0 +1,2192 @@
+{
+  "status": "passed",
+  "before_commit": "786842a",
+  "units": "microseconds per layer/denoising step; DQ per channel",
+  "modes": {
+    "before": {
+      "stage_sum_us": 204.115366,
+      "channels": [
+        {
+          "channel": 0,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.527266
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.527266,
+            "dq_idle_global_ca_free_us": 174.05715599999996
+          }
+        },
+        {
+          "channel": 1,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.517885999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.517885999999999,
+            "dq_idle_global_ca_free_us": 174.06653599999999
+          }
+        },
+        {
+          "channel": 2,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.517885999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.517885999999999,
+            "dq_idle_global_ca_free_us": 174.06653599999999
+          }
+        },
+        {
+          "channel": 3,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 4,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 5,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 6,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 7,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.518824
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.045961999999999996
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.518824,
+            "dq_idle_global_ca_free_us": 174.06559799999997
+          }
+        },
+        {
+          "channel": 8,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 9,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 10,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.518824
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.518824,
+            "dq_idle_global_ca_free_us": 174.06559799999997
+          }
+        },
+        {
+          "channel": 11,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 12,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.517885999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.517885999999999,
+            "dq_idle_global_ca_free_us": 174.06653599999999
+          }
+        },
+        {
+          "channel": 13,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 14,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        },
+        {
+          "channel": 15,
+          "stage_us": 204.115366,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 183.58442199999996,
+          "modelled_dq_idle_outside_tail_clear_work_us": 15.928177999999999,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 167.656244,
+          "tail_clear_complete_zero_external_phase_us": 167.656244,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 36.4545785625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.706533999999998,
+              "idle_us": 185.408832,
+              "occupied_during_dq_idle_us": 9.519762
+            },
+            "rank0": {
+              "occupied_us": 0.04783799999999999,
+              "idle_us": 204.06752799999998,
+              "occupied_during_dq_idle_us": 0.04689999999999999
+            },
+            "rank1": {
+              "occupied_us": 34.907669999999996,
+              "idle_us": 169.207696,
+              "occupied_during_dq_idle_us": 25.117764
+            },
+            "dq_idle_global_ca_busy_us": 9.519762,
+            "dq_idle_global_ca_free_us": 174.06465999999998
+          }
+        }
+      ]
+    },
+    "independent_only": {
+      "stage_sum_us": 187.376756,
+      "channels": [
+        {
+          "channel": 0,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 1,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 2,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 3,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 4,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 5,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 6,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 7,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 8,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 9,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 10,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 11,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 12,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 13,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 14,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        },
+        {
+          "channel": 15,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 18.692463999999998,
+              "idle_us": 168.68429199999997,
+              "occupied_during_dq_idle_us": 9.463481999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 9.463481999999999,
+            "dq_idle_global_ca_free_us": 157.38232999999997
+          }
+        }
+      ]
+    },
+    "after": {
+      "stage_sum_us": 187.376756,
+      "channels": [
+        {
+          "channel": 0,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 1,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 2,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 3,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 4,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 5,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 6,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 7,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 8,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 9,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 10,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 11,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 12,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 13,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 14,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        },
+        {
+          "channel": 15,
+          "stage_us": 187.376756,
+          "external_DQ_bytes": 350208,
+          "modelled_dq_occupied_us": 20.530943999999998,
+          "modelled_dq_idle_us": 166.84581199999997,
+          "modelled_dq_idle_outside_tail_clear_work_us": 14.281987999999998,
+          "modelled_dq_tail_after_stage_us": 0.0,
+          "complete_zero_external_phase_us": 152.56382399999998,
+          "tail_clear_complete_zero_external_phase_us": 152.56382399999998,
+          "removed_boundary_data_tail_us": 0.0,
+          "other_semantic_phase_us": 34.8083885625,
+          "boundary_overhead_us": 0.0045434375,
+          "command_bus": {
+            "global": {
+              "occupied_us": 17.304223999999998,
+              "idle_us": 170.07253199999997,
+              "occupied_during_dq_idle_us": 8.170917999999999
+            },
+            "rank0": {
+              "occupied_us": 0.04314799999999999,
+              "idle_us": 187.33360799999997,
+              "occupied_during_dq_idle_us": 0.04221
+            },
+            "rank1": {
+              "occupied_us": 34.778226,
+              "idle_us": 152.59852999999998,
+              "occupied_during_dq_idle_us": 24.988319999999998
+            },
+            "dq_idle_global_ca_busy_us": 8.170917999999999,
+            "dq_idle_global_ca_free_us": 158.674894
+          }
+        }
+      ]
+    }
+  },
+  "cases": {
+    "chain": {
+      "before": {
+        "latency_us": 58.708482000000004,
+        "memory_cycles": 62589,
+        "external_DQ_bytes": 901120
+      },
+      "independent_only": {
+        "latency_us": 41.969872,
+        "memory_cycles": 44744,
+        "external_DQ_bytes": 901120
+      },
+      "after": {
+        "latency_us": 41.969872,
+        "memory_cycles": 44744,
+        "external_DQ_bytes": 901120
+      },
+      "saved_us": 16.73861
+    },
+    "v": {
+      "before": {
+        "latency_us": 20.592852,
+        "memory_cycles": 21954,
+        "external_DQ_bytes": 851968
+      },
+      "independent_only": {
+        "latency_us": 20.592852,
+        "memory_cycles": 21954,
+        "external_DQ_bytes": 851968
+      },
+      "after": {
+        "latency_us": 20.592852,
+        "memory_cycles": 21954,
+        "external_DQ_bytes": 851968
+      },
+      "saved_us": 0.0
+    },
+    "pv": {
+      "before": {
+        "latency_us": 18.9945,
+        "memory_cycles": 20250,
+        "external_DQ_bytes": 638976
+      },
+      "independent_only": {
+        "latency_us": 18.9945,
+        "memory_cycles": 20250,
+        "external_DQ_bytes": 638976
+      },
+      "after": {
+        "latency_us": 18.9945,
+        "memory_cycles": 20250,
+        "external_DQ_bytes": 638976
+      },
+      "saved_us": 0.0
+    },
+    "gate_up_gpu": {
+      "before": {
+        "latency_us": 47.127934,
+        "memory_cycles": 50243,
+        "external_DQ_bytes": 1048576
+      },
+      "independent_only": {
+        "latency_us": 47.127934,
+        "memory_cycles": 50243,
+        "external_DQ_bytes": 1048576
+      },
+      "after": {
+        "latency_us": 47.127934,
+        "memory_cycles": 50243,
+        "external_DQ_bytes": 1048576
+      },
+      "saved_us": 0.0
+    },
+    "down_gpu_input": {
+      "before": {
+        "latency_us": 58.691598,
+        "memory_cycles": 62571,
+        "external_DQ_bytes": 2162688
+      },
+      "independent_only": {
+        "latency_us": 58.691598,
+        "memory_cycles": 62571,
+        "external_DQ_bytes": 2162688
+      },
+      "after": {
+        "latency_us": 58.691598,
+        "memory_cycles": 62571,
+        "external_DQ_bytes": 2162688
+      },
+      "saved_us": 0.0
+    },
+    "combined_timing_chain": {
+      "before": {
+        "latency_us": 105.910518,
+        "memory_cycles": 112911,
+        "external_DQ_bytes": 3211264
+      },
+      "independent_only": {
+        "latency_us": 105.910518,
+        "memory_cycles": 112911,
+        "external_DQ_bytes": 3211264
+      },
+      "after": {
+        "latency_us": 105.910518,
+        "memory_cycles": 112911,
+        "external_DQ_bytes": 3211264
+      },
+      "saved_us": 0.0
+    },
+    "serial_layer_control": {
+      "before": {
+        "latency_us": 204.33861,
+        "memory_cycles": 217845,
+        "external_DQ_bytes": 5603328
+      },
+      "independent_only": {
+        "latency_us": 188.328826,
+        "memory_cycles": 200777,
+        "external_DQ_bytes": 5603328
+      },
+      "after": {
+        "latency_us": 188.328826,
+        "memory_cycles": 200777,
+        "external_DQ_bytes": 5603328
+      },
+      "saved_us": 16.009783999999996
+    }
+  },
+  "phase_breakdown": {
+    "chain": {
+      "before": {
+        "projection_gpu_input_stage": 1.2466313125,
+        "projection_local_input_compute": 22.533573999999998,
+        "projection_local_spill": 3.8955139999999995,
+        "projection_gemv_release": 0.002814,
+        "rope_local": 12.652681999999999,
+        "q_export_to_gpu": 4.238822,
+        "q_remote_buffer_fill": 1.8478599999999998,
+        "qkt_compute": 8.529234000000004,
+        "qkt_export": 3.7585660000000005,
+        "qk_gemv_release": 0.0018759999999999998,
+        "phase_boundary_overhead": 0.0009086874999510997
+      },
+      "independent_only": {
+        "projection_gpu_input_stage": 1.2456933124999998,
+        "projection_local_input_compute": 22.533573999999998,
+        "projection_local_spill": 0.36863399999999996,
+        "projection_gemv_release": 0.002814,
+        "rope_local": 0.902356,
+        "q_export_to_gpu": 4.029648,
+        "q_remote_buffer_fill": 0.48119399999999996,
+        "qkt_compute": 8.710268000000003,
+        "qkt_export": 3.692906000000001,
+        "qk_gemv_release": 0.0018759999999999998,
+        "phase_boundary_overhead": 0.0009086874999510997
+      },
+      "after": {
+        "projection_gpu_input_stage": 1.2456933124999998,
+        "projection_local_input_compute": 22.533573999999998,
+        "projection_local_spill": 0.38551799999999997,
+        "projection_gemv_release": 0.002814,
+        "rope_local": 0.8854719999999999,
+        "q_export_to_gpu": 4.029648,
+        "q_remote_buffer_fill": 0.48119399999999996,
+        "qkt_compute": 8.710268000000003,
+        "qkt_export": 3.692906000000001,
+        "qk_gemv_release": 0.0018759999999999998,
+        "phase_boundary_overhead": 0.0009086874999510997
+      }
+    },
+    "v": {
+      "before": {
+        "v_gpu_input_stage": 2.5035513125,
+        "v_local_input_compute": 16.064187999999998,
+        "v_gemv_release": 0.002814,
+        "v_result_export": 0.9830239999999999,
+        "v_prefix_tail_read": 0.505582,
+        "v_suffix_write": 0.532784,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "independent_only": {
+        "v_gpu_input_stage": 2.5026133125,
+        "v_local_input_compute": 16.065126,
+        "v_gemv_release": 0.002814,
+        "v_result_export": 0.9830239999999999,
+        "v_prefix_tail_read": 0.505582,
+        "v_suffix_write": 0.532784,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "after": {
+        "v_gpu_input_stage": 2.5026133125,
+        "v_local_input_compute": 16.065126,
+        "v_gemv_release": 0.002814,
+        "v_result_export": 0.9830239999999999,
+        "v_prefix_tail_read": 0.505582,
+        "v_suffix_write": 0.532784,
+        "phase_boundary_overhead": 0.0009086875000008376
+      }
+    },
+    "pv": {
+      "before": {
+        "pv_gpu_input_stage": 2.4435193125,
+        "pv_local_input_compute": 15.587684,
+        "pv_gemv_release": 0.002814,
+        "pv_result_export": 0.9595739999999999,
+        "phase_boundary_overhead": 0.0009086874999972849
+      },
+      "independent_only": {
+        "pv_gpu_input_stage": 2.4425813124999998,
+        "pv_local_input_compute": 15.588621999999999,
+        "pv_gemv_release": 0.002814,
+        "pv_result_export": 0.9595739999999999,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "after": {
+        "pv_gpu_input_stage": 2.4425813124999998,
+        "pv_local_input_compute": 15.588621999999999,
+        "pv_gemv_release": 0.002814,
+        "pv_result_export": 0.9595739999999999,
+        "phase_boundary_overhead": 0.0009086875000008376
+      }
+    },
+    "gate_up_gpu": {
+      "before": {
+        "gate_up_gpu_input_stage": 2.5035513125,
+        "gate_up_local_input_and_compute": 40.756099999999996,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "phase_boundary_overhead": 0.0009086875000079431
+      },
+      "independent_only": {
+        "gate_up_gpu_input_stage": 2.5026133125,
+        "gate_up_local_input_and_compute": 40.757038,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "after": {
+        "gate_up_gpu_input_stage": 2.5026133125,
+        "gate_up_local_input_and_compute": 40.757038,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "phase_boundary_overhead": 0.0009086875000008376
+      }
+    },
+    "down_gpu_input": {
+      "before": {
+        "down_gpu_input_stage": 10.548777312499999,
+        "down_local_input_and_compute": 47.637268,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.50183,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "independent_only": {
+        "down_gpu_input_stage": 10.5478393125,
+        "down_local_input_and_compute": 47.638206,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.50183,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "after": {
+        "down_gpu_input_stage": 10.5478393125,
+        "down_local_input_and_compute": 47.638206,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.50183,
+        "phase_boundary_overhead": 0.0009086875000008376
+      }
+    },
+    "combined_timing_chain": {
+      "before": {
+        "gate_up_gpu_input_stage": 2.5035513125,
+        "gate_up_local_input_and_compute": 40.756099999999996,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "gpu_gelu_multiply_boundary": 0.0,
+        "down_gpu_input_stage": 10.622849999999998,
+        "down_local_input_and_compute": 47.656966,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.49995399999999995,
+        "phase_boundary_overhead": 0.0009086875000008376
+      },
+      "independent_only": {
+        "gate_up_gpu_input_stage": 2.5026133125,
+        "gate_up_local_input_and_compute": 40.757038,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "gpu_gelu_multiply_boundary": 0.0,
+        "down_gpu_input_stage": 10.622849999999998,
+        "down_local_input_and_compute": 47.656966,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.49995399999999995,
+        "phase_boundary_overhead": 0.0009086874999866268
+      },
+      "after": {
+        "gate_up_gpu_input_stage": 2.5026133125,
+        "gate_up_local_input_and_compute": 40.757038,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "gpu_gelu_multiply_boundary": 0.0,
+        "down_gpu_input_stage": 10.622849999999998,
+        "down_local_input_and_compute": 47.656966,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.49995399999999995,
+        "phase_boundary_overhead": 0.0009086874999866268
+      }
+    },
+    "serial_layer_control": {
+      "before": {
+        "chain/projection_gpu_input_stage": 1.2466313125,
+        "chain/projection_local_input_compute": 22.533573999999998,
+        "chain/projection_local_spill": 3.8955139999999995,
+        "chain/projection_gemv_release": 0.002814,
+        "chain/rope_local": 12.652681999999999,
+        "chain/q_export_to_gpu": 4.238822,
+        "chain/q_remote_buffer_fill": 1.8478599999999998,
+        "chain/qk_tile_0_compute": 0.28515199999999996,
+        "chain/qk_tile_0_export": 0.119126,
+        "chain/qk_tile_1_compute": 0.48775999999999997,
+        "chain/qk_tile_1_export": 0.119126,
+        "chain/qk_tile_2_compute": 0.24481799999999998,
+        "chain/qk_tile_2_export": 0.119126,
+        "chain/qk_tile_3_compute": 0.24481799999999998,
+        "chain/qk_tile_3_export": 0.119126,
+        "chain/qk_tile_4_compute": 0.28515199999999996,
+        "chain/qk_tile_4_export": 0.119126,
+        "chain/qk_tile_5_compute": 0.24481799999999998,
+        "chain/qk_tile_5_export": 0.119126,
+        "chain/qk_tile_6_compute": 0.24481799999999998,
+        "chain/qk_tile_6_export": 0.119126,
+        "chain/qk_tile_7_compute": 0.24481799999999998,
+        "chain/qk_tile_7_export": 0.119126,
+        "chain/qk_tile_8_compute": 0.28515199999999996,
+        "chain/qk_tile_8_export": 0.119126,
+        "chain/qk_tile_9_compute": 0.24481799999999998,
+        "chain/qk_tile_9_export": 0.119126,
+        "chain/qk_tile_10_compute": 0.24481799999999998,
+        "chain/qk_tile_10_export": 0.14163800000000001,
+        "chain/qk_tile_11_compute": 0.46243399999999996,
+        "chain/qk_tile_11_export": 0.119126,
+        "chain/qk_tile_12_compute": 0.28515199999999996,
+        "chain/qk_tile_12_export": 0.119126,
+        "chain/qk_tile_13_compute": 0.24481799999999998,
+        "chain/qk_tile_13_export": 0.119126,
+        "chain/qk_tile_14_compute": 0.24481799999999998,
+        "chain/qk_tile_14_export": 0.119126,
+        "chain/qk_tile_15_compute": 0.24481799999999998,
+        "chain/qk_tile_15_export": 0.119126,
+        "chain/qk_tile_16_compute": 0.28515199999999996,
+        "chain/qk_tile_16_export": 0.119126,
+        "chain/qk_tile_17_compute": 0.24481799999999998,
+        "chain/qk_tile_17_export": 0.119126,
+        "chain/qk_tile_18_compute": 0.24481799999999998,
+        "chain/qk_tile_18_export": 0.119126,
+        "chain/qk_tile_19_compute": 0.24481799999999998,
+        "chain/qk_tile_19_export": 0.119126,
+        "chain/qk_tile_20_compute": 0.28515199999999996,
+        "chain/qk_tile_20_export": 0.1407,
+        "chain/qk_tile_21_compute": 0.36863399999999996,
+        "chain/qk_tile_21_export": 0.119126,
+        "chain/qk_tile_22_compute": 0.24481799999999998,
+        "chain/qk_tile_22_export": 0.119126,
+        "chain/qk_tile_23_compute": 0.24481799999999998,
+        "chain/qk_tile_23_export": 0.119126,
+        "chain/qk_tile_24_compute": 0.28515199999999996,
+        "chain/qk_tile_24_export": 0.119126,
+        "chain/qk_tile_25_compute": 0.24481799999999998,
+        "chain/qk_tile_25_export": 0.119126,
+        "chain/qk_tile_26_compute": 0.24481799999999998,
+        "chain/qk_tile_26_export": 0.119126,
+        "chain/qk_tile_27_compute": 0.24481799999999998,
+        "chain/qk_tile_27_export": 0.119126,
+        "chain/qk_tile_28_compute": 0.28515199999999996,
+        "chain/qk_tile_28_export": 0.119126,
+        "chain/qk_tile_29_compute": 0.24481799999999998,
+        "chain/qk_tile_29_export": 0.119126,
+        "chain/qk_tile_30_compute": 0.27764799999999995,
+        "chain/qk_tile_30_export": 0.1407,
+        "chain/qk_gemv_release": 0.0018759999999999998,
+        "v/v_gpu_input_stage": 2.611392,
+        "v/v_local_input_compute": 16.042614,
+        "v/v_gemv_release": 0.002814,
+        "v/v_result_export": 0.9830239999999999,
+        "v/v_prefix_tail_read": 0.30391199999999996,
+        "v/v_suffix_write": 0.532784,
+        "pv/pv_gpu_input_stage": 2.461312,
+        "pv/pv_local_input_compute": 15.562357999999998,
+        "pv/pv_gemv_release": 0.002814,
+        "pv/pv_result_export": 0.9811479999999999,
+        "gate_up_gpu/gate_up_gpu_input_stage": 2.503522,
+        "gate_up_gpu/gate_up_local_input_and_compute": 40.750471999999995,
+        "gate_up_gpu/gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_gpu/gate_up_result_export": 3.86456,
+        "down_gpu_input/down_gpu_input_stage": 10.548748,
+        "down_gpu_input/down_local_input_and_compute": 47.993708,
+        "down_gpu_input/down_local_input_and_compute_gemv_release": 0.002814,
+        "down_gpu_input/down_result_export": 0.47931799999999997,
+        "phase_boundary_overhead": 0.0009086874999013617
+      },
+      "independent_only": {
+        "chain/projection_gpu_input_stage": 1.2456933124999998,
+        "chain/projection_local_input_compute": 22.533573999999998,
+        "chain/projection_local_spill": 0.36863399999999996,
+        "chain/projection_gemv_release": 0.002814,
+        "chain/rope_local": 0.902356,
+        "chain/q_export_to_gpu": 4.029648,
+        "chain/q_remote_buffer_fill": 0.48119399999999996,
+        "chain/qk_tile_0_compute": 0.28515199999999996,
+        "chain/qk_tile_0_export": 0.119126,
+        "chain/qk_tile_1_compute": 0.24481799999999998,
+        "chain/qk_tile_1_export": 0.119126,
+        "chain/qk_tile_2_compute": 0.24481799999999998,
+        "chain/qk_tile_2_export": 0.119126,
+        "chain/qk_tile_3_compute": 0.24481799999999998,
+        "chain/qk_tile_3_export": 0.119126,
+        "chain/qk_tile_4_compute": 0.530908,
+        "chain/qk_tile_4_export": 0.119126,
+        "chain/qk_tile_5_compute": 0.24481799999999998,
+        "chain/qk_tile_5_export": 0.119126,
+        "chain/qk_tile_6_compute": 0.24481799999999998,
+        "chain/qk_tile_6_export": 0.119126,
+        "chain/qk_tile_7_compute": 0.24481799999999998,
+        "chain/qk_tile_7_export": 0.119126,
+        "chain/qk_tile_8_compute": 0.28515199999999996,
+        "chain/qk_tile_8_export": 0.119126,
+        "chain/qk_tile_9_compute": 0.24481799999999998,
+        "chain/qk_tile_9_export": 0.119126,
+        "chain/qk_tile_10_compute": 0.24481799999999998,
+        "chain/qk_tile_10_export": 0.119126,
+        "chain/qk_tile_11_compute": 0.24481799999999998,
+        "chain/qk_tile_11_export": 0.119126,
+        "chain/qk_tile_12_compute": 0.28515199999999996,
+        "chain/qk_tile_12_export": 0.119126,
+        "chain/qk_tile_13_compute": 0.24481799999999998,
+        "chain/qk_tile_13_export": 0.119126,
+        "chain/qk_tile_14_compute": 0.49057399999999995,
+        "chain/qk_tile_14_export": 0.119126,
+        "chain/qk_tile_15_compute": 0.24481799999999998,
+        "chain/qk_tile_15_export": 0.119126,
+        "chain/qk_tile_16_compute": 0.28515199999999996,
+        "chain/qk_tile_16_export": 0.119126,
+        "chain/qk_tile_17_compute": 0.24481799999999998,
+        "chain/qk_tile_17_export": 0.119126,
+        "chain/qk_tile_18_compute": 0.24481799999999998,
+        "chain/qk_tile_18_export": 0.119126,
+        "chain/qk_tile_19_compute": 0.24481799999999998,
+        "chain/qk_tile_19_export": 0.119126,
+        "chain/qk_tile_20_compute": 0.28515199999999996,
+        "chain/qk_tile_20_export": 0.119126,
+        "chain/qk_tile_21_compute": 0.24481799999999998,
+        "chain/qk_tile_21_export": 0.119126,
+        "chain/qk_tile_22_compute": 0.24481799999999998,
+        "chain/qk_tile_22_export": 0.119126,
+        "chain/qk_tile_23_compute": 0.24481799999999998,
+        "chain/qk_tile_23_export": 0.119126,
+        "chain/qk_tile_24_compute": 0.559048,
+        "chain/qk_tile_24_export": 0.119126,
+        "chain/qk_tile_25_compute": 0.24481799999999998,
+        "chain/qk_tile_25_export": 0.119126,
+        "chain/qk_tile_26_compute": 0.24481799999999998,
+        "chain/qk_tile_26_export": 0.119126,
+        "chain/qk_tile_27_compute": 0.24481799999999998,
+        "chain/qk_tile_27_export": 0.119126,
+        "chain/qk_tile_28_compute": 0.28515199999999996,
+        "chain/qk_tile_28_export": 0.119126,
+        "chain/qk_tile_29_compute": 0.24481799999999998,
+        "chain/qk_tile_29_export": 0.119126,
+        "chain/qk_tile_30_compute": 0.27764799999999995,
+        "chain/qk_tile_30_export": 0.119126,
+        "chain/qk_gemv_release": 0.0018759999999999998,
+        "v/v_gpu_input_stage": 2.810248,
+        "v/v_local_input_compute": 16.014474,
+        "v/v_gemv_release": 0.002814,
+        "v/v_result_export": 0.9595739999999999,
+        "v/v_prefix_tail_read": 0.316106,
+        "v/v_suffix_write": 0.8348199999999999,
+        "pv/pv_gpu_input_stage": 2.461312,
+        "pv/pv_local_input_compute": 15.498573999999998,
+        "pv/pv_gemv_release": 0.002814,
+        "pv/pv_result_export": 0.9595739999999999,
+        "gate_up_gpu/gate_up_gpu_input_stage": 2.810248,
+        "gate_up_gpu/gate_up_local_input_and_compute": 40.73264999999999,
+        "gate_up_gpu/gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_gpu/gate_up_result_export": 3.86456,
+        "down_gpu_input/down_gpu_input_stage": 10.548748,
+        "down_gpu_input/down_local_input_and_compute": 48.057491999999996,
+        "down_gpu_input/down_local_input_and_compute_gemv_release": 0.002814,
+        "down_gpu_input/down_result_export": 0.47931799999999997,
+        "phase_boundary_overhead": 0.0009086874999582051
+      },
+      "after": {
+        "chain/projection_gpu_input_stage": 1.2456933124999998,
+        "chain/projection_local_input_compute": 22.533573999999998,
+        "chain/projection_local_spill": 0.38551799999999997,
+        "chain/projection_gemv_release": 0.002814,
+        "chain/rope_local": 0.8854719999999999,
+        "chain/q_export_to_gpu": 4.029648,
+        "chain/q_remote_buffer_fill": 0.48119399999999996,
+        "chain/qk_tile_0_compute": 0.28515199999999996,
+        "chain/qk_tile_0_export": 0.119126,
+        "chain/qk_tile_1_compute": 0.24481799999999998,
+        "chain/qk_tile_1_export": 0.119126,
+        "chain/qk_tile_2_compute": 0.24481799999999998,
+        "chain/qk_tile_2_export": 0.119126,
+        "chain/qk_tile_3_compute": 0.24481799999999998,
+        "chain/qk_tile_3_export": 0.119126,
+        "chain/qk_tile_4_compute": 0.530908,
+        "chain/qk_tile_4_export": 0.119126,
+        "chain/qk_tile_5_compute": 0.24481799999999998,
+        "chain/qk_tile_5_export": 0.119126,
+        "chain/qk_tile_6_compute": 0.24481799999999998,
+        "chain/qk_tile_6_export": 0.119126,
+        "chain/qk_tile_7_compute": 0.24481799999999998,
+        "chain/qk_tile_7_export": 0.119126,
+        "chain/qk_tile_8_compute": 0.28515199999999996,
+        "chain/qk_tile_8_export": 0.119126,
+        "chain/qk_tile_9_compute": 0.24481799999999998,
+        "chain/qk_tile_9_export": 0.119126,
+        "chain/qk_tile_10_compute": 0.24481799999999998,
+        "chain/qk_tile_10_export": 0.119126,
+        "chain/qk_tile_11_compute": 0.24481799999999998,
+        "chain/qk_tile_11_export": 0.119126,
+        "chain/qk_tile_12_compute": 0.28515199999999996,
+        "chain/qk_tile_12_export": 0.119126,
+        "chain/qk_tile_13_compute": 0.24481799999999998,
+        "chain/qk_tile_13_export": 0.119126,
+        "chain/qk_tile_14_compute": 0.49057399999999995,
+        "chain/qk_tile_14_export": 0.119126,
+        "chain/qk_tile_15_compute": 0.24481799999999998,
+        "chain/qk_tile_15_export": 0.119126,
+        "chain/qk_tile_16_compute": 0.28515199999999996,
+        "chain/qk_tile_16_export": 0.119126,
+        "chain/qk_tile_17_compute": 0.24481799999999998,
+        "chain/qk_tile_17_export": 0.119126,
+        "chain/qk_tile_18_compute": 0.24481799999999998,
+        "chain/qk_tile_18_export": 0.119126,
+        "chain/qk_tile_19_compute": 0.24481799999999998,
+        "chain/qk_tile_19_export": 0.119126,
+        "chain/qk_tile_20_compute": 0.28515199999999996,
+        "chain/qk_tile_20_export": 0.119126,
+        "chain/qk_tile_21_compute": 0.24481799999999998,
+        "chain/qk_tile_21_export": 0.119126,
+        "chain/qk_tile_22_compute": 0.24481799999999998,
+        "chain/qk_tile_22_export": 0.119126,
+        "chain/qk_tile_23_compute": 0.24481799999999998,
+        "chain/qk_tile_23_export": 0.119126,
+        "chain/qk_tile_24_compute": 0.559048,
+        "chain/qk_tile_24_export": 0.119126,
+        "chain/qk_tile_25_compute": 0.24481799999999998,
+        "chain/qk_tile_25_export": 0.119126,
+        "chain/qk_tile_26_compute": 0.24481799999999998,
+        "chain/qk_tile_26_export": 0.119126,
+        "chain/qk_tile_27_compute": 0.24481799999999998,
+        "chain/qk_tile_27_export": 0.119126,
+        "chain/qk_tile_28_compute": 0.28515199999999996,
+        "chain/qk_tile_28_export": 0.119126,
+        "chain/qk_tile_29_compute": 0.24481799999999998,
+        "chain/qk_tile_29_export": 0.119126,
+        "chain/qk_tile_30_compute": 0.27764799999999995,
+        "chain/qk_tile_30_export": 0.119126,
+        "chain/qk_gemv_release": 0.0018759999999999998,
+        "v/v_gpu_input_stage": 2.810248,
+        "v/v_local_input_compute": 16.014474,
+        "v/v_gemv_release": 0.002814,
+        "v/v_result_export": 0.9595739999999999,
+        "v/v_prefix_tail_read": 0.316106,
+        "v/v_suffix_write": 0.8348199999999999,
+        "pv/pv_gpu_input_stage": 2.461312,
+        "pv/pv_local_input_compute": 15.498573999999998,
+        "pv/pv_gemv_release": 0.002814,
+        "pv/pv_result_export": 0.9595739999999999,
+        "gate_up_gpu/gate_up_gpu_input_stage": 2.810248,
+        "gate_up_gpu/gate_up_local_input_and_compute": 40.73264999999999,
+        "gate_up_gpu/gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_gpu/gate_up_result_export": 3.86456,
+        "down_gpu_input/down_gpu_input_stage": 10.548748,
+        "down_gpu_input/down_local_input_and_compute": 48.057491999999996,
+        "down_gpu_input/down_local_input_and_compute_gemv_release": 0.002814,
+        "down_gpu_input/down_result_export": 0.47931799999999997,
+        "phase_boundary_overhead": 0.0009086874999582051
+      }
+    }
+  },
+  "saved_us": 16.738609999999994,
+  "saved_percent": 8.200563400993532,
+  "preserved": "External bytes, non-maintenance native command counts, DRAM timings; all 16-channel DQ partitions close",
+  "interpretation": "Mode differences include refresh/row-state phase changes; no concurrent GPU workload is simulated"
+}

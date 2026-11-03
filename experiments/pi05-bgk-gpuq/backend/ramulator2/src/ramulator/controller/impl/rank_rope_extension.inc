@@ -40,7 +40,7 @@ void init_rank_rope() {
   m_localrd = m_device.m_spec->get_command_id("LOCALRD");
   m_rope_banks.resize(m_bank_inputs.size());
 }
-bool send_rank_rope(Request& req) {
+void prepare_rank_rope(Request& req) {
   if (!m_rank_rope) throw std::runtime_error("New rank/RoPE request requires pim_rank_rope=true");
   if (req.addr_vec[m_rank_level] != 1 || req.size_bytes != 32)
     throw std::runtime_error("Rank RoPE request requires rank1 and exactly 32B");
@@ -59,7 +59,10 @@ bool send_rank_rope(Request& req) {
   req.pim_rank_mask = 2;
   req.final_command = spec_command(req.type_id);
   req.arrive = m_clk;
-  m_pim_buffer.enqueue(req);
+}
+bool send_rank_rope(Request& req) {
+  prepare_rank_rope(req);
+  if(!m_pim_buffer.enqueue(req)) return false;
   ++s_pim_requests; ++s_bgk_requests;
   return true;
 }

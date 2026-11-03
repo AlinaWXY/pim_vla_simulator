@@ -75,6 +75,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_rank_staging": config.pim_rank_staging,
                     "pim_staging_banks": config.pim_staging_banks,
                     "pim_rank_controller": config.pim_rank_controller,
+                    "pim_rank_descriptors": config.pim_rank_descriptors,
+                    "rank_descriptor_events_path": str(output / f"rank_descriptors.csv.ch{channel}") if config.pim_rank_descriptors else "",
                     "rank_ca_events_path": str(output / f"rank_ca_events.csv.ch{channel}") if config.pim_rank_controller else "",
                     "staging_events_path": str(output / f"staging_events.csv.ch{channel}") if config.pim_rank_staging else "",
                     "gemv_port_cycles": config.gemv_port_cycles,
@@ -103,6 +105,9 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         clock_ratio=config.memory_ratio,
         controllers=controllers,
         channel_mapper=ramulator.channel_mapper.CacheLineInterleave(),
+        channel_independent_dispatch=config.channel_independent_dispatch,
+        channel_queue_capacity=config.channel_queue_capacity,
+        ingress_events_path=str(output / "channel_ingress.csv") if config.channel_independent_dispatch else "",
     )
     frontend = ramulator.frontend.LoadStoreTrace(
         clock_ratio=config.frontend_ratio,
@@ -111,6 +116,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         write_tail_cycles=timings["nCWL"] + timings["nBL_max"] + timings["nWR"],
         max_frontend_ticks=(config.max_cycles * config.frontend_ratio // config.memory_ratio + 1),
         events_path=str(output / "barriers.csv"),
+        channel_independent_dispatch=config.channel_independent_dispatch,
+        dispatch_events_path=str(output / "frontend_dispatch.csv") if config.channel_independent_dispatch else "",
     )
     sim = ramulator.Simulation(frontend, memory)
     sim.run()
@@ -475,6 +482,19 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
     else:
         # Preserve result metadata of the single-bank and direct-input baselines.
         result["config"].pop("pim_staging_banks", None)
+    if config.pim_rank_descriptors or config.channel_independent_dispatch:
+        result["rank_dispatch_model"] = dict(
+            rank_descriptors=config.pim_rank_descriptors,
+            channel_independent_dispatch=config.channel_independent_dispatch,
+            channel_queue_capacity=config.channel_queue_capacity if config.channel_independent_dispatch else None,
+            descriptor_children=16, descriptor_completion="All sixteen bank operations complete",
+            requests_total_basis="Trace requests including one parent per rank descriptor; child operations counted separately",
+            GEMV_compute_instructions="Unchanged original PIM_MAC_AB and PIM_MAC_QK")
+    if not config.pim_rank_descriptors:
+        result["config"].pop("pim_rank_descriptors", None)
+    if not config.channel_independent_dispatch:
+        result["config"].pop("channel_independent_dispatch", None)
+        result["config"].pop("channel_queue_capacity", None)
     if not config.pim_rank_staging:
         result["config"].pop("pim_rank_staging", None)
     if not config.pim_rank_controller:

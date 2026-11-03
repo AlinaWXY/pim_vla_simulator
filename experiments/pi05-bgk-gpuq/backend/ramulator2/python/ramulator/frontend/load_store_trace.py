@@ -18,3 +18,5 @@ class LoadStoreTrace(Component):
     write_tail_cycles = Param(int, default=0)
     max_frontend_ticks = Param(int, default=0, cpp_type="uint64_t")
     events_path = Param(str, default='')
+    channel_independent_dispatch = Param(bool, default=False)
+    dispatch_events_path = Param(str, default='')

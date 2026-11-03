@@ -104,6 +104,7 @@ void init_rank_staging() {
   };
 }
 const char* coarse_name(const Request& req) const {
+  if(req.pim_rank_batch) return rank_descriptor_name(req.type_id);
   switch(req.type_id) {
     case Request::Type::PIM_STAGE_BEGIN:return "PIM_STAGE_BEGIN";
     case Request::Type::PIM_STAGE_SEAL:return "PIM_STAGE_SEAL";

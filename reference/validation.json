@@ -1,8 +1,8 @@
 {
-  "unit_tests_passed": 65,
+  "unit_tests_passed": 81,
   "native_guards": {
     "passed": true,
-    "case_count": 33,
+    "case_count": 38,
     "subprocess_isolation": true,
     "native_cases": [
       {
@@ -520,10 +520,231 @@
         "exception_type": "RuntimeError",
         "message": "staging source bank capacity exceeded",
         "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_queue_capacity_one",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 13233,
+        "native_audit": {
+          "channel_ingress": {
+            "requests_checked": 290,
+            "channel_count": 2,
+            "capacity_per_channel": 1,
+            "queue_high_water_by_channel": {
+              "0": 1,
+              "1": 1
+            },
+            "no_channel_FIFO_reordering": true,
+            "one_dispatch_per_channel_per_CK": true,
+            "completion_fences_checked": 2,
+            "global_barriers_checked": 4,
+            "peer_export_dependencies_checked": 0,
+            "peer_wait_events": 0,
+            "all_accepted_requests_complete": true
+          },
+          "native_data_commands_checked": 290,
+          "rank_controller": {
+            "command_intervals_checked": 1932,
+            "rank_command_coverage": 966,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 0
+          },
+          "rank_descriptors": {
+            "parent_descriptors_checked": 0,
+            "fine_children_checked": 0,
+            "children_per_descriptor": 16,
+            "parent_waits_for_all_children": true,
+            "one_global_CA_per_descriptor": true,
+            "fine_bank_operations_preserved": true,
+            "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+          },
+          "other_channel_dispatches_during_channel0_backpressure": 58,
+          "write_barrier_covers_DRAM_recovery": true
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_late_peer",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 45522,
+        "native_audit": {
+          "channel_ingress": {
+            "requests_checked": 67336,
+            "channel_count": 16,
+            "capacity_per_channel": 32,
+            "queue_high_water_by_channel": {
+              "0": 32,
+              "1": 32,
+              "2": 32,
+              "3": 32,
+              "4": 32,
+              "5": 32,
+              "6": 32,
+              "7": 32,
+              "8": 32,
+              "9": 32,
+              "10": 32,
+              "11": 32,
+              "12": 32,
+              "13": 32,
+              "14": 32,
+              "15": 32
+            },
+            "no_channel_FIFO_reordering": true,
+            "one_dispatch_per_channel_per_CK": true,
+            "completion_fences_checked": 70,
+            "global_barriers_checked": 70,
+            "peer_export_dependencies_checked": 128,
+            "peer_wait_events": 127,
+            "all_accepted_requests_complete": true
+          },
+          "native_data_commands_checked": 92032,
+          "rank_controller": {
+            "command_intervals_checked": 181352,
+            "rank_command_coverage": 113216,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 1024
+          },
+          "rank_descriptors": {
+            "parent_descriptors_checked": 1464,
+            "fine_children_checked": 23424,
+            "children_per_descriptor": 16,
+            "parent_waits_for_all_children": true,
+            "one_global_CA_per_descriptor": true,
+            "fine_bank_operations_preserved": true,
+            "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+          },
+          "unified_gemv": {
+            "events_checked": 53040,
+            "operation_counts": {
+              "GEMV_MULTICAST": 8192,
+              "GEMV_MAC": 32768,
+              "GEMV_RELEASE": 48,
+              "GEMV_Q_LOCAL": 2048,
+              "GEMV_Q_REMOTE": 2048,
+              "GEMV_QK": 7936
+            },
+            "bank_generations_checked": 16640,
+            "physical_bank_releases": 768,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "external_fill_checks": 2048,
+          "unrelated_channel_completions_during_peer_wait": 16
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_repeated_peer_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 90507,
+        "native_audit": {
+          "channel_ingress": {
+            "requests_checked": 134616,
+            "channel_count": 16,
+            "capacity_per_channel": 32,
+            "queue_high_water_by_channel": {
+              "0": 32,
+              "1": 32,
+              "2": 32,
+              "3": 32,
+              "4": 32,
+              "5": 32,
+              "6": 32,
+              "7": 32,
+              "8": 32,
+              "9": 32,
+              "10": 32,
+              "11": 32,
+              "12": 32,
+              "13": 32,
+              "14": 32,
+              "15": 32
+            },
+            "no_channel_FIFO_reordering": true,
+            "one_dispatch_per_channel_per_CK": true,
+            "completion_fences_checked": 142,
+            "global_barriers_checked": 141,
+            "peer_export_dependencies_checked": 256,
+            "peer_wait_events": 128,
+            "all_accepted_requests_complete": true
+          },
+          "native_data_commands_checked": 183424,
+          "rank_controller": {
+            "command_intervals_checked": 362584,
+            "rank_command_coverage": 226192,
+            "global_CA_resources": 16,
+            "rank_CA_resources": 32,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 2048
+          },
+          "rank_descriptors": {
+            "parent_descriptors_checked": 2872,
+            "fine_children_checked": 45952,
+            "children_per_descriptor": 16,
+            "parent_waits_for_all_children": true,
+            "one_global_CA_per_descriptor": true,
+            "fine_bank_operations_preserved": true,
+            "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 4096
+          },
+          "unified_gemv": {
+            "events_checked": 106080,
+            "operation_counts": {
+              "GEMV_MULTICAST": 16384,
+              "GEMV_MAC": 65536,
+              "GEMV_RELEASE": 96,
+              "GEMV_Q_LOCAL": 4096,
+              "GEMV_Q_REMOTE": 4096,
+              "GEMV_QK": 15872
+            },
+            "bank_generations_checked": 33280,
+            "physical_bank_releases": 1536,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true
+          },
+          "external_fill_checks": 4096,
+          "unrelated_channel_completions_during_peer_wait": 16,
+          "repeated_address_waits_for_latest_export_instance": true
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Dispatch_no_peer_export",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "Q_REMOTE has no preceding peer Q_EXPORT",
+        "exception_type": "RuntimeError",
+        "message": "Q_REMOTE has no preceding peer Q_EXPORT",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Descriptor_noncanonical_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "rank descriptor requires canonical rank1 BG0 bank0",
+        "exception_type": "RuntimeError",
+        "message": "rank descriptor requires canonical rank1 BG0 bank0",
+        "python_trace_precheck_bypassed": true,
+        "native_input_retains_invalid_address": true,
+        "worker_returncode": 0
       }
     ]
   },
-  "native_job": 1902629,
+  "native_job": 1902756,
   "native_cases_passed": [
     "chain",
     "v",
@@ -533,7 +754,20 @@
     "combined_timing_chain",
     "serial_layer_control"
   ],
-  "historical_measurements_reused": false,
+  "fresh_modes": [
+    "corrected",
+    "legacy_1103",
+    "independent_only",
+    "direct_1101"
+  ],
+  "legacy_1103_regression": {
+    "status": "passed",
+    "baseline_commit": "786842a",
+    "cases": 7,
+    "native_cycles_bytes_traces_and_event_hashes_identical": true,
+    "all_channel_partitions_identical": true,
+    "stage_sum_us": 204.115366
+  },
   "direct_input_baseline_regression": {
     "status": "passed",
     "baseline_commit": "4073452",
@@ -542,12 +776,72 @@
     "all_channel_partitions_identical": true,
     "stage_sum_us": 109.76288399999999
   },
-  "single_bank_1102_regression": {
+  "independent_Q_SRF_completion_review": {
     "status": "passed",
-    "baseline_commit": "cbc1ee4",
-    "cases": 7,
-    "native_cycles_bytes_traces_and_event_hashes_identical": true,
-    "all_channel_partitions_identical": true,
-    "stage_sum_us": 214.35457399999999
-  }
+    "read_only": true,
+    "cases": [
+      {
+        "case": "chain",
+        "Q_EXPORT_children_checked": 2048,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": 0
+      },
+      {
+        "case": "combined_timing_chain",
+        "Q_EXPORT_children_checked": 0,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": null
+      },
+      {
+        "case": "down_gpu_input",
+        "Q_EXPORT_children_checked": 0,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": null
+      },
+      {
+        "case": "gate_up_gpu",
+        "Q_EXPORT_children_checked": 0,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": null
+      },
+      {
+        "case": "pv",
+        "Q_EXPORT_children_checked": 0,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": null
+      },
+      {
+        "case": "serial_layer_control",
+        "Q_EXPORT_children_checked": 2048,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": 0
+      },
+      {
+        "case": "v",
+        "Q_EXPORT_children_checked": 0,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": null
+      },
+      {
+        "case": "Dispatch_late_peer",
+        "Q_EXPORT_children_checked": 2048,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": 0
+      },
+      {
+        "case": "Dispatch_queue_capacity_one",
+        "Q_EXPORT_children_checked": 0,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": null
+      },
+      {
+        "case": "Dispatch_repeated_peer_source",
+        "Q_EXPORT_children_checked": 4096,
+        "callback_covers_local_SRF_write": true,
+        "minimum_callback_slack_ck": 0
+      }
+    ],
+    "total_Q_EXPORT_children_checked": 10240
+  },
+  "historical_measurements_reused": false
 }

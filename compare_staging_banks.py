@@ -8,6 +8,8 @@ from pathlib import Path
 def compare(run, reference):
     old = json.loads(reference.read_text(encoding="utf-8"))
     new = json.loads((run / "summary.json").read_text(encoding="utf-8"))
+    if new.get("channel_independent_dispatch") or new.get("rank_descriptors"):
+        raise AssertionError("Historical bank-only comparison requires --legacy-rank-dispatch; use compare_rank_dispatch.py for the corrected model")
     if new["status"] != "passed" or new["staging_banks"] != 2:
         raise AssertionError("Requires a successful two-bank native run")
     cases = {}

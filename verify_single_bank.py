@@ -8,6 +8,8 @@ def verify(root):
     read = lambda p: json.loads(p.read_text(encoding='utf-8'))
     expected = read(Path(__file__).resolve().parent/'reference/baseline-xinyao_1102.json')
     actual = read(root/'summary.json')
+    if actual.get('channel_independent_dispatch') or actual.get('rank_descriptors'):
+        raise AssertionError('1102 reproduction requires --staging-banks 1 --legacy-rank-dispatch')
     assert actual['status'] == 'passed' and actual['rank_staging'] and actual['rank_controller'] and actual['staging_banks'] == 1
     for case, ref in expected['cases'].items():
         run = actual['runs'][case]

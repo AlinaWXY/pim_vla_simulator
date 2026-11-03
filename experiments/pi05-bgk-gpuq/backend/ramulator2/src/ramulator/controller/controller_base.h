@@ -29,6 +29,10 @@ class ControllerBase : public IController, public Implementation {
 
   // Forwarding methods — bind m_clk for sub-components
   bool check_timing(int command, const AddrVec_t& addr_vec);
+  // Request-aware hooks preserve ownership when an internal transfer uses the
+  // ordinary scheduler; default controllers retain identical device behavior.
+  virtual bool check_request_timing(const Request& req, int command, Clk_t clock = -1);
+  virtual void issue_request_command(const Request& req, int command);
   int get_preq_command(int command, const AddrVec_t& addr_vec);
 
   // IController overrides

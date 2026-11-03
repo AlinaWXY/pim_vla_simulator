@@ -171,8 +171,9 @@ def native_key(command, geometry):
 
 
 def expected_native_commands(records):
+    from dispatch_audit import expand_rank_records
     expected = Counter()
-    for e in records:
+    for e in expand_rank_records(records):
         if e["operation"] == "PIM_STAGE_FRAGMENT":
             ch, rank, bg, bank, row, column = decode(e["address"])
             first = row*2048+column*32
@@ -417,6 +418,8 @@ def audit_ffn_streams(native, gemv_events, case, staging_events=None, staging_ba
 
 
 def audit_trace(records, case, staging_banks=1):
+    from dispatch_audit import expand_rank_records
+    records = expand_rank_records(records)
     actual = Counter(trace_key(e) for e in records if e["operation"] not in ("BARRIER", "WAIT"))
     expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records), staging_banks=staging_banks)
     require(actual == expected, "Trace differs from independent matrix/address oracle: "+counter_difference(expected, actual))
@@ -480,7 +483,9 @@ def audit_run(directory):
     case = manifest["case"]
     require(native_result["config"]["pim_ffn_dram"] is False,
             "GPU-fed experiment must disable the old local Z/nonlinear path")
-    records = trace_records(directory / "workload.trace")
+    from dispatch_audit import expand_rank_records, audit_ingress, audit_rank_descriptors
+    raw_records = trace_records(directory / "workload.trace")
+    records = expand_rank_records(raw_records)
     staging_banks = native_result["config"].get("pim_staging_banks", 1)
     audit_trace(records, case, staging_banks)
     simulation = directory / "simulation"
@@ -530,10 +535,25 @@ def audit_run(directory):
         batching = audit_paired_staging(stage_events, native, events, case, staging_banks=staging_banks)
         require(Counter(e["operation"] for e in controller_events)["PIM_ROPE_EXEC"] == counts["PIM_ROPE_EXEC"],
                 "RoPE execute event count differs from trace")
-        ca = audit_rank_ca(ca_events, native, stage_events, controller_events, records, events)
+        ca = audit_rank_ca(ca_events, native, stage_events, controller_events, raw_records, events)
     ffn = audit_ffn_streams(native, events, case, stage_events, staging_banks) if case not in ("chain", "v", "pv") else None
     continuity = audit_serial_continuity(manifest, native_result, simulation, native, events) if case == "serial_layer_control" else None
-    return dict(status="passed", case=case, horizon=16,
+    independent = native_result["config"].get("channel_independent_dispatch", False)
+    descriptors = native_result["config"].get("pim_rank_descriptors", False)
+    extra_files, dispatch_events = [], []
+    ingress_audit, descriptor_audit = None, None
+    if independent:
+        extra_files += [simulation / "frontend_dispatch.csv", simulation / "channel_ingress.csv"]
+        dispatch_events = read_csv(extra_files[0])
+        ingress_audit = audit_ingress(raw_records, dispatch_events, read_csv(extra_files[1]),
+            read_csv(simulation / "barriers.csv"), native_result["config"].get("channel_queue_capacity", 32))
+    if descriptors:
+        descriptor_files = [simulation / f"rank_descriptors.csv.ch{ch}" for ch in range(16)]
+        extra_files += descriptor_files
+        descriptor_audit = audit_rank_descriptors(raw_records,
+            [e for p in descriptor_files for e in read_csv(p)], controller_events, ca_events,
+            dispatch_events, native_result["config"]["frontend_ratio"])
+    result = dict(status="passed", case=case, horizon=16,
         trace_and_native_address_coverage=True, native_data_commands_checked=issued_count,
         array_open_row_checks=row_checks, independent_MAC_order_checks=order_checks,
         external_DQ_to_bank_fill_checks=fill_checks,
@@ -541,5 +561,10 @@ def audit_run(directory):
         rank_controller=ca, ffn_streams=ffn, serial_continuity=continuity,
         native_external_DQ_bytes=dq, native_command_counts=dict(native_counts),
         trace_sha256=digest(directory / "workload.trace"),
-        native_sha256={p.name: digest(p) for p in timelines+gemv_files+stage_files+ca_files+controller_files},
+        native_sha256={p.name: digest(p) for p in timelines+gemv_files+stage_files+ca_files+controller_files+extra_files},
         numerical_compute=False, unmeasured="GPU/nonlinear arithmetic and GPU contention")
+    if independent:
+        result["channel_ingress"] = ingress_audit
+    if descriptors:
+        result["rank_descriptors"] = descriptor_audit
+    return result

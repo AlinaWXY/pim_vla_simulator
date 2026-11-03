@@ -43,6 +43,11 @@ CASES = {
     "Stage_two_bank_missing_write": "staging seal requires every declared input write",
     "Stage_two_bank_wrong_weight_fragment": "staging source/weight fragment mismatch",
     "Stage_two_bank_bank_capacity": "staging source bank capacity exceeded",
+    "Dispatch_queue_capacity_one": None,
+    "Dispatch_late_peer": None,
+    "Dispatch_repeated_peer_source": None,
+    "Dispatch_no_peer_export": "Q_REMOTE has no preceding peer Q_EXPORT",
+    "Descriptor_noncanonical_source": "rank descriptor requires canonical rank1 BG0 bank0",
 }
 
 
@@ -56,7 +61,43 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
-    if name.startswith("Stage_two_bank_"):
+    if name == "Dispatch_queue_capacity_one":
+        lines = ["BARRIER 0"]+[f"LD {address(2048*(20+i))}" for i in range(192)]
+        lines += [f"LD {address(2048*20+(i%64)*32, ch=1)}" for i in range(96)]
+        lines += ["BARRIER 1", f"ST {address(409600, ch=1)}", "BARRIER 2",
+                  f"LD {address(409600, ch=1)}", "BARRIER 3"]
+    elif name == "Dispatch_no_peer_export":
+        lines = [command("PIM_RANK_Q_REMOTE", 82176, 0)]
+    elif name == "Descriptor_noncanonical_source":
+        lines = [f"PIM_RANK_ROPE_COEF {address(81920, bank=1)}"]
+    elif name in ("Dispatch_late_peer", "Dispatch_repeated_peer_source"):
+        import workload
+        manifest = workload.generate(path, "chain", staging_banks=2, rank_descriptors=True,
+                                     channel_independent_dispatch=True)
+        original = path.read_text(encoding="ascii").splitlines()
+        boundary = next(s["line_end"] for s in manifest["segments"] if s["name"] == "q_export_to_gpu")
+        delayed = [line for i, line in enumerate(original, 1) if i != boundary]
+        first_export = next(i for i, line in enumerate(delayed) if line.startswith("PIM_RANK_Q_EXPORT "))
+        # COEF cannot be reloaded until both Q and K consume it. Delay only
+        # channel1 with complete, legal recomputation from existing spills.
+        delay = []
+        for token in range(8):
+            q, k = 82176+token*32, 82432+token*32
+            delay += [f"PIM_RANK_ROPE_COEF {address(81920+token*32, ch=1)}",
+                      command("PIM_RANK_ROPE_LOAD", q, 0, ch=1),
+                      command("PIM_RANK_ROPE_EXEC", q, 0, ch=1),
+                      command("PIM_RANK_ROPE_LOAD", k, 1, ch=1),
+                      command("PIM_RANK_ROPE_EXEC", k, 1, ch=1),
+                      f"PIM_RANK_ROPE_STORE {address(q, ch=1)}",
+                      f"PIM_RANK_ROPE_STORE {address(k, ch=1)}"]
+        delayed[first_export:first_export] = delay
+        lines = original+delayed if name == "Dispatch_repeated_peer_source" else delayed
+        marker = 0
+        for i, line in enumerate(lines):
+            if line.startswith("BARRIER "):
+                lines[i] = f"BARRIER {marker}"
+                marker += 1
+    elif name.startswith("Stage_two_bank_"):
         base = 524288
         payload = 131072 if name == "Stage_two_bank_bank_capacity" else 1024
         lines = [f"PIM_STAGE_BEGIN {address(base)} {payload} 16"]
@@ -158,7 +199,64 @@ def trace_for(path, name):
     path.write_text("\n".join(lines)+"\n", encoding="ascii")
 
 
+def dispatch_positive_audit(directory, name):
+    from audit_native import (read_csv, read_json, trace_records, audit_native_commands,
+                              audit_slot_events, audit_external_fills)
+    from dispatch_audit import audit_ingress, audit_rank_descriptors
+    from staging_audit import audit_rank_ca, require
+    simulation = directory / "simulation"
+    read_channels = lambda name: [e for ch in range(16) for e in read_csv(simulation / f"{name}.csv.ch{ch}")]
+    native, gemv, stage, ca, fine, descriptors = map(read_channels,
+        ("timeline", "unified_gemv", "staging_events", "rank_ca_events", "bgk_events", "rank_descriptors"))
+    records = trace_records(directory / "guard.trace")
+    dispatch, ingress = read_csv(simulation / "frontend_dispatch.csv"), read_csv(simulation / "channel_ingress.csv")
+    result = read_json(simulation / "result.json")
+    config = result["config"]
+    audit = dict(channel_ingress=audit_ingress(records, dispatch, ingress, read_csv(simulation / "barriers.csv"),
+        config["channel_queue_capacity"]),
+        native_data_commands_checked=audit_native_commands(records, native),
+        rank_controller=audit_rank_ca(ca, native, stage, fine, records, gemv),
+        rank_descriptors=audit_rank_descriptors(records, descriptors, fine, ca, dispatch, config["frontend_ratio"]))
+    if name == "Dispatch_queue_capacity_one":
+        require(audit["channel_ingress"]["queue_high_water_by_channel"][0] == 1,
+                "Capacity-one guard never filled the blocked channel queue")
+        enqueue = {e["request_id"]: e["clock"] for e in ingress if e["operation"] == "ENQUEUE"}
+        stalls = [(enqueue[e["request_id"]], e["clock"]) for e in ingress
+                  if e["operation"] == "DISPATCH" and e["channel"] == 0 and e["clock"] > enqueue[e["request_id"]]+1]
+        progressed = [e for e in ingress if e["operation"] == "DISPATCH" and e["channel"] == 1 and
+                      any(begin+1 < e["clock"] < end for begin, end in stalls)]
+        require(progressed, "Other channel never dispatches while channel0 is backpressured")
+        audit["other_channel_dispatches_during_channel0_backpressure"] = len(progressed)
+        barriers = {e["marker"]: e for e in read_csv(simulation / "barriers.csv")}
+        write = next(e for e in native if e["command"] == "WR")
+        t = result["resolved_timings_ck"]
+        ready = write["clock"]+t["nCWL"]+t["nBL_max"]+t["nWR"]
+        require(barriers[2]["frontend_tick"] >= (ready-1)*config["frontend_ratio"],
+                "Global barrier ignores native DRAM write recovery")
+        audit["write_barrier_covers_DRAM_recovery"] = True
+    else:
+        audit["unified_gemv"] = audit_slot_events(gemv, "chain")
+        audit["external_fill_checks"] = audit_external_fills(native, gemv, rank_staging=True)
+        waits = [e for e in dispatch if e["operation"] == "PEER_WAIT" and e["channel"] == 0]
+        require(waits, "Adverse peer control never waits for delayed channel1 export")
+        completes = {e["trace_index"]: e["frontend_tick"] for e in dispatch if e["operation"] == "COMPLETE"}
+        accepts = {e["trace_index"]: e["frontend_tick"] for e in dispatch if e["operation"] == "ACCEPT"}
+        progressed = sum(any(wait["frontend_tick"] < e["frontend_tick"] < accepts[wait["trace_index"]] for wait in waits)
+                         for e in dispatch if e["operation"] == "COMPLETE" and e["channel"] == 2)
+        require(progressed > 0, "Peer wait blocks an unrelated channel")
+        audit["unrelated_channel_completions_during_peer_wait"] = progressed
+        if name == "Dispatch_repeated_peer_source":
+            exports = [e for e in records if e["operation"] == "PIM_RANK_Q_EXPORT" and e["address"] == address(82176, ch=1)]
+            remote = [e for e in records if e["operation"] == "PIM_RANK_Q_REMOTE" and e["address"] == address(82176)]
+            require(len(exports) == len(remote) == 2 and accepts[remote[1]["line"]-1] >= completes[exports[1]["line"]-1],
+                    "Repeated Q address reused the previous export completion")
+            audit["repeated_address_waits_for_latest_export_instance"] = True
+    return audit
+
+
 def positive_audit(directory, name):
+    if name.startswith("Dispatch_"):
+        return dispatch_positive_audit(directory, name)
     from audit_native import read_csv, read_json, audit_slot_events
     events = [e for ch in range(16)
               for e in read_csv(directory / "simulation" / f"unified_gemv.csv.ch{ch}")]
@@ -261,16 +359,37 @@ def worker(backend, output, name):
     trace_for(trace, name)
     is_q = name.startswith("Q")
     is_down = name.startswith("Down_")
-    staged = name.startswith("Stage_")
-    config = config_for("chain" if is_q else "down_gpu_input" if is_down or staged else "v",
+    independent = name.startswith(("Dispatch_", "Descriptor_"))
+    staged = name.startswith("Stage_") or independent
+    config = config_for("chain" if is_q or independent else "down_gpu_input" if is_down or staged else "v",
                         refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged,
-                        staging_banks=2 if name.startswith("Stage_two_bank_") else 1)
+                        staging_banks=2 if name.startswith("Stage_two_bank_") or independent else 1,
+                        rank_descriptors=independent, channel_independent_dispatch=independent)
+    if name == "Dispatch_queue_capacity_one":
+        from dataclasses import replace
+        config = replace(config, channel_queue_capacity=1)
     try:
-        native = run_trace(config, trace, output / "simulation")
+        if name == "Descriptor_noncanonical_source":
+            # Exercise the compiled controller rather than stopping in the
+            # adapter's duplicate Python address precheck. Metadata comes
+            # from an otherwise identical valid request; input.trace remains
+            # the deliberately invalid original throughout the native run.
+            from unittest.mock import patch
+            import simulator.backend as adapter
+            metadata_trace = output / "guard-metadata.trace"
+            metadata_trace.write_text(f"PIM_RANK_ROPE_COEF {address(81920)}\n", encoding="ascii")
+            inspect = adapter.inspect_trace
+            with patch.object(adapter, "inspect_trace", lambda path, **kwargs: inspect(metadata_trace, **kwargs)):
+                native = run_trace(config, trace, output / "simulation")
+        else:
+            native = run_trace(config, trace, output / "simulation")
     except Exception as error:
         passed = CASES[name] is not None and isinstance(error, RuntimeError) and CASES[name] in str(error)
         result = dict(case=name, passed=passed, compiled_backend_invoked=True,
             expected_message=CASES[name], exception_type=type(error).__name__, message=str(error))
+        if name == "Descriptor_noncanonical_source":
+            result["python_trace_precheck_bypassed"] = True
+            result["native_input_retains_invalid_address"] = True
     else:
         if CASES[name] is not None:
             result = dict(case=name, passed=False, compiled_backend_invoked=True,

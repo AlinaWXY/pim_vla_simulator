@@ -5,17 +5,19 @@
   "unified_bank_gemv": true,
   "rank_staging": true,
   "rank_controller": true,
+  "rank_descriptors": true,
+  "channel_independent_dispatch": true,
   "staging_banks": 2,
   "latency_us": 18.9945,
   "memory_cycles": 20250,
   "tCK_ns": 0.938,
   "phase_us": {
-    "pv_gpu_input_stage": 2.4435193125,
-    "pv_local_input_compute": 15.587684,
+    "pv_gpu_input_stage": 2.4425813124999998,
+    "pv_local_input_compute": 15.588621999999999,
     "pv_gemv_release": 0.002814,
     "pv_result_export": 0.9595739999999999
   },
-  "phase_boundary_us": 0.0009086874999972849,
+  "phase_boundary_us": 0.0009086875000008376,
   "external_DQ_bytes": 638976,
   "traffic_bytes": {
     "requested_read": 0,

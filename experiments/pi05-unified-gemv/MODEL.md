@@ -1,6 +1,6 @@
 # xinyao_1103 双 bank 输入暂存与 rank controller
 
-本实验从 `xinyao_1102` 的 `cbc1ee4` 派生；其直接输入基线是 `xinyao_1101` 的 `4073452`。1103 将 GPU 广播输入分布到不同 bank group 的两个 DRAM bank，并交错写入。权重、KV cache、计算指令、输出归属及每 bank 的两个 SRF slot 保持不变。rank controller 的派发政策沿用 1102；[RoPE 命令说明](ROPE-CONTROL.md) 记录其现有跨 channel 队头阻塞，本次不修复该问题。
+本实验从 `xinyao_1102` 的 `cbc1ee4` 派生；其直接输入基线是 `xinyao_1101` 的 `4073452`。1103 将 GPU 广播输入分布到不同 bank group 的两个 DRAM bank，并交错写入。权重、KV cache、计算指令、输出归属及每 bank 的两个 SRF slot 保持不变。当前默认模式在双 bank 数据路径上进一步启用 channel 独立派发和 rank 粗粒度描述符，修正旧模式的跨 channel 队头阻塞。[RoPE 命令说明](ROPE-CONTROL.md) 保留问题的历史证据，并解释本次控制路径修改；`--legacy-rank-dispatch` 可复现修改前的 1103。
 
 ## 输入路径与双 bank 布局
 
@@ -76,9 +76,13 @@ MAC fragment 2p+1
 - 两个源 bank 都保留权重计算职责。暂存行和权重行共享各 bank 的真实行状态，加载与全 bank MAC 之间的 PRE/ACT 成本继续计入，不假设独立 array 读端口。
 - 输入覆盖、写完成、SRF 消费完成、slot 复用和 release 检查继续生效。Q/K projection 为 8 CK/MAC，其余 GEMV 为 16 CK/MAC，QKT 和 RoPE 参数保持基线。
 
-总 controller 对输入装载采用 256/512 B fragment 描述符，每个占用 1 CK global CA；内部 PRE/ACT、LOCALRD、BCAST 由 rank controller 发出。其余既有 PIM 请求继续沿用 1102 的派发路径：包括 RoPE 的单 bank、32 B 请求也分别经过 global CA 准入。现有 channel-major trace 与单前端重试造成跨 channel 队头阻塞，不能全部解释成硬件 rank 内命令竞争。[ROPE-CONTROL.md](ROPE-CONTROL.md) 区分这两种影响；1103 的双 bank 数据路径修改不修复该控制问题。
+总 controller 对输入装载继续采用 256/512 B fragment 描述符；内部 PRE/ACT、LOCALRD、BCAST 由 rank controller 发出。新默认模式还把 projection spill、RoPE COEF/LOAD/EXEC/STORE、Q_EXPORT/Q_REMOTE 合为 rank 级描述符，每个描述符占用 1 CK global CA，再在 rank controller 内展开 16 个原有单 bank 操作。所有实际 bank 操作继续竞争 rank CA；原有 `PIM_MAC_AB`、`PIM_MAC_QK` 等 GEMV 计算指令不改变。
 
-QKT 的 Q 按 feature 定向送到对应 bank，并非同一数据对所有 bank multicast，因此保留 `PIM_Q_EXPORT`、`PIM_Q_REMOTE` 和 GPU 往返路径。V suffix cache 的普通 DRAM 回写也保留。
+描述符地址使用目标 channel 的 canonical rank1/BG0/bank0；row/column 和可选 slot 对所有 16 个 bank 相同。只有全部子操作完成，父描述符才回调完成。native 仅在现有 PIM 请求队列有 16 个空位时接收描述符，保留有限队列背压；这些控制队列不是额外的数据 SRAM。语法与展开规则见 [ROPE-CONTROL.md](ROPE-CONTROL.md)。
+
+前端在当前合法阶段内为各 channel 保留独立指令游标，按 channel FIFO 顺序提交到各自容量为 32 的入口请求队列；一个 channel 的总 CA 或 controller 背压不再阻止其它 channel 前进。memory system 每个 memory CK 对每个 channel 最多尝试派发一条队首请求，controller 继续检查 global/rank CA 与所有数据依赖。全局 BARRIER、WAIT、原普通访问/PIM 阶段完成边界和 Q_REMOTE 对 peer Q_EXPORT 的完成依赖仍保留。
+
+QKT 的 Q 按 feature 定向送到对应 bank，并非同一数据对所有 bank multicast，因此保留原子 `PIM_Q_EXPORT`、`PIM_Q_REMOTE` 的真实 GPU 往返路径；新描述符仅合并控制请求，仍执行全部单 bank RD/WRGB 数据传输。V suffix cache 的普通 DRAM 回写也保留。
 
 ## 流量与统计解释
 
@@ -88,8 +92,20 @@ QKT 的 Q 按 feature 定向送到对应 bank，并非同一数据对所有 bank
 
 ## 复现模式与兼容性
 
-`reproduce.py` 默认 `--staging-banks 2`，启用 `pim_rank_staging=True`、`pim_rank_controller=True` 和 `pim_staging_banks=2`，见 [CLI 参数](reproduce.py#L117)。
+默认 `reproduce.py` 使用双 bank 暂存，并同时启用 `pim_rank_descriptors=True`、`channel_independent_dispatch=True`。两个新开关在 Python API/MemoryConfig 中默认为 false，CLI 显式开启，避免改变既有 guards 的调用含义。
 
-`--staging-banks 1` 使用 1102 的单 bank 布局：rank1/BG0/bank0、128 KiB、row256–319，offset 为 `524288 + (f*R+t)*32`。保留 1102 的 GPU 写入顺序与成对 SRF 装载顺序；7 个 staged case 的生成 trace 已与 `cbc1ee4` 逐字节核对一致。Python generator 和 backend 参数默认仍为 1，兼容原 API 与 guards；CLI 显式传入默认值 2。
+| CLI 模式 | rank 粗描述符 | channel 独立派发 | 用途 |
+|---|---|---|---|
+| 默认 | 开 | 开 | 修正后的双 bank 1103 |
+| `--no-rank-descriptors` | 关 | 开 | 单独测 channel HOL 修正，trace 仍为原细请求 |
+| `--legacy-rank-dispatch` | 关 | 关 | 复现 `786842a` 的双 bank 1103 |
+| `--staging-banks 1 --legacy-rank-dispatch` | 关 | 关 | 复现 1102 单 bank 控制与数据路径 |
+| `--direct-input-baseline` | 关 | 关 | 关闭暂存与 rank controller，恢复 1101 直接 WRGB 路径 |
 
-`--direct-input-baseline` 关闭暂存与 rank controller，恢复 1101 的直接 WRGB 输入路径。此时 `--staging-banks` 不改变 trace，backend 使用兼容值 1；summary/provenance 的有效 `staging_banks=0` 表示没有暂存。7 个 direct case 的生成 trace 已与 `cbc1ee4` 的 direct 模式逐字节核对一致。summary、manifest 和 provenance 均记录有效 bank 数量，便于区分运行结果。
+`--staging-banks 1` 本身仅选择单 bank 数据布局，仍默认使用新的派发模式。其布局为 rank1/BG0/bank0、128 KiB、row256–319，offset 为 `524288 + (f*R+t)*32`。需要旧时序对照时必须同时指定 `--legacy-rank-dispatch`。两个 bank 模式均保留两 slot 成对装载/计算顺序。
+
+legacy 模式的 7 cases × 单/双 bank × staged/direct 共 28 个生成 trace 已与 `786842a` 逐字节核对一致。新描述符展开成原 16 个 bank 操作后，同样逐字节恢复原指令、地址、slot 与次序，DQ 总量一致；native 时序与日志是否一致由实际重新运行的验证结果判定，不由 trace 一致直接推断。
+
+`--direct-input-baseline` 无论附带哪种 bank/派发选项都使用旧控制路径。有效 `staging_banks=0` 表示没有暂存，backend 的兼容参数为 1。summary、manifest、provenance 记录有效 bank 数及两个派发开关。
+
+新模式附加 `frontend_dispatch.csv`、`channel_ingress.csv` 和 `rank_descriptors.csv.chN`，分别记录前端请求接受/完成、有限队列入队/派发和父子描述符生命周期。manifest 的 `counts` 统计实际 trace 父请求，`expanded_counts` 统计细操作；backend 的 `requests.total` 是父请求数，旧 `pim_q_export` 等流量计数按展开后的操作数计，避免把描述符压缩误当成数据量下降。

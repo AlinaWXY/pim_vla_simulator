@@ -25,7 +25,10 @@ struct Request {
 
   int type_id = -1;        // Request type. -1 is the convention for internal maintenance/direct-command requests.
   int source_id = -1;      // Source identifier (e.g., which core)
-  int ingress_id = -1;     // External ingress identifier (e.g., gem5 memory port)
+  int ingress_id = -1;     // External ingress identifier (e.g., trace line index).
+  int channel_count = 1;   // Channel mapper geometry for rank descriptor address expansion.
+  bool pim_rank_micro = false; // Internal child: retains rank CA scope through ordinary RD scheduling.
+  bool pim_rank_batch = false; // One rank descriptor expands into the original 16 bank requests.
   int pim_buffer = -1;     // Optional ping-pong input SRAM slot, 0/1; -1 = legacy trace.
   uint64_t pim_bank_mask = 0; // New bank-local input/result destinations.
   int pim_rank_mask = 0;   // Controller-resolved PIM targets; input broadcasts may select all ranks.

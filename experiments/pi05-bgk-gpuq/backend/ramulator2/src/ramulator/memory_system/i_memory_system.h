@@ -65,6 +65,11 @@ class IMemorySystem : public TopLevel<IMemorySystem> {
 
   // Returns the number of bytes per DRAM transaction (channel_width * internal_prefetch / 8).
   virtual int get_tx_bytes() = 0;
+
+  // Frontends may route independent trace streams without admitting a request.
+  virtual int get_num_channels() const { return 1; }
+  virtual int get_channel_id(Addr_t addr) const { return 0; }
+  virtual bool has_independent_channel_ingress() const { return false; }
 };
 
 }  // namespace Ramulator

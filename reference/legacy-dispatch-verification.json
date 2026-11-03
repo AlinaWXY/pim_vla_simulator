@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "baseline_commit": "786842a",
+  "cases": 7,
+  "native_cycles_bytes_traces_and_event_hashes_identical": true,
+  "all_channel_partitions_identical": true,
+  "stage_sum_us": 204.115366
+}

@@ -1,73 +1,89 @@
-# xinyao_1103：两个 bank 交错写入
+# xinyao_1103：独立 channel 派发与 rank 粗指令
 
-从已备份并上传的 `xinyao_1102`（`cbc1ee4`）派生。GPU 输入按 fragment 奇偶分配到 rank1 的 BG0/bank0 与 BG1/bank0，逐 token 交错发出普通 WR，以利用跨 bank group 的短列间隔。全部写入完成后，仍先填两个 SRF slot，再计算对应的两个 fragment。
+在双 bank 暂存版本 `786842a` 上修正跨 channel 队头阻塞，并将逐 bank 的 RoPE、projection spill、Q export/remote 循环下沉到 rank controller。旧版本保留在 Git 历史与本地 bundle，紧凑数据保存在 [previous-rank-dispatch](reference/previous-rank-dispatch/summary.json)。
 
-总 DRAM 暂存容量仍为128KiB，分成两个64KiB区域；每 bank 的 SRF 仍为2×512B。MAC、输出、输入字节数及rank controller派发政策保持原样。详见[模型与地址映射](experiments/pi05-unified-gemv/MODEL.md)。
+每个 channel 有独立的32项入口FIFO；请求入队不占CA，实际派发最多每channel每memory CK一次，并接受外层CA与下游队列背压。前端在barrier/既有完成栅栏之间维护独立channel指令流。一个channel阻塞不再阻止其它channel入队。Q转发依赖绑定具体的源EXPORT请求实例，显式BARRIER、WAIT及原有普通/PIM切换完成栅栏保留。
 
-## 原生结果：每层、每denoising step，单位µs
+`PIM_RANK_SPILL`、`PIM_RANK_ROPE_COEF/LOAD/EXEC/STORE`、`PIM_RANK_Q_EXPORT/REMOTE`各用一次外层CA派发，由rank controller展开16个bank微请求。父请求必须等16个微请求全部完成；微请求保留真实rank CA、DRAM行状态、DQ和SRF依赖。Q导出的内部RD仍走原ordinary scheduler及完整读时序，但其命令归属rank CA。原MAC计算指令和STAGE_FRAGMENT展开保持原样。
 
-H16、batch1、16个LPDDR5X-8533 channel，每channel的rank0预留给GPU、rank1包含16个PIM bank。DQ列为每channel时间；16个channel分别审计。
+## 原生 latency 对比
 
-| 阶段 | 1102 单bank | 1103 双bank | DQ占用 | DQ空闲 | 完整无外部传输窗口 |
-|---|---:|---:|---:|---:|---:|
-| Q/K + RoPE + QKT | 58.708482 | 58.708482 | 3.301760 | 55.406722 | 47.611004 |
-| V | 21.992348 | 20.592852 | 3.121664 | 17.471188 | 16.064188 |
-| PV | 20.364918 | 18.994500 | 2.341248 | 16.653252 | 15.587684 |
-| Gate/Up | 48.579958 | 47.127934 | 3.842048 | 43.285886 | 40.756100 |
-| Down | 64.708868 | 58.691598 | 7.924224 | 50.767374 | 47.637268 |
-| **合计** | **214.354574** | **204.115366** | **20.530944** | **183.584422** | **167.656244** |
+单位µs/层/denoising step。H16、batch1、16个LPDDR5X-8533 channel；每channel rank0预留GPU、rank1有16个PIM bank。四种模式均使用同一原生库重新运行，比较不依靠估算扣除。
 
-总latency降低 **4.78%**，按18层×10步折算为 **36.740766ms**（1102为38.583823ms）。这仍是已建模阶段之和，不是完整AE端到端时间。
-
-## 整批输入写入
-
-| 输入阶段 | 单bank写入µs | 双bank写入µs | 缩短 | 写入阶段DQ利用率 |
+| 阶段 | 修改前 | 仅独立channel | 两项均修正 | 缩短 |
 |---|---:|---:|---:|---:|
-| Q/K + RoPE + QKT | 2.486667 | 1.246631 | 49.87% | 38.63% → 77.05% |
-| V | 5.270651 | 2.503551 | 52.50% | 36.45% → 76.73% |
-| PV | 5.150587 | 2.443519 | 52.56% | 36.13% → 76.16% |
-| Gate/Up | 5.270651 | 2.503551 | 52.50% | 36.45% → 76.73% |
-| Down | 21.332025 | 10.548777 | 50.55% | 36.02% → 72.84% |
+| Q/K + RoPE + QKT | 58.708482 | 41.969872 | 41.969872 | 16.738610 |
+| V | 20.592852 | 20.592852 | 20.592852 | 0.000000 |
+| PV | 18.994500 | 18.994500 | 18.994500 | 0.000000 |
+| Gate/Up | 47.127934 | 47.127934 | 47.127934 | 0.000000 |
+| Down | 58.691598 | 58.691598 | 58.691598 | 0.000000 |
+| **合计** | **204.115366** | **187.376756** | **187.376756** | **16.738610** |
 
-原生日志确认跨BG写入达到2CK，同BG写入间隔仍至少4CK；没有放宽DRAM时序或增加DQ带宽。写入latency的改善不会全部变成总latency改善：读取需要准备两个源bank，且refresh相位也会变化。计算指令及非ACT/PRE/refresh的原生命令计数在全部16个channel均与1102一致。
+总latency减少 **8.20%**。18层×10步折算 **33.727816ms**，修改前为36.740766ms；这是已建模阶段之和，未计GPU算术等完整AE端到端开销。单层连续控制为188.328826µs，combined FFN控制为105.910518µs，不重复计入主结果。
 
-[写入阶段数据](reference/input-write-comparison.json)、[逐channel命令对比](reference/staging-bank-comparison.json)、[原生审计](reference/down_gpu_input/native-audit.json)。
+本次全部7个案例中，仅独立channel与两项均修正的latency相同。因而本次latency改善可归于消除前端跨channel阻塞；rank粗描述符降低外层CA占用，但保留了相同的细指令与数据依赖，没有进一步缩短本工作负载的临界路径。
 
-## DQ及命令总线分解
+## Q/K、RoPE、QKT 内部阶段
 
-时间闭合：`204.115366 = 20.530944 + 167.656244 + 15.928178`，分别为DQ占用、完整无外部传输工作窗口、其它DQ空隙。DQ空闲比例为89.94%。外部流量仍为5472KiB/层/步（全部16channel），其中暂存输入3824KiB。
+| 子阶段 | 修改前 | 仅独立channel | 两项均修正 |
+|---|---:|---:|---:|
+| Q/K输入写入 | 1.246631 | 1.245693 | 1.245693 |
+| Q/K暂存读取＋计算 | 22.533574 | 22.533574 | 22.533574 |
+| Projection spill | 3.895514 | 0.368634 | 0.385518 |
+| RoPE | 12.652682 | 0.902356 | 0.885472 |
+| Q导出 | 4.238822 | 4.029648 | 4.029648 |
+| Q跨channel填充 | 1.847860 | 0.481194 | 0.481194 |
+| QKT计算 | 8.529234 | 8.710268 | 8.710268 |
+| QKT结果输出 | 3.758566 | 3.692906 | 3.692906 |
 
-总CA占用范围18.706534µs；rank0 CA为0.047838µs；rank1 CA为34.907670µs。DQ空闲时，总CA忙9.517886–9.527266µs，总CA也空闲174.057156–174.066536µs。不同资源的占用不能相加到latency；未注入并发GPU请求，这些空闲窗口只是资源可用上界。
+所有阶段（包括V、PV、Gate/Up、Down的输入、内部计算与输出）及边界时间见 [完整子阶段CSV](reference/rank-dispatch-phase-comparison.csv)。分组时间来自barrier，不是把可能重叠的请求延迟相加。消融差值也包含refresh相位和行状态变化，不能全部视作某一条总线的独立成本。
 
-![单bank和双bank DQ对比](reference/channel-breakdown.png)
+## DQ 空闲时间 breakdown
 
-[逐channel时间分区](reference/channel-partitions.csv)、[阶段窗口](reference/channel-phase-windows.csv)、[CA分解](reference/channel-command-bus.csv)、[完整数据](reference/channel-analysis.json)。单层连续控制为204.338610µs，combined FFN控制为105.910518µs，不重复加入主结果。
+下表展示channel0，全部16channel独立审计并保存在CSV。外部数据量和DQ占用未变；完整无传输窗口已扣除边界数据尾部，其它DQ空闲包括传输阶段内的间隙。
 
-## 保留的已知问题与RoPE旧指令
+| 阶段 | DQ占用（前后相同） | 修改前DQ空闲 | 修改后DQ空闲 | 修改后完整无传输窗口 | 修改后其它DQ空闲 |
+|---|---:|---:|---:|---:|---:|
+| Q/K + RoPE + QKT | 3.301760 | 55.406722 | 38.668112 | 32.514832 | 6.153280 |
+| V | 3.121664 | 17.471188 | 17.471188 | 16.065126 | 1.406062 |
+| PV | 2.341248 | 16.653252 | 16.653252 | 15.588622 | 1.064630 |
+| Gate/Up | 3.842048 | 43.285886 | 43.285886 | 40.757038 | 2.528848 |
+| Down | 7.924224 | 50.767374 | 50.767374 | 47.638206 | 3.129168 |
+| **合计** | **20.530944** | **183.584422** | **166.845812** | **152.563824** | **14.281988** |
 
-1102备注的“引入rank controller导致命令堆积”问题本次仍保留。当前单bank细粒度RoPE指令逐条经过总CA准入，单前端按channel分组发令，受阻时挡住其它channel，产生跨channel队头阻塞。双bank写入实验不修复这条控制路径，当前latency仍包含其额外代价。
+时间闭合：`187.376756 = 20.530944 + 152.563824 + 14.281988`。总外部流量仍为5472KiB/层/步（16channel合计）。运行变短，因此绝对DQ空闲时间也减少；未注入并发GPU工作，这些窗口是资源可用上界，不能直接当作GPU实际获益。
 
-旧版的RoPE是每个本地query依次执行 `COEF → LOAD Q(slot0) → EXEC Q → LOAD K(slot1) → EXEC K → STORE Q → STORE K`，每组遍历各bank；每条请求处理一个32B向量。旧版本地LOCALRD/LOCALWR不占共享CA，EXEC也可跨bank同CK发出；前端没有新增的逐请求1CK总CA门限。因此旧0.529032µs是更理想化的bank内执行模型。新版RoPE工作量不变，但新增仲裁与前端HOL叠加。详细旧指令、代码位置和日志证据见[RoPE控制路径说明](experiments/pi05-unified-gemv/ROPE-CONTROL.md)。
+![Latency and DQ comparison](reference/rank-dispatch-comparison.png)
 
-GPU softmax、GeLU/multiply、packing、O projection、norm/residual、dispatch与后台VLM竞争未计时。单层地址布局已核对；18层×10步只是耗时折算，未构建18层同时驻留的地址布局。
+[逐channel前后DQ与CA对比](reference/rank-dispatch-channel-comparison.csv)、[逐阶段窗口](reference/channel-phase-windows.csv)、[CA占用](reference/channel-command-bus.csv)、[完整JSON](reference/rank-dispatch-comparison.json)、[可导出PDF图](reference/rank-dispatch-comparison.pdf)。外层CA的`global`日志字段作用域是每个channel，并非16channel共享一条总线。
 
-## 复现与验证
+下表是channel0的命令资源分解，单位µs。DQ空闲的后两项相加等于DQ总空闲；不同总线的占用不能彼此相加当作latency。
 
-Linux、C++20、CMake≥3.18、Python3.11及开发头文件。依赖源码随附，绘图另需matplotlib。
+| 资源 | 修改前 | 仅独立channel | 两项均修正 |
+|---|---:|---:|---:|
+| 外层CA占用 | 18.706534 | 18.692464 | 17.304224 |
+| rank1 CA占用 | 34.907670 | 34.778226 | 34.778226 |
+| DQ空闲、外层CA忙 | 9.527266 | 9.463482 | 8.170918 |
+| DQ与外层CA同时空闲 | 174.057156 | 157.382330 | 158.674894 |
+
+## 保留的资源和验证
+
+双bank DRAM暂存仍为BG0/B0与BG1/B0，各64KiB；每bank SRF仍为2×512B。没有增加数据buffer容量、减少计算量、放宽DRAM时序或取消细CA竞争。计算、读取、广播和输出保留真实依赖；输入全部落地与写恢复完成后才能开始暂存读取。GPU softmax、GeLU/multiply、packing、O projection、norm/residual与背景VLM竞争未计时，模型不执行BF16数值计算。
+
+原生job 1902756通过 **81项Python测试、38项原生guards、28个完整case运行**（7个新模式、7个修改前兼容模式、7个仅独立channel、7个1101直接输入）。兼容模式的周期、外部字节、trace和原始事件CSV哈希与`786842a`完全一致；1101兼容检查也通过。新模式审计有界FIFO、逐channel独立推进、全部barrier和peer依赖、16个唯一bank微请求完成、CA无冲突、DQ时间闭合。实验/backend/vendor的505个文件与最终原生运行快照逐字节一致。
+
+另有独立只读审计核对10240个Q_EXPORT子回调均覆盖对应SRF写完成，含晚到peer和重复地址实例：[审计证据](reference/independent-srf-review.json)。
+
+## 复现
 
 ```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements.txt
 PYTHON="$(command -v python)" JOBS=4 bash experiments/pi05-unified-gemv/build.sh
-python experiments/pi05-unified-gemv/reproduce.py --output results/fresh-h16 --staging-banks 2
-python verify_reference.py results/fresh-h16
-python compare_staging_banks.py results/fresh-h16
-python experiments/pi05-unified-gemv/plot_comparison.py results/fresh-h16
-python experiments/pi05-unified-gemv/reproduce.py --output results/single --staging-banks 1
-python verify_single_bank.py results/single
-python experiments/pi05-unified-gemv/reproduce.py --output results/direct --direct-input-baseline
-python verify_baseline.py results/direct
+python experiments/pi05-unified-gemv/reproduce.py --output results/fresh
+python verify_reference.py results/fresh
+python experiments/pi05-unified-gemv/reproduce.py --output results/legacy --legacy-rank-dispatch --skip-tests
+python verify_legacy_rank_dispatch.py results/legacy
+python experiments/pi05-unified-gemv/reproduce.py --output results/independent --no-rank-descriptors --skip-tests
+python compare_rank_dispatch.py results/fresh --before results/legacy --dispatch-only results/independent --plot
 ```
 
-原生job1902629通过 **65项Python测试、33项原生guards、7个双bank案例**。同一编译库另跑7个1102单bank及7个1101直接输入案例，周期、字节、trace、事件CSV哈希与逐channel时间窗口均与历史结果一致。实验/backend/vendor的502个文件与实际原生运行源码逐字节一致。reference保存紧凑证据；原始trace、timeline由复现脚本生成。
+Linux、C++20、CMake≥3.18、Python3.11及开发头文件；Python依赖见requirements.txt。[模型细节](experiments/pi05-unified-gemv/MODEL.md)、[RoPE控制路径](experiments/pi05-unified-gemv/ROPE-CONTROL.md)。旧单bank或双bank比较脚本针对历史模式；重现1102时需同时指定`--staging-banks 1 --legacy-rank-dispatch`。

@@ -8,6 +8,8 @@ from pathlib import Path
 def compare(run, previous):
     old = json.loads(previous.read_text(encoding="utf-8"))
     new = json.loads((run / "summary.json").read_text(encoding="utf-8"))
+    if new.get("channel_independent_dispatch") or new.get("rank_descriptors") or new.get("staging_banks", 1) != 1:
+        raise AssertionError("Historical slot-only comparison requires --staging-banks 1 --legacy-rank-dispatch")
     primary = new["primary_cases"]
     if new["status"] != "passed" or not new["rank_staging"]:
         raise AssertionError("Requires a successful native staging run")

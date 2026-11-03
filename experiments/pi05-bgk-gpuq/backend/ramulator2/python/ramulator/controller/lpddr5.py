@@ -41,6 +41,8 @@ class LPDDR5(Component):
     pim_rank_controller = Param(bool, default=False)
     rank_ca_events_path = Param(str, default='')
     staging_events_path = Param(str, default='')
+    pim_rank_descriptors = Param(bool, default=False)
+    rank_descriptor_events_path = Param(str, default='')
     scheduler = Child("scheduler")
     refresh_manager = Child("refresh_manager")
     row_policy = Child("row_policy")

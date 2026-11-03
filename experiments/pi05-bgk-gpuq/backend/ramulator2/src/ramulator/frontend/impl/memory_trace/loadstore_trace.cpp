@@ -1,9 +1,11 @@
 #include <filesystem>
+#include <algorithm>
 #include <fmt/format.h>
 #include <fstream>
 #include <limits>
 #include <sstream>
 #include <unordered_set>
+#include <map>
 
 #include "ramulator/base/param.h"
 #include "ramulator/frontend/i_frontend.h"
@@ -16,7 +18,11 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
  private:
   static constexpr int Barrier = -2;
   static constexpr int Wait = -3;
-  struct Trace { int type_id; Addr_t addr; int pim_buffer; int stage_bytes=0, stage_rows=0; };
+  struct Trace {
+    int type_id; Addr_t addr; int pim_buffer; int stage_bytes=0, stage_rows=0;
+    bool rank_batch=false;
+    size_t peer_source=std::numeric_limits<size_t>::max();
+  };
   std::vector<Trace> m_trace;
   size_t m_curr_trace_idx = 0;
   size_t m_trace_count = 0;
@@ -34,6 +40,119 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
   Clk_t m_write_ready_at = 0;
   Clk_t m_wait_until = -1;
   uint64_t m_max_frontend_ticks = 0;
+  bool m_channel_independent_dispatch = false;
+  std::string m_dispatch_events_path;
+  std::ofstream m_dispatch_events;
+  std::vector<std::vector<size_t>> m_channel_streams;
+  std::vector<size_t> m_channel_positions;
+  std::vector<bool> m_trace_completed, m_peer_wait_logged;
+  bool m_epoch_active = false;
+
+  void record_dispatch(size_t index, int channel, const char* operation) {
+    if (!m_dispatch_events) return;
+    const auto& t = m_trace[index];
+    m_dispatch_events << m_clk << ',' << channel << ',' << operation << ',' << index << ','
+      << t.addr << ',' << t.type_id << ',' << t.rank_batch << '\n';
+  }
+
+  // Trace records are predecoded instruction sources, not unbounded hardware
+  // request queues. Only the current dependency epoch is exposed; each channel
+  // advances its own source cursor into a bounded memory-system ingress FIFO.
+  bool prepare_epoch() {
+    int last = m_last_pim;
+    bool has_write = m_phase_has_write;
+    size_t end = m_curr_trace_idx;
+    for (auto& stream : m_channel_streams) stream.clear();
+    std::fill(m_channel_positions.begin(), m_channel_positions.end(), 0);
+    while (end < m_trace.size()) {
+      const auto& t = m_trace[end];
+      if (t.type_id == Barrier || t.type_id == Wait) break;
+      const int pim = t.type_id == Request::Type::PIM_MAC_HB ||
+          (t.type_id == Request::Type::Read && last == 2) ? 2 :
+          t.type_id >= Request::Type::PIM_MAC_AB ? 1 : 0;
+      const bool reads_to_half = pim == 2 && last == 0 && !has_write;
+      if (m_wait_for_completion && last >= 0 && pim != last && !reads_to_half) {
+        if (end != m_curr_trace_idx) break;
+        if (!drained()) return false;
+      }
+      m_channel_streams.at(m_memory_system->get_channel_id(t.addr)).push_back(end);
+      if (pim != last) has_write = false;
+      if (t.type_id == Request::Type::Write) has_write = true;
+      last = pim;
+      ++end;
+    }
+    if (end == m_curr_trace_idx) throw std::runtime_error("Empty independent trace epoch");
+    m_last_pim = last;
+    m_phase_has_write = has_write;
+    m_curr_trace_idx = end;
+    m_epoch_active = true;
+    return true;
+  }
+
+  void tick_independent() {
+    while (!m_epoch_active && m_curr_trace_idx < m_trace.size()) {
+      const auto& t = m_trace[m_curr_trace_idx];
+      if (t.type_id != Barrier && t.type_id != Wait) {
+        if (!prepare_epoch()) return;
+        break;
+      }
+      if (!drained()) return;
+      if (t.type_id == Wait) {
+        if (m_wait_until < 0) {
+          m_wait_until = m_clk + memory_to_frontend(t.addr);
+          m_wait_cycles += t.addr;
+        }
+        if (m_clk < m_wait_until) return;
+        m_wait_until = -1;
+      } else {
+        ++m_barriers;
+        if (m_events) {
+          m_events << t.addr << ',' << m_clk << ',' << m_completed << '\n';
+          m_events.flush();
+        }
+      }
+      ++m_curr_trace_idx;
+    }
+    if (!m_epoch_active) return;
+    bool remaining = false;
+    for (size_t channel = 0; channel < m_channel_streams.size(); ++channel) {
+      auto& position = m_channel_positions[channel];
+      const auto& stream = m_channel_streams[channel];
+      if (position == stream.size()) continue;
+      const size_t index = stream[position];
+      const auto& t = m_trace[index];
+      if (t.type_id == Request::Type::PIM_Q_REMOTE && !m_trace_completed.at(t.peer_source)) {
+        if (!m_peer_wait_logged[index]) {
+          record_dispatch(index, static_cast<int>(channel), "PEER_WAIT");
+          m_peer_wait_logged[index] = true;
+        }
+        remaining = true;
+        continue;
+      }
+      Request req(t.addr, t.type_id);
+      req.ingress_id = static_cast<int>(index);
+      req.pim_buffer = t.pim_buffer;
+      req.pim_stage_bytes = t.stage_bytes;
+      req.pim_stage_rows = t.stage_rows;
+      req.pim_rank_batch = t.rank_batch;
+      req.size_bytes = m_memory_system->get_tx_bytes();
+      req.callback = [this, index, channel](Request& completed) {
+        ++m_completed;
+        m_trace_completed[index] = true;
+        record_dispatch(index, static_cast<int>(channel), "COMPLETE");
+        if (completed.type_id == Request::Type::Write)
+          m_write_ready_at = std::max(m_write_ready_at,
+              m_clk + memory_to_frontend(m_write_tail_cycles) + 1);
+      };
+      if (m_memory_system->send(req)) {
+        ++position;
+        ++m_trace_count;
+        record_dispatch(index, static_cast<int>(channel), "ACCEPT");
+      }
+      if (position != stream.size()) remaining = true;
+    }
+    m_epoch_active = remaining;
+  }
 
   bool drained() const {
     return m_completed == m_trace_count && m_clk >= m_write_ready_at;
@@ -55,9 +174,13 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
     RAMULATOR_PARSE_PARAM(m_write_tail_cycles, int, "write_tail_cycles").default_val(0);
     RAMULATOR_PARSE_PARAM(m_max_frontend_ticks, uint64_t, "max_frontend_ticks").default_val(0);
     RAMULATOR_PARSE_PARAM(m_events_path, std::string, "events_path").default_val("");
+    RAMULATOR_PARSE_PARAM(m_channel_independent_dispatch, bool, "channel_independent_dispatch").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_dispatch_events_path, std::string, "dispatch_events_path").default_val("");
     if (m_write_tail_cycles < 0) {
       throw std::runtime_error("LoadStoreTrace: write_tail_cycles must be nonnegative");
     }
+    if (m_channel_independent_dispatch && !m_wait_for_completion)
+      throw std::runtime_error("Independent channel traces require wait_for_completion=true");
     m_stats.add("requests_accepted", m_trace_count);
     m_stats.add("requests_completed", m_completed);
     m_stats.add("barriers_completed", m_barriers);
@@ -70,10 +193,41 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
     }
   }
 
+  void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
+    if (!m_channel_independent_dispatch) return;
+    if (!memory_system->has_independent_channel_ingress())
+      throw std::runtime_error("Independent trace streams require bounded independent channel ingress");
+    if (m_trace.size() > static_cast<size_t>(std::numeric_limits<int>::max()))
+      throw std::runtime_error("Trace has too many records for ingress identifiers");
+    m_channel_streams.resize(memory_system->get_num_channels());
+    m_channel_positions.resize(m_channel_streams.size(), 0);
+    m_trace_completed.resize(m_trace.size(), false);
+    m_peer_wait_logged.resize(m_trace.size(), false);
+    std::map<std::pair<Addr_t, bool>, size_t> exports;
+    for (size_t i = 0; i < m_trace.size(); ++i) {
+      auto& t = m_trace[i];
+      if (t.type_id == Request::Type::PIM_Q_EXPORT) exports[{t.addr, t.rank_batch}] = i;
+      if (t.type_id == Request::Type::PIM_Q_REMOTE) {
+        const auto found = exports.find({t.addr ^ Addr_t{32}, t.rank_batch});
+        if (found == exports.end()) throw std::runtime_error("Q_REMOTE has no preceding peer Q_EXPORT");
+        t.peer_source = found->second;
+      }
+    }
+    if (!m_dispatch_events_path.empty()) {
+      m_dispatch_events.open(m_dispatch_events_path);
+      if (!m_dispatch_events) throw std::runtime_error("Cannot open dispatch_events_path");
+      m_dispatch_events << "frontend_tick,channel,operation,trace_index,address,type_id,rank_batch\n";
+    }
+  }
+
   void tick() override {
     m_clk++;
     if (m_max_frontend_ticks && static_cast<uint64_t>(m_clk) > m_max_frontend_ticks) {
       throw std::runtime_error("LoadStoreTrace: simulation tick limit exceeded");
+    }
+    if (m_channel_independent_dispatch) {
+      tick_independent();
+      return;
     }
     // Control records do not consume an artificial frontend issue slot.
     while (m_curr_trace_idx < m_trace.size()) {
@@ -113,7 +267,9 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       }
       Request req(t.addr, t.type_id);
       req.pim_buffer = t.pim_buffer;
+      req.ingress_id = static_cast<int>(m_curr_trace_idx);
       req.pim_stage_bytes = t.stage_bytes; req.pim_stage_rows = t.stage_rows;
+      req.pim_rank_batch = t.rank_batch;
       req.size_bytes = m_memory_system->get_tx_bytes();
       if (m_wait_for_completion) {
         req.callback = [this](Request& completed) {
@@ -154,6 +310,8 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       }
       fields >> buffer;
       fields >> extra;
+      const bool rank_batch = op.starts_with("PIM_RANK_");
+      if (rank_batch) op = "PIM_" + op.substr(9);
       if (fields >> overflow || (!extra.empty() && op != "PIM_STAGE_BEGIN")) throw std::runtime_error("LoadStoreTrace: too many fields");
       int type = op == "LD" ? Request::Type::Read :
           op == "ST" ? Request::Type::Write :
@@ -185,6 +343,8 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
           op == "PIM_STAGE_FRAGMENT" ? Request::Type::PIM_STAGE_FRAGMENT :
           op == "BARRIER" ? Barrier : op == "WAIT" ? Wait : -1;
       if (type == -1) throw std::runtime_error("LoadStoreTrace: unknown operation " + op);
+      if (rank_batch && (type < Request::Type::PIM_SPILL || type > Request::Type::PIM_Q_REMOTE))
+        throw std::runtime_error("Unsupported rank descriptor operation " + op);
       int pim_buffer = -1, stage_bytes=0, stage_rows=0;
       if (type == Request::Type::PIM_STAGE_BEGIN) {
         size_t used=0;
@@ -218,13 +378,13 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       if (type == Request::Type::Write && m_wait_for_completion && m_write_tail_cycles == 0) {
         throw std::runtime_error("LoadStoreTrace: writes require explicit write_tail_cycles");
       }
-      m_trace.push_back({type, addr, pim_buffer, stage_bytes, stage_rows});
+      m_trace.push_back({type, addr, pim_buffer, stage_bytes, stage_rows, rank_batch});
     }
     if (m_trace.empty()) throw std::runtime_error("LoadStoreTrace: empty trace");
   }
 
   bool is_finished() override {
-    return m_curr_trace_idx >= m_trace.size() && (!m_wait_for_completion || drained());
+    return !m_epoch_active && m_curr_trace_idx >= m_trace.size() && (!m_wait_for_completion || drained());
   }
 };
 

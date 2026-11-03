@@ -13,14 +13,19 @@ from rank_staging import stage_input, input_offset, source_bank, fragment_metada
 OPERATORS = ("chain", "projection", "rope", "qk")
 CONTROL_OPERATORS = ()
 SCORE_TILE_TOKENS = 16
+RANK_BANK_OPERATIONS = {"PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC",
+                        "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE"}
 
 
 class Writer:
-    def __init__(self, path):
+    def __init__(self, path, rank_descriptors=False):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.stream = self.path.open("w", encoding="utf-8", newline="\n")
         self.counts = Counter()
+        self.expanded_counts = Counter()
+        self.rank_descriptors = rank_descriptors
+        self.rank_batches = []
         self.segments, self.input_fragments, self.exports, self.local_writes = [], [], [], []
         self.marker = self.line_no = 0
         self.boundary = self.fence()
@@ -28,6 +33,10 @@ class Writer:
     def emit(self, op, address, buffer=None):
         self.stream.write(f"{op} {address}" + ("" if buffer is None else f" {buffer}") + "\n")
         self.counts[op] += 1
+        if op.startswith("PIM_RANK_"):
+            self.expanded_counts[op.replace("PIM_RANK_", "PIM_", 1)] += L.BANKS_PER_RANK
+        else:
+            self.expanded_counts[op] += 1
         self.line_no += 1
 
     def fence(self):
@@ -50,6 +59,18 @@ class Writer:
             self.emit(command, L.physical_address(channel, L.PIM_RANK, bank//4, bank%4, offset), buffer)
 
     def banks(self, command, offset, buffer=None):
+        if self.rank_descriptors:
+            if command not in RANK_BANK_OPERATIONS:
+                raise ValueError(f"Unsupported rank batch operation: {command}")
+            first = self.line_no+1
+            descriptor = command.replace("PIM_", "PIM_RANK_", 1)
+            self.ranks(descriptor, offset, buffer)
+            self.rank_batches.append(dict(command=descriptor, child_command=command,
+                line_start=first, line_end=self.line_no, physical_rank=1,
+                canonical_bank=0, child_banks=list(range(L.BANKS_PER_RANK)),
+                children_per_descriptor=L.BANKS_PER_RANK, offset_bytes=offset,
+                buffer=buffer, completion="after all sixteen child operations complete"))
+            return
         for location in L.active_bank_locations(offset):
             self.emit(command, L.physical_address(*location), buffer)
 
@@ -100,7 +121,7 @@ def projection(w, schedule, rank_staging=False, staging_banks=1):
             for kind in ("q_local", "k_suffix"):
                 w.banks("PIM_SPILL", L.work_offset(kind, local_query))
         w.local_writes.append(dict(phase="projection_local_spill", line_start=first,
-                                   line_end=w.line_no, bytes=(w.line_no-first+1) * L.BURST_BYTES,
+                                   line_end=w.line_no, bytes=(w.line_no-first+1) * L.BURST_BYTES * (L.BANKS_PER_RANK if w.rank_descriptors else 1),
                                    source="FP32 accumulators rounded to BF16", external_bytes=0))
     w.phase("projection_local_spill", spill, kind="local_write")
     def release_projection():
@@ -141,7 +162,7 @@ def q_exchange(w):
         for local_query in range(L.LOCAL_QUERIES):
             w.banks("PIM_Q_EXPORT", L.work_offset("q_local", local_query))
         w.exports.append(dict(phase="q_export_to_gpu", line_start=first,
-                              line_end=w.line_no, bytes=(w.line_no-first+1)*L.BURST_BYTES,
+                              line_end=w.line_no, bytes=(w.line_no-first+1)*L.BURST_BYTES*(L.BANKS_PER_RANK if w.rank_descriptors else 1),
                               local_tap=True, source_retained=True))
     w.phase("q_export_to_gpu", export, kind="external_read",
             native_effect="RD plus retained local Q-buffer row")
@@ -185,10 +206,10 @@ def qk(w):
             kind="gemv_release")
 
 
-def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1):
+def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False):
     if case not in OPERATORS or schedule not in ("double", "serial"):
         raise ValueError((case, schedule))
-    w = Writer(path)
+    w = Writer(path, rank_descriptors=rank_descriptors)
     try:
         if case in ("chain", "projection"):
             projection(w, schedule, rank_staging=rank_staging, staging_banks=staging_banks)
@@ -200,9 +221,10 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
     finally:
         w.close()
     counts = dict(w.counts)
+    expanded = w.expanded_counts
     dq = dict(x_gpu_to_pim=(w.counts["ST"] if rank_staging else w.counts["PIM_WR_GB"]) * L.BURST_BYTES,
-              q_pim_to_gpu=w.counts["PIM_Q_EXPORT"] * L.BURST_BYTES,
-              q_gpu_to_remote_buffer=w.counts["PIM_Q_REMOTE"] * L.BURST_BYTES,
+              q_pim_to_gpu=expanded["PIM_Q_EXPORT"] * L.BURST_BYTES,
+              q_gpu_to_remote_buffer=expanded["PIM_Q_REMOTE"] * L.BURST_BYTES,
               score_pim_to_gpu=w.counts["PIM_RD_BG"] * L.BURST_BYTES)
     dq["total"] = sum(dq.values())
     buffers = dict(L.manifest()["buffers"])
@@ -212,16 +234,17 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
     buffers["rope_output_entries_per_bank"] = 2
     return dict(case=case, variant=f"H={L.QUERIES} bank-local RoPE", schedule=schedule,
                 action_horizon=L.QUERIES, attention_heads=L.HEADS,
-                counts=counts, segments=w.segments, input_fragments=w.input_fragments,
+                counts=counts, expanded_counts=dict(expanded), rank_batches=w.rank_batches,
+                rank_descriptors=rank_descriptors, segments=w.segments, input_fragments=w.input_fragments,
                 staging_inputs=getattr(w, "staging_inputs", []), rank_staging=rank_staging,
                 staging_banks=staging_banks if rank_staging else 0,
                 exports=w.exports, local_writes=w.local_writes,
                 expected_dq_bytes=dq, buffers=buffers,
                 expected_local_bytes=dict(
-                    projection_spill=w.counts["PIM_SPILL"] * L.BURST_BYTES,
-                    rope_coeff_read=w.counts["PIM_ROPE_COEF"] * L.BURST_BYTES,
-                    rope_input_read=w.counts["PIM_ROPE_LOAD"] * L.BURST_BYTES,
-                    rope_output_write=w.counts["PIM_ROPE_STORE"] * L.BURST_BYTES,
+                    projection_spill=expanded["PIM_SPILL"] * L.BURST_BYTES,
+                    rope_coeff_read=expanded["PIM_ROPE_COEF"] * L.BURST_BYTES,
+                    rope_input_read=expanded["PIM_ROPE_LOAD"] * L.BURST_BYTES,
+                    rope_output_write=expanded["PIM_ROPE_STORE"] * L.BURST_BYTES,
                     qk_k_read=w.counts["PIM_MAC_QK"] * L.BANKS_PER_RANK * L.BURST_BYTES),
                 qk_query_outer_rescans=False, q_remote_dram_writes=0,
                 physical_active_rank=L.PIM_RANK, score_padding_exported=True,

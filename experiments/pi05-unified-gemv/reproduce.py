@@ -42,7 +42,8 @@ def setup(backend):
     return env
 
 
-def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, staging_banks=1):
+def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, staging_banks=1,
+               rank_descriptors=False, channel_independent_dispatch=False):
     from simulator.config import MemoryConfig
     chain = case in ("chain", "serial_layer_control")
     timings = dict(nCCDAB=8 if chain else 16, nLOCALWR=4)
@@ -55,20 +56,24 @@ def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, stag
         pim_unified_gemv=True, gemv_port_cycles=2,
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
         pim_staging_banks=staging_banks if rank_staging else 1,
+        pim_rank_descriptors=bool(rank_descriptors and rank_staging),
+        channel_independent_dispatch=bool(channel_independent_dispatch and rank_staging),
         ffn_z_preinstalled=False,
         rope_ii_cycles=1, rope_latency_cycles=4, pim_cast_cycles=1, rank_reduce_cycles=4,
         timing_overrides=timings, pim_local_transfer_cycles=2)
 
 
-def run_case(output, case, rank_staging=True, staging_banks=1):
+def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False):
     import workload
     from simulator.backend import run_trace
     from audit_native import audit_run
     directory = output / case
     directory.mkdir()
-    manifest = workload.generate(directory / "workload.trace", case, rank_staging=rank_staging, staging_banks=staging_banks)
+    manifest = workload.generate(directory / "workload.trace", case, rank_staging=rank_staging, staging_banks=staging_banks,
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
     dump(directory / "manifest.json", manifest)
-    config = config_for(case, rank_staging=rank_staging, staging_banks=staging_banks)
+    config = config_for(case, rank_staging=rank_staging, staging_banks=staging_banks,
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
     native = run_trace(config, directory / "workload.trace", directory / "simulation")
     with (directory / "simulation/barriers.csv").open(newline="") as stream:
         markers = {int(r["marker"]): int(r["frontend_tick"]) for r in csv.DictReader(stream)}
@@ -81,6 +86,7 @@ def run_case(output, case, rank_staging=True, staging_banks=1):
         raise AssertionError((case, "external DQ differs", dq, manifest["expected_dq_bytes"]))
     summary = dict(case=case, horizon=16, fresh_native_run=True, unified_bank_gemv=True,
         rank_staging=rank_staging, rank_controller=rank_staging,
+        rank_descriptors=config.pim_rank_descriptors, channel_independent_dispatch=config.channel_independent_dispatch,
         staging_banks=staging_banks if rank_staging else 0,
         latency_us=native["latency_ns"]/1000, memory_cycles=native["memory_cycles"],
         tCK_ns=native["tCK_ns"], phase_us=phases,
@@ -116,8 +122,14 @@ def main():
     parser.add_argument("--direct-input-baseline", action="store_true", help="Reproduce xinyao_1101 direct WRGB input behavior")
     parser.add_argument("--staging-banks", type=int, choices=(1, 2), default=2,
                         help="Number of DRAM input staging banks per PIM rank (default: 2)")
+    parser.add_argument("--legacy-rank-dispatch", action="store_true",
+                        help="Reproduce the original 1103 serial frontend and per-bank PIM requests")
+    parser.add_argument("--no-rank-descriptors", action="store_true",
+                        help="Keep channel-independent dispatch but use per-bank PIM requests for ablation")
     parser.add_argument("--skip-tests", action="store_true", help="For diagnostic runs only")
     args = parser.parse_args()
+    channel_independent_dispatch = not (args.direct_input_baseline or args.legacy_rank_dispatch)
+    rank_descriptors = channel_independent_dispatch and not args.no_rank_descriptors
     backend, output = args.backend.resolve(strict=True), args.output.resolve()
     library = backend / "ramulator2/libramulator.so"
     if not library.is_file():
@@ -138,20 +150,23 @@ def main():
         rank_staging=not args.direct_input_baseline,
         staging_banks=args.staging_banks if not args.direct_input_baseline else 0,
         requested_staging_banks=args.staging_banks,
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
         source_sha256={str(p): digest(p) for p in sorted(set(source_files))},
         fresh_native_simulation=True, historical_latency_used_as_oracle=False,
-        policy=f"{args.staging_banks}-bank whole-input DRAM staging, two-slot input batches and rank command arbitration" if not args.direct_input_baseline else "Legacy direct WRGB bank GEMV fill"))
+        policy=f"{args.staging_banks}-bank whole-input DRAM staging; rank_descriptors={rank_descriptors}; channel_independent_dispatch={channel_independent_dispatch}" if not args.direct_input_baseline else "Legacy direct WRGB bank GEMV fill"))
     if not args.skip_tests:
         execute("unit-tests", [sys.executable, "-m", "unittest", "discover", "-s",
                 HERE / "validation", "-p", "test_*.py", "-v"], output, env)
         execute("native-guards", [sys.executable, HERE / "validation/native_guards.py",
                 "--backend", backend, "--output", output / "native-guards"], output, env)
-    runs = {case: run_case(output, case, rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks) for case in args.cases}
+    runs = {case: run_case(output, case, rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks,
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch) for case in args.cases}
     import workload
     complete = all(case in runs for case in PRIMARY)
     summary = dict(status="passed", horizon=16, attention_heads=8,
         unified_bank_gemv=True, primary_cases=list(PRIMARY), runs=runs,
         rank_staging=not args.direct_input_baseline, rank_controller=not args.direct_input_baseline,
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
         staging_banks=args.staging_banks if not args.direct_input_baseline else 0,
         down_rank_partial_reduction=False, input_broadcast_extra_cycles=0,
         measured_stage_sum_us_per_layer_step=sum(runs[c]["latency_us"] for c in PRIMARY) if complete else None,

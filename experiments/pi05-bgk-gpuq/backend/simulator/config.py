@@ -32,6 +32,9 @@ class MemoryConfig:
     pim_rank_staging: bool = False
     pim_staging_banks: int = 1
     pim_rank_controller: bool = False
+    pim_rank_descriptors: bool = False
+    channel_independent_dispatch: bool = False
+    channel_queue_capacity: int = 32
     gemv_port_cycles: int = 2
     pim_rank_rope: bool = False
     pim_horizon: int = 16
@@ -43,6 +46,12 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
+        if type(self.pim_rank_descriptors) is not bool or type(self.channel_independent_dispatch) is not bool:
+            raise ValueError("Rank descriptor/channel dispatch flags must be boolean")
+        if self.pim_rank_descriptors and (not self.pim_rank_controller or not self.pim_unified_gemv):
+            raise ValueError("Rank descriptors require rank controller and unified GEMV")
+        if type(self.channel_queue_capacity) is not int or self.channel_queue_capacity < 1:
+            raise ValueError("channel_queue_capacity must be a positive integer")
         if type(self.pim_staging_banks) is not int or self.pim_staging_banks not in (1, 2):
             raise ValueError("pim_staging_banks must be 1 or 2")
         if self.pim_staging_banks != 1 and not self.pim_rank_staging:

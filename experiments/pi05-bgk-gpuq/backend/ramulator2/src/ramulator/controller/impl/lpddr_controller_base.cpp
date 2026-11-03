@@ -58,7 +58,7 @@ void LPDDRControllerBase::tick() {
     assert(!urgent_act2.valid);
     assert(m_cas_buffer != nullptr);
 
-    if (check_timing(m_cas_req_it->command, m_cas_req_it->addr_vec)) {
+    if (check_request_timing(*m_cas_req_it, m_cas_req_it->command)) {
       m_cas_issued = false;
       if (m_wck_sync_mode == WCKSyncMode::NeedSync) {
         extend_wck_expiry(m_cas_req_it->command);
@@ -69,7 +69,7 @@ void LPDDRControllerBase::tick() {
         update_request_stats(m_cas_req_it);
       }
 
-      m_device.issue_command(m_cas_req_it->command, m_cas_req_it->addr_vec, m_clk);
+      issue_request_command(*m_cas_req_it, m_cas_req_it->command);
 
       m_rowpolicy->on_issue(*m_cas_req_it);
       for (auto* p : m_plugins) {
@@ -248,7 +248,7 @@ bool LPDDRControllerBase::can_start_act1(const Request& req) {
   }
 
   Clk_t earliest_act2 = m_clk + m_device.m_spec->command_cycles[m_cmd_act1];
-  return m_device.check_timing(m_cmd_act2, req.addr_vec, earliest_act2);
+  return check_request_timing(req, m_cmd_act2, earliest_act2);
 }
 
 bool LPDDRControllerBase::is_owned_act2_candidate(const Request& req) const {
@@ -301,7 +301,7 @@ ControllerBase::Candidate LPDDRControllerBase::pick_cas_lookahead_candidate() {
     }
 
     int cas = m_cmd_cas >= 0 ? m_cmd_cas : (is_read_cmd(cmd) ? m_cmd_cas_rd : m_cmd_cas_wr);
-    return check_timing(cas, req.addr_vec) && m_device.check_timing(cmd, req.addr_vec, m_clk + m_cas_deadline_guard);
+    return check_request_timing(req, cas) && check_request_timing(req, cmd, m_clk + m_cas_deadline_guard);
   });
   if (it == m_active_buffer.end()) {
     return cand;
@@ -326,7 +326,7 @@ ControllerBase::Candidate LPDDRControllerBase::pick_urgent_act2() {
 
     it->command = m_cmd_act2;
 
-    bool timing_ok = check_timing(it->command, it->addr_vec);
+    bool timing_ok = check_request_timing(*it, it->command);
     assert(deadline > m_clk || timing_ok);
     if (deadline > m_clk || !timing_ok) {
       continue;
@@ -355,7 +355,7 @@ ControllerBase::Candidate LPDDRControllerBase::pick_deferred_act2() {
     assert(deadline >= 0);
 
     it->command = m_cmd_act2;
-    if (!check_timing(it->command, it->addr_vec)) {
+    if (!check_request_timing(*it, it->command)) {
       continue;
     }
 
@@ -384,7 +384,7 @@ void LPDDRControllerBase::issue_owned_act2(Candidate cand, Act2IssueKind kind) {
     update_request_stats(cand.it);
   }
 
-  m_device.issue_command(m_cmd_act2, cand.it->addr_vec, m_clk);
+  issue_request_command(*cand.it, m_cmd_act2);
 
   m_rowpolicy->on_issue(*cand.it);
   for (auto* p : m_plugins) {
@@ -416,11 +416,11 @@ bool LPDDRControllerBase::try_issue_cas_sync(Candidate& cand) {
   }
 
   int cas = m_cmd_cas >= 0 ? m_cmd_cas : (is_read_cmd(cmd) ? m_cmd_cas_rd : m_cmd_cas_wr);
-  if (check_timing(cas, cand.it->addr_vec)) {
+  if (check_request_timing(*cand.it, cas)) {
     int saved = cand.it->command;
     cand.it->command = cas;
 
-    m_device.issue_command(cas, cand.it->addr_vec, m_clk);
+    issue_request_command(*cand.it, cas);
     m_rowpolicy->on_issue(*cand.it);
     for (auto* p : m_plugins) {
       p->on_issue(*cand.it);
@@ -458,7 +458,7 @@ void LPDDRControllerBase::issue_standard_candidate(Candidate cand) {
     update_request_stats(cand.it);
   }
 
-  m_device.issue_command(cmd, cand.it->addr_vec, m_clk);
+  issue_request_command(*cand.it, cmd);
 
   m_rowpolicy->on_issue(*cand.it);
   for (auto* p : m_plugins) {

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <unordered_map>
 #include "ramulator/base/base.h"
 #include "ramulator/controller/impl/lpddr_controller_base.h"
@@ -102,6 +103,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "ffn_dram_extension.inc"
 #include "unified_gemv_extension.inc"
 #include "rank_staging_extension.inc"
+#include "rank_descriptor_extension.inc"
 
  public:
   void init() override {
@@ -179,6 +181,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_rank_ca_path, std::string, "rank_ca_events_path").default_val("");
     RAMULATOR_PARSE_PARAM(m_staging_path, std::string, "staging_events_path").default_val("");
     init_rank_staging();
+    RAMULATOR_PARSE_PARAM(m_rank_descriptors, bool, "pim_rank_descriptors").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_rank_descriptor_path, std::string, "rank_descriptor_events_path").default_val("");
+    init_rank_descriptors();
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -195,6 +200,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       if(!m_staging_events) throw std::runtime_error("Cannot open staging events");
       m_staging_events<<"clock,ready_at,operation,Channel,Rank,BankGroup,Bank,Row,Column,buffer,bytes,stage_generation\n";
     }
+    setup_rank_descriptors();
     m_stats.add("num_pim_requests", s_pim_requests);
     m_stats.add("num_pim_completed", s_pim_completed);
     m_stats.add("pim_request_latency_cycles", s_pim_latency);
@@ -231,6 +237,16 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       m_local_trace << "clock,ready_at,Channel,Rank,pim_buffer,offset_bytes,bytes,port_cycles,buffer_in_use_until,port_ready_before\n";
       m_local_trace.flush();
     }
+  }
+
+  bool check_request_timing(const Request& req, int command, Clk_t clock = -1) override {
+    RankFineScope fine(m_rank_fine_context,m_rank_controller && req.pim_rank_micro);
+    return ControllerBase::check_request_timing(req,command,clock);
+  }
+
+  void issue_request_command(const Request& req, int command) override {
+    RankFineScope fine(m_rank_fine_context,m_rank_controller && req.pim_rank_micro);
+    ControllerBase::issue_request_command(req,command);
   }
 
   bool send(Request& req) override {
@@ -302,6 +318,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       req.callback = callback;
       return accepted;
     }
+    if(req.pim_rank_batch) return send_rank_descriptor(req);
     if (m_pim_buffer.size() >= m_pim_buffer.max_size) {
       return false;
     }

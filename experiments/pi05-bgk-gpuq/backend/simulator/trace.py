@@ -3,6 +3,9 @@
 import hashlib
 from pathlib import Path
 
+RANK_BATCH_OPS = {f"PIM_RANK_{name}": f"PIM_{name}" for name in
+    ("SPILL", "ROPE_COEF", "ROPE_LOAD", "ROPE_EXEC", "ROPE_STORE", "Q_EXPORT", "Q_REMOTE")}
+
 
 def inspect_trace(
     path: Path, *, transaction_bytes: int, capacity_bytes: int, pim: bool = False
@@ -10,6 +13,7 @@ def inspect_trace(
     counts = dict.fromkeys(("LD", "ST", "PIM_MAC_AB", "PIM_WR_GB", "PIM_RD_RES", "PIM_MAC_HB", "PIM_LOCAL_GB", 'PIM_WR_BG', 'PIM_WR_Q', 'PIM_MAC_K', 'PIM_MAC_QK', 'PIM_RD_BG', 'PIM_LOCAL_WR', 'PIM_RD_Q'), 0)
     new_ops = ("PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE", "PIM_Z_STORE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT")
     counts.update(dict.fromkeys(new_ops, 0))
+    counts.update(dict.fromkeys(RANK_BATCH_OPS, 0))
     controls = {"BARRIER": 0, "WAIT": 0}
     wait_cycles = 0
     staged_input_bytes = 0
@@ -29,6 +33,10 @@ def inspect_trace(
                 address = int(address_text, 16 if address_text.lower().startswith("0x") else 10)
             except (UnicodeDecodeError, ValueError) as error:
                 raise ValueError(f"Trace line {number}: invalid address") from error
+            wire_op = op
+            op = RANK_BATCH_OPS.get(op, op)
+            if wire_op in RANK_BATCH_OPS and ((address >> 15) & 1 != 1 or (address >> 16) & 15):
+                raise ValueError(f"Trace line {number}: rank descriptor requires canonical rank1/BG0/bank0")
             if op == "PIM_STAGE_BEGIN":
                 if len(fields) != 4:
                     raise ValueError(f"Trace line {number}: STAGE_BEGIN needs ADDRESS BYTES ROWS")
@@ -73,11 +81,17 @@ def inspect_trace(
                 stage_input_read_bursts += stage_rows_by_channel[(address >> 5) & 15]
             elif op == "PIM_STAGE_LOAD":
                 stage_input_read_bursts += 1
-            counts[op] += 1
+            counts[wire_op] += 1
     if not sum(counts.values()) and not sum(controls.values()):
         raise ValueError("Empty trace")
+    logical_counts = counts.copy()
+    for descriptor, child in RANK_BATCH_OPS.items():
+        logical_counts[child] += 16*counts[descriptor]
+    descriptor_count = sum(counts[name] for name in RANK_BATCH_OPS)
     return dict(
-        **{name.lower(): counts[name] for name in new_ops if counts[name]},
+        **{name.lower(): logical_counts[name] for name in new_ops if logical_counts[name]},
+        **{name.lower(): counts[name] for name in RANK_BATCH_OPS if counts[name]},
+        **({"rank_descriptor_requests": descriptor_count, "rank_descriptor_child_requests": 16*descriptor_count} if descriptor_count else {}),
         **({"stage_input_declared_bytes": staged_input_bytes, "stage_input_read_bursts": stage_input_read_bursts} if staged_input_bytes else {}),
         reads=counts["LD"],
         writes=counts["ST"],
