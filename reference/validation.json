@@ -1,8 +1,8 @@
 {
-  "unit_tests_passed": 51,
+  "unit_tests_passed": 56,
   "native_guards": {
     "passed": true,
-    "case_count": 25,
+    "case_count": 27,
     "subprocess_isolation": true,
     "native_cases": [
       {
@@ -304,10 +304,89 @@
         "exception_type": "RuntimeError",
         "message": "staging token rows do not match operator",
         "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_slot_Down_batch",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 496,
+        "native_audit": {
+          "events_checked": 42,
+          "operation_counts": {
+            "GEMV_MULTICAST": 32,
+            "GEMV_MAC": 8,
+            "GEMV_RELEASE": 2
+          },
+          "bank_generations_checked": 32,
+          "physical_bank_releases": 32,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "rank_controller": {
+            "command_intervals_checked": 156,
+            "rank_command_coverage": 108,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 2
+          },
+          "minimum_staged_read_issue_gap_ck": 4,
+          "staged_read_latency_ck": 25,
+          "different_tokens_pipeline_before_prior_read_completion": true,
+          "external_input_bytes": 1024,
+          "internal_read_bytes": 1024,
+          "input_batching": {
+            "input_batches_checked": 1,
+            "slots_per_bank": 2,
+            "slot_capacity_bytes": 512,
+            "physical_input_capacity_bytes_per_bank": 1024,
+            "maximum_prefetched_input_bytes_per_bank": 1024,
+            "both_slots_ready_before_first_MAC": true,
+            "no_weight_row_switch_between_paired_fills": true,
+            "MAC_counts_and_reduction_order_preserved": true,
+            "row_command_counts": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "input_batches": 1,
+                "source_ACT2": 0,
+                "weight_ACTAB": 1,
+                "refresh_commands": 0
+              }
+            ],
+            "first_two_batches_channel0": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "batch": 0,
+                "source_row": 256,
+                "input_begin_ck": 192,
+                "last_input_issue_ck": 316,
+                "both_slots_ready_ck": 341,
+                "first_MAC_ck": 367,
+                "last_MAC_complete_ck": 495,
+                "input_bytes_per_bank": 1024,
+                "refresh_commands_during_load": 0
+              }
+            ]
+          }
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_three_fragments_overflow",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging overwrite before full consumption",
+        "exception_type": "RuntimeError",
+        "message": "staging overwrite before full consumption",
+        "worker_returncode": 0
       }
     ]
   },
-  "native_job": 1902573,
+  "native_job": 1902586,
   "native_cases_passed": [
     "chain",
     "v",

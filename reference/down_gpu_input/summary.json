@@ -5,12 +5,12 @@
   "unified_bank_gemv": true,
   "rank_staging": true,
   "rank_controller": true,
-  "latency_us": 75.231352,
-  "memory_cycles": 80204,
+  "latency_us": 64.708868,
+  "memory_cycles": 68986,
   "tCK_ns": 0.938,
   "phase_us": {
     "down_gpu_input_stage": 21.332025312499997,
-    "down_local_input_and_compute": 53.416286,
+    "down_local_input_and_compute": 42.893801999999994,
     "down_local_input_and_compute_gemv_release": 0.002814,
     "down_result_export": 0.47931799999999997
   },
@@ -41,7 +41,7 @@
     "input_srf_multicast_destination": 33554432,
     "local_array_read": 2097152
   },
-  "trace_sha256": "37c1a459a3b75e57d01443478a17ae67681450e4df4960424a9c63db9cdd0716",
+  "trace_sha256": "ef5ce313c42d3666d871ad851332b10d9edda7eeded772c246fb7679048edd64",
   "numerical_compute": false,
   "complete_end_to_end_latency_us": null,
   "audit_status": "passed"

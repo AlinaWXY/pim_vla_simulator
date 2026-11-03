@@ -113,6 +113,7 @@ class IndependentAddressTests(unittest.TestCase):
                     actual = Counter(trace_key(e) for e in records if e["operation"] != "BARRIER")
                     expected = expected_addresses(case)
                     self.assertTrue(actual == expected, f"{case}: missing {sum((expected-actual).values())}, extra {sum((actual-expected).values())} address records")
+                    audit_trace(records, case)
                     self.assertEqual(manifest["buffers"]["gemv_total_bytes_per_bank"], 1024)
                     self.assertEqual(manifest["buffers"]["separate_rank_MAC_input_bytes"], 0)
 

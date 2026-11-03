@@ -35,6 +35,8 @@ CASES = {
     "Stage_mixed_fragment_rows": "staging mixed source fragments",
     "Stage_wrong_weight_fragment": "staging source/weight fragment mismatch",
     "Stage_wrong_token_rows": "staging token rows do not match operator",
+    "Stage_two_slot_Down_batch": None,
+    "Stage_three_fragments_overflow": "staging overwrite before full consumption",
 }
 
 
@@ -50,7 +52,9 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 def trace_for(path, name):
     if name.startswith("Stage_"):
         base = 524288
-        payload = 1024 if name == "Stage_mixed_fragment_rows" else 256 if name == "Stage_wrong_token_rows" else 512
+        payload = (1536 if name == "Stage_three_fragments_overflow" else
+                   1024 if name in ("Stage_mixed_fragment_rows", "Stage_two_slot_Down_batch") else
+                   256 if name == "Stage_wrong_token_rows" else 512)
         rows = 8 if name == "Stage_wrong_token_rows" else 16
         begin_bank = 1 if name == "Stage_wrong_source_bank" else 0
         lines = [f"PIM_STAGE_BEGIN {address(base, bank=begin_bank)} {payload} {rows}"]
@@ -60,7 +64,12 @@ def trace_for(path, name):
             lines.append(f"ST {address(base)}")
         if name != "Stage_load_before_seal":
             lines.append(f"PIM_STAGE_SEAL {address(base)}")
-        if name == "Stage_rebegin_before_consume":
+        if name in ("Stage_two_slot_Down_batch", "Stage_three_fragments_overflow"):
+            lines += [command("PIM_STAGE_FRAGMENT", base+512*f, f%2) for f in range(payload//512)]
+            if name == "Stage_two_slot_Down_batch":
+                lines += [command("PIM_MAC_AB", 327680+(f*4+c)*32, f%2) for f in range(2) for c in range(4)]
+                lines += [command("PIM_GEMV_RELEASE", slot=slot) for slot in (0, 1)]
+        elif name == "Stage_rebegin_before_consume":
             lines.append(f"PIM_STAGE_BEGIN {address(base)} {payload} {rows}")
         elif name == "Stage_mixed_fragment_rows":
             lines += [command("PIM_STAGE_LOAD", base), command("PIM_STAGE_LOAD", base+17*32)]
@@ -128,7 +137,7 @@ def positive_audit(directory, name):
     from audit_native import read_csv, read_json, audit_slot_events
     events = [e for ch in range(16)
               for e in read_csv(directory / "simulation" / f"unified_gemv.csv.ch{ch}")]
-    if name == "Stage_complete_Down_fragment":
+    if name in ("Stage_complete_Down_fragment", "Stage_two_slot_Down_batch"):
         result = audit_slot_events(events, "down_gpu_input")
         native = [e for ch in range(16)
                   for e in read_csv(directory / "simulation" / f"timeline.csv.ch{ch}")]
@@ -139,7 +148,8 @@ def positive_audit(directory, name):
         from collections import Counter
         from staging_audit import audit_rank_ca
         from audit_native import trace_records
-        if Counter(e["operation"] for e in staged) != Counter(BEGIN=1, WR=16, SEAL=1, LOCALRD=16, BROADCAST=16):
+        packets = 32 if name == "Stage_two_slot_Down_batch" else 16
+        if Counter(e["operation"] for e in staged) != Counter(BEGIN=1, WR=packets, SEAL=1, LOCALRD=packets, BROADCAST=packets):
             raise AssertionError("Positive staging control lacks complete store/read/broadcast evidence")
         if any(e["command"] == "WRGB" for e in native):
             raise AssertionError("Positive staging control unexpectedly issued direct input WRGB")
@@ -158,8 +168,11 @@ def positive_audit(directory, name):
         result["minimum_staged_read_issue_gap_ck"] = min(gaps)
         result["staged_read_latency_ck"] = timings["nCL"]+timings["nBL_min"]
         result["different_tokens_pipeline_before_prior_read_completion"] = True
-        result["external_input_bytes"] = 512
-        result["internal_read_bytes"] = 512
+        result["external_input_bytes"] = packets*32
+        result["internal_read_bytes"] = packets*32
+        if name == "Stage_two_slot_Down_batch":
+            from paired_audit import audit_paired_staging
+            result["input_batching"] = audit_paired_staging(staged, native, events, "down_gpu_input", complete_workload=False)
         return result
     if name == "Down_GPU_input_complete":
         result = audit_slot_events(events, "down_gpu_input")

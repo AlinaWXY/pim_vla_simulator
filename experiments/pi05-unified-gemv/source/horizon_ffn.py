@@ -6,7 +6,7 @@ The direct WRGB path remains available only for baseline reproduction.
 """
 from collections import Counter
 from pathlib import Path
-from rank_staging import stage_input, input_offset, reservation
+from rank_staging import stage_input, input_offset, reservation, fragment_batches, prefetch_metadata
 
 HORIZONS = (16,)
 CASES = ("gate_up_gpu", "down_gpu_input", "combined_timing_chain")
@@ -171,26 +171,32 @@ def compute(w, operator, rank_staging=False):
     if rank_staging:
         stage_input(w, operator, w.horizon, fragments)
     def body():
-        for fragment in range(fragments):
-            buffer, first = fragment%2, w.line_no+1
-            if rank_staging:
-                w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, w.horizon), buffer)
-            else:
-                for token in range(w.horizon):
-                    w.ranks("PIM_WR_GB", token*32, buffer)
-            last, mac_first = w.line_no, w.line_no+1
-            for slot in range(slots):
-                w.ranks("PIM_MAC_AB", base+(fragment*slots+slot)*32, buffer)
-            w.input_fragments.append(dict(phase=name, fragment=fragment, buffer=buffer,
-                input_source="bank0_dram_staging" if rank_staging else "gpu_wrgb", source_tensor="X" if gu else "Z_gpu",
-                source_tensor_width=1024 if gu else 4096, source_feature_first=fragment*16,
-                same_source_fragment_all_ranks=True, input_line_first=first, input_line_last=last,
-                line_start=first, line_end=last, mac_line_first=mac_first, mac_line_last=w.line_no,
-                bursts_per_rank=w.horizon, bytes_per_rank=w.horizon*32,
-                useful_input_bytes_per_rank=w.horizon*32, command_count=16 if rank_staging else w.horizon*16,
-                internal_load_bursts=w.horizon*16 if rank_staging else 0,
-                consumer_mac_count=slots*16, slots_per_fragment=slots,
-                input_broadcast_extra_cycles=0))
+        for batch in fragment_batches(fragments, rank_staging):
+            inputs = {}
+            for fragment in batch:
+                buffer, first = fragment%2, w.line_no+1
+                if rank_staging:
+                    w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, w.horizon), buffer)
+                else:
+                    for token in range(w.horizon):
+                        w.ranks("PIM_WR_GB", token*32, buffer)
+                inputs[fragment] = (buffer, first, w.line_no)
+            for fragment in batch:
+                buffer, first, last = inputs[fragment]
+                mac_first = w.line_no+1
+                for slot in range(slots):
+                    w.ranks("PIM_MAC_AB", base+(fragment*slots+slot)*32, buffer)
+                w.input_fragments.append(dict(phase=name, fragment=fragment, buffer=buffer,
+                    input_source="bank0_dram_staging" if rank_staging else "gpu_wrgb", source_tensor="X" if gu else "Z_gpu",
+                    source_tensor_width=1024 if gu else 4096, source_feature_first=fragment*16,
+                    same_source_fragment_all_ranks=True, input_line_first=first, input_line_last=last,
+                    line_start=first, line_end=last, mac_line_first=mac_first, mac_line_last=w.line_no,
+                    bursts_per_rank=w.horizon, bytes_per_rank=w.horizon*32,
+                    useful_input_bytes_per_rank=w.horizon*32, command_count=16 if rank_staging else w.horizon*16,
+                    internal_load_bursts=w.horizon*16 if rank_staging else 0,
+                    consumer_mac_count=slots*16, slots_per_fragment=slots,
+                    input_broadcast_extra_cycles=0,
+                    **(prefetch_metadata(batch, w.horizon) if rank_staging else {})))
         w.drain(w.horizon)
     w.phase(name, body, kind="local_compute" if rank_staging else "pipeline", M=w.horizon,
         fragment_count=fragments, slots_per_fragment=slots, weight_base=base,

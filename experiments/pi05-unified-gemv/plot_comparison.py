@@ -28,7 +28,7 @@ def main():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
     fig.subplots_adjust(left=.16, right=.95, top=.76, bottom=.22, wspace=.15)
     max_wall = max(s['stage_us'] for s in report['stages'].values())
-    for ax, title, rows in zip(axes, ['xinyao_1101 | Full DQ', 'xinyao_1102 | Bank staging + rank controller'],
+    for ax, title, rows in zip(axes, ['xinyao_1101 | Full DQ', 'xinyao_1102 | Two-slot bank staging'],
             [[baseline['stage_channel_partitions'][case][0] for case in report['primary_cases']],
              [report['stages'][case]['channels'][0] for case in report['primary_cases']]]):
         for y, row in enumerate(rows):

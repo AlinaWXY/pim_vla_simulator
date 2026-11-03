@@ -133,7 +133,7 @@ def main():
         native_library_sha256=library_hash,
         source_sha256={str(p): digest(p) for p in sorted(set(source_files))},
         fresh_native_simulation=True, historical_latency_used_as_oracle=False,
-        policy="Single-bank whole-input DRAM staging and rank command arbitration" if not args.direct_input_baseline else "Legacy direct WRGB bank GEMV fill"))
+        policy="Single-bank whole-input DRAM staging, two-slot input batches and rank command arbitration" if not args.direct_input_baseline else "Legacy direct WRGB bank GEMV fill"))
     if not args.skip_tests:
         execute("unit-tests", [sys.executable, "-m", "unittest", "discover", "-s",
                 HERE / "validation", "-p", "test_*.py", "-v"], output, env)

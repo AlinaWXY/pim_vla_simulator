@@ -29,7 +29,9 @@ def unified_buffers(case, rank_staging=True):
     if rank_staging:
         buffers.update(input_staging_dram=reservation(), input_staging_dram_bytes_per_rank=131072,
             input_fill_policy="Entire operator GPU input -> bank0 DRAM -> bank0 SRF -> same-rank SRF broadcast",
-            column_read_includes_bank_to_srf_and_broadcast=True)
+            column_read_includes_bank_to_srf_and_broadcast=True,
+            input_prefetch_slots=2,
+            input_compute_order="Fill both SRF slots before computing the two fragments")
     if case == "chain":
         buffers.update(projection_accumulator_per_bank=1024,
             rope_input_double_per_bank=64, rope_coefficient_per_bank=32,

@@ -32,6 +32,11 @@ test_count_corruption_is_rejected (test_channel_analysis.StageTests.test_count_c
 test_five_stage_report_does_not_add_combined_control (test_channel_analysis.StageTests.test_five_stage_report_does_not_add_combined_control) ... ok
 test_tail_corrected_whole_phase_and_two_partitions_close (test_channel_analysis.StageTests.test_tail_corrected_whole_phase_and_two_partitions_close) ... ok
 test_unclassified_command_is_rejected_at_exact_phase_end (test_channel_analysis.StageTests.test_unclassified_command_is_rejected_at_exact_phase_end) ... ok
+test_descriptor_multiset_does_not_hide_old_trace_schedule (test_paired_audit.PairedAuditTests.test_descriptor_multiset_does_not_hide_old_trace_schedule) ... ok
+test_old_interleaving_fails_even_when_all_counts_are_unchanged (test_paired_audit.PairedAuditTests.test_old_interleaving_fails_even_when_all_counts_are_unchanged) ... ok
+test_paired_input_cannot_alias_one_physical_slot (test_paired_audit.PairedAuditTests.test_paired_input_cannot_alias_one_physical_slot) ... ok
+test_two_prefetched_fragments_use_exactly_existing_capacity (test_paired_audit.PairedAuditTests.test_two_prefetched_fragments_use_exactly_existing_capacity) ... ok
+test_weight_row_cannot_be_opened_between_the_two_input_fills (test_paired_audit.PairedAuditTests.test_weight_row_cannot_be_opened_between_the_two_input_fills) ... ok
 test_coarse_fragment_descriptor_cannot_expand_on_global_CA (test_staging_audit.CommandBusTests.test_coarse_fragment_descriptor_cannot_expand_on_global_CA) ... ok
 test_data_and_compute_share_one_rank_bus (test_staging_audit.CommandBusTests.test_data_and_compute_share_one_rank_bus) ... ok
 test_global_dispatch_competes_with_external_commands (test_staging_audit.CommandBusTests.test_global_dispatch_competes_with_external_commands) ... ok
@@ -51,6 +56,6 @@ test_valid_full_payload_once_in_one_bank (test_staging_audit.StagingAuditTests.t
 test_write_cannot_omit_array_recovery_time (test_staging_audit.StagingAuditTests.test_write_cannot_omit_array_recovery_time) ... ok
 
 ----------------------------------------------------------------------
-Ran 51 tests in 7.570s
+Ran 56 tests in 10.122s
 
 OK

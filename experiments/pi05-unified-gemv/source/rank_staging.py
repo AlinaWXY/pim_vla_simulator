@@ -12,6 +12,18 @@ def input_offset(fragment, token, rows):
     return BASE + (fragment*rows+token)*32
 
 
+def fragment_batches(fragments, rank_staging):
+    """Use both physical SRF slots before returning bank0 to weight rows."""
+    width = 2 if rank_staging else 1
+    for first in range(0, fragments, width):
+        yield tuple(range(first, min(first+width, fragments)))
+
+
+def prefetch_metadata(batch, rows):
+    return dict(prefetch_batch=batch[0]//2, prefetch_fragments=list(batch),
+                prefetched_bytes_per_bank=len(batch)*rows*32)
+
+
 def stage_input(writer, name, rows, fragments):
     payload = rows*fragments*32
     if rows not in (8, 16) or not 0 < payload <= CAPACITY:
@@ -29,7 +41,10 @@ def stage_input(writer, name, rows, fragments):
         writer.staging_inputs.append(dict(name=name, base=BASE, bank=0,
             bytes_per_rank=payload, rows_per_fragment=rows, fragments=fragments,
             first_line=first, store_first_line=store_first, store_last_line=store_last,
-            last_line=writer.line_no, copies=16, source_layout="[fragment][token][lane16] BF16"))
+            last_line=writer.line_no, copies=16, source_layout="[fragment][token][lane16] BF16",
+            srf_fragments_per_batch=2, srf_batch_bytes_per_bank=rows*64,
+            srf_slots_per_bank=2, srf_slot_bytes=512,
+            consumption_order="load both slots, then compute both fragments in order"))
     writer.phase(name+"_gpu_input_stage", body, kind="input_staging",
         bytes_per_rank=payload, source_bank=0, source_base=BASE,
         rows_per_fragment=rows, fragments=fragments,

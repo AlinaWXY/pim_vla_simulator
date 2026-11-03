@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 
 import horizon_attention_layout as L
-from rank_staging import stage_input, input_offset
+from rank_staging import stage_input, input_offset, fragment_batches, prefetch_metadata
 
 OPERATORS = ("chain", "projection", "rope", "qk")
 CONTROL_OPERATORS = ()
@@ -61,29 +61,34 @@ def projection(w, schedule, rank_staging=False):
     if rank_staging:
         stage_input(w, "projection", L.LOCAL_QUERIES, L.HIDDEN//L.LANES)
     def compute():
-        for fragment in range(L.HIDDEN // L.LANES):
-            buffer = fragment % 2 if schedule == "double" else 0
-            first = w.line_no + 1
-            if rank_staging:
-                w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, L.LOCAL_QUERIES), buffer)
-            else:
-                for local_query in range(L.LOCAL_QUERIES):
-                    w.ranks("PIM_WR_GB", local_query*L.BURST_BYTES, buffer)
-            last = w.line_no
-            mac_first = w.line_no + 1
-            for output_column in range(len(L.PROJECTIONS) * L.FEATURES_PER_BANK):
-                offset = (fragment * len(L.PROJECTIONS) * L.FEATURES_PER_BANK
-                          + output_column) * L.BURST_BYTES
-                w.ranks("PIM_MAC_AB", offset, buffer)
-            w.input_fragments.append(dict(fragment=fragment, buffer=buffer,
-                line_start=first, line_end=last, mac_line_first=mac_first,
-                mac_line_last=w.line_no, external_bytes=0 if rank_staging else (last-first+1)*L.BURST_BYTES,
-                input_source="bank0_dram_staging" if rank_staging else "gpu_wrgb",
-                command_count=16 if rank_staging else L.LOCAL_QUERIES*16,
-                internal_load_bursts=L.LOCAL_QUERIES*16 if rank_staging else 0,
-                scope=f"rank1 shared input, {L.LOCAL_QUERIES} local tokens, Q/K reuse"))
-            if schedule == "serial":
-                w.fence()
+        for batch in fragment_batches(L.HIDDEN//L.LANES, rank_staging):
+            inputs = {}
+            for fragment in batch:
+                buffer = fragment%2 if rank_staging or schedule == "double" else 0
+                first = w.line_no+1
+                if rank_staging:
+                    w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, L.LOCAL_QUERIES), buffer)
+                else:
+                    for local_query in range(L.LOCAL_QUERIES):
+                        w.ranks("PIM_WR_GB", local_query*L.BURST_BYTES, buffer)
+                inputs[fragment] = (buffer, first, w.line_no)
+            for fragment in batch:
+                buffer, first, last = inputs[fragment]
+                mac_first = w.line_no+1
+                for output_column in range(len(L.PROJECTIONS)*L.FEATURES_PER_BANK):
+                    offset = (fragment*len(L.PROJECTIONS)*L.FEATURES_PER_BANK
+                              + output_column)*L.BURST_BYTES
+                    w.ranks("PIM_MAC_AB", offset, buffer)
+                w.input_fragments.append(dict(fragment=fragment, buffer=buffer,
+                    line_start=first, line_end=last, mac_line_first=mac_first,
+                    mac_line_last=w.line_no, external_bytes=0 if rank_staging else (last-first+1)*L.BURST_BYTES,
+                    input_source="bank0_dram_staging" if rank_staging else "gpu_wrgb",
+                    command_count=16 if rank_staging else L.LOCAL_QUERIES*16,
+                    internal_load_bursts=L.LOCAL_QUERIES*16 if rank_staging else 0,
+                    scope=f"rank1 shared input, {L.LOCAL_QUERIES} local tokens, Q/K reuse",
+                    **(prefetch_metadata(batch, L.LOCAL_QUERIES) if rank_staging else {})))
+                if schedule == "serial":
+                    w.fence()
     w.phase("projection_local_input_compute" if rank_staging else "projection_input_compute", compute, kind="projection", mac_service_ck=L.LOCAL_QUERIES,
             native_mac_completion=True)
 

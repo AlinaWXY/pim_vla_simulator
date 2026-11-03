@@ -5,21 +5,21 @@
   "unified_bank_gemv": true,
   "rank_staging": true,
   "rank_controller": true,
-  "latency_us": 126.094402,
-  "memory_cycles": 134429,
+  "latency_us": 113.294454,
+  "memory_cycles": 120783,
   "tCK_ns": 0.938,
   "phase_us": {
     "gate_up_gpu_input_stage": 5.2706513125,
-    "gate_up_local_input_and_compute": 41.6003,
-    "gate_up_local_input_and_compute_gemv_release": 0.02345,
-    "gate_up_result_export": 3.8411099999999996,
+    "gate_up_local_input_and_compute": 39.443838,
+    "gate_up_local_input_and_compute_gemv_release": 0.002814,
+    "gate_up_result_export": 3.8617459999999997,
     "gpu_gelu_multiply_boundary": 0.0,
-    "down_gpu_input_stage": 21.617147999999997,
-    "down_local_input_and_compute": 53.258702,
+    "down_gpu_input_stage": 21.331996,
+    "down_local_input_and_compute": 42.879732,
     "down_local_input_and_compute_gemv_release": 0.002814,
-    "down_result_export": 0.47931799999999997
+    "down_result_export": 0.49995399999999995
   },
-  "phase_boundary_us": 0.0009086875000008376,
+  "phase_boundary_us": 0.0009086875000150485,
   "external_DQ_bytes": 3211264,
   "traffic_bytes": {
     "requested_read": 0,
@@ -46,7 +46,7 @@
     "input_srf_multicast_destination": 41943040,
     "local_array_read": 2621440
   },
-  "trace_sha256": "c9e7549781957e90fe7e9e1358fe022368fb39717f11120ea775a22ee4b1b297",
+  "trace_sha256": "2e6e1352336db405369f26acd95b977c49bbe26766e331559b3a485f48d436e5",
   "numerical_compute": false,
   "complete_end_to_end_latency_us": null,
   "audit_status": "passed"

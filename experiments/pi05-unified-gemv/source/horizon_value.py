@@ -5,7 +5,7 @@ one cache tail read-modify-write. Physical KV padding is shared with Q/K.
 """
 from collections import Counter
 from pathlib import Path
-from rank_staging import stage_input, input_offset, reservation
+from rank_staging import stage_input, input_offset, reservation, fragment_batches, prefetch_metadata
 
 
 HEADS, CHANNELS, BANKS_PER_RANK, HEAD_DIM, HIDDEN = 8, 16, 16, 256, 1024
@@ -132,21 +132,27 @@ def generate(path, horizon, case, rank_staging=False):
         if rank_staging:
             stage_input(w, case, horizon, fragments)
         def compute():
-            for fragment in range(fragments):
-                buffer, first = fragment % 2, w.line_no+1
-                if rank_staging:
-                    w.ranks('PIM_STAGE_FRAGMENT', input_offset(fragment, 0, horizon), buffer)
-                else:
-                    for query in range(horizon):
-                        w.ranks('PIM_WR_GB', query*32, buffer)
-                last, mac_first = w.line_no, w.line_no+1
-                for slot in range(8):
-                    w.ranks('PIM_MAC_AB', base+(fragment*8+slot)*32, buffer)
-                w.input_fragments.append(dict(operator=case, fragment=fragment, buffer=buffer,
-                    line_start=first, line_end=last, mac_line_first=mac_first, mac_line_last=w.line_no,
-                    command_count=16 if rank_staging else horizon*16, external_bytes=0 if rank_staging else horizon*16*32,
-                    internal_load_bursts=horizon*16 if rank_staging else 0,
-                    query_count=horizon, source='X' if case == 'v' else 'post-softmax P'))
+            for batch in fragment_batches(fragments, rank_staging):
+                inputs = {}
+                for fragment in batch:
+                    buffer, first = fragment%2, w.line_no+1
+                    if rank_staging:
+                        w.ranks('PIM_STAGE_FRAGMENT', input_offset(fragment, 0, horizon), buffer)
+                    else:
+                        for query in range(horizon):
+                            w.ranks('PIM_WR_GB', query*32, buffer)
+                    inputs[fragment] = (buffer, first, w.line_no)
+                for fragment in batch:
+                    buffer, first, last = inputs[fragment]
+                    mac_first = w.line_no+1
+                    for slot in range(8):
+                        w.ranks('PIM_MAC_AB', base+(fragment*8+slot)*32, buffer)
+                    w.input_fragments.append(dict(operator=case, fragment=fragment, buffer=buffer,
+                        line_start=first, line_end=last, mac_line_first=mac_first, mac_line_last=w.line_no,
+                        command_count=16 if rank_staging else horizon*16, external_bytes=0 if rank_staging else horizon*16*32,
+                        internal_load_bursts=horizon*16 if rank_staging else 0,
+                        query_count=horizon, source='X' if case == 'v' else 'post-softmax P',
+                        **(prefetch_metadata(batch, horizon) if rank_staging else {})))
             w.fence()
         w.phase(f'{case}_local_input_compute' if rank_staging else f'{case}_input_compute', compute, kind='local_compute' if rank_staging else 'pipeline', operator=case,
                 mac_service_ck=horizon, native_mac_completion=True, query_count=horizon)

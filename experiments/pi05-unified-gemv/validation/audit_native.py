@@ -420,6 +420,9 @@ def audit_trace(records, case):
     require(actual == expected, "Trace differs from independent matrix/address oracle: "+counter_difference(expected, actual))
     require(not any(e["operation"] == "WAIT" for e in records), "Artificial legacy completion WAIT retained")
     require(not any(e["operation"].startswith("PIM_Z_") for e in records), "GPU-fed FFN must not use local Z commands")
+    if any(e["operation"] == "PIM_STAGE_BEGIN" for e in records):
+        from paired_audit import audit_paired_trace
+        audit_paired_trace(records, case)
     return len(records)
 
 
@@ -516,10 +519,12 @@ def audit_run(directory):
     require(dq == manifest["expected_dq_bytes"]["total"], "External DQ differs from source contract")
     require(Counter(native_result["issued_commands"]) == native_counts, "Native summary differs from command files")
     fill_checks = audit_external_fills(native, events, rank_staging=rank_staging)
-    staging, ca = None, None
+    staging, ca, batching = None, None, None
     if rank_staging:
         from staging_audit import audit_staging, audit_rank_ca
         staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"])
+        from paired_audit import audit_paired_staging
+        batching = audit_paired_staging(stage_events, native, events, case)
         require(Counter(e["operation"] for e in controller_events)["PIM_ROPE_EXEC"] == counts["PIM_ROPE_EXEC"],
                 "RoPE execute event count differs from trace")
         ca = audit_rank_ca(ca_events, native, stage_events, controller_events, records, events)
@@ -529,7 +534,8 @@ def audit_run(directory):
         trace_and_native_address_coverage=True, native_data_commands_checked=issued_count,
         array_open_row_checks=row_checks, independent_MAC_order_checks=order_checks,
         external_DQ_to_bank_fill_checks=fill_checks,
-        unified_gemv=slots, staging=staging, rank_controller=ca, ffn_streams=ffn, serial_continuity=continuity,
+        unified_gemv=slots, staging=staging, input_batching=batching,
+        rank_controller=ca, ffn_streams=ffn, serial_continuity=continuity,
         native_external_DQ_bytes=dq, native_command_counts=dict(native_counts),
         trace_sha256=digest(directory / "workload.trace"),
         native_sha256={p.name: digest(p) for p in timelines+gemv_files+stage_files+ca_files+controller_files},
