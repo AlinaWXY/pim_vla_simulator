@@ -4,6 +4,15 @@
 
 GPU 输入装载现在以两个 SRF slot 为一批：先连续读取并广播两个 fragment，再切换到权重行计算。每 bank 的 SRAM 仍为 2×512 B，没有扩容。
 
+## 1102 备份时的已知问题
+
+本分支保留单 bank 暂存版本及其原生结果（job1902586），作为后续 `xinyao_1103` 的对照。
+
+1. **集中写入一个 bank 导致 DQ 利用率低。** 当前同 bank group 列间隔为4CK，32B DQ burst只占2CK；再叠加换行、写恢复和refresh，Down整批写入阶段的DQ利用率约36.02%，128KiB/rank耗时21.332025µs。
+2. **引入 rank controller 后出现命令堆积和派发阻塞。** 当前每条单bank RoPE细指令都经过总CA准入；channel优先排列的单条trace遇到发送失败便停住，也挡住其它channel的请求，造成跨channel队头阻塞。RoPE从0.529032µs放大到12.652682µs，而channel0的rank CA只忙0.966140µs。这不是新增广播工作量，也不能全部归因于硬件命令总线竞争。
+
+因此本分支的214.354574µs是当前实现的实测值，包含上述已知问题，不能当作该架构不可避免的latency。1103首先仅实验两个不同bank group的bank交错写入；命令堆积问题应单独修正和验证，避免混淆两项改动的收益。
+
 ## 新版原生结果
 
 H=16，batch=1，8 attention heads，head_dim=256，hidden=1024，FFN=4096；16 个 LPDDR5X-8533 channel，每个 channel 的 rank0 预留给 GPU、rank1 的16个 bank 执行 PIM。以下为 **µs/层/denoising step**；DQ 与窗口列为单 channel，16个 channel 均已分别验证且相同。

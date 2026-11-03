@@ -6,13 +6,13 @@
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
   "branch": "xinyao_1102",
   "file_count_excluding_manifest": 539,
-  "bytes_excluding_manifest": 6228993,
-  "MiB": 5.940430641174316,
+  "bytes_excluding_manifest": 6230085,
+  "MiB": 5.941472053527832,
   "categories": {
     "publication": {
       "files": 8,
-      "bytes": 18015,
-      "MiB": 0.017180442810058594
+      "bytes": 19107,
+      "MiB": 0.01822185516357422
     },
     "backend_metadata": {
       "files": 2,
@@ -105,8 +105,8 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 7831,
-      "output_sha256": "bb8116b701778a4fcdc6fce23b6252473d3f5a3546605a0a820e04838f47738a"
+      "output_bytes": 8923,
+      "output_sha256": "cd0d8168e51766c4047646d0010c1f2d8549adb36025e1643bee01287a9e8a7e"
     },
     "compare_staging_batches.py": {
       "category": "publication",
