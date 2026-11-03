@@ -5,7 +5,7 @@ one cache tail read-modify-write. Physical KV padding is shared with Q/K.
 """
 from collections import Counter
 from pathlib import Path
-from rank_staging import stage_input, input_offset, reservation, fragment_batches, prefetch_metadata
+from rank_staging import stage_input, input_offset, source_bank, fragment_metadata, reservation, fragment_batches, prefetch_metadata
 
 
 HEADS, CHANNELS, BANKS_PER_RANK, HEAD_DIM, HIDDEN = 8, 16, 16, 256, 1024
@@ -108,16 +108,16 @@ class Writer:
             line_start=first, line_end=self.line_no, counts=dict(self.counts-before), **metadata))
         self.boundary = end
 
-    def ranks(self, operation, offset, buffer=None):
+    def ranks(self, operation, offset, buffer=None, bank=0):
         for channel in range(16):
-            self.emit(operation, physical_address(channel, 1, 0, 0, offset), buffer)
+            self.emit(operation, physical_address(channel, 1, bank//4, bank%4, offset), buffer)
 
 
-def generate(path, horizon, case, rank_staging=False):
+def generate(path, horizon, case, rank_staging=False, staging_banks=1):
     if case not in ('v', 'pv'):
         raise ValueError(case)
     geometry = layout(horizon)
-    geometry['input_staging'] = reservation() if rank_staging else None
+    geometry['input_staging'] = reservation(staging_banks) if rank_staging else None
     fragments = 64 if case == 'v' else geometry['kv_fragments']
     base = geometry['regions']['w_v' if case == 'v' else 'v_cache']['base']
     matrix = dict(M=horizon, K=1024 if case == 'v' else PREFIX+horizon,
@@ -130,14 +130,15 @@ def generate(path, horizon, case, rank_staging=False):
     w = Writer(path)
     try:
         if rank_staging:
-            stage_input(w, case, horizon, fragments)
+            stage_input(w, case, horizon, fragments, staging_banks)
         def compute():
             for batch in fragment_batches(fragments, rank_staging):
                 inputs = {}
                 for fragment in batch:
                     buffer, first = fragment%2, w.line_no+1
                     if rank_staging:
-                        w.ranks('PIM_STAGE_FRAGMENT', input_offset(fragment, 0, horizon), buffer)
+                        w.ranks('PIM_STAGE_FRAGMENT', input_offset(fragment, 0, horizon, staging_banks), buffer,
+                            bank=source_bank(fragment, staging_banks))
                     else:
                         for query in range(horizon):
                             w.ranks('PIM_WR_GB', query*32, buffer)
@@ -152,7 +153,8 @@ def generate(path, horizon, case, rank_staging=False):
                         command_count=16 if rank_staging else horizon*16, external_bytes=0 if rank_staging else horizon*16*32,
                         internal_load_bursts=horizon*16 if rank_staging else 0,
                         query_count=horizon, source='X' if case == 'v' else 'post-softmax P',
-                        **(prefetch_metadata(batch, horizon) if rank_staging else {})))
+                        **(prefetch_metadata(batch, horizon) if rank_staging else {}),
+                        **(fragment_metadata(fragment, horizon, staging_banks) if rank_staging else {})))
             w.fence()
         w.phase(f'{case}_local_input_compute' if rank_staging else f'{case}_input_compute', compute, kind='local_compute' if rank_staging else 'pipeline', operator=case,
                 mac_service_ck=horizon, native_mac_completion=True, query_count=horizon)
@@ -193,6 +195,7 @@ def generate(path, horizon, case, rank_staging=False):
         schedule='double', matrix=matrix, layout=geometry, counts=dict(w.counts),
         segments=w.segments, input_fragments=w.input_fragments, exports=w.exports,
         staging_inputs=getattr(w, 'staging_inputs', []), rank_staging=rank_staging,
+        staging_banks=staging_banks if rank_staging else 0,
         expected_dq_bytes=dq, expected_internal_array_read=w.counts['PIM_MAC_AB']*16*32,
         buffers=dict(input_double_per_bank=64*horizon, separate_rank_input_bytes=0,
             accumulator_per_bank=32*horizon),

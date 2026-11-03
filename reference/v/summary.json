@@ -5,18 +5,19 @@
   "unified_bank_gemv": true,
   "rank_staging": true,
   "rank_controller": true,
-  "latency_us": 21.992348000000003,
-  "memory_cycles": 23446,
+  "staging_banks": 2,
+  "latency_us": 20.592852,
+  "memory_cycles": 21954,
   "tCK_ns": 0.938,
   "phase_us": {
-    "v_gpu_input_stage": 5.2706513125,
-    "v_local_input_compute": 14.905758,
+    "v_gpu_input_stage": 2.5035513125,
+    "v_local_input_compute": 16.064187999999998,
     "v_gemv_release": 0.002814,
-    "v_result_export": 0.9595739999999999,
-    "v_prefix_tail_read": 0.31985800000000003,
+    "v_result_export": 0.9830239999999999,
+    "v_prefix_tail_read": 0.505582,
     "v_suffix_write": 0.532784
   },
-  "phase_boundary_us": 0.0009086875000043904,
+  "phase_boundary_us": 0.0009086875000008376,
   "external_DQ_bytes": 851968,
   "traffic_bytes": {
     "requested_read": 65536,
@@ -43,7 +44,7 @@
     "input_srf_multicast_destination": 8388608,
     "local_array_read": 524288
   },
-  "trace_sha256": "b8f0b965d5eab1c3b58c9b893e641520e30d69256b9bb438bf342154e1e98037",
+  "trace_sha256": "324df1491089d967f32de45645a6d7cb63e915175e809e77c38ea8437eed1643",
   "numerical_compute": false,
   "complete_end_to_end_latency_us": null,
   "audit_status": "passed"

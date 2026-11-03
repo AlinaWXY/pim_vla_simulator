@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 
 import horizon_attention_layout as L
-from rank_staging import stage_input, input_offset, fragment_batches, prefetch_metadata
+from rank_staging import stage_input, input_offset, source_bank, fragment_metadata, fragment_batches, prefetch_metadata
 
 OPERATORS = ("chain", "projection", "rope", "qk")
 CONTROL_OPERATORS = ()
@@ -45,9 +45,9 @@ class Writer:
                                   counts=dict(self.counts - before), **metadata))
         self.boundary = end
 
-    def ranks(self, command, offset, buffer=None):
+    def ranks(self, command, offset, buffer=None, bank=0):
         for channel in range(L.CHANNELS):
-            self.emit(command, L.physical_address(channel, L.PIM_RANK, 0, 0, offset), buffer)
+            self.emit(command, L.physical_address(channel, L.PIM_RANK, bank//4, bank%4, offset), buffer)
 
     def banks(self, command, offset, buffer=None):
         for location in L.active_bank_locations(offset):
@@ -57,9 +57,9 @@ class Writer:
         self.stream.close()
 
 
-def projection(w, schedule, rank_staging=False):
+def projection(w, schedule, rank_staging=False, staging_banks=1):
     if rank_staging:
-        stage_input(w, "projection", L.LOCAL_QUERIES, L.HIDDEN//L.LANES)
+        stage_input(w, "projection", L.LOCAL_QUERIES, L.HIDDEN//L.LANES, staging_banks)
     def compute():
         for batch in fragment_batches(L.HIDDEN//L.LANES, rank_staging):
             inputs = {}
@@ -67,7 +67,8 @@ def projection(w, schedule, rank_staging=False):
                 buffer = fragment%2 if rank_staging or schedule == "double" else 0
                 first = w.line_no+1
                 if rank_staging:
-                    w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, L.LOCAL_QUERIES), buffer)
+                    w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, L.LOCAL_QUERIES, staging_banks), buffer,
+                            bank=source_bank(fragment, staging_banks))
                 else:
                     for local_query in range(L.LOCAL_QUERIES):
                         w.ranks("PIM_WR_GB", local_query*L.BURST_BYTES, buffer)
@@ -82,11 +83,12 @@ def projection(w, schedule, rank_staging=False):
                 w.input_fragments.append(dict(fragment=fragment, buffer=buffer,
                     line_start=first, line_end=last, mac_line_first=mac_first,
                     mac_line_last=w.line_no, external_bytes=0 if rank_staging else (last-first+1)*L.BURST_BYTES,
-                    input_source="bank0_dram_staging" if rank_staging else "gpu_wrgb",
+                    input_source=("bank0_dram_staging" if staging_banks == 1 else "striped_dram_staging") if rank_staging else "gpu_wrgb",
                     command_count=16 if rank_staging else L.LOCAL_QUERIES*16,
                     internal_load_bursts=L.LOCAL_QUERIES*16 if rank_staging else 0,
                     scope=f"rank1 shared input, {L.LOCAL_QUERIES} local tokens, Q/K reuse",
-                    **(prefetch_metadata(batch, L.LOCAL_QUERIES) if rank_staging else {})))
+                    **(prefetch_metadata(batch, L.LOCAL_QUERIES) if rank_staging else {}),
+                    **(fragment_metadata(fragment, L.LOCAL_QUERIES, staging_banks) if rank_staging else {})))
                 if schedule == "serial":
                     w.fence()
     w.phase("projection_local_input_compute" if rank_staging else "projection_input_compute", compute, kind="projection", mac_service_ck=L.LOCAL_QUERIES,
@@ -183,13 +185,13 @@ def qk(w):
             kind="gemv_release")
 
 
-def generate(path, case="chain", schedule="double", rank_staging=False):
+def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1):
     if case not in OPERATORS or schedule not in ("double", "serial"):
         raise ValueError((case, schedule))
     w = Writer(path)
     try:
         if case in ("chain", "projection"):
-            projection(w, schedule, rank_staging=rank_staging)
+            projection(w, schedule, rank_staging=rank_staging, staging_banks=staging_banks)
         if case in ("chain", "rope"):
             rope(w, schedule)
         if case in ("chain", "qk"):
@@ -212,6 +214,7 @@ def generate(path, case="chain", schedule="double", rank_staging=False):
                 action_horizon=L.QUERIES, attention_heads=L.HEADS,
                 counts=counts, segments=w.segments, input_fragments=w.input_fragments,
                 staging_inputs=getattr(w, "staging_inputs", []), rank_staging=rank_staging,
+                staging_banks=staging_banks if rank_staging else 0,
                 exports=w.exports, local_writes=w.local_writes,
                 expected_dq_bytes=dq, buffers=buffers,
                 expected_local_bytes=dict(

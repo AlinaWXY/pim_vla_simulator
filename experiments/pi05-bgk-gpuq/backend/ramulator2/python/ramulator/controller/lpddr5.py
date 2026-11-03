@@ -37,6 +37,7 @@ class LPDDR5(Component):
     ffn_z_preinstalled = Param(bool, default=False)
     ffn_dram_events_path = Param(str, default='')
     pim_rank_staging = Param(bool, default=False)
+    pim_staging_banks = Param(int, default=1)
     pim_rank_controller = Param(bool, default=False)
     rank_ca_events_path = Param(str, default='')
     staging_events_path = Param(str, default='')

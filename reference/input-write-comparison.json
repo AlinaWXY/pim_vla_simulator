@@ -1,0 +1,42 @@
+{
+  "chain": {
+    "input_bytes_per_rank": 16384,
+    "DQ_busy_us": 0.9605119999999999,
+    "one_bank_store_us": 2.4866673125,
+    "two_bank_store_us": 1.2466313125,
+    "one_bank_DQ_percent": 38.626477903645984,
+    "two_bank_DQ_percent": 77.04860213031108
+  },
+  "v": {
+    "input_bytes_per_rank": 32768,
+    "DQ_busy_us": 1.9210239999999998,
+    "one_bank_store_us": 5.2706513125,
+    "two_bank_store_us": 2.5035513125,
+    "one_bank_DQ_percent": 36.44756380381404,
+    "two_bank_DQ_percent": 76.73196033204931
+  },
+  "pv": {
+    "input_bytes_per_rank": 31744,
+    "DQ_busy_us": 1.860992,
+    "one_bank_store_us": 5.1505873125,
+    "two_bank_store_us": 2.4435193125,
+    "one_bank_DQ_percent": 36.1316464917223,
+    "two_bank_DQ_percent": 76.16031477549454
+  },
+  "gate_up_gpu": {
+    "input_bytes_per_rank": 32768,
+    "DQ_busy_us": 1.9210239999999998,
+    "one_bank_store_us": 5.2706513125,
+    "two_bank_store_us": 2.5035513125,
+    "one_bank_DQ_percent": 36.44756380381404,
+    "two_bank_DQ_percent": 76.73196033204931
+  },
+  "down_gpu_input": {
+    "input_bytes_per_rank": 131072,
+    "DQ_busy_us": 7.684095999999999,
+    "one_bank_store_us": 21.332025312499997,
+    "two_bank_store_us": 10.548777312499999,
+    "one_bank_DQ_percent": 36.02140859779181,
+    "two_bank_DQ_percent": 72.84347533713283
+  }
+}

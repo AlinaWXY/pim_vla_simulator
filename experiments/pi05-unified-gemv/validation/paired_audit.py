@@ -2,23 +2,28 @@
 from bisect import bisect_left, bisect_right
 from collections import defaultdict
 
-from staging_audit import BASE, INPUTS, WEIGHTS, WEIGHT_INPUTS, offset, require
+from staging_audit import (BASE, INPUTS, WEIGHTS, WEIGHT_INPUTS, offset, require,
+                           source_bank, source_packet, source_location)
 
 
 def address_offset(address):
     return (address >> 20)*2048+(address >> 9 & 63)*32
 
 
-def audit_paired_trace(records, case):
+def audit_paired_trace(records, case, staging_banks=1):
     """The address multiset is unchanged; independently check the new ordering."""
-    actual = defaultdict(list)
+    actual, stores = defaultdict(list), defaultdict(list)
     generation = defaultdict(int)
     for e in records:
         ch = e["address"] >> 5 & 15
         if e["operation"] == "PIM_STAGE_BEGIN":
             generation[ch] += 1
+        elif e["operation"] == "ST" and address_offset(e["address"]) >= BASE:
+            bank = (e["address"] >> 16 & 3)*4+(e["address"] >> 18 & 3)
+            stores[ch, generation[ch]].append((bank, address_offset(e["address"])))
         elif e["operation"] in ("PIM_STAGE_FRAGMENT", "PIM_MAC_AB"):
-            actual[ch, generation[ch]].append((e["operation"], address_offset(e["address"]), e["buffer"]))
+            bank = (e["address"] >> 16 & 3)*4+(e["address"] >> 18 & 3)
+            actual[ch, generation[ch]].append((e["operation"], bank, address_offset(e["address"]), e["buffer"]))
     require(set(actual) == {(ch, gen) for ch in range(16) for gen in range(1, len(INPUTS[case])+1)},
             "Paired trace lacks an operator/channel input schedule")
     batches = 0
@@ -30,16 +35,21 @@ def audit_paired_trace(records, case):
         require(fragments%2 == 0, "Paired schedule requires an even fragment count")
         expected = []
         for first in range(0, fragments, 2):
-            expected.extend(("PIM_STAGE_FRAGMENT", BASE+f*rows*32, f%2) for f in (first, first+1))
-            expected.extend(("PIM_MAC_AB", base+(f*columns+c)*32, f%2)
+            expected.extend(("PIM_STAGE_FRAGMENT", *source_location(f, 0, rows, staging_banks), f%2)
+                            for f in (first, first+1))
+            expected.extend(("PIM_MAC_AB", 0, base+(f*columns+c)*32, f%2)
                             for f in (first, first+1) for c in range(columns))
             batches += 1
         require(sequence == expected,
                 f"Paired trace must fill both slots before either fragment's MACs: channel{ch}, stage{gen}")
+        order = ((f, t) for f in range(fragments) for t in range(rows)) if staging_banks == 1 else (
+            (f, t) for first in range(0, fragments, 2) for t in range(rows) for f in (first, first+1))
+        require(stores[ch, gen] == [source_location(f, t, rows, staging_banks) for f, t in order],
+                "Staged write order must interleave each token across the two source bank groups")
     return batches
 
 
-def audit_paired_staging(staging, native, gemv, case, complete_workload=True):
+def audit_paired_staging(staging, native, gemv, case, complete_workload=True, staging_banks=1):
     """Reconstruct pair readiness, capacity, and source/weight row visits."""
     reads, broadcasts, macs = defaultdict(list), defaultdict(list), defaultdict(list)
     seals = {}
@@ -50,7 +60,7 @@ def audit_paired_staging(staging, native, gemv, case, complete_workload=True):
         if e["operation"] not in ("LOCALRD", "BROADCAST"):
             continue
         rows = INPUTS[case][gen-1][1]
-        fragment = ((offset(e)-BASE)//32)//rows
+        fragment = source_packet(e, rows, staging_banks)//rows
         (reads if e["operation"] == "LOCALRD" else broadcasts)[e["Channel"], gen, fragment].append(e)
     completions = {(e["Channel"], e["clock"]): e["ready_at"] for e in gemv if e["operation"] == "GEMV_MAC"}
     by_channel = defaultdict(list)
@@ -89,6 +99,8 @@ def audit_paired_staging(staging, native, gemv, case, complete_workload=True):
             require(len(reads[key]) == len(broadcasts[key]) == rows, "Pair does not fill exactly one fragment per slot")
             require(all(e["buffer"] == slot for e in reads[key]+broadcasts[key]), "Pair aliases or exceeds its two physical slots")
             require(len(macs[key]) == columns, "Pair changes the number of weight MACs")
+            require({source_bank(e) for e in reads[key]+broadcasts[key]} == {4*(key[2]%staging_banks)},
+                    "Each fragment must remain in its independently assigned source bank")
         all_reads = reads[first]+reads[second]
         ready = max(e["ready_at"] for key in (first, second) for e in broadcasts[key])
         begin = min(e["clock"] for e in reads[first])
@@ -111,6 +123,8 @@ def audit_paired_staging(staging, native, gemv, case, complete_workload=True):
             input_begin_ck=begin, last_input_issue_ck=last_read, both_slots_ready_ck=ready,
             first_MAC_ck=first_mac, last_MAC_complete_ck=last_mac_done,
             input_bytes_per_bank=2*rows*32, refresh_commands_during_load=interrupted))
+        if staging_banks == 2:
+            batch_rows[-1]["source_banks"] = sorted({source_bank(e) for e in all_reads})
         key = ch, gen
         stage_windows[key] = max(stage_windows.get(key, 0), last_mac_done)
     row_counts = []

@@ -174,6 +174,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_ffn_events_path, std::string, "ffn_dram_events_path").default_val("");
     init_ffn_dram();
     RAMULATOR_PARSE_PARAM(m_rank_staging, bool, "pim_rank_staging").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_staging_banks, int, "pim_staging_banks").default_val(1);
     RAMULATOR_PARSE_PARAM(m_rank_controller, bool, "pim_rank_controller").default_val(false);
     RAMULATOR_PARSE_PARAM(m_rank_ca_path, std::string, "rank_ca_events_path").default_val("");
     RAMULATOR_PARSE_PARAM(m_staging_path, std::string, "staging_events_path").default_val("");
@@ -266,7 +267,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       if(staging_write) {
         for(const auto& pending:m_pim_buffer) if(pending.type_id==Request::Type::PIM_STAGE_BEGIN) return false;
         stage_address(req);
-        const int offset=stage_offset(req);
+        const int offset=stage_logical_offset(req);
         if(!m_stage.active || m_stage.sealed || offset<m_stage.base || offset>=m_stage.base+m_stage.bytes)
           throw std::runtime_error("staging write outside active payload");
         if(m_stage.writes.count(offset)) throw std::runtime_error("duplicate staging write");
@@ -287,7 +288,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         if (done.type_id == Request::Type::Write) {
           m_normal_ready_at = std::max(m_normal_ready_at, m_clk + m_write_recovery);
           if(staging_write) {
-            m_stage.writes.at(stage_offset(done))=m_clk+m_write_recovery;
+            m_stage.writes.at(stage_logical_offset(done))=m_clk+m_write_recovery;
             record_stage(done,"WR",m_clk,m_clk+m_write_recovery);
           }
         }
@@ -295,9 +296,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
           callback(done);
         }
       };
-      if(staging_write) m_stage.writes.emplace(stage_offset(req),-1);
+      if(staging_write) m_stage.writes.emplace(stage_logical_offset(req),-1);
       bool accepted = LPDDR5Controller::send(req);
-      if(staging_write && !accepted) m_stage.writes.erase(stage_offset(req));
+      if(staging_write && !accepted) m_stage.writes.erase(stage_logical_offset(req));
       req.callback = callback;
       return accepted;
     }

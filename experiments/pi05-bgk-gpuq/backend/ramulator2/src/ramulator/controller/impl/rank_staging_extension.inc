@@ -1,6 +1,7 @@
-// Hierarchical rank controller and whole-operator single-bank input storage.
-// Only coverage/timing metadata is kept here; the payload resides in bank0 DRAM.
+// Hierarchical rank controller and whole-operator input storage.
+// Only coverage/timing metadata is kept here; payloads reside in source-bank DRAM.
 bool m_rank_staging=false, m_rank_controller=false, m_rank_fine_context=false;
+int m_staging_banks=1;
 Clk_t m_global_ca_ready=0;
 std::vector<Clk_t> m_rank_ca_ready;
 std::string m_rank_ca_path, m_staging_path;
@@ -25,8 +26,34 @@ int stage_offset(const Request& req) const {
   return a[m_device.m_spec->get_level_id("Row")]*2048+a[m_device.m_spec->get_level_id("Column")]*32;
 }
 void stage_address(const Request& req) const {
-  if(req.addr_vec[m_rank_level]!=1 || req.addr_vec[m_bg_level]!=0 || req.addr_vec[m_bank_level]!=0)
-    throw std::runtime_error("staging requires rank1 bank0");
+  const bool control=req.type_id==Request::Type::PIM_STAGE_BEGIN || req.type_id==Request::Type::PIM_STAGE_SEAL;
+  const int rank=req.addr_vec[m_rank_level],bg=req.addr_vec[m_bg_level],bank=req.addr_vec[m_bank_level];
+  if(m_staging_banks==1) {
+    if(rank!=1 || bg!=0 || bank!=0)
+      throw std::runtime_error("staging requires rank1 bank0");
+    return;
+  }
+  if(control) {
+    if(rank!=1 || bg!=0 || bank!=0)
+      throw std::runtime_error("staging control requires rank1 bank0");
+  } else {
+    if(rank!=1 || (bg!=0 && bg!=1) || bank!=0)
+      throw std::runtime_error("staging requires rank1 BG0/BG1 bank0");
+    if(stage_offset(req)>=256*2048+65536)
+      throw std::runtime_error("staging source bank capacity exceeded");
+  }
+}
+int stage_logical_offset(const Request& req) const {
+  const int physical=stage_offset(req);
+  if(m_staging_banks==1) return physical;
+  if(!m_stage.active || m_stage.rows<=0)
+    throw std::runtime_error("staging write outside active payload");
+  // Alternating logical fragments occupy BG0/B0 and BG1/B0. Each
+  // descriptor remains on its physical source bank for all token reads.
+  if(physical<m_stage.base) return physical; // Keep below-region addresses out of the logical payload.
+  const int packet=(physical-m_stage.base)/32;
+  const int fragment=2*(packet/m_stage.rows)+req.addr_vec[m_bg_level];
+  return m_stage.base+(fragment*m_stage.rows+packet%m_stage.rows)*32;
 }
 void record_ca(Clk_t clock,Clk_t ready,int rank,const std::string& command,const char* scope) {
   if(m_rank_ca_events) m_rank_ca_events<<clock<<','<<ready<<','<<m_channel_id<<','<<rank<<','<<command<<','<<scope<<'\n';
@@ -49,6 +76,10 @@ bool rank_pseudo(const char* command,int rank=1) {
   return true;
 }
 void init_rank_staging() {
+  if(m_staging_banks!=1 && m_staging_banks!=2)
+    throw std::runtime_error("pim_staging_banks must be 1 or 2");
+  if(m_staging_banks!=1 && !m_rank_staging)
+    throw std::runtime_error("multiple staging banks require rank staging");
   if(m_rank_staging && (!m_rank_controller || !m_unified_gemv || m_ffn_dram))
     throw std::runtime_error("rank staging requires rank controller, unified GEMV and GPU FFN");
   m_rank_ca_ready.resize(m_inputs.size(),0);
@@ -101,11 +132,11 @@ bool send_stage(Request& req) {
   return true;
 }
 bool stage_fill_ready(const Request& req) {
-  const int row=((stage_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
+  const int row=((stage_logical_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
   // Distinct rows pipeline at native nCCDL. Only a new fragment waits for
   // the previous slot consumer; earlier reads of this fragment may be in flight.
   if(row==0 && !gemv_slot_idle(slot)) return false;
-  const int fragment=(stage_offset(req)-m_stage.base)/(m_stage.rows*32);
+  const int fragment=(stage_logical_offset(req)-m_stage.base)/(m_stage.rows*32);
   if(row!=0 && (m_stage_slot_generation[slot]!=m_stage.generation || m_stage_slot_fragment[slot]!=fragment))
     throw std::runtime_error("staging mixed source fragments");
   for(int bank=16;bank<32;++bank) {
@@ -120,9 +151,9 @@ bool stage_fill_ready(const Request& req) {
   return true;
 }
 void stage_fill(const Request& req,Clk_t ready) {
-  const int row=((stage_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
+  const int row=((stage_logical_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
   if(row==0) {
-    m_stage_slot_fragment[slot]=(stage_offset(req)-m_stage.base)/(m_stage.rows*32);
+    m_stage_slot_fragment[slot]=(stage_logical_offset(req)-m_stage.base)/(m_stage.rows*32);
     m_stage_slot_generation[slot]=m_stage.generation;
   }
   for(int bank=16;bank<32;++bank) {
@@ -134,9 +165,9 @@ void stage_fill(const Request& req,Clk_t ready) {
 }
 bool issue_stage(ReqBuffer::iterator it) {
   stage_address(*it);
-  const int offset=stage_offset(*it);
+  const int physical_offset=stage_offset(*it);
   if(it->type_id==Request::Type::PIM_STAGE_BEGIN) {
-    if(offset!=256*2048 || it->pim_stage_bytes<=0 || it->pim_stage_bytes>131072 ||
+    if(physical_offset!=256*2048 || it->pim_stage_bytes<=0 || it->pim_stage_bytes>131072 ||
        (it->pim_stage_rows!=8 && it->pim_stage_rows!=16) || it->pim_stage_bytes%(it->pim_stage_rows*32))
       throw std::runtime_error("invalid staging region/size/rows");
     if(m_stage.active) {
@@ -150,11 +181,11 @@ bool issue_stage(ReqBuffer::iterator it) {
     }
     if(!gemv_slot_idle(0) || !gemv_slot_idle(1)) return false;
     const int generation=m_stage.generation+1;
-    m_stage=StagePayload{};m_stage.active=true;m_stage.base=offset;m_stage.bytes=it->pim_stage_bytes;m_stage.rows=it->pim_stage_rows;m_stage.generation=generation;
+    m_stage=StagePayload{};m_stage.active=true;m_stage.base=physical_offset;m_stage.bytes=it->pim_stage_bytes;m_stage.rows=it->pim_stage_rows;m_stage.generation=generation;
     record_stage(*it,"BEGIN",m_clk,m_clk,m_stage.bytes);enqueue_bgk_done(it,m_clk);return true;
   }
   if(it->type_id==Request::Type::PIM_STAGE_SEAL) {
-    if(!m_stage.active || offset!=m_stage.base || m_stage.sealed)
+    if(!m_stage.active || physical_offset!=m_stage.base || m_stage.sealed)
       throw std::runtime_error("invalid staging seal");
     if(m_stage.writes.size()!=static_cast<size_t>(m_stage.bytes/32))
       throw std::runtime_error("staging seal requires every declared input write");
@@ -166,6 +197,7 @@ bool issue_stage(ReqBuffer::iterator it) {
     m_stage.sealed=true;record_stage(*it,"SEAL",m_clk,m_clk,m_stage.bytes);enqueue_bgk_done(it,m_clk);return true;
   }
   if(!m_stage.active || !m_stage.sealed) throw std::runtime_error("staging load requires sealed input");
+  const int offset=stage_logical_offset(*it);
   if(offset<m_stage.base || offset>=m_stage.base+m_stage.bytes || !m_stage.writes.count(offset))
     throw std::runtime_error("staging load address outside payload");
   if(it->type_id==Request::Type::PIM_STAGE_FRAGMENT && it->pim_stage_cursor==0 && ((offset-m_stage.base)/32)%m_stage.rows)
@@ -176,7 +208,7 @@ bool issue_stage(ReqBuffer::iterator it) {
     stage_fill(*it,ready);record_stage(*it,"BROADCAST",m_clk,ready);
     ++m_stage.loads[offset];
     if(it->type_id==Request::Type::PIM_STAGE_FRAGMENT && ++it->pim_stage_cursor<m_stage.rows) {
-      const int next=offset+32;
+      const int next=physical_offset+32;
       it->addr_vec[m_device.m_spec->get_level_id("Row")]=next/2048;
       it->addr_vec[m_device.m_spec->get_level_id("Column")]=(next%2048)/32;
       it->pim_origin_addr_vec=it->addr_vec;

@@ -1,0 +1,6673 @@
+{
+  "status": "passed",
+  "baseline_commit": "cbc1ee4",
+  "one_bank_native_job": 1902586,
+  "primary_cases": [
+    "chain",
+    "v",
+    "pv",
+    "gate_up_gpu",
+    "down_gpu_input"
+  ],
+  "one_bank_sum_us": 214.35457399999999,
+  "two_bank_sum_us": 204.115366,
+  "saved_us": 10.23920799999999,
+  "saved_percent": 4.776762076464946,
+  "identical_payload_and_compute_all_16_channels": true,
+  "rank_controller_dispatch_policy_unchanged": true,
+  "cases": {
+    "chain": {
+      "one_bank_us": 58.708482000000004,
+      "two_bank_us": 58.708482000000004,
+      "saved_us": 0.0,
+      "input_store_one_bank_us": 2.4866673125,
+      "input_store_two_bank_us": 1.2466313125,
+      "input_store_saved_percent": 49.86738651232422,
+      "phase_us": {
+        "projection_gpu_input_stage": 1.2466313125,
+        "projection_local_input_compute": 22.533573999999998,
+        "projection_local_spill": 3.8955139999999995,
+        "projection_gemv_release": 0.002814,
+        "rope_local": 12.652681999999999,
+        "q_export_to_gpu": 4.238822,
+        "q_remote_buffer_fill": 1.8478599999999998,
+        "qk_tile_0_compute": 0.28515199999999996,
+        "qk_tile_0_export": 0.119126,
+        "qk_tile_1_compute": 0.48775999999999997,
+        "qk_tile_1_export": 0.119126,
+        "qk_tile_2_compute": 0.24481799999999998,
+        "qk_tile_2_export": 0.119126,
+        "qk_tile_3_compute": 0.24481799999999998,
+        "qk_tile_3_export": 0.119126,
+        "qk_tile_4_compute": 0.28515199999999996,
+        "qk_tile_4_export": 0.119126,
+        "qk_tile_5_compute": 0.24481799999999998,
+        "qk_tile_5_export": 0.119126,
+        "qk_tile_6_compute": 0.24481799999999998,
+        "qk_tile_6_export": 0.119126,
+        "qk_tile_7_compute": 0.24481799999999998,
+        "qk_tile_7_export": 0.119126,
+        "qk_tile_8_compute": 0.28515199999999996,
+        "qk_tile_8_export": 0.119126,
+        "qk_tile_9_compute": 0.24481799999999998,
+        "qk_tile_9_export": 0.119126,
+        "qk_tile_10_compute": 0.24481799999999998,
+        "qk_tile_10_export": 0.14163800000000001,
+        "qk_tile_11_compute": 0.46243399999999996,
+        "qk_tile_11_export": 0.119126,
+        "qk_tile_12_compute": 0.28515199999999996,
+        "qk_tile_12_export": 0.119126,
+        "qk_tile_13_compute": 0.24481799999999998,
+        "qk_tile_13_export": 0.119126,
+        "qk_tile_14_compute": 0.24481799999999998,
+        "qk_tile_14_export": 0.119126,
+        "qk_tile_15_compute": 0.24481799999999998,
+        "qk_tile_15_export": 0.119126,
+        "qk_tile_16_compute": 0.28515199999999996,
+        "qk_tile_16_export": 0.119126,
+        "qk_tile_17_compute": 0.24481799999999998,
+        "qk_tile_17_export": 0.119126,
+        "qk_tile_18_compute": 0.24481799999999998,
+        "qk_tile_18_export": 0.119126,
+        "qk_tile_19_compute": 0.24481799999999998,
+        "qk_tile_19_export": 0.119126,
+        "qk_tile_20_compute": 0.28515199999999996,
+        "qk_tile_20_export": 0.1407,
+        "qk_tile_21_compute": 0.36863399999999996,
+        "qk_tile_21_export": 0.119126,
+        "qk_tile_22_compute": 0.24481799999999998,
+        "qk_tile_22_export": 0.119126,
+        "qk_tile_23_compute": 0.24481799999999998,
+        "qk_tile_23_export": 0.119126,
+        "qk_tile_24_compute": 0.28515199999999996,
+        "qk_tile_24_export": 0.119126,
+        "qk_tile_25_compute": 0.24481799999999998,
+        "qk_tile_25_export": 0.119126,
+        "qk_tile_26_compute": 0.24481799999999998,
+        "qk_tile_26_export": 0.119126,
+        "qk_tile_27_compute": 0.24481799999999998,
+        "qk_tile_27_export": 0.119126,
+        "qk_tile_28_compute": 0.28515199999999996,
+        "qk_tile_28_export": 0.119126,
+        "qk_tile_29_compute": 0.24481799999999998,
+        "qk_tile_29_export": 0.119126,
+        "qk_tile_30_compute": 0.27764799999999995,
+        "qk_tile_30_export": 0.1407,
+        "qk_gemv_release": 0.0018759999999999998
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACT2": {
+              "one_bank": 137,
+              "two_banks": 170
+            },
+            "ACTAB": {
+              "one_bank": 48,
+              "two_banks": 47
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 896,
+              "two_banks": 896
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 55,
+              "two_banks": 55
+            },
+            "PREpb": {
+              "one_bank": 55,
+              "two_banks": 85
+            },
+            "REFab": {
+              "one_bank": 30,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 512,
+              "two_banks": 512
+            }
+          }
+        }
+      ]
+    },
+    "v": {
+      "one_bank_us": 21.992348000000003,
+      "two_bank_us": 20.592852,
+      "saved_us": 1.3994960000000027,
+      "input_store_one_bank_us": 5.2706513125,
+      "input_store_two_bank_us": 2.5035513125,
+      "input_store_saved_percent": 52.50015294006418,
+      "phase_us": {
+        "v_gpu_input_stage": 2.5035513125,
+        "v_local_input_compute": 16.064187999999998,
+        "v_gemv_release": 0.002814,
+        "v_result_export": 0.9830239999999999,
+        "v_prefix_tail_read": 0.505582,
+        "v_suffix_write": 0.532784
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 67,
+              "two_banks": 97
+            },
+            "ACT2": {
+              "one_bank": 67,
+              "two_banks": 96
+            },
+            "ACTAB": {
+              "one_bank": 34,
+              "two_banks": 35
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 512,
+              "two_banks": 512
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 37,
+              "two_banks": 37
+            },
+            "PREpb": {
+              "one_bank": 63,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 10
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1280,
+              "two_banks": 1280
+            }
+          }
+        }
+      ]
+    },
+    "pv": {
+      "one_bank_us": 20.364918000000003,
+      "two_bank_us": 18.9945,
+      "saved_us": 1.3704180000000044,
+      "input_store_one_bank_us": 5.1505873125,
+      "input_store_two_bank_us": 2.4435193125,
+      "input_store_saved_percent": 52.5584333543904,
+      "phase_us": {
+        "pv_gpu_input_stage": 2.4435193125,
+        "pv_local_input_compute": 15.587684,
+        "pv_gemv_release": 0.002814,
+        "pv_result_export": 0.9595739999999999
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACT2": {
+              "one_bank": 49,
+              "two_banks": 79
+            },
+            "ACTAB": {
+              "one_bank": 33,
+              "two_banks": 34
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 992,
+              "two_banks": 992
+            },
+            "MACAB": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 36,
+              "two_banks": 35
+            },
+            "PREpb": {
+              "one_bank": 46,
+              "two_banks": 75
+            },
+            "REFab": {
+              "one_bank": 10,
+              "two_banks": 8
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 992,
+              "two_banks": 992
+            }
+          }
+        }
+      ]
+    },
+    "gate_up_gpu": {
+      "one_bank_us": 48.579958,
+      "two_bank_us": 47.127934,
+      "saved_us": 1.4520239999999944,
+      "input_store_one_bank_us": 5.2706513125,
+      "input_store_two_bank_us": 2.5035513125,
+      "input_store_saved_percent": 52.50015294006418,
+      "phase_us": {
+        "gate_up_gpu_input_stage": 2.5035513125,
+        "gate_up_local_input_and_compute": 40.756099999999996,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACT2": {
+              "one_bank": 50,
+              "two_banks": 80
+            },
+            "ACTAB": {
+              "one_bank": 41,
+              "two_banks": 42
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACAB": {
+              "one_bank": 2048,
+              "two_banks": 2048
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 44,
+              "two_banks": 43
+            },
+            "PREpb": {
+              "one_bank": 47,
+              "two_banks": 78
+            },
+            "REFab": {
+              "one_bank": 24,
+              "two_banks": 24
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            }
+          }
+        }
+      ]
+    },
+    "down_gpu_input": {
+      "one_bank_us": 64.708868,
+      "two_bank_us": 58.691598,
+      "saved_us": 6.017269999999996,
+      "input_store_one_bank_us": 21.332025312499997,
+      "input_store_two_bank_us": 10.548777312499999,
+      "input_store_saved_percent": 50.54957437014339,
+      "phase_us": {
+        "down_gpu_input_stage": 10.548777312499999,
+        "down_local_input_and_compute": 47.637268,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.50183
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 200,
+              "two_banks": 328
+            },
+            "ACT2": {
+              "one_bank": 200,
+              "two_banks": 326
+            },
+            "ACTAB": {
+              "one_bank": 132,
+              "two_banks": 131
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            },
+            "MACAB": {
+              "one_bank": 1024,
+              "two_banks": 1024
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 141,
+              "two_banks": 140
+            },
+            "PREpb": {
+              "one_bank": 190,
+              "two_banks": 311
+            },
+            "REFab": {
+              "one_bank": 32,
+              "two_banks": 30
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 4096,
+              "two_banks": 4096
+            }
+          }
+        }
+      ]
+    },
+    "combined_timing_chain": {
+      "one_bank_us": 113.294454,
+      "two_bank_us": 105.910518,
+      "saved_us": 7.383936000000006,
+      "input_store_one_bank_us": 26.6026473125,
+      "input_store_two_bank_us": 13.126401312499997,
+      "input_store_saved_percent": 50.65753735594507,
+      "phase_us": {
+        "gate_up_gpu_input_stage": 2.5035513125,
+        "gate_up_local_input_and_compute": 40.756099999999996,
+        "gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_result_export": 3.86456,
+        "gpu_gelu_multiply_boundary": 0.0,
+        "down_gpu_input_stage": 10.622849999999998,
+        "down_local_input_and_compute": 47.656966,
+        "down_local_input_and_compute_gemv_release": 0.002814,
+        "down_result_export": 0.49995399999999995
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACT2": {
+              "one_bank": 250,
+              "two_banks": 410
+            },
+            "ACTAB": {
+              "one_bank": 173,
+              "two_banks": 173
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            },
+            "MACAB": {
+              "one_bank": 3072,
+              "two_banks": 3072
+            },
+            "MACQK": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 186,
+              "two_banks": 183
+            },
+            "PREpb": {
+              "one_bank": 237,
+              "two_banks": 391
+            },
+            "REFab": {
+              "one_bank": 58,
+              "two_banks": 54
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 5120,
+              "two_banks": 5120
+            }
+          }
+        }
+      ]
+    },
+    "serial_layer_control": {
+      "one_bank_us": 214.70163399999998,
+      "two_bank_us": 204.33861,
+      "saved_us": 10.363023999999996,
+      "input_store_one_bank_us": 39.7224533125,
+      "input_store_two_bank_us": 19.371605312499998,
+      "input_store_saved_percent": 51.23260600219757,
+      "phase_us": {
+        "chain/projection_gpu_input_stage": 1.2466313125,
+        "chain/projection_local_input_compute": 22.533573999999998,
+        "chain/projection_local_spill": 3.8955139999999995,
+        "chain/projection_gemv_release": 0.002814,
+        "chain/rope_local": 12.652681999999999,
+        "chain/q_export_to_gpu": 4.238822,
+        "chain/q_remote_buffer_fill": 1.8478599999999998,
+        "chain/qk_tile_0_compute": 0.28515199999999996,
+        "chain/qk_tile_0_export": 0.119126,
+        "chain/qk_tile_1_compute": 0.48775999999999997,
+        "chain/qk_tile_1_export": 0.119126,
+        "chain/qk_tile_2_compute": 0.24481799999999998,
+        "chain/qk_tile_2_export": 0.119126,
+        "chain/qk_tile_3_compute": 0.24481799999999998,
+        "chain/qk_tile_3_export": 0.119126,
+        "chain/qk_tile_4_compute": 0.28515199999999996,
+        "chain/qk_tile_4_export": 0.119126,
+        "chain/qk_tile_5_compute": 0.24481799999999998,
+        "chain/qk_tile_5_export": 0.119126,
+        "chain/qk_tile_6_compute": 0.24481799999999998,
+        "chain/qk_tile_6_export": 0.119126,
+        "chain/qk_tile_7_compute": 0.24481799999999998,
+        "chain/qk_tile_7_export": 0.119126,
+        "chain/qk_tile_8_compute": 0.28515199999999996,
+        "chain/qk_tile_8_export": 0.119126,
+        "chain/qk_tile_9_compute": 0.24481799999999998,
+        "chain/qk_tile_9_export": 0.119126,
+        "chain/qk_tile_10_compute": 0.24481799999999998,
+        "chain/qk_tile_10_export": 0.14163800000000001,
+        "chain/qk_tile_11_compute": 0.46243399999999996,
+        "chain/qk_tile_11_export": 0.119126,
+        "chain/qk_tile_12_compute": 0.28515199999999996,
+        "chain/qk_tile_12_export": 0.119126,
+        "chain/qk_tile_13_compute": 0.24481799999999998,
+        "chain/qk_tile_13_export": 0.119126,
+        "chain/qk_tile_14_compute": 0.24481799999999998,
+        "chain/qk_tile_14_export": 0.119126,
+        "chain/qk_tile_15_compute": 0.24481799999999998,
+        "chain/qk_tile_15_export": 0.119126,
+        "chain/qk_tile_16_compute": 0.28515199999999996,
+        "chain/qk_tile_16_export": 0.119126,
+        "chain/qk_tile_17_compute": 0.24481799999999998,
+        "chain/qk_tile_17_export": 0.119126,
+        "chain/qk_tile_18_compute": 0.24481799999999998,
+        "chain/qk_tile_18_export": 0.119126,
+        "chain/qk_tile_19_compute": 0.24481799999999998,
+        "chain/qk_tile_19_export": 0.119126,
+        "chain/qk_tile_20_compute": 0.28515199999999996,
+        "chain/qk_tile_20_export": 0.1407,
+        "chain/qk_tile_21_compute": 0.36863399999999996,
+        "chain/qk_tile_21_export": 0.119126,
+        "chain/qk_tile_22_compute": 0.24481799999999998,
+        "chain/qk_tile_22_export": 0.119126,
+        "chain/qk_tile_23_compute": 0.24481799999999998,
+        "chain/qk_tile_23_export": 0.119126,
+        "chain/qk_tile_24_compute": 0.28515199999999996,
+        "chain/qk_tile_24_export": 0.119126,
+        "chain/qk_tile_25_compute": 0.24481799999999998,
+        "chain/qk_tile_25_export": 0.119126,
+        "chain/qk_tile_26_compute": 0.24481799999999998,
+        "chain/qk_tile_26_export": 0.119126,
+        "chain/qk_tile_27_compute": 0.24481799999999998,
+        "chain/qk_tile_27_export": 0.119126,
+        "chain/qk_tile_28_compute": 0.28515199999999996,
+        "chain/qk_tile_28_export": 0.119126,
+        "chain/qk_tile_29_compute": 0.24481799999999998,
+        "chain/qk_tile_29_export": 0.119126,
+        "chain/qk_tile_30_compute": 0.27764799999999995,
+        "chain/qk_tile_30_export": 0.1407,
+        "chain/qk_gemv_release": 0.0018759999999999998,
+        "v/v_gpu_input_stage": 2.611392,
+        "v/v_local_input_compute": 16.042614,
+        "v/v_gemv_release": 0.002814,
+        "v/v_result_export": 0.9830239999999999,
+        "v/v_prefix_tail_read": 0.30391199999999996,
+        "v/v_suffix_write": 0.532784,
+        "pv/pv_gpu_input_stage": 2.461312,
+        "pv/pv_local_input_compute": 15.562357999999998,
+        "pv/pv_gemv_release": 0.002814,
+        "pv/pv_result_export": 0.9811479999999999,
+        "gate_up_gpu/gate_up_gpu_input_stage": 2.503522,
+        "gate_up_gpu/gate_up_local_input_and_compute": 40.750471999999995,
+        "gate_up_gpu/gate_up_local_input_and_compute_gemv_release": 0.002814,
+        "gate_up_gpu/gate_up_result_export": 3.86456,
+        "down_gpu_input/down_gpu_input_stage": 10.548748,
+        "down_gpu_input/down_local_input_and_compute": 47.993708,
+        "down_gpu_input/down_local_input_and_compute_gemv_release": 0.002814,
+        "down_gpu_input/down_result_export": 0.47931799999999997
+      },
+      "command_counts_by_channel": [
+        {
+          "channel": 0,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 1,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 2,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 3,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 4,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 5,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 6,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 7,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 8,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 9,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 10,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 11,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 12,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 13,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 14,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        },
+        {
+          "channel": 15,
+          "commands": {
+            "ACT1": {
+              "one_bank": 501,
+              "two_banks": 759
+            },
+            "ACT2": {
+              "one_bank": 500,
+              "two_banks": 757
+            },
+            "ACTAB": {
+              "one_bank": 288,
+              "two_banks": 286
+            },
+            "ACTHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "LOCALRD": {
+              "one_bank": 8032,
+              "two_banks": 8032
+            },
+            "MACAB": {
+              "one_bank": 6128,
+              "two_banks": 6128
+            },
+            "MACQK": {
+              "one_bank": 496,
+              "two_banks": 496
+            },
+            "PREHB": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "PREab": {
+              "one_bank": 313,
+              "two_banks": 312
+            },
+            "PREpb": {
+              "one_bank": 400,
+              "two_banks": 627
+            },
+            "REFab": {
+              "one_bank": 108,
+              "two_banks": 104
+            },
+            "REFpb": {
+              "one_bank": 0,
+              "two_banks": 0
+            },
+            "WR": {
+              "one_bank": 7904,
+              "two_banks": 7904
+            }
+          }
+        }
+      ]
+    }
+  }
+}

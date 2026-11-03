@@ -1,4 +1,4 @@
-"""Plot native DQ partitions against the frozen xinyao_1101 Full DQ reference.
+"""Plot native DQ partitions against the frozen xinyao_1102 single-bank reference.
 
 Optional plotting dependency: matplotlib (the simulation itself needs PyYAML).
 """
@@ -10,7 +10,7 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('run', type=Path)
-    parser.add_argument('--baseline', type=Path, default=Path(__file__).resolve().parents[2]/'reference/baseline-xinyao_1101.json')
+    parser.add_argument('--baseline', type=Path, default=Path(__file__).resolve().parents[2]/'reference/baseline-xinyao_1102.json')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     import matplotlib
@@ -27,8 +27,9 @@ def main():
         'axes.spines.top': False, 'axes.spines.right': False})
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
     fig.subplots_adjust(left=.16, right=.95, top=.76, bottom=.22, wspace=.15)
-    max_wall = max(s['stage_us'] for s in report['stages'].values())
-    for ax, title, rows in zip(axes, ['xinyao_1101 | Full DQ', 'xinyao_1102 | Two-slot bank staging'],
+    max_wall = max([s['stage_us'] for s in report['stages'].values()] +
+                   [baseline['cases'][case]['latency_us'] for case in report['primary_cases']])
+    for ax, title, rows in zip(axes, ['xinyao_1102 | One staging bank', 'xinyao_1103 | Two staging banks'],
             [[baseline['stage_channel_partitions'][case][0] for case in report['primary_cases']],
              [report['stages'][case]['channels'][0] for case in report['primary_cases']]]):
         for y, row in enumerate(rows):

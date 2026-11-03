@@ -117,6 +117,18 @@ class IndependentAddressTests(unittest.TestCase):
                     self.assertEqual(manifest["buffers"]["gemv_total_bytes_per_bank"], 1024)
                     self.assertEqual(manifest["buffers"]["separate_rank_MAC_input_bytes"], 0)
 
+    def test_all_two_bank_cases_match_independent_geometry(self):
+        with tempfile.TemporaryDirectory() as root:
+            for case in workload.CASES:
+                with self.subTest(case=case):
+                    trace = Path(root) / f"{case}.trace"
+                    workload.generate(trace, case, staging_banks=2)
+                    records = trace_records(trace)
+                    audit_trace(records, case, staging_banks=2)
+                    stores = [e for e in records if e["operation"] == "ST" and decode(e["address"])[4] >= 256]
+                    self.assertEqual({decode(e["address"])[2:4] for e in stores}, {(0, 0), (1, 0)})
+                    self.assertLessEqual(max(decode(e["address"])[4] for e in stores), 287)
+
     def test_correlated_trace_and_native_address_error_fails_independent_oracle(self):
         with tempfile.TemporaryDirectory() as root:
             trace = Path(root) / "v.trace"

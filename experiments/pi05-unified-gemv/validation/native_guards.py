@@ -37,6 +37,12 @@ CASES = {
     "Stage_wrong_token_rows": "staging token rows do not match operator",
     "Stage_two_slot_Down_batch": None,
     "Stage_three_fragments_overflow": "staging overwrite before full consumption",
+    "Stage_two_bank_Down_batch": None,
+    "Stage_two_bank_same_BG_source": "staging requires rank1 BG0/BG1 bank0",
+    "Stage_two_bank_unreserved_source": "staging requires rank1 BG0/BG1 bank0",
+    "Stage_two_bank_missing_write": "staging seal requires every declared input write",
+    "Stage_two_bank_wrong_weight_fragment": "staging source/weight fragment mismatch",
+    "Stage_two_bank_bank_capacity": "staging source bank capacity exceeded",
 }
 
 
@@ -50,7 +56,26 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
-    if name.startswith("Stage_"):
+    if name.startswith("Stage_two_bank_"):
+        base = 524288
+        payload = 131072 if name == "Stage_two_bank_bank_capacity" else 1024
+        lines = [f"PIM_STAGE_BEGIN {address(base)} {payload} 16"]
+        lines += [f"ST {address(base+32*t, bank=bank)}" for t in range(16) for bank in (0, 4)
+                  if not (name == "Stage_two_bank_missing_write" and t == 15 and bank == 4)]
+        if name == "Stage_two_bank_bank_capacity":
+            lines.append(f"ST {address(base+65536)}")
+        lines.append(f"PIM_STAGE_SEAL {address(base)}")
+        if name in ("Stage_two_bank_same_BG_source", "Stage_two_bank_unreserved_source"):
+            bank = 1 if name == "Stage_two_bank_same_BG_source" else 8
+            lines.append(command("PIM_STAGE_FRAGMENT", base, 0, bank=bank))
+        else:
+            lines += [command("PIM_STAGE_FRAGMENT", base, slot, bank=4*slot) for slot in (0, 1)]
+            if name == "Stage_two_bank_wrong_weight_fragment":
+                lines.append(command("PIM_MAC_AB", 327680, 1))
+            else:
+                lines += [command("PIM_MAC_AB", 327680+(f*4+c)*32, f) for f in (0, 1) for c in range(4)]
+                lines += [command("PIM_GEMV_RELEASE", slot=slot) for slot in (0, 1)]
+    elif name.startswith("Stage_"):
         base = 524288
         payload = (1536 if name == "Stage_three_fragments_overflow" else
                    1024 if name in ("Stage_mixed_fragment_rows", "Stage_two_slot_Down_batch") else
@@ -137,7 +162,7 @@ def positive_audit(directory, name):
     from audit_native import read_csv, read_json, audit_slot_events
     events = [e for ch in range(16)
               for e in read_csv(directory / "simulation" / f"unified_gemv.csv.ch{ch}")]
-    if name in ("Stage_complete_Down_fragment", "Stage_two_slot_Down_batch"):
+    if name in ("Stage_complete_Down_fragment", "Stage_two_slot_Down_batch", "Stage_two_bank_Down_batch"):
         result = audit_slot_events(events, "down_gpu_input")
         native = [e for ch in range(16)
                   for e in read_csv(directory / "simulation" / f"timeline.csv.ch{ch}")]
@@ -146,9 +171,10 @@ def positive_audit(directory, name):
         ca = [e for ch in range(16)
               for e in read_csv(directory / "simulation" / f"rank_ca_events.csv.ch{ch}")]
         from collections import Counter
-        from staging_audit import audit_rank_ca
+        from staging_audit import audit_rank_ca, audit_write_timing, audit_source_identity, source_bank, offset
         from audit_native import trace_records
-        packets = 32 if name == "Stage_two_slot_Down_batch" else 16
+        two_bank = name == "Stage_two_bank_Down_batch"
+        packets = 16 if name == "Stage_complete_Down_fragment" else 32
         if Counter(e["operation"] for e in staged) != Counter(BEGIN=1, WR=packets, SEAL=1, LOCALRD=packets, BROADCAST=packets):
             raise AssertionError("Positive staging control lacks complete store/read/broadcast evidence")
         if any(e["command"] == "WRGB" for e in native):
@@ -161,7 +187,8 @@ def positive_audit(directory, name):
         gaps = [b["clock"]-a["clock"] for a, b in zip(reads, reads[1:])]
         if not gaps or min(gaps) >= timings["nCL"]+timings["nBL_min"]:
             raise AssertionError("Staged token reads incorrectly serialize on full column completion")
-        if min(gaps) < timings["nCCDL"]:
+        same_bank_gaps = [b["clock"]-a["clock"] for a, b in zip(reads, reads[1:]) if source_bank(a) == source_bank(b)]
+        if min(same_bank_gaps) < timings["nCCDL"]:
             raise AssertionError("Pipelined staged reads violate same-bank column issue spacing")
         result["rank_controller"] = audit_rank_ca(ca, native, staged,
             records=trace_records(directory / "guard.trace"))
@@ -170,9 +197,19 @@ def positive_audit(directory, name):
         result["different_tokens_pipeline_before_prior_read_completion"] = True
         result["external_input_bytes"] = packets*32
         result["internal_read_bytes"] = packets*32
-        if name == "Stage_two_slot_Down_batch":
+        if name in ("Stage_two_slot_Down_batch", "Stage_two_bank_Down_batch"):
             from paired_audit import audit_paired_staging
-            result["input_batching"] = audit_paired_staging(staged, native, events, "down_gpu_input", complete_workload=False)
+            result["input_batching"] = audit_paired_staging(staged, native, events, "down_gpu_input",
+                complete_workload=False, staging_banks=2 if two_bank else 1)
+        if two_bank:
+            expected = Counter((bank, 524288+32*t) for bank in (0, 4) for t in range(16))
+            for operation in ("WR", "LOCALRD", "BROADCAST"):
+                actual = Counter((source_bank(e), offset(e)) for e in staged if e["operation"] == operation)
+                if actual != expected:
+                    raise AssertionError("Two-bank control lacks independent exact source-bank coverage")
+            result["writer"] = audit_write_timing([e for e in staged if e["operation"] == "WR"], timings, 2, True)
+            result["source_fragment_to_MAC_weight_checks"] = audit_source_identity(staged, native, events,
+                "down_gpu_input", staging_banks=2)
         return result
     if name == "Down_GPU_input_complete":
         result = audit_slot_events(events, "down_gpu_input")
@@ -226,7 +263,8 @@ def worker(backend, output, name):
     is_down = name.startswith("Down_")
     staged = name.startswith("Stage_")
     config = config_for("chain" if is_q else "down_gpu_input" if is_down or staged else "v",
-                        refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged)
+                        refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged,
+                        staging_banks=2 if name.startswith("Stage_two_bank_") else 1)
     try:
         native = run_trace(config, trace, output / "simulation")
     except Exception as error:

@@ -73,6 +73,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_local_transfer_cycles": config.pim_local_transfer_cycles,
                     "pim_unified_gemv": config.pim_unified_gemv,
                     "pim_rank_staging": config.pim_rank_staging,
+                    "pim_staging_banks": config.pim_staging_banks,
                     "pim_rank_controller": config.pim_rank_controller,
                     "rank_ca_events_path": str(output / f"rank_ca_events.csv.ch{channel}") if config.pim_rank_controller else "",
                     "staging_events_path": str(output / f"staging_events.csv.ch{channel}") if config.pim_rank_staging else "",
@@ -457,6 +458,23 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             local_read_and_broadcast_extra_data_latency_ck=0,
             input_array_read_completion_ck=timings["nCL"]+timings["nBL_min"],
             shared_rank_commands=["single-bank array commands", "SRF multicast", "PIM compute"])
+    if config.pim_staging_banks == 2:
+        result["pim_model"]["buffer_transfer_basis"] = (
+            "GPU ordinary WR to two source banks; source-bank-to-SRF and rank SRF multicast via internal LOCALRD")
+        result["pim_model"]["transfer_scheduling"] = (
+            "GPU broadcast inputs first use ordinary WR to rank1 BG0/B0 and BG1/B0 DRAM; "
+            "all writes complete before local loads. Fragments alternate source banks; "
+            "local read/broadcast/compute commands share rank CA.")
+        result["pim_model"]["bank_input_multicast"]["source"] = "Dedicated rank1 BG0/B0 and BG1/B0 DRAM staging"
+        result["unified_gemv_model"].pop("input_staging_bank", None)
+        result["unified_gemv_model"].update(
+            external_multicast="Entire operator input written once per rank across two source banks before any SRF fill; no direct GPU-to-SRF multicast",
+            input_staging_banks=[0, 4], input_staging_capacity_bytes_per_bank=65536,
+            input_staging_layout="fragment f maps to BG=f%2, bank0, physical offset=524288+(floor(f/2)*rows+token)*32",
+            down_layout="Output partition:64 complete output features per rank,4 per bank; complete128KiB GPU Z staged across two64KiB source-bank regions")
+    else:
+        # Preserve result metadata of the single-bank and direct-input baselines.
+        result["config"].pop("pim_staging_banks", None)
     if not config.pim_rank_staging:
         result["config"].pop("pim_rank_staging", None)
     if not config.pim_rank_controller:

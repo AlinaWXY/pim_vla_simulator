@@ -1,8 +1,8 @@
 {
-  "unit_tests_passed": 56,
+  "unit_tests_passed": 65,
   "native_guards": {
     "passed": true,
-    "case_count": 27,
+    "case_count": 33,
     "subprocess_isolation": true,
     "native_cases": [
       {
@@ -383,10 +383,147 @@
         "exception_type": "RuntimeError",
         "message": "staging overwrite before full consumption",
         "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_Down_batch",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 434,
+        "native_audit": {
+          "events_checked": 42,
+          "operation_counts": {
+            "GEMV_MULTICAST": 32,
+            "GEMV_MAC": 8,
+            "GEMV_RELEASE": 2
+          },
+          "bank_generations_checked": 32,
+          "physical_bank_releases": 32,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "rank_controller": {
+            "command_intervals_checked": 160,
+            "rank_command_coverage": 110,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 2
+          },
+          "minimum_staged_read_issue_gap_ck": 2,
+          "staged_read_latency_ck": 25,
+          "different_tokens_pipeline_before_prior_read_completion": true,
+          "external_input_bytes": 1024,
+          "internal_read_bytes": 1024,
+          "input_batching": {
+            "input_batches_checked": 1,
+            "slots_per_bank": 2,
+            "slot_capacity_bytes": 512,
+            "physical_input_capacity_bytes_per_bank": 1024,
+            "maximum_prefetched_input_bytes_per_bank": 1024,
+            "both_slots_ready_before_first_MAC": true,
+            "no_weight_row_switch_between_paired_fills": true,
+            "MAC_counts_and_reduction_order_preserved": true,
+            "row_command_counts": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "input_batches": 1,
+                "source_ACT2": 0,
+                "weight_ACTAB": 1,
+                "refresh_commands": 0
+              }
+            ],
+            "first_two_batches_channel0": [
+              {
+                "channel": 0,
+                "stage_generation": 1,
+                "batch": 0,
+                "source_row": 256,
+                "input_begin_ck": 132,
+                "last_input_issue_ck": 254,
+                "both_slots_ready_ck": 279,
+                "first_MAC_ck": 305,
+                "last_MAC_complete_ck": 433,
+                "input_bytes_per_bank": 1024,
+                "refresh_commands_during_load": 0,
+                "source_banks": [
+                  0,
+                  4
+                ]
+              }
+            ]
+          },
+          "writer": {
+            "same_BG_spacing_checks": 30,
+            "cross_BG_short_WR_pairs": 30,
+            "minimum_cross_BG_WR_gap_ck": 2,
+            "issue_gap_histogram": [
+              {
+                "kind": "cross_BG",
+                "gap_ck": 2,
+                "count": 30
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 4,
+                "count": 1
+              }
+            ]
+          },
+          "source_fragment_to_MAC_weight_checks": 8
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_same_BG_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging requires rank1 BG0/BG1 bank0",
+        "exception_type": "RuntimeError",
+        "message": "staging requires rank1 BG0/BG1 bank0",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_unreserved_source",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging requires rank1 BG0/BG1 bank0",
+        "exception_type": "RuntimeError",
+        "message": "staging requires rank1 BG0/BG1 bank0",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_missing_write",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging seal requires every declared input write",
+        "exception_type": "RuntimeError",
+        "message": "staging seal requires every declared input write",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_wrong_weight_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging source/weight fragment mismatch",
+        "exception_type": "RuntimeError",
+        "message": "staging source/weight fragment mismatch",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_two_bank_bank_capacity",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging source bank capacity exceeded",
+        "exception_type": "RuntimeError",
+        "message": "staging source bank capacity exceeded",
+        "worker_returncode": 0
       }
     ]
   },
-  "native_job": 1902586,
+  "native_job": 1902629,
   "native_cases_passed": [
     "chain",
     "v",
@@ -404,5 +541,13 @@
     "native_cycles_bytes_traces_and_event_hashes_identical": true,
     "all_channel_partitions_identical": true,
     "stage_sum_us": 109.76288399999999
+  },
+  "single_bank_1102_regression": {
+    "status": "passed",
+    "baseline_commit": "cbc1ee4",
+    "cases": 7,
+    "native_cycles_bytes_traces_and_event_hashes_identical": true,
+    "all_channel_partitions_identical": true,
+    "stage_sum_us": 214.35457399999999
   }
 }

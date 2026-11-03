@@ -23,21 +23,59 @@
   },
   "staging": {
     "stages_checked": 32,
-    "source_bank": 0,
     "staging_base_row": 256,
     "external_input_bytes": 2621440,
     "internal_read_bytes": 2621440,
     "multicast_destination_bytes": 41943040,
     "write_completion_checks": 81920,
     "full_input_seal_checks": 32,
-    "source_read_to_precharge_checks": 6496,
+    "source_read_to_precharge_checks": 11856,
     "read_to_SRF_multicast_checks": 81920,
     "source_fragment_to_MAC_weight_checks": 49152,
     "external_input_bytes_unchanged": true,
     "internal_read_and_broadcast_use_DQ": false,
     "SRAM_bytes_per_bank": 1024,
     "maximum_DRAM_staging_bytes_per_rank": 131072,
-    "reserved_DRAM_staging_bytes_per_rank": 131072
+    "reserved_DRAM_staging_bytes_per_rank": 131072,
+    "source_banks": [
+      0,
+      4
+    ],
+    "source_bank_groups": [
+      0,
+      1
+    ],
+    "staging_banks": 2,
+    "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+    "maximum_DRAM_staging_bytes_per_source_bank": 65536,
+    "source_last_reserved_row": 287,
+    "writer": {
+      "same_BG_spacing_checks": 81856,
+      "cross_BG_short_WR_pairs": 80576,
+      "minimum_cross_BG_WR_gap_ck": 2,
+      "issue_gap_histogram": [
+        {
+          "kind": "cross_BG",
+          "gap_ck": 2,
+          "count": 80576
+        },
+        {
+          "kind": "cross_BG",
+          "gap_ck": 4,
+          "count": 672
+        },
+        {
+          "kind": "cross_BG",
+          "gap_ck": 79,
+          "count": 608
+        },
+        {
+          "kind": "cross_BG",
+          "gap_ck": 308,
+          "count": 32
+        }
+      ]
+    }
   },
   "input_batching": {
     "input_batches_checked": 2560,
@@ -53,257 +91,257 @@
         "channel": 0,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 0,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 1,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 1,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 2,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 2,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 3,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 3,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 4,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 4,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 5,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 5,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 6,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 6,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 7,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 7,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 8,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 8,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 9,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 9,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 10,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 10,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 11,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 11,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 12,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 12,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 13,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 13,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 14,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 14,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       },
       {
         "channel": 15,
         "stage_generation": 1,
         "input_batches": 32,
-        "source_ACT2": 33,
-        "weight_ACTAB": 41,
-        "refresh_commands": 10
+        "source_ACT2": 64,
+        "weight_ACTAB": 42,
+        "refresh_commands": 11
       },
       {
         "channel": 15,
         "stage_generation": 2,
         "input_batches": 128,
-        "source_ACT2": 132,
-        "weight_ACTAB": 132,
-        "refresh_commands": 11
+        "source_ACT2": 262,
+        "weight_ACTAB": 131,
+        "refresh_commands": 12
       }
     ],
     "first_two_batches_channel0": [
@@ -312,58 +350,74 @@
         "stage_generation": 1,
         "batch": 0,
         "source_row": 256,
-        "input_begin_ck": 5661,
-        "last_input_issue_ck": 5785,
-        "both_slots_ready_ck": 5810,
-        "first_MAC_ck": 5836,
-        "last_MAC_complete_ck": 6860,
+        "input_begin_ck": 2711,
+        "last_input_issue_ck": 2873,
+        "both_slots_ready_ck": 2898,
+        "first_MAC_ck": 2924,
+        "last_MAC_complete_ck": 3948,
         "input_bytes_per_bank": 1024,
-        "refresh_commands_during_load": 0
+        "refresh_commands_during_load": 0,
+        "source_banks": [
+          0,
+          4
+        ]
       },
       {
         "channel": 0,
         "stage_generation": 1,
         "batch": 1,
         "source_row": 256,
-        "input_begin_ck": 6892,
-        "last_input_issue_ck": 7016,
-        "both_slots_ready_ck": 7041,
-        "first_MAC_ck": 7067,
-        "last_MAC_complete_ck": 8091,
+        "input_begin_ck": 3980,
+        "last_input_issue_ck": 4142,
+        "both_slots_ready_ck": 4167,
+        "first_MAC_ck": 4417,
+        "last_MAC_complete_ck": 5441,
         "input_bytes_per_bank": 1024,
-        "refresh_commands_during_load": 0
+        "refresh_commands_during_load": 0,
+        "source_banks": [
+          0,
+          4
+        ]
       },
       {
         "channel": 0,
         "stage_generation": 2,
         "batch": 0,
         "source_row": 256,
-        "input_begin_ck": 74574,
-        "last_input_issue_ck": 74698,
-        "both_slots_ready_ck": 74723,
-        "first_MAC_ck": 74749,
-        "last_MAC_complete_ck": 74877,
+        "input_begin_ck": 61609,
+        "last_input_issue_ck": 61771,
+        "both_slots_ready_ck": 61796,
+        "first_MAC_ck": 61822,
+        "last_MAC_complete_ck": 61950,
         "input_bytes_per_bank": 1024,
-        "refresh_commands_during_load": 0
+        "refresh_commands_during_load": 0,
+        "source_banks": [
+          0,
+          4
+        ]
       },
       {
         "channel": 0,
         "stage_generation": 2,
         "batch": 1,
         "source_row": 256,
-        "input_begin_ck": 74909,
-        "last_input_issue_ck": 75304,
-        "both_slots_ready_ck": 75329,
-        "first_MAC_ck": 75355,
-        "last_MAC_complete_ck": 75483,
+        "input_begin_ck": 61982,
+        "last_input_issue_ck": 62144,
+        "both_slots_ready_ck": 62169,
+        "first_MAC_ck": 62195,
+        "last_MAC_complete_ck": 62323,
         "input_bytes_per_bank": 1024,
-        "refresh_commands_during_load": 1
+        "refresh_commands_during_load": 0,
+        "source_banks": [
+          0,
+          4
+        ]
       }
     ]
   },
   "rank_controller": {
-    "command_intervals_checked": 491872,
-    "rank_command_coverage": 331808,
+    "command_intervals_checked": 499184,
+    "rank_command_coverage": 339280,
     "global_CA_resources": 16,
     "rank_CA_resources": 32,
     "transfer_broadcast_compute_share_rank_CA": true,
@@ -381,7 +435,7 @@
     "GPU_Z_DRAM_store_bytes": 2097152,
     "separate_Z_staging_bytes": 131072,
     "direct_GPU_input": false,
-    "GPU_input_via_single_DRAM_bank": true,
+    "GPU_input_via_single_DRAM_bank": false,
     "extra_internal_broadcast_cycles": 0,
     "combined_GPU_export_before_Down_input": true,
     "GPU_GeLU_multiply_cast_latency_us": null,
@@ -392,83 +446,83 @@
   "serial_continuity": null,
   "native_external_DQ_bytes": 3211264,
   "native_command_counts": {
-    "ACT1": 4000,
-    "ACT2": 4000,
+    "ACT1": 6560,
+    "ACT2": 6560,
     "WR": 81920,
-    "PREpb": 3792,
-    "REFab": 928,
-    "PREab": 2976,
+    "PREpb": 6256,
     "LOCALRD": 81920,
+    "PREab": 2928,
     "ACTAB": 2768,
     "MACAB": 49152,
+    "REFab": 864,
     "RDRES": 18432
   },
-  "trace_sha256": "2e6e1352336db405369f26acd95b977c49bbe26766e331559b3a485f48d436e5",
+  "trace_sha256": "9f04ae919cf1929b505511cb0a03933daf685a71f7c337cb3f14e032e580779a",
   "native_sha256": {
-    "timeline.csv.ch0": "8b6a4a33350baf5f1976cb66b70709f40e5443ca77a5ab20d8d9224fa72cd274",
-    "timeline.csv.ch1": "1c9c4abc02358df9133c42de44ec6344ba9cf1ab3c0dd6053bfcd473dabe6e81",
-    "timeline.csv.ch2": "004ec3b371f01e78d70ff8724e14cf87b50615f6765b1f40d6a1fd71474f7371",
-    "timeline.csv.ch3": "b9826fcf2b178cda629c8e68c6afa51d4d94eeed1b321a78cadf147cacb5d537",
-    "timeline.csv.ch4": "d7e874f331f4fb61c58a8ceb5268769e34a4af72a4867057b1dae3310a98c8ad",
-    "timeline.csv.ch5": "8276e6cd2c76c660e3df41b288b9b8400a3406a20309f5fa415e26ec34018536",
-    "timeline.csv.ch6": "72ce4774d16dadd0869951db04edf675e7eee01c5ac9f3cea152db217a4796e3",
-    "timeline.csv.ch7": "30f408595a429270c8d72c3e655be7494608175f6406f2a2df8925e6659fd7b2",
-    "timeline.csv.ch8": "f85f6524b8ac6748e6419d32744fd0f04746a89b83f6da347029c68ed5937956",
-    "timeline.csv.ch9": "5f3448ed4c840bf85b4f673ffe63a0b447dd2e6030067e234a935227651c880b",
-    "timeline.csv.ch10": "3a8516db25c84c600cbabdc19fbf29a04c3cc5dd73535a2252ad05c1e0b90b27",
-    "timeline.csv.ch11": "378e7cdf26bb0b621045f377c23746c0a2df153f27a3173b9cd50a6bc9631118",
-    "timeline.csv.ch12": "7d1959a268e4cb0a622a42ebdb38b380b297fb9fd6b6ababf67ee205f312a374",
-    "timeline.csv.ch13": "9da9dc3638b55548c38a7d44a0088b9528fa3dce173ed3991cabf4bc5d419adb",
-    "timeline.csv.ch14": "0e77c8125adbf794c787f728bb265ada992da57c770d793ec09d6536de9563da",
-    "timeline.csv.ch15": "8d60bb7c012f77f9c5af456e7727ef408a3c1efa2b2bed03251395037f65d957",
-    "unified_gemv.csv.ch0": "9424dfee594b94ba48c7f48f69b9f20fc0936e75904eea8d660e0e3da57f6089",
-    "unified_gemv.csv.ch1": "e7764e3f6b1d65813cf57f84683ca66adfa595dea2a90219d333caf266c01d61",
-    "unified_gemv.csv.ch2": "094ead6e2b3663961bbff325656c8311dc3c67a3a3055b9d847e482efca55b02",
-    "unified_gemv.csv.ch3": "34f1d88949e6c16be0e1b3b8fc607a77239309b886ea21e72456c768ec698ef9",
-    "unified_gemv.csv.ch4": "4948dad8d0d4b7bba44a9feaa63fb2a63b84f77b9a22f25a0ca768e05d8269b8",
-    "unified_gemv.csv.ch5": "e5f549af37889a506cf4a85987d6c2e0e66bb1a4ca003dd59a66f0ba73e1bf28",
-    "unified_gemv.csv.ch6": "85553377e21b18db24489d9e6e71bc42a2ecc90a585759c8c73bba4dbc3b133b",
-    "unified_gemv.csv.ch7": "35739fbb117ae7ad8ae7ea6540a6b78b486a3401c533bddef45e9035b320d062",
-    "unified_gemv.csv.ch8": "f4a563787406f7e605b70397dfa5e688174625d720a7e5d31e49a74eeb07e825",
-    "unified_gemv.csv.ch9": "1dc6ba2fedcb7123aebd0bf1cc975a5a81b3eaba2d450a85189772238e925d83",
-    "unified_gemv.csv.ch10": "c66591024ab96a3951ad13d489851e67cdeedff9109ba5d417d1e3403a90c72c",
-    "unified_gemv.csv.ch11": "817b614b1f8f46388193d4b44ba1c09def5e5350a4bf276204e09633833f40b9",
-    "unified_gemv.csv.ch12": "1f034d59429e0ecb1f69304ffa22ec0fa6905429966a69462a30cc7d36c25f90",
-    "unified_gemv.csv.ch13": "140fc79cacf7f10b9b43bb11122cece6c2274da828f6fbb5bacb8d297bb28a0d",
-    "unified_gemv.csv.ch14": "1f4801be0234b04ae66789096a2cb87812401dc70752cd03bc9935e1e63c853a",
-    "unified_gemv.csv.ch15": "21fffbe40dcc3c8a31ef08d59e08013fbed6f02faa068e0a564105afeb851481",
-    "staging_events.csv.ch0": "16bb019d2de8827debc1ea7466d7616e5551b07ed2a8455f59e1adbe13db3d1a",
-    "staging_events.csv.ch1": "84421fa46339d99114458abd23e26604764d0b545ffc82ff7e1fe15d8ca794fa",
-    "staging_events.csv.ch2": "218a127710c9d8888ec5806634f1acb49822d66b5c41070d1ee5d734d1febb96",
-    "staging_events.csv.ch3": "e54519520d6a9e03edeac1a48e7ddc23cd96d8dd27908c20a6c0a4377de36601",
-    "staging_events.csv.ch4": "b3639e165af1f64551e744ef69e7029928025398cde6c9e5d2f8133c1c291431",
-    "staging_events.csv.ch5": "848bc2e8f1048a0fedf7b1b1a1ad38490f7bc313c1dcfa29ceee67f412187c55",
-    "staging_events.csv.ch6": "922d317f6903e98ac539a3e379302748e8708301f3282d4102f36b23073895d8",
-    "staging_events.csv.ch7": "42fa9bf7b0fb3b22dc7f73ed1f67fd1272eb458a7fda077e229fe37a5cf3eb28",
-    "staging_events.csv.ch8": "36583310c6fa5ab8684daee3ef677db2c4642496089e848ede6e00b93ad7d133",
-    "staging_events.csv.ch9": "ecfbd5ab47584431b71a2aedb48806ec687f3df78a61d186ce3f8067034118fd",
-    "staging_events.csv.ch10": "dbbfa5854f94c08e8f4ab66b1122c3a72153893086fba8767e34b515f41dc56f",
-    "staging_events.csv.ch11": "7322ce16583e5d031186799e077c42e84f24ea680304effa495404a2924b1fc9",
-    "staging_events.csv.ch12": "c1b54948b17d8f4ae9bc532025f02dc6b1f62b55ad00db76eb61fbe0f3972cb4",
-    "staging_events.csv.ch13": "4e08c2bb06a7bf4a2cf2d07f356a4eda76e760ec2e8279236b11ede3f43b0ed9",
-    "staging_events.csv.ch14": "4a530e448e56976334a36f9275c44f0fbf3436d70076d2ede7422422a40b24ef",
-    "staging_events.csv.ch15": "a237e30408694dfd4d5340d7460668b55f005e171d2e39326556da71c35b3cc8",
-    "rank_ca_events.csv.ch0": "15ddd893f7edec6c6d7f9a562a5fb415e2ca143221581025484c6e54bdc9fe03",
-    "rank_ca_events.csv.ch1": "f58e37815cc8d18c11f6288de9f1ee02155cc933227eacf7f8e01be3e779ae51",
-    "rank_ca_events.csv.ch2": "57556fc532a1f24e63dd9d011ca1ad6206a765e7aeee4e6b06ee4231fedc2387",
-    "rank_ca_events.csv.ch3": "0d90a618508989ae84025db44416498b1b282e933fad62ee0e492dd80314aed7",
-    "rank_ca_events.csv.ch4": "096313262d05c81c1de08b903a71bdf2980392e29b9a62e052c2d9fa1382793e",
-    "rank_ca_events.csv.ch5": "91b7c926362f1b93e5d0bca0614594299caacd2b93c9ea60247a8ef7de8bd05c",
-    "rank_ca_events.csv.ch6": "50abc4f7effbc15b1184c849bbccb1b59e206286a1c4d046ffa8b91965dd46dd",
-    "rank_ca_events.csv.ch7": "0c8f20412285ee9b6f48754b3f0342e6c9a0638767751f1aa6b20722b12e3af1",
-    "rank_ca_events.csv.ch8": "f8e8fdd95e21fe39bd516ab010df130eac4330df49d8977ce94a16917efd7972",
-    "rank_ca_events.csv.ch9": "37742395a3dd13f9852dc36f75538069b391a9caa8787fd98c5a0e927f988bf2",
-    "rank_ca_events.csv.ch10": "1794e82999d251c0adf3d61c554c9a6ce1b6b3920259ce9a37c2434e0e67db97",
-    "rank_ca_events.csv.ch11": "8dc3ab1a19a70f4a06ffe6f60c3c763374de489f84a592664a033e5473a1e86e",
-    "rank_ca_events.csv.ch12": "c0c8f04c0c4090ae9367a0b2c9c2ed7319b767eafd20e5b79acff381171b9684",
-    "rank_ca_events.csv.ch13": "181ca67a18166e1477570ef89e070542d8a910163f9fab630a6fd79ecd6fbf33",
-    "rank_ca_events.csv.ch14": "8b353a92fbeb84005bd4e9953a593fe07ce5854df9d9b2cb550eb99a47a0177d",
-    "rank_ca_events.csv.ch15": "815df43b8decf7ac7a81e7ebd8199e74610005518d947b834cacdb9a0393b4d9",
+    "timeline.csv.ch0": "34423ffc8c0cb5f0453538b13d87acd6a6611fb904a9f7ba0e1f7e48d077d647",
+    "timeline.csv.ch1": "94c913643ae7e94f047e21d3f16a66a25bbc9c9d45c34d63216577694aba4ef5",
+    "timeline.csv.ch2": "bc31c6fe6d56a4b954a3043150d3f9a1e4776763ae60d675a4b16bf41c3c9af0",
+    "timeline.csv.ch3": "142777e269a82f58eb29e80281efeea0d60e199cd0f88498ba2c54a18e405773",
+    "timeline.csv.ch4": "0d1ad1076ac919124c579bd1f80a5c25d2da1264699cd3a8dabc6362a464217c",
+    "timeline.csv.ch5": "a9770eba04e55230dba36d3257aeb3fb08d0bdc292854cc04885ccc58cb2196b",
+    "timeline.csv.ch6": "6ddcf5aec378d75d763c77dac43f8d81018893c1f1182a5737806f879e21d048",
+    "timeline.csv.ch7": "2ca11b7a366c9867f1d5e808d8982ac6e2ef6888851a47a6f687d558cffc0802",
+    "timeline.csv.ch8": "d64bd79310bb82d0075ef3245dc68a72c03afd35c906ff8883def719216a8063",
+    "timeline.csv.ch9": "2dcc6cfdfd0e0307580302ac48f0245ab55d3d1d49f394109802f37084d9dc03",
+    "timeline.csv.ch10": "3bc7aa7b12f37b747d80bcf0578d271ced3f229976178364f400f0160570fcc8",
+    "timeline.csv.ch11": "b167200c38db8b193af26c72f0385e8fb367e395c51e7fbcf3b8e1c3895abea9",
+    "timeline.csv.ch12": "59fa6a658893257ad61e2fc0047f86262ca08e128b419823e90465412a499b68",
+    "timeline.csv.ch13": "9db84eb535f2b96993598852b87676ec0c5f1156aed54b8371bf18eded0afd43",
+    "timeline.csv.ch14": "0980a27b6f70f9014633b158e84ab9fe652a302ebf088bf1bf360eaa27b6c57a",
+    "timeline.csv.ch15": "29d33f6d7c8997d61a1d108bacfe09d2cfc7bebf0096a8db0c54e24f726b1a51",
+    "unified_gemv.csv.ch0": "27b64a13bacf7e17742cd84606796bd90828eea9048df079f3f0dbee2ed5408d",
+    "unified_gemv.csv.ch1": "34fb28c28af42293b47fc5316883bbb15074196d96b30fdf9708df1702246105",
+    "unified_gemv.csv.ch2": "b82e86e3426ff452f2b474b6ca2b86f45082c6689f641bfeb6f8e996e9559f7c",
+    "unified_gemv.csv.ch3": "834bde1955ff7e854236722e5eee4470cf876004a75e843fb00697475d4e1918",
+    "unified_gemv.csv.ch4": "1c5eaf62b525798f42044cb651c1a8b319af7267b8c5e41bd91eecade4890d5e",
+    "unified_gemv.csv.ch5": "45405e37102e6b96382d02679347dc3313acedd3daa5d2fc0cd36bad200b4f11",
+    "unified_gemv.csv.ch6": "c6b80179b0c3d74ff095585e8025d24c22a8f906b84ec996e469697ea32e3a9d",
+    "unified_gemv.csv.ch7": "6baee748bc6a7a0a3c522c36e8167778d743a0e709610ac99544a9aaf1b5422e",
+    "unified_gemv.csv.ch8": "eda1d9baeb345d136904ad54eef90653e667a0132d875da844c6b0a20bcfbc79",
+    "unified_gemv.csv.ch9": "ef30cebfd22a4c4c1c74adee102990abb2f0044bf824102eadfe3753533bddec",
+    "unified_gemv.csv.ch10": "deea1d38970534f3aa6786e2455f245ada769365e7e56c50da0c78634a683c4a",
+    "unified_gemv.csv.ch11": "f0cd5b4ad8db3fa339f2cf0e06bdda7298c5051b7606cf9353105ba3a7b2076b",
+    "unified_gemv.csv.ch12": "ff2822fb3b7d76e879fdaec507b4fb543b217c2ff1f121a356d2cab31e509637",
+    "unified_gemv.csv.ch13": "9071186c5ed0497c0b9f26ec69d798185e111df80a335dba654242e386072e25",
+    "unified_gemv.csv.ch14": "818ddadc11af0e46a174fa61572b9cc85d3fc5aeac353742c3008d49cee4846b",
+    "unified_gemv.csv.ch15": "89bfff3beba0a34d6db2578771319ee22ae4e98600f431096fccd74119dd5c9b",
+    "staging_events.csv.ch0": "44d821600072a441ebe2b47ad4f76baa1de46f0064508db29ebaec2ca65a6d51",
+    "staging_events.csv.ch1": "71a25293803c0dce61956258deb942b3369c6226349b9cfe72400984209585fd",
+    "staging_events.csv.ch2": "86f811220165613f26b237ea53e716bc71c3c3bb83e52382cf2b2cd5ef311b96",
+    "staging_events.csv.ch3": "9b51cb739ff34547ead79f98def410a41eaa90a17733ecb22aa8af60190e2875",
+    "staging_events.csv.ch4": "8ea6f242dcc13097cae505e89e0d654b7747ac1afb0af819dfb1d684ff41629f",
+    "staging_events.csv.ch5": "ac968a105ec628f631be46fd2e1b35ec2dbe75f7e837489ecac67214d85913d2",
+    "staging_events.csv.ch6": "5659b62c6bbf95091c182f2a924e229573101e1027ff52e9b553445420a607ef",
+    "staging_events.csv.ch7": "dafb7170a81f5c4303c7555a0fe5763c9692ebb0defbba4000020826178a28b3",
+    "staging_events.csv.ch8": "46ee905f8d69f35daffff5805d53a43da48f52859d55ad105c2393a88c87e2e5",
+    "staging_events.csv.ch9": "4a52b9490daeff5edc657b36ca94c76573cb0ddba70b5050267a0c2fcd2cfc97",
+    "staging_events.csv.ch10": "65feffe6a3be4c240b177c2e14dd922e06ccbec8e418d2ba7f6c041e522b7021",
+    "staging_events.csv.ch11": "fa8e5d31b6c1d0518ae65b5300bf6906fac4849935f8fec0c86a241f106c4cc7",
+    "staging_events.csv.ch12": "e4010894205c07410502e2416f2a7ae1e98e1e85db569531a54285fa074069a2",
+    "staging_events.csv.ch13": "ccf1e6cc2ad89ccef1e55865c821e424087703ad5d9c501041311797346c5f07",
+    "staging_events.csv.ch14": "aa094f061bc9784ca07d0d72aa208621633ca343944c68b6bf42212ed99721a6",
+    "staging_events.csv.ch15": "58c324011547029d92cd128ccf1db0af272b984dcb7ec58a5ee09670547237a4",
+    "rank_ca_events.csv.ch0": "f41b5cea6490f1530c4543085a2bd20bad047e78be7c4226354d92ac5da92188",
+    "rank_ca_events.csv.ch1": "00a8f35268fc4492e6ab8bd589844eccbc3c75559de979c246220b6a4dfe3957",
+    "rank_ca_events.csv.ch2": "4e0766b4fd9ca1c96413d906c259d3da92bcba17196183d22b56b32afa47e276",
+    "rank_ca_events.csv.ch3": "019c06e872ddc6b26171cf6a2033ee36ffdae37c508afaaa83a797bbbff76c6f",
+    "rank_ca_events.csv.ch4": "526dc68900b72fb4cf7e68a8dafb30cabfd276c62b6cd0dc573d498610fa3327",
+    "rank_ca_events.csv.ch5": "a88fcfcdebc024f7834197bf886abf21fe15c48b0b53b66c241a1fbf2e07a6ce",
+    "rank_ca_events.csv.ch6": "5609747b97a0c852cfd71e644b83e4ddd2319cef3db14097cbb4186d848383bc",
+    "rank_ca_events.csv.ch7": "af040cdaaaea34f38cc69393f992a32ded7bc097755a36b127e70f7716bd498b",
+    "rank_ca_events.csv.ch8": "73a7cdb05cdf346bf4874759bc66e6184ef146031082de9d695380617932fba5",
+    "rank_ca_events.csv.ch9": "fa051ab60679744db071ab7cade91a4aa35632e5901d858323f2ff02e9ed4e62",
+    "rank_ca_events.csv.ch10": "8b3a017c1f8e7db7771803646fd1fb83ca621b591fc3cf0a7d39186f0116390a",
+    "rank_ca_events.csv.ch11": "7ff9d9e5f4e55ffa0cb1d020422334c07cab1c5ff9d425296699cd68cae55cdf",
+    "rank_ca_events.csv.ch12": "dbaee12dbee1a95c859049ece0a8dddfa1f095203a17d511b86e016287aa7a3c",
+    "rank_ca_events.csv.ch13": "1f1a116ee59219c87216b9d09d29c49272821b1099b92a2499b31f7d0a99e79e",
+    "rank_ca_events.csv.ch14": "4f922e0076cdc095b963091ec7b9b68afe88a342598556f866f3d3caaedf7f65",
+    "rank_ca_events.csv.ch15": "525690056a713e2d847f46c2cacda6bb7022a764b8b58548b90888ba24a2ef43",
     "bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
     "bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
     "bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",

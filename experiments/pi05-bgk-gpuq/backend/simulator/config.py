@@ -30,6 +30,7 @@ class MemoryConfig:
     pim_local_transfer_cycles: int = 2
     pim_unified_gemv: bool = False
     pim_rank_staging: bool = False
+    pim_staging_banks: int = 1
     pim_rank_controller: bool = False
     gemv_port_cycles: int = 2
     pim_rank_rope: bool = False
@@ -42,6 +43,10 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
+        if type(self.pim_staging_banks) is not int or self.pim_staging_banks not in (1, 2):
+            raise ValueError("pim_staging_banks must be 1 or 2")
+        if self.pim_staging_banks != 1 and not self.pim_rank_staging:
+            raise ValueError("Multiple staging banks require rank staging")
         if type(self.pim_rank_staging) is not bool or type(self.pim_rank_controller) is not bool:
             raise ValueError("Rank staging/controller flags must be boolean")
         if self.pim_rank_controller and not self.pim_unified_gemv:

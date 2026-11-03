@@ -1,4 +1,4 @@
-"""Independent reconstruction of the one-bank input store and both CA buses.
+"""Independent reconstruction of the striped input store and both CA buses.
 
 The fixed geometry below is intentionally independent of the trace generator.
 Only issue/completion evidence from the compiled controller is accepted.
@@ -36,11 +36,60 @@ def offset(event):
     return event["Row"]*2048+event["Column"]*32
 
 
-def source_key(event):
-    return event["Channel"], event["stage_generation"], offset(event)
+def source_bank(event):
+    return event.get("BankGroup", 0)*4+event.get("Bank", 0)
 
 
-def audit_source_identity(staging, native, gemv, case):
+def source_location(fragment, token, rows, staging_banks=1):
+    """Fixed independent layout; do not import the producer's address helper."""
+    require(staging_banks in (1, 2), "Only one or two staging banks are supported")
+    return 4*(fragment%staging_banks), BASE+((fragment//staging_banks)*rows+token)*32
+
+
+def source_packet(event, rows, staging_banks=1):
+    require(staging_banks in (1, 2), "Only one or two staging banks are supported")
+    bank = source_bank(event)
+    require(event.get("Bank", 0) == 0 and bank in ((0,) if staging_banks == 1 else (0, 4)),
+            "Invalid staging source bank")
+    require(offset(event) >= BASE, "Staging source below reserved storage")
+    fragment, token = divmod((offset(event)-BASE)//32, rows)
+    return (fragment*staging_banks+bank//4)*rows+token
+
+
+def audit_write_timing(writes, timings, staging_banks=1, require_short_gap=False):
+    """Measure actual issued WR cadence, independently of trace declarations."""
+    groups, gaps = defaultdict(list), Counter()
+    same_bg_checks = 0
+    short, long = timings["nCCDS_WR"], timings["nCCDL_WR"]
+    for e in writes:
+        groups[e["Channel"], e["stage_generation"]].append(e)
+    for entries in groups.values():
+        ordered = sorted(entries, key=lambda e: e["clock"])
+        previous_bg = {}
+        group_short_pairs = 0
+        for e in ordered:
+            bg = e["BankGroup"]
+            if bg in previous_bg:
+                require(e["clock"]-previous_bg[bg] >= long, "Staging WR violates same-BG write spacing")
+                same_bg_checks += 1
+            previous_bg[bg] = e["clock"]
+        for a, b in zip(ordered, ordered[1:]):
+            gap = b["clock"]-a["clock"]
+            cross = a["BankGroup"] != b["BankGroup"]
+            require(gap >= (short if cross else long), "Staging WR violates column issue spacing")
+            gaps[("cross_BG" if cross else "same_BG", gap)] += 1
+            group_short_pairs += cross and gap == short
+        if require_short_gap:
+            require(group_short_pairs > 0, "Two-bank writer never issues cross-BG WR at nCCDS_WR in an input stage")
+    short_count = gaps["cross_BG", short]
+    if require_short_gap:
+        require(staging_banks == 2 and short_count > 0, "Two-bank writer never issues cross-BG WR at nCCDS_WR")
+    return dict(same_BG_spacing_checks=same_bg_checks, cross_BG_short_WR_pairs=short_count,
+        minimum_cross_BG_WR_gap_ck=min((gap for (kind, gap) in gaps if kind == "cross_BG"), default=None),
+        issue_gap_histogram=[dict(kind=kind, gap_ck=gap, count=count) for (kind, gap), count in sorted(gaps.items())])
+
+
+def audit_source_identity(staging, native, gemv, case, staging_banks=1):
     """A correct address multiset alone cannot detect permuted input fragments."""
     source_at_fill = {}
     for e in staging:
@@ -48,7 +97,7 @@ def audit_source_identity(staging, native, gemv, case):
             continue
         generation = e["stage_generation"]
         rows = INPUTS[case][generation-1][1]
-        fragment, token = divmod((offset(e)-BASE)//32, rows)
+        fragment, token = divmod(source_packet(e, rows, staging_banks), rows)
         key = e["Channel"], e["ready_at"], e["buffer"], 1 << token
         require(key not in source_at_fill, "Ambiguous simultaneous staging source fills")
         source_at_fill[key] = generation, fragment
@@ -83,15 +132,17 @@ def audit_source_identity(staging, native, gemv, case):
     return checks
 
 
-def audit_staging(events, native, gemv, case, timings):
+def audit_staging(events, native, gemv, case, timings, staging_banks=1):
     """Prove full array residency before the first bank->SRF transfer."""
     require(case in INPUTS, "Unknown staging geometry")
     groups = defaultdict(list)
     allowed = {"BEGIN", "WR", "SEAL", "LOCALRD", "BROADCAST"}
     for event in events:
         require(event["operation"] in allowed, "Unknown staging operation")
-        require(event["Rank"] == 1 and event["BankGroup"] == event["Bank"] == 0,
-                "Input staging must use exactly physical rank1/BG0/bank0")
+        allowed_banks = (0,) if staging_banks == 1 or event["operation"] in ("BEGIN", "SEAL") else (0, 4)
+        require(event["Rank"] == 1 and event["Bank"] == 0 and source_bank(event) in allowed_banks,
+                "Input staging must use exactly physical rank1/BG0/bank0" if staging_banks == 1 else
+                "Input staging must use rank1/BG0/bank0 and BG1/bank0, with canonical BEGIN/SEAL")
         require(0 <= event["Channel"] < 16 and event["ready_at"] >= event["clock"],
                 "Invalid staging event channel/duration")
         groups[event["Channel"], event["stage_generation"]].append(event)
@@ -111,9 +162,10 @@ def audit_staging(events, native, gemv, case, timings):
         require(offset(begin) == offset(seal) == BASE, "Staging base differs from reserved row256")
         require(begin["bytes"] == payload, "Staging declaration differs from independent tensor size")
         require(begin["clock"] >= last_complete[ch], "Staging storage overwritten before earlier reads complete")
-        expected_offsets = Counter(range(BASE, BASE+payload, 32))
+        expected_offsets = Counter(source_location(f, t, rows, staging_banks)
+                                   for f in range(payload//(rows*32)) for t in range(rows))
         for op in ("WR", "LOCALRD", "BROADCAST"):
-            require(Counter(offset(e) for e in by_op[op]) == expected_offsets,
+            require(Counter((source_bank(e), offset(e)) for e in by_op[op]) == expected_offsets,
                     f"Staging {op} lacks exact full-input source-address coverage")
             require(all(e["bytes"] == 32 for e in by_op[op]), "Staging packet is not32 bytes")
         require(all(e["clock"] >= begin["clock"] for e in by_op["WR"]),
@@ -122,15 +174,15 @@ def audit_staging(events, native, gemv, case, timings):
                 "Staging write completion omits CWL/burst/write recovery")
         require(seal["clock"] >= max(e["ready_at"] for e in by_op["WR"]),
                 "Input sealed before every DRAM write completes")
-        read_map = {offset(e): e for e in by_op["LOCALRD"]}
+        read_map = {(source_bank(e), offset(e)): e for e in by_op["LOCALRD"]}
         for e in by_op["LOCALRD"]:
             require(e["clock"] >= seal["ready_at"], "Local input read precedes full-input seal")
             require(e["ready_at"] == e["clock"]+read_latency,
                     "Internal input read must charge DRAM column read latency")
-            packet = (offset(e)-BASE)//32
+            packet = source_packet(e, rows, staging_banks)
             require(e["buffer"] == (packet//rows)%2, "Staged read targets the wrong shared slot")
         for e in by_op["BROADCAST"]:
-            source = read_map[offset(e)]
+            source = read_map[source_bank(e), offset(e)]
             require(e["clock"] >= source["clock"], "Broadcast dispatch precedes its source read")
             require(e["ready_at"] == max(source["ready_at"], e["clock"]),
                     "Broadcast must finish within the read latency unless CA dispatch is delayed")
@@ -157,15 +209,16 @@ def audit_staging(events, native, gemv, case, timings):
     for e in sorted(native, key=lambda item: (item["Channel"], item["clock"])):
         ch = e["Channel"]
         if e["command"] == "LOCALRD" and offset(e) >= BASE:
-            last_source_read[ch] = e["clock"]
+            last_source_read[ch, source_bank(e)] = e["clock"]
         affects_rank = e["Rank"] in (-1, 1)
-        affects_source = (e["command"] == "PREab" or
-            e["command"] == "PREpb" and e["BankGroup"] in (-1, 0) and e["Bank"] in (-1, 0) or
-            e["command"] == "PREHB" and e["BankGroup"] in (-1, 0))
-        if affects_rank and affects_source and ch in last_source_read:
-            require(e["clock"]-last_source_read[ch] >= timings["nRTP"],
-                    "Source-bank precharge violates internal read-to-precharge timing")
-            precharge_checks += 1
+        for bank in ((0,) if staging_banks == 1 else (0, 4)):
+            affects_source = (e["command"] == "PREab" or
+                e["command"] == "PREpb" and e["BankGroup"] in (-1, bank//4) and e["Bank"] in (-1, 0) or
+                e["command"] == "PREHB" and e["BankGroup"] in (-1, bank//4))
+            if affects_rank and affects_source and (ch, bank) in last_source_read:
+                require(e["clock"]-last_source_read[ch, bank] >= timings["nRTP"],
+                        "Source-bank precharge violates internal read-to-precharge timing")
+                precharge_checks += 1
     expected_fills = Counter()
     for e in broadcasts:
         rows = INPUTS[case][e["stage_generation"]-1][1]
@@ -174,8 +227,8 @@ def audit_staging(events, native, gemv, case, timings):
     actual_fills = Counter((e["Channel"], e["clock"], e["buffer"], e["token_mask"], e["lane_mask"], e["bank_mask"])
                           for e in gemv if e["operation"] == "GEMV_MULTICAST")
     require(actual_fills == expected_fills, "Staged source reads do not exactly cover physical SRF multicast completions")
-    identity_checks = audit_source_identity(events, native, gemv, case)
-    return dict(stages_checked=len(groups), source_bank=0, staging_base_row=256,
+    identity_checks = audit_source_identity(events, native, gemv, case, staging_banks)
+    result = dict(stages_checked=len(groups), source_bank=0, staging_base_row=256,
         external_input_bytes=input_bytes, internal_read_bytes=len(reads)*32,
         multicast_destination_bytes=len(broadcasts)*32*16,
         write_completion_checks=len(writes), full_input_seal_checks=len(groups),
@@ -186,6 +239,14 @@ def audit_staging(events, native, gemv, case, timings):
         SRAM_bytes_per_bank=1024,
         maximum_DRAM_staging_bytes_per_rank=max(size for size, _ in INPUTS[case]),
         reserved_DRAM_staging_bytes_per_rank=131072)
+    if staging_banks == 2:
+        result.update(source_banks=[0, 4], source_bank_groups=[0, 1], staging_banks=2,
+            reserved_DRAM_staging_bytes_per_source_bank=65536,
+            maximum_DRAM_staging_bytes_per_source_bank=max(size for size, _ in INPUTS[case])//2,
+            source_last_reserved_row=287,
+            writer=audit_write_timing(writes, timings, staging_banks, require_short_gap=True))
+        result.pop("source_bank")
+    return result
 
 
 def audit_rank_ca(events, native, staging, controller_events=(), records=None, gemv_events=()):

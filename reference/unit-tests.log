@@ -2,6 +2,7 @@ test_down_output_shards_cover_complete_outputs_and_bank_weight_space (test_audit
 test_every_rank_receives_the_full_GPU_Z_once_without_transpose (test_audit.FFNLayoutTests.test_every_rank_receives_the_full_GPU_Z_once_without_transpose) ... ok
 test_gate_up_pair_ownership_matches_for_GPU_elementwise_product (test_audit.FFNLayoutTests.test_gate_up_pair_ownership_matches_for_GPU_elementwise_product) ... ok
 test_all_cases_match_independent_geometry (test_audit.IndependentAddressTests.test_all_cases_match_independent_geometry) ... ok
+test_all_two_bank_cases_match_independent_geometry (test_audit.IndependentAddressTests.test_all_two_bank_cases_match_independent_geometry) ... ok
 test_correlated_trace_and_native_address_error_fails_independent_oracle (test_audit.IndependentAddressTests.test_correlated_trace_and_native_address_error_fails_independent_oracle) ... ok
 test_non_H16_geometry_is_rejected (test_audit.IndependentAddressTests.test_non_H16_geometry_is_rejected) ... ok
 test_same_address_multiset_with_wrong_reduction_order_is_rejected (test_audit.IndependentAddressTests.test_same_address_multiset_with_wrong_reduction_order_is_rejected) ... ok
@@ -54,8 +55,16 @@ test_second_source_bank_is_rejected (test_staging_audit.StagingAuditTests.test_s
 test_source_precharge_must_respect_read_recovery (test_staging_audit.StagingAuditTests.test_source_precharge_must_respect_read_recovery) ... ok
 test_valid_full_payload_once_in_one_bank (test_staging_audit.StagingAuditTests.test_valid_full_payload_once_in_one_bank) ... ok
 test_write_cannot_omit_array_recovery_time (test_staging_audit.StagingAuditTests.test_write_cannot_omit_array_recovery_time) ... ok
+test_matching_wrong_native_and_staging_bank_still_fails_fixed_oracle (test_two_bank_audit.TwoBankAuditTests.test_matching_wrong_native_and_staging_bank_still_fails_fixed_oracle) ... ok
+test_missing_second_bank_packet_cannot_alias_first_bank_address (test_two_bank_audit.TwoBankAuditTests.test_missing_second_bank_packet_cannot_alias_first_bank_address) ... ok
+test_pair_uses_two_source_banks_at_same_row_before_weight_activation (test_two_bank_audit.TwoBankAuditTests.test_pair_uses_two_source_banks_at_same_row_before_weight_activation) ... ok
+test_precharge_of_second_source_bank_checks_its_own_last_read (test_two_bank_audit.TwoBankAuditTests.test_precharge_of_second_source_bank_checks_its_own_last_read) ... ok
+test_same_offset_in_other_bank_is_a_different_reduction_fragment (test_two_bank_audit.TwoBankAuditTests.test_same_offset_in_other_bank_is_a_different_reduction_fragment) ... ok
+test_trace_write_permutation_fails_even_with_identical_address_counts (test_two_bank_audit.TwoBankAuditTests.test_trace_write_permutation_fails_even_with_identical_address_counts) ... ok
+test_two_bank_storage_preserves_full_input_and_physical_SRF_capacity (test_two_bank_audit.TwoBankAuditTests.test_two_bank_storage_preserves_full_input_and_physical_SRF_capacity) ... ok
+test_writer_short_gap_cannot_be_claimed_for_same_BG_or_serialized_WR (test_two_bank_audit.TwoBankAuditTests.test_writer_short_gap_cannot_be_claimed_for_same_BG_or_serialized_WR) ... ok
 
 ----------------------------------------------------------------------
-Ran 56 tests in 10.122s
+Ran 65 tests in 16.458s
 
 OK

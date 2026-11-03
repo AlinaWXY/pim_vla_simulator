@@ -82,10 +82,10 @@ def trace_key(record):
     return (*key, record["stage_bytes"], record["stage_rows"]) if record["operation"] == "PIM_STAGE_BEGIN" else key
 
 
-def expected_addresses(case, rank_staging=True):
+def expected_addresses(case, rank_staging=True, staging_banks=1):
     """Derive every request independently from matrix dimensions and ownership."""
     if case == "serial_layer_control":
-        return sum((expected_addresses(stage, rank_staging=rank_staging) for stage in
+        return sum((expected_addresses(stage, rank_staging=rank_staging, staging_banks=staging_banks) for stage in
                     ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")), Counter())
     expected = Counter()
     def add(op, ch, offset, slot=-1, bank=0):
@@ -98,12 +98,13 @@ def expected_addresses(case, rank_staging=True):
         for ch in range(16):
             if rank_staging:
                 expected["PIM_STAGE_BEGIN", ch, 1, 0, 0, 256, 0, -1, fragments*rows*32, rows] += 1
-                for packet in range(fragments*rows):
-                    add("ST", ch, 524288+packet*32)
+                for f in range(fragments):
+                    for t in range(rows):
+                        add("ST", ch, 524288+((f//staging_banks)*rows+t)*32, bank=4*(f%staging_banks))
                 add("PIM_STAGE_SEAL", ch, 524288)
             for f in range(fragments):
                 if rank_staging:
-                    add("PIM_STAGE_FRAGMENT", ch, 524288+f*rows*32, f%2)
+                    add("PIM_STAGE_FRAGMENT", ch, 524288+(f//staging_banks)*rows*32, f%2, 4*(f%staging_banks))
                 else:
                     for q in range(rows):
                         add("PIM_WR_GB", ch, q*32, f%2)
@@ -332,7 +333,7 @@ def audit_external_fills(native, gemv_events, burst_cycles=2, rank_staging=False
     return sum(actual.values())
 
 
-def audit_ffn_streams(native, gemv_events, case, staging_events=None):
+def audit_ffn_streams(native, gemv_events, case, staging_events=None, staging_banks=1):
     """Reconstruct GPU-fed FFN traffic independently from native events."""
     require(not any(e["operation"] == "GEMV_Z_SCATTER" for e in gemv_events),
             "GPU-fed FFN must not use a local Z scatter path")
@@ -406,7 +407,8 @@ def audit_ffn_streams(native, gemv_events, case, staging_events=None):
         Z_local_write_bytes=0,
         GPU_Z_DRAM_store_bytes=len(fill_sets["down"])*32 if staging_events is not None else 0,
         separate_Z_staging_bytes=131072 if staging_events is not None and down else 0,
-        direct_GPU_input=staging_events is None, GPU_input_via_single_DRAM_bank=staging_events is not None,
+        direct_GPU_input=staging_events is None,
+        GPU_input_via_single_DRAM_bank=staging_events is not None and staging_banks == 1,
         extra_internal_broadcast_cycles=0,
         combined_GPU_export_before_Down_input=gu and down,
         GPU_GeLU_multiply_cast_latency_us=None,
@@ -414,15 +416,15 @@ def audit_ffn_streams(native, gemv_events, case, staging_events=None):
         Down_cross_rank_reduction_required=False)
 
 
-def audit_trace(records, case):
+def audit_trace(records, case, staging_banks=1):
     actual = Counter(trace_key(e) for e in records if e["operation"] not in ("BARRIER", "WAIT"))
-    expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records))
+    expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records), staging_banks=staging_banks)
     require(actual == expected, "Trace differs from independent matrix/address oracle: "+counter_difference(expected, actual))
     require(not any(e["operation"] == "WAIT" for e in records), "Artificial legacy completion WAIT retained")
     require(not any(e["operation"].startswith("PIM_Z_") for e in records), "GPU-fed FFN must not use local Z commands")
     if any(e["operation"] == "PIM_STAGE_BEGIN" for e in records):
         from paired_audit import audit_paired_trace
-        audit_paired_trace(records, case)
+        audit_paired_trace(records, case, staging_banks)
     return len(records)
 
 
@@ -479,7 +481,8 @@ def audit_run(directory):
     require(native_result["config"]["pim_ffn_dram"] is False,
             "GPU-fed experiment must disable the old local Z/nonlinear path")
     records = trace_records(directory / "workload.trace")
-    audit_trace(records, case)
+    staging_banks = native_result["config"].get("pim_staging_banks", 1)
+    audit_trace(records, case, staging_banks)
     simulation = directory / "simulation"
     timelines = [simulation / f"timeline.csv.ch{ch}" for ch in range(16)]
     gemv_files = [simulation / f"unified_gemv.csv.ch{ch}" for ch in range(16)]
@@ -522,13 +525,13 @@ def audit_run(directory):
     staging, ca, batching = None, None, None
     if rank_staging:
         from staging_audit import audit_staging, audit_rank_ca
-        staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"])
+        staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"], staging_banks)
         from paired_audit import audit_paired_staging
-        batching = audit_paired_staging(stage_events, native, events, case)
+        batching = audit_paired_staging(stage_events, native, events, case, staging_banks=staging_banks)
         require(Counter(e["operation"] for e in controller_events)["PIM_ROPE_EXEC"] == counts["PIM_ROPE_EXEC"],
                 "RoPE execute event count differs from trace")
         ca = audit_rank_ca(ca_events, native, stage_events, controller_events, records, events)
-    ffn = audit_ffn_streams(native, events, case, stage_events) if case not in ("chain", "v", "pv") else None
+    ffn = audit_ffn_streams(native, events, case, stage_events, staging_banks) if case not in ("chain", "v", "pv") else None
     continuity = audit_serial_continuity(manifest, native_result, simulation, native, events) if case == "serial_layer_control" else None
     return dict(status="passed", case=case, horizon=16,
         trace_and_native_address_coverage=True, native_data_commands_checked=issued_count,
