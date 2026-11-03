@@ -33,6 +33,9 @@ def verify(root):
         audit = read(root / case / "native-audit.json")
         if audit["status"] != "passed" or audit["native_sha256"] != reference["native_sha256"]:
             raise AssertionError((case, "native command/GEMV CSV audit or hash mismatch"))
+        if expected.get("staging_split_activation_deadline_enforced"):
+            if audit.get("staging_split_activation", {}).get("status") != "passed":
+                raise AssertionError((case, "staging ACT1/ACT2 protocol audit did not pass"))
     fields = ("stage_us", "modelled_dq_occupied_us", "modelled_dq_idle_us",
               "tail_clear_complete_zero_external_phase_us",
               "modelled_dq_idle_outside_tail_clear_work_us",

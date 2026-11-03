@@ -76,6 +76,10 @@ MAC fragment 2p+1
 - 两个源 bank 都保留权重计算职责。暂存行和权重行共享各 bank 的真实行状态，加载与全 bank MAC 之间的 PRE/ACT 成本继续计入，不假设独立 array 读端口。
 - 输入覆盖、写完成、SRF 消费完成、slot 复用和 release 检查继续生效。Q/K projection 为 8 CK/MAC，其余 GEMV 为 16 CK/MAC，QKT 和 RoPE 参数保持基线。
 
+内部 staging 的 ACT1/ACT2 与 ordinary RD/WR 使用相同的 `can_start_act1` lookahead：只有下一命令周期的 ACT2 已满足 DRAM 与 rank CA 约束，才发出 ACT1。fragment 请求保留在 PIM FIFO 队首，并登记普通控制器的 bank owner 与 `ACT1_clock+nAAD` deadline。已开始的激活优先完成 ACT2，刷新和其它命令随后恢复调度；ACT2 仍占 rank CA，并保留 nRP、nRFC、nRCD 等时序。超时或 owner 丢失会报错。SRF、数据布局、预取批量及所有时序参数均不改变。
+
+本项修正仅覆盖 `PIM_STAGE_LOAD/FRAGMENT` 的内部激活。完整命令日志另行审计其它内部路径，并显式报告尚未修正的非 staging 协议问题；staging 专项通过不能等同于所有内部路径均满足 ACT 协议。
+
 总 controller 对输入装载继续采用 256/512 B fragment 描述符；内部 PRE/ACT、LOCALRD、BCAST 由 rank controller 发出。新默认模式还把 projection spill、RoPE COEF/LOAD/EXEC/STORE、Q_EXPORT/Q_REMOTE 合为 rank 级描述符，每个描述符占用 1 CK global CA，再在 rank controller 内展开 16 个原有单 bank 操作。所有实际 bank 操作继续竞争 rank CA；原有 `PIM_MAC_AB`、`PIM_MAC_QK` 等 GEMV 计算指令不改变。
 
 描述符地址使用目标 channel 的 canonical rank1/BG0/bank0；row/column 和可选 slot 对所有 16 个 bank 相同。只有全部子操作完成，父描述符才回调完成。native 仅在现有 PIM 请求队列有 16 个空位时接收描述符，保留有限队列背压；这些控制队列不是额外的数据 SRAM。语法与展开规则见 [ROPE-CONTROL.md](ROPE-CONTROL.md)。
@@ -105,6 +109,8 @@ QKT 的 Q 按 feature 定向送到对应 bank，并非同一数据对所有 bank
 `--staging-banks 1` 本身仅选择单 bank 数据布局，仍默认使用新的派发模式。其布局为 rank1/BG0/bank0、128 KiB、row256–319，offset 为 `524288 + (f*R+t)*32`。需要旧时序对照时必须同时指定 `--legacy-rank-dispatch`。两个 bank 模式均保留两 slot 成对装载/计算顺序。
 
 legacy 模式的 7 cases × 单/双 bank × staged/direct 共 28 个生成 trace 已与 `786842a` 逐字节核对一致。新描述符展开成原 16 个 bank 操作后，同样逐字节恢复原指令、地址、slot 与次序，DQ 总量一致；native 时序与日志是否一致由实际重新运行的验证结果判定，不由 trace 一致直接推断。
+
+ACT1/ACT2 修正对所有启用 staging 的模式生效，包括 `--legacy-rank-dispatch`；该开关只恢复旧派发方式，不能撤销 deadline 修正。需要逐字节重现修正前时序或日志时，应检出 `14fb3bf`（或对应历史 commit），并使用该版本的独立 backend。历史 verify_legacy/单 bank 脚本的旧事件哈希不作为本版修正后的验收标准。
 
 `--direct-input-baseline` 无论附带哪种 bank/派发选项都使用旧控制路径。有效 `staging_banks=0` 表示没有暂存，backend 的兼容参数为 1。summary、manifest、provenance 记录有效 bank 数及两个派发开关。
 

@@ -1,3 +1,22 @@
+test_PRE_cannot_cancel_pending_target (test_act2_audit.SplitActivationTests.test_PRE_cannot_cancel_pending_target) ... ok
+test_channel_protocol_is_shared_by_both_ranks (test_act2_audit.SplitActivationTests.test_channel_protocol_is_shared_by_both_ranks) ... ok
+test_deadline_is_inclusive_and_gap_is_measured_per_physical_bank (test_act2_audit.SplitActivationTests.test_deadline_is_inclusive_and_gap_is_measured_per_physical_bank) ... ok
+test_half_precharge_selects_two_bank_groups (test_act2_audit.SplitActivationTests.test_half_precharge_selects_two_bank_groups) ... ok
+test_independent_channels_can_activate_and_refresh_concurrently (test_act2_audit.SplitActivationTests.test_independent_channels_can_activate_and_refresh_concurrently) ... ok
+test_late_ACT2_is_rejected_even_when_row_is_correct (test_act2_audit.SplitActivationTests.test_late_ACT2_is_rejected_even_when_row_is_correct) ... ok
+test_new_staging_ACT1_cannot_ignore_other_pending_owner (test_act2_audit.SplitActivationTests.test_new_staging_ACT1_cannot_ignore_other_pending_owner) ... ok
+test_orphan_and_wrong_row_ACT2_are_rejected (test_act2_audit.SplitActivationTests.test_orphan_and_wrong_row_ACT2_are_rejected) ... ok
+test_other_rank_ACT2_cannot_claim_this_rank_owner (test_act2_audit.SplitActivationTests.test_other_rank_ACT2_cannot_claim_this_rank_owner) ... ok
+test_pending_activation_must_not_survive_end_of_log (test_act2_audit.SplitActivationTests.test_pending_activation_must_not_survive_end_of_log) ... ok
+test_read_and_precharge_other_banks_are_legal (test_act2_audit.SplitActivationTests.test_read_and_precharge_other_banks_are_legal) ... ok
+test_read_of_activating_bank_is_not_a_substitute_for_ACT2 (test_act2_audit.SplitActivationTests.test_read_of_activating_bank_is_not_a_substitute_for_ACT2) ... ok
+test_refresh_cannot_cancel_pending_target (test_act2_audit.SplitActivationTests.test_refresh_cannot_cancel_pending_target) ... ok
+test_report_only_retains_failure_and_bounds_examples (test_act2_audit.SplitActivationTests.test_report_only_retains_failure_and_bounds_examples) ... ok
+test_scoped_audit_catches_other_path_interrupting_staging (test_act2_audit.SplitActivationTests.test_scoped_audit_catches_other_path_interrupting_staging) ... ok
+test_scoped_pass_does_not_hide_other_internal_failure (test_act2_audit.SplitActivationTests.test_scoped_pass_does_not_hide_other_internal_failure) ... ok
+test_source_region_write_is_ordinary_and_unknown_source_is_not_assumed_internal (test_act2_audit.SplitActivationTests.test_source_region_write_is_ordinary_and_unknown_source_is_not_assumed_internal) ... ok
+test_wildcard_rank_precharge_does_not_hide_cancellation (test_act2_audit.SplitActivationTests.test_wildcard_rank_precharge_does_not_hide_cancellation) ... ok
+test_zero_cycle_ACT2_is_not_a_valid_pair (test_act2_audit.SplitActivationTests.test_zero_cycle_ACT2_is_not_a_valid_pair) ... ok
 test_down_output_shards_cover_complete_outputs_and_bank_weight_space (test_audit.FFNLayoutTests.test_down_output_shards_cover_complete_outputs_and_bank_weight_space) ... ok
 test_every_rank_receives_the_full_GPU_Z_once_without_transpose (test_audit.FFNLayoutTests.test_every_rank_receives_the_full_GPU_Z_once_without_transpose) ... ok
 test_gate_up_pair_ownership_matches_for_GPU_elementwise_product (test_audit.FFNLayoutTests.test_gate_up_pair_ownership_matches_for_GPU_elementwise_product) ... ok
@@ -81,6 +100,6 @@ test_two_bank_storage_preserves_full_input_and_physical_SRF_capacity (test_two_b
 test_writer_short_gap_cannot_be_claimed_for_same_BG_or_serialized_WR (test_two_bank_audit.TwoBankAuditTests.test_writer_short_gap_cannot_be_claimed_for_same_BG_or_serialized_WR) ... ok
 
 ----------------------------------------------------------------------
-Ran 81 tests in 24.704s
+Ran 100 tests in 26.016s
 
 OK

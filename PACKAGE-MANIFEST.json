@@ -2,17 +2,17 @@
   "schema_version": 3,
   "native_build": "minimal",
   "dataflow": "Independent bounded channel ingress -> external CA descriptor dispatch -> rank micro-operations; two-bank whole-input staging",
-  "parent_revision": "786842a801f527f9cebceedcad4349624800f684",
+  "parent_revision": "14fb3bfea5998012fc1be518821cf356edb6979e",
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
   "branch": "xinyao_1103",
-  "file_count_excluding_manifest": 568,
-  "bytes_excluding_manifest": 9354437,
-  "MiB": 8.921086311340332,
+  "file_count_excluding_manifest": 598,
+  "bytes_excluding_manifest": 12796560,
+  "MiB": 12.203750610351562,
   "categories": {
     "publication": {
-      "files": 16,
-      "bytes": 71289,
-      "MiB": 0.06798648834228516
+      "files": 19,
+      "bytes": 106766,
+      "MiB": 0.10181999206542969
     },
     "backend_metadata": {
       "files": 2,
@@ -21,8 +21,8 @@
     },
     "native_metadata": {
       "files": 177,
-      "bytes": 637627,
-      "MiB": 0.608088493347168
+      "bytes": 639706,
+      "MiB": 0.6100711822509766
     },
     "vendored": {
       "files": 209,
@@ -41,13 +41,13 @@
     },
     "experiment": {
       "files": 22,
-      "bytes": 263386,
-      "MiB": 0.25118446350097656
+      "bytes": 265074,
+      "MiB": 0.2527942657470703
     },
     "reference_evidence": {
-      "files": 51,
-      "bytes": 5761914,
-      "MiB": 5.494989395141602
+      "files": 78,
+      "bytes": 9164793,
+      "MiB": 8.740227699279785
     }
   },
   "compiled_native_translation_units": [
@@ -76,7 +76,7 @@
     "controller/plugin/impl/cmd_trace_recorder.cpp"
   ],
   "clean_native_build_passed": true,
-  "final_native_job": 1902756,
+  "final_native_job": 1902838,
   "source_snapshot": "reference/publish-byte-verification.json",
   "exclusions": [
     "Precompiled native libraries",
@@ -84,8 +84,8 @@
     "Raw generated results"
   ],
   "preservation": {
-    "legacy_1103_commit": "786842a",
-    "legacy_1103_regression": "reference/legacy-dispatch-verification.json",
+    "before_commit": "14fb3bf",
+    "before_regression": "reference/act2-deadline/before-regression.json",
     "direct_baseline_commit": "4073452",
     "direct_baseline_regression": "reference/baseline-verification.json"
   },
@@ -107,8 +107,13 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 7540,
-      "output_sha256": "ca47fcdfb4272995328466869b6c61d2a30ece137c046482cc08881de1addc5a"
+      "output_bytes": 5920,
+      "output_sha256": "6a82c18ff9fe4ed108426de89188267db5f400a3103209b7e9f1153c615a3474"
+    },
+    "compare_act2_deadline.py": {
+      "category": "publication",
+      "output_bytes": 18482,
+      "output_sha256": "95618732272fe8f22596bfd9278e8bbdf4caea46996144d37ee80ac547d32673"
     },
     "compare_rank_dispatch.py": {
       "category": "publication",
@@ -1837,8 +1842,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp": {
       "category": "native_metadata",
-      "output_bytes": 47706,
-      "output_sha256": "49564c080e4b4c68c7263848c3558f30ae94aa547ef86939de73d7757d98f61c"
+      "output_bytes": 48083,
+      "output_sha256": "75954e0c82e431c110f8aa8abf613f72c91356abce9b111903afe0f1073f01f4"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr6_controller.cpp": {
       "category": "native_metadata",
@@ -1872,8 +1877,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 13138,
-      "output_sha256": "33a453f147e6f4b122c3deaccb689fb9a283c92afa9a98baf91062912ab317e1"
+      "output_bytes": 14840,
+      "output_sha256": "7de2b7f4b579ca58b2f8a05f1f74f277d419ef4007db447e152dd721617a9a45"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc": {
       "category": "native_metadata",
@@ -2527,8 +2532,8 @@
     },
     "experiments/pi05-unified-gemv/MODEL.md": {
       "category": "experiment",
-      "output_bytes": 10602,
-      "output_sha256": "39aecc94136c6e3190d20d1bb065fd0d50342a29a408f89d70407c7c53ce9278"
+      "output_bytes": 11791,
+      "output_sha256": "30c6b5d257eb817f9e718450c22100a2693a6f76d9d3e9c5f2f28b4e601dffb7"
     },
     "experiments/pi05-unified-gemv/ROPE-CONTROL.md": {
       "category": "experiment",
@@ -2590,10 +2595,15 @@
       "output_bytes": 10568,
       "output_sha256": "f78ba3a8ef8a3a487480828e07ebade3705d8eae0ffcde82188e5d615e5f4d1f"
     },
+    "experiments/pi05-unified-gemv/validation/act2_audit.py": {
+      "category": "publication",
+      "output_bytes": 11623,
+      "output_sha256": "b2d39bd63085b00f9ad85d03e63041aa74f0dc0f177f88767c3a18a0f67ad95a"
+    },
     "experiments/pi05-unified-gemv/validation/audit_native.py": {
       "category": "experiment",
-      "output_bytes": 33254,
-      "output_sha256": "bf62c52bea173dd9429ecb29b288ae360d98d1b9e498362beda3864d178eee18"
+      "output_bytes": 33753,
+      "output_sha256": "bfdab44e4f9c230157665de5e3ffd88a2599de31aae121eaf0c0401eb117a76a"
     },
     "experiments/pi05-unified-gemv/validation/dispatch_audit.py": {
       "category": "publication",
@@ -2614,6 +2624,11 @@
       "category": "experiment",
       "output_bytes": 17717,
       "output_sha256": "76ee72ed465076e0871920a9d5695572a7d09a08102ea6567deacac00db69ad9"
+    },
+    "experiments/pi05-unified-gemv/validation/test_act2_audit.py": {
+      "category": "publication",
+      "output_bytes": 6743,
+      "output_sha256": "6c51c52531b50005bc8345ec305e802dbf792eafa517477b1392cbf8e1e71e40"
     },
     "experiments/pi05-unified-gemv/validation/test_audit.py": {
       "category": "experiment",
@@ -2648,12 +2663,52 @@
     "reference/CHANNEL-ANALYSIS.md": {
       "category": "reference_evidence",
       "output_bytes": 2878,
-      "output_sha256": "ee44d0627ee70de7252c968fcac96af0f27914ff30c8ca2cb9c26942a089ff4a"
+      "output_sha256": "5695426cb4ca925de762fee2e01d54e2062a8ce5b6ae071ef4c5aab75402a405"
     },
     "reference/RANK-DISPATCH-COMPARISON.md": {
       "category": "reference_evidence",
       "output_bytes": 1548,
       "output_sha256": "d91d6391c2d86e1685eb2534642dd048d9737c117ef2ba9209c295ed4be43b6e"
+    },
+    "reference/act2-deadline/act2-deadline-comparison.json": {
+      "category": "reference_evidence",
+      "output_bytes": 993861,
+      "output_sha256": "9aecc63b2c5da17b4d2f52d827f62de0120d952a02923233753e7943e2602c28"
+    },
+    "reference/act2-deadline/before-regression.json": {
+      "category": "reference_evidence",
+      "output_bytes": 248,
+      "output_sha256": "7f2d311448d9e3c7ca8776be6d60fa9f5e9c93a21095070a3b5baa8104e6f845"
+    },
+    "reference/act2-deadline/case-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 804,
+      "output_sha256": "a0e182054ee4e8ffd056a8f81545066ff7677687ebdc0b6eb066b54fc7e46712"
+    },
+    "reference/act2-deadline/channel-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 175819,
+      "output_sha256": "e6ec1e7476b9c71c5626162b1a1505961cfc3bc7cc0f17912848c761eb952ccd"
+    },
+    "reference/act2-deadline/native-command-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 6664,
+      "output_sha256": "24689fc5c8cae1e6670217ae015ed7d2b010d6ea4336feb55493be5eaf420fd0"
+    },
+    "reference/act2-deadline/phase-kind-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 236856,
+      "output_sha256": "c6bbccd0a56d8e84262b3dd7e8685c2cccf8c38ea85487aaeab09022077274e9"
+    },
+    "reference/act2-deadline/phase-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 16145,
+      "output_sha256": "e973abe212f930b6d6c058548344a0b65cfb13d63f7df724594590cc8fcb6c48"
+    },
+    "reference/act2-deadline/protocol-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 62074,
+      "output_sha256": "99362cf2bcfea909e41efae552b80a4b163626d225b2b5559545fb86b530b140"
     },
     "reference/baseline-verification.json": {
       "category": "reference_evidence",
@@ -2677,8 +2732,8 @@
     },
     "reference/chain/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 17748,
-      "output_sha256": "c277d7d7995ae0bfe5bc93a5f644c4f263111127305efcacd7bf29eebb6ea08f"
+      "output_bytes": 24233,
+      "output_sha256": "1e4de292a4b74f1e8d8e0319f312d15fe46f1cbcb2d7b606940434013741b3e7"
     },
     "reference/chain/summary.json": {
       "category": "reference_evidence",
@@ -2687,8 +2742,8 @@
     },
     "reference/channel-analysis.json": {
       "category": "reference_evidence",
-      "output_bytes": 1052665,
-      "output_sha256": "839cdfe82d41617326023353e73fa437c52b57786069e96fd0445de96434cc8e"
+      "output_bytes": 1052937,
+      "output_sha256": "ee3600a1adfcc402114e346dc7ddbf18f7be00ec2525b1156d1cd1cffdd0599a"
     },
     "reference/channel-breakdown.png": {
       "category": "reference_evidence",
@@ -2697,8 +2752,8 @@
     },
     "reference/channel-command-bus.csv": {
       "category": "reference_evidence",
-      "output_bytes": 6656,
-      "output_sha256": "da95783c2dadc3380391f3cf3152a7d25388276ca17fbf591e71f84d906b86dd"
+      "output_bytes": 6512,
+      "output_sha256": "b3aab6a994f751cfcec3c895b89a85b7033d6eb77a872396c81bc2f0acc9c80d"
     },
     "reference/channel-partitions.csv": {
       "category": "reference_evidence",
@@ -2717,8 +2772,8 @@
     },
     "reference/combined_timing_chain/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 22326,
-      "output_sha256": "a2810e930392bc2d442a83970edbeb6291fa52a0ac3d8757d2a3c5da93445253"
+      "output_bytes": 24160,
+      "output_sha256": "496ad7ff12f3ae6c69b8f787d16b8757d95e75ec29f5c07fc46d493dba7149ca"
     },
     "reference/combined_timing_chain/summary.json": {
       "category": "reference_evidence",
@@ -2727,8 +2782,8 @@
     },
     "reference/down_gpu_input/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 18471,
-      "output_sha256": "82a392530174ebd168bca5cc7116629feb84c18dd65ba736bbe17e64e1f0072f"
+      "output_bytes": 20305,
+      "output_sha256": "48abd22562cd2c253585db84b335d0fc2298dc4b5fb117be8e93c665aee15a75"
     },
     "reference/down_gpu_input/summary.json": {
       "category": "reference_evidence",
@@ -2737,13 +2792,13 @@
     },
     "reference/expected.json": {
       "category": "reference_evidence",
-      "output_bytes": 539817,
-      "output_sha256": "f20d4c4380fd4f7d2cd64b382af8ecc8743cffa5637dc9ef3595809ed24c374e"
+      "output_bytes": 540143,
+      "output_sha256": "2b3305952d4b1db713bf870aff99ac541406d44b2309b33431202ea4a2060784"
     },
     "reference/gate_up_gpu/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 18287,
-      "output_sha256": "8adf7b8144ffb6fba7b44128544eaaa683eca4e6c5bf38f9b6c87c8a6cc8a80e"
+      "output_bytes": 20118,
+      "output_sha256": "633e0bc629b0cc11ab9c50ddd204ac83b372d257a28bea2d7fc31c3b488a30ed"
     },
     "reference/gate_up_gpu/summary.json": {
       "category": "reference_evidence",
@@ -2769,6 +2824,101 @@
       "category": "reference_evidence",
       "output_bytes": 210,
       "output_sha256": "7e4dcaa21e183b51497b1c96622d905297ba91971f05b623de1426c260a718c9"
+    },
+    "reference/previous-act2-deadline/chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 17748,
+      "output_sha256": "c277d7d7995ae0bfe5bc93a5f644c4f263111127305efcacd7bf29eebb6ea08f"
+    },
+    "reference/previous-act2-deadline/chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 4402,
+      "output_sha256": "2796c7799e61c21bcc80d5a08c06fbc2d7b9cf1c6bcdd56bcf80f60749b1a478"
+    },
+    "reference/previous-act2-deadline/channel-analysis.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1052665,
+      "output_sha256": "839cdfe82d41617326023353e73fa437c52b57786069e96fd0445de96434cc8e"
+    },
+    "reference/previous-act2-deadline/combined_timing_chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 22326,
+      "output_sha256": "a2810e930392bc2d442a83970edbeb6291fa52a0ac3d8757d2a3c5da93445253"
+    },
+    "reference/previous-act2-deadline/combined_timing_chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1821,
+      "output_sha256": "d30ec8fe0f92bcae463a40436329a0a7265398c818eaafe61305681d4ef8ae85"
+    },
+    "reference/previous-act2-deadline/down_gpu_input/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 18471,
+      "output_sha256": "82a392530174ebd168bca5cc7116629feb84c18dd65ba736bbe17e64e1f0072f"
+    },
+    "reference/previous-act2-deadline/down_gpu_input/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1559,
+      "output_sha256": "056537c09e8b8e7ac8728417fab05371102586e3d8e5a4f70d4b9e6ea0304f25"
+    },
+    "reference/previous-act2-deadline/expected.json": {
+      "category": "reference_evidence",
+      "output_bytes": 539817,
+      "output_sha256": "f20d4c4380fd4f7d2cd64b382af8ecc8743cffa5637dc9ef3595809ed24c374e"
+    },
+    "reference/previous-act2-deadline/gate_up_gpu/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 18287,
+      "output_sha256": "8adf7b8144ffb6fba7b44128544eaaa683eca4e6c5bf38f9b6c87c8a6cc8a80e"
+    },
+    "reference/previous-act2-deadline/gate_up_gpu/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1562,
+      "output_sha256": "bba0619cf19535c03e16731289492973928430eee3eaaedbc0ad3681a8ac9d07"
+    },
+    "reference/previous-act2-deadline/provenance.json": {
+      "category": "reference_evidence",
+      "output_bytes": 60385,
+      "output_sha256": "9afcabfe780f1c55d7d2dcc478a4e1920fbadbc73421b9a0bd704eb6c9f56e25"
+    },
+    "reference/previous-act2-deadline/pv/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 17579,
+      "output_sha256": "5568dbb7aed03d1abd5349e658b92ee778643c94127f05cd3fb083b10f241271"
+    },
+    "reference/previous-act2-deadline/pv/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1527,
+      "output_sha256": "e517f8797b5fa22cbf67afc4f6756a5571857b8e44ade0b9002b083919e7fb35"
+    },
+    "reference/previous-act2-deadline/serial_layer_control/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 34357,
+      "output_sha256": "bc2c3ecd9a7f82d9850ca6349ffe4e64002df9f797c7d76ea18efb94bbba15fd"
+    },
+    "reference/previous-act2-deadline/serial_layer_control/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5777,
+      "output_sha256": "c667ecd404ba470b848b873c9d48a6eb67489e625f51aa0320fc05693d8e709d"
+    },
+    "reference/previous-act2-deadline/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 38819,
+      "output_sha256": "e885ae3ee49ae277a0adbc5da7f450a015604ef54d094d88efa08e0995855861"
+    },
+    "reference/previous-act2-deadline/v/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 17596,
+      "output_sha256": "170dfd914e0c125b6dc0a7c1633151960b8507b3e65d20361f5c1f5a89e4c0d7"
+    },
+    "reference/previous-act2-deadline/v/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1585,
+      "output_sha256": "842b7661257668392d8ee5698aab65f024a31ea3a4115b17c61b4a270a29cb97"
+    },
+    "reference/previous-act2-deadline/validation.json": {
+      "category": "reference_evidence",
+      "output_bytes": 29681,
+      "output_sha256": "a80d2d602a8a44f53045458c17f75f98a9726ad60911329531af8867bc02db0e"
     },
     "reference/previous-rank-dispatch/channel-analysis.json": {
       "category": "reference_evidence",
@@ -2807,18 +2957,18 @@
     },
     "reference/provenance.json": {
       "category": "reference_evidence",
-      "output_bytes": 60385,
-      "output_sha256": "9afcabfe780f1c55d7d2dcc478a4e1920fbadbc73421b9a0bd704eb6c9f56e25"
+      "output_bytes": 60756,
+      "output_sha256": "0b20f1ed2bf39e4ad23b302d528b395bf27a9c2a1cb0238d77d0f9bdf6da7c3a"
     },
     "reference/publish-byte-verification.json": {
       "category": "reference_evidence",
-      "output_bytes": 80198,
-      "output_sha256": "23b988b58d44b3a38d0df9fd3c8a281f1e5ef66655a8c416580afadb0fdeadce"
+      "output_bytes": 80457,
+      "output_sha256": "9d37c1a59cec08d9dd84b9888551f9a617f10804d24a3d5e5e73f4cecf5c9180"
     },
     "reference/pv/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 17579,
-      "output_sha256": "5568dbb7aed03d1abd5349e658b92ee778643c94127f05cd3fb083b10f241271"
+      "output_bytes": 19410,
+      "output_sha256": "3e9643d2cb353537068422ad5cb55287795cfe44603d58692da3d0eb0398a5b4"
     },
     "reference/pv/summary.json": {
       "category": "reference_evidence",
@@ -2852,8 +3002,8 @@
     },
     "reference/serial_layer_control/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 34357,
-      "output_sha256": "bc2c3ecd9a7f82d9850ca6349ffe4e64002df9f797c7d76ea18efb94bbba15fd"
+      "output_bytes": 40889,
+      "output_sha256": "057fafb24eeb14ca2547184a347289aab1938a205e77811d05960c95ea6ba9ce"
     },
     "reference/serial_layer_control/summary.json": {
       "category": "reference_evidence",
@@ -2882,13 +3032,13 @@
     },
     "reference/unit-tests.log": {
       "category": "reference_evidence",
-      "output_bytes": 12528,
-      "output_sha256": "056e8927f026b108754ea86da76dc2b3b0ad3575ddcd1276e832eabf60af33ef"
+      "output_bytes": 15401,
+      "output_sha256": "fcbfd65ba3fe5b49e4f464afcdb33f474acbc2df66b26703b2f1ad4d007e21e2"
     },
     "reference/v/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 17596,
-      "output_sha256": "170dfd914e0c125b6dc0a7c1633151960b8507b3e65d20361f5c1f5a89e4c0d7"
+      "output_bytes": 19467,
+      "output_sha256": "e03c0f61cf3cbeaa1d6777d61866224e00b219613a8f26760b715704661ee229"
     },
     "reference/v/summary.json": {
       "category": "reference_evidence",
@@ -2897,8 +3047,8 @@
     },
     "reference/validation.json": {
       "category": "reference_evidence",
-      "output_bytes": 29681,
-      "output_sha256": "a80d2d602a8a44f53045458c17f75f98a9726ad60911329531af8867bc02db0e"
+      "output_bytes": 27950,
+      "output_sha256": "2a8835a9a3915f58b226990398abf1c81f51fa42e1ea9ed2934456886201ca7f"
     },
     "requirements.txt": {
       "category": "publication",
@@ -2922,8 +3072,8 @@
     },
     "verify_reference.py": {
       "category": "publication",
-      "output_bytes": 3661,
-      "output_sha256": "80487dc6f75989ff0499f4993e4be8d26dfc63a7382d2a10fb3759c93406b4ab"
+      "output_bytes": 3910,
+      "output_sha256": "4d96071caaf74e7b2f554bbfd6a55d81432e563aa28717af450a8cf91f73a42f"
     },
     "verify_single_bank.py": {
       "category": "publication",
@@ -2935,5 +3085,7 @@
   "input_prefetch_slots": 2,
   "rank_descriptors": true,
   "channel_independent_dispatch": true,
-  "channel_queue_capacity": 32
+  "channel_queue_capacity": 32,
+  "staging_split_activation_deadline_enforced": true,
+  "whole_internal_ACT_protocol_compliant": false
 }

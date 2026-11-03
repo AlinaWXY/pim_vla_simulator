@@ -445,15 +445,17 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void tick() override {
-    if ((m_pim_buffer.size() && m_pim_buffer.begin()->type_id == Request::Type::PIM_MAC_HB) ||
-        (!m_pim_pending.empty() && m_pim_pending.front().type_id == Request::Type::PIM_MAC_HB)) {
+    if (!m_stage_act2_pending &&
+        ((m_pim_buffer.size() && m_pim_buffer.begin()->type_id == Request::Type::PIM_MAC_HB) ||
+         (!m_pim_pending.empty() && m_pim_pending.front().type_id == Request::Type::PIM_MAC_HB))) {
       LPDDR5Controller::tick();
       complete_pim();
       return;
     }
-    if (m_read_buffer.size() || m_write_buffer.size() || m_active_buffer.size() || m_activating_buffer.size() ||
+    if (!m_stage_act2_pending &&
+        (m_read_buffer.size() || m_write_buffer.size() || m_active_buffer.size() || m_activating_buffer.size() ||
         !m_pending.empty() || m_cas_issued || m_clk < m_normal_ready_at ||
-        (!m_pim_buffer.size() && m_pim_pending.empty())) {
+        (!m_pim_buffer.size() && m_pim_pending.empty()))) {
       LPDDR5Controller::tick();
       complete_pim();
       issue_local_ready();
@@ -470,11 +472,18 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
     // Weights are latched when MAC issues; refresh obeys the normal array
     // recovery rules. SRAM ownership is tracked independently below.
-    Candidate cand = pick_priority_if();
-    if (cand.valid) {
-      issue_standard_candidate(cand);
-    } else if (m_priority_buffer.size() == 0 && m_pim_buffer.size()) {
-      issue_pim_ready();
+    if(m_stage_act2_pending) {
+      // Finish an owned split activation before refresh/PRE or another PIM
+      // command can disturb it. The ACT2 still consumes the rank CA and must
+      // satisfy all ordinary DRAM timing constraints.
+      issue_stage_act2();
+    } else {
+      Candidate cand = pick_priority_if();
+      if (cand.valid) {
+        issue_standard_candidate(cand);
+      } else if (m_priority_buffer.size() == 0 && m_pim_buffer.size()) {
+        issue_pim_ready();
+      }
     }
     m_rowpolicy->post_schedule();
     for (auto* p : m_plugins) {
