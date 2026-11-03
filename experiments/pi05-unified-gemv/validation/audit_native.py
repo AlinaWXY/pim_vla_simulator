@@ -14,7 +14,7 @@ GEOMETRY = ("Channel", "Rank", "BankGroup", "Bank", "Row", "Column")
 NATIVE = dict(PIM_WR_GB="WRGB", PIM_MAC_AB="MACAB", PIM_RD_RES="RDRES",
     PIM_SPILL="LOCALWR", PIM_ROPE_COEF="LOCALRD", PIM_ROPE_LOAD="LOCALRD",
     PIM_ROPE_STORE="LOCALWR", PIM_Q_EXPORT="RD", PIM_Q_REMOTE="WRGB",
-    PIM_MAC_QK="MACQK", PIM_RD_BG="RDRES", LD="RD", ST="WR")
+    PIM_MAC_QK="MACQK", PIM_RD_BG="RDRES", LD="RD", ST="WR", PIM_STAGE_LOAD="LOCALRD")
 EXTERNAL = {"RD", "RDA", "WR", "WRA", "WRGB", "RDRES"}
 RANK_COMMANDS = {"WRGB", "MACAB", "MACQK", "RDRES"}
 FILL_OPS = {"GEMV_MULTICAST", "GEMV_Q_LOCAL", "GEMV_Q_REMOTE"}
@@ -23,6 +23,12 @@ FILL_OPS = {"GEMV_MULTICAST", "GEMV_Q_LOCAL", "GEMV_Q_REMOTE"}
 def require(condition, message):
     if not condition:
         raise AssertionError(message)
+
+
+def counter_difference(expected, actual):
+    missing, extra = expected-actual, actual-expected
+    return (f"missing_count={sum(missing.values())}, extra_count={sum(extra.values())}; "
+            f"first_missing={list(missing.items())[:5]}, first_extra={list(extra.items())[:5]}")
 
 
 def read_json(path):
@@ -53,22 +59,33 @@ def decode(address):
 
 def trace_records(path):
     records = []
+    stage_rows = {}
     for number, line in enumerate(Path(path).read_text(encoding="ascii").splitlines(), 1):
         words = line.split()
         if words and not words[0].startswith("#"):
-            records.append(dict(line=number, operation=words[0], address=int(words[1], 0),
-                buffer=int(words[2]) if len(words) > 2 else -1))
+            record = dict(line=number, operation=words[0], address=int(words[1], 0),
+                buffer=int(words[2]) if len(words) > 2 and words[0] != "PIM_STAGE_BEGIN" else -1)
+            if words[0] == "PIM_STAGE_BEGIN":
+                require(len(words) == 4, "Staging BEGIN requires byte count and token rows")
+                record.update(stage_bytes=int(words[2]), stage_rows=int(words[3]))
+                stage_rows[decode(record["address"])[0]] = record["stage_rows"]
+            elif words[0] == "PIM_STAGE_FRAGMENT":
+                channel = decode(record["address"])[0]
+                require(channel in stage_rows, "Fragment descriptor has no declared staging geometry")
+                record["fragment_rows"] = stage_rows[channel]
+            records.append(record)
     return records
 
 
 def trace_key(record):
-    return record["operation"], *decode(record["address"]), record["buffer"]
+    key = record["operation"], *decode(record["address"]), record["buffer"]
+    return (*key, record["stage_bytes"], record["stage_rows"]) if record["operation"] == "PIM_STAGE_BEGIN" else key
 
 
-def expected_addresses(case):
+def expected_addresses(case, rank_staging=True):
     """Derive every request independently from matrix dimensions and ownership."""
     if case == "serial_layer_control":
-        return sum((expected_addresses(stage) for stage in
+        return sum((expected_addresses(stage, rank_staging=rank_staging) for stage in
                     ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")), Counter())
     expected = Counter()
     def add(op, ch, offset, slot=-1, bank=0):
@@ -79,9 +96,17 @@ def expected_addresses(case):
                 add("PIM_GEMV_RELEASE", ch, 0, slot)
     def ordinary(base, fragments, columns, rows):
         for ch in range(16):
+            if rank_staging:
+                expected["PIM_STAGE_BEGIN", ch, 1, 0, 0, 256, 0, -1, fragments*rows*32, rows] += 1
+                for packet in range(fragments*rows):
+                    add("ST", ch, 524288+packet*32)
+                add("PIM_STAGE_SEAL", ch, 524288)
             for f in range(fragments):
-                for q in range(rows):
-                    add("PIM_WR_GB", ch, q*32, f%2)
+                if rank_staging:
+                    add("PIM_STAGE_FRAGMENT", ch, 524288+f*rows*32, f%2)
+                else:
+                    for q in range(rows):
+                        add("PIM_WR_GB", ch, q*32, f%2)
                 for column in range(columns):
                     add("PIM_MAC_AB", ch, base+(f*columns+column)*32, f%2)
     if case == "chain":
@@ -144,13 +169,26 @@ def native_key(command, geometry):
     return command, ch, rank, bg, bank, row, column
 
 
+def expected_native_commands(records):
+    expected = Counter()
+    for e in records:
+        if e["operation"] == "PIM_STAGE_FRAGMENT":
+            ch, rank, bg, bank, row, column = decode(e["address"])
+            first = row*2048+column*32
+            for token in range(e["fragment_rows"]):
+                offset = first+token*32
+                expected[native_key("LOCALRD", (ch, rank, bg, bank, offset//2048, offset%2048//32))] += 1
+        elif e["operation"] in NATIVE:
+            expected[native_key(NATIVE[e["operation"]], decode(e["address"]))] += 1
+    return expected
+
+
 def audit_native_commands(records, native):
-    expected = Counter(native_key(NATIVE[e["operation"]], decode(e["address"]))
-                       for e in records if e["operation"] in NATIVE)
+    expected = expected_native_commands(records)
     actual = Counter(native_key({"RDA": "RD", "WRA": "WR"}.get(e["command"], e["command"]),
                                 tuple(e[k] for k in GEOMETRY))
                      for e in native if e["command"] in set(NATIVE.values()) | {"RDA", "WRA"})
-    require(expected == actual, f"Native issued command/address coverage differs: missing={expected-actual}, extra={actual-expected}")
+    require(expected == actual, "Native issued command/address coverage differs: "+counter_difference(expected, actual))
     for event in native:
         if event["command"] in set(NATIVE.values()) | {"RDA", "WRA"}:
             require(event["Rank"] == 1, "PIM work touched physical rank0")
@@ -283,17 +321,18 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                 rank_full_input_SRAM_bytes=0, independent_mask_reconstruction=True)
 
 
-def audit_external_fills(native, gemv_events, burst_cycles=2):
+def audit_external_fills(native, gemv_events, burst_cycles=2, rank_staging=False):
     """Match physical WRGB DQ completion to every ordinary/Q-remote fill."""
     expected = Counter((e["Channel"], e["clock"]+burst_cycles)
                        for e in native if e["command"] == "WRGB")
+    operations = {"GEMV_Q_REMOTE"} if rank_staging else {"GEMV_MULTICAST", "GEMV_Q_REMOTE"}
     actual = Counter((e["Channel"], e["clock"])
-                     for e in gemv_events if e["operation"] in ("GEMV_MULTICAST", "GEMV_Q_REMOTE"))
+                     for e in gemv_events if e["operation"] in operations)
     require(actual == expected, "Bank fill must match external WRGB DQ completion exactly")
     return sum(actual.values())
 
 
-def audit_ffn_streams(native, gemv_events, case):
+def audit_ffn_streams(native, gemv_events, case, staging_events=None):
     """Reconstruct GPU-fed FFN traffic independently from native events."""
     require(not any(e["operation"] == "GEMV_Z_SCATTER" for e in gemv_events),
             "GPU-fed FFN must not use a local Z scatter path")
@@ -312,6 +351,19 @@ def audit_ffn_streams(native, gemv_events, case):
     gu = case != "down_gpu_input"
     down = case != "gate_up_gpu"
     fill_sets = {}
+    input_begin = {}
+    if staging_events is not None:
+        stage_fills = {(e["Channel"], e["ready_at"], e["buffer"]): e["stage_generation"]
+                       for e in staging_events if e["operation"] == "BROADCAST"}
+        for e in staging_events:
+            if e["operation"] == "WR":
+                key = e["Channel"], e["stage_generation"]
+                input_begin[key] = min(input_begin.get(key, e["clock"]), e["clock"])
+    def input_issue(fill):
+        if staging_events is None:
+            return fill["clock"]-2
+        generation = stage_fills[fill["Channel"], fill["clock"], fill["buffer"]]
+        return input_begin[fill["Channel"], generation]
     for stage, enabled, fragments in (("gu", gu, 64), ("down", down, 256)):
         require(len(groups[stage]) == (16*fragments if enabled else 0),
                 f"Incorrect {stage} GPU input fragment count")
@@ -325,8 +377,7 @@ def audit_ffn_streams(native, gemv_events, case):
         exports = sorted((e for e in native if e["Channel"] == ch and e["command"] == "RDRES"),
                          key=lambda e: e["clock"])
         down_fills = [e for e in fill_sets["down"] if e["Channel"] == ch]
-        # Multicast is at DQ completion, so subtract the 2CK burst for WRGB issue.
-        down_begin = min((e["clock"]-2 for e in down_fills), default=float("inf"))
+        down_begin = min((input_issue(e) for e in down_fills), default=float("inf"))
         if gu:
             selected = [e for e in exports if compute_done["gu"][ch] <= e["clock"] < down_begin]
             require(len(selected) == 1024, "Gate/Up must export both full FP32 arrays before Down input")
@@ -344,15 +395,19 @@ def audit_ffn_streams(native, gemv_events, case):
             down_reads += selected
     if gu and down:
         require(max(e["clock"]+2 for e in gu_reads) <=
-                min(e["clock"]-2 for e in fill_sets["down"]),
+                min(input_issue(e) for e in fill_sets["down"]),
                 "Full GPU Z broadcast begins before every rank's Gate/Up export completes")
     return dict(GU_GPU_input_bytes=len(fill_sets["gu"])*32,
         GU_GPU_FP32_export_bytes=len(gu_reads)*32,
         Down_GPU_BF16_input_bytes=len(fill_sets["down"])*32,
         Down_GPU_FP32_output_bytes=len(down_reads)*32,
         GPU_input_multicast_destination_bytes=sum(map(len, fill_sets.values()))*32*16,
-        Z_local_read_bytes=0, Z_local_write_bytes=0, separate_Z_staging_bytes=0,
-        direct_GPU_input=True, extra_internal_broadcast_cycles=0,
+        Z_local_read_bytes=len(fill_sets["down"])*32 if staging_events is not None else 0,
+        Z_local_write_bytes=0,
+        GPU_Z_DRAM_store_bytes=len(fill_sets["down"])*32 if staging_events is not None else 0,
+        separate_Z_staging_bytes=131072 if staging_events is not None and down else 0,
+        direct_GPU_input=staging_events is None, GPU_input_via_single_DRAM_bank=staging_events is not None,
+        extra_internal_broadcast_cycles=0,
         combined_GPU_export_before_Down_input=gu and down,
         GPU_GeLU_multiply_cast_latency_us=None,
         Down_output_features_per_rank=64, Down_outputs_are_complete=True,
@@ -361,8 +416,8 @@ def audit_ffn_streams(native, gemv_events, case):
 
 def audit_trace(records, case):
     actual = Counter(trace_key(e) for e in records if e["operation"] not in ("BARRIER", "WAIT"))
-    expected = expected_addresses(case)
-    require(actual == expected, f"Trace differs from independent matrix/address oracle: missing={expected-actual}, extra={actual-expected}")
+    expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records))
+    require(actual == expected, "Trace differs from independent matrix/address oracle: "+counter_difference(expected, actual))
     require(not any(e["operation"] == "WAIT" for e in records), "Artificial legacy completion WAIT retained")
     require(not any(e["operation"].startswith("PIM_Z_") for e in records), "GPU-fed FFN must not use local Z commands")
     return len(records)
@@ -428,6 +483,14 @@ def audit_run(directory):
     require(all(p.is_file() for p in timelines+gemv_files), "Missing channel native evidence")
     native = [e for p in timelines for e in read_csv(p)]
     events = [e for p in gemv_files for e in read_csv(p)]
+    rank_staging = native_result["config"].get("pim_rank_staging", False)
+    stage_files = [simulation / f"staging_events.csv.ch{ch}" for ch in range(16)] if rank_staging else []
+    ca_files = [simulation / f"rank_ca_events.csv.ch{ch}" for ch in range(16)] if rank_staging else []
+    controller_files = [simulation / f"bgk_events.csv.ch{ch}" for ch in range(16)] if rank_staging else []
+    require(all(p.is_file() for p in stage_files+ca_files+controller_files), "Missing staging/rank-controller evidence")
+    stage_events = [e for p in stage_files for e in read_csv(p)] if rank_staging else None
+    ca_events = [e for p in ca_files for e in read_csv(p)]
+    controller_events = [e for p in controller_files for e in read_csv(p)]
     issued_count = audit_native_commands(records, native)
     row_checks = audit_array_rows(native)
     order_checks = audit_mac_order(native, case)
@@ -437,7 +500,10 @@ def audit_run(directory):
     native_counts = Counter(e["command"] for e in native)
     require(slots["operation_counts"].get("GEMV_MAC", 0) == counts["PIM_MAC_AB"], "Missing native bank GEMV consume events")
     require(slots["operation_counts"].get("GEMV_QK", 0) == counts["PIM_MAC_QK"], "Missing shared-slot QKT consumes")
-    require(slots["operation_counts"].get("GEMV_MULTICAST", 0) == counts["PIM_WR_GB"], "Missing ordinary bank multicast writes")
+    expected_fills = (counts["PIM_STAGE_LOAD"] + sum(e["fragment_rows"] for e in records
+                      if e["operation"] == "PIM_STAGE_FRAGMENT")) if rank_staging else counts["PIM_WR_GB"]
+    require(slots["operation_counts"].get("GEMV_MULTICAST", 0) == expected_fills,
+            "Missing ordinary bank multicast writes")
     require(not slots["operation_counts"].get("GEMV_Z_SCATTER", 0), "Local Z scatter retained in GPU-fed FFN")
     require(slots["operation_counts"].get("GEMV_RELEASE", 0) == counts["PIM_GEMV_RELEASE"], "Release event count mismatch")
     require(slots["operation_counts"].get("GEMV_Q_LOCAL", 0) == counts["PIM_Q_EXPORT"], "Missing local Q tap writes to shared slots")
@@ -449,15 +515,22 @@ def audit_run(directory):
     dq = sum(native_counts[c]*32 for c in EXTERNAL)
     require(dq == manifest["expected_dq_bytes"]["total"], "External DQ differs from source contract")
     require(Counter(native_result["issued_commands"]) == native_counts, "Native summary differs from command files")
-    fill_checks = audit_external_fills(native, events)
-    ffn = audit_ffn_streams(native, events, case) if case not in ("chain", "v", "pv") else None
+    fill_checks = audit_external_fills(native, events, rank_staging=rank_staging)
+    staging, ca = None, None
+    if rank_staging:
+        from staging_audit import audit_staging, audit_rank_ca
+        staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"])
+        require(Counter(e["operation"] for e in controller_events)["PIM_ROPE_EXEC"] == counts["PIM_ROPE_EXEC"],
+                "RoPE execute event count differs from trace")
+        ca = audit_rank_ca(ca_events, native, stage_events, controller_events, records, events)
+    ffn = audit_ffn_streams(native, events, case, stage_events) if case not in ("chain", "v", "pv") else None
     continuity = audit_serial_continuity(manifest, native_result, simulation, native, events) if case == "serial_layer_control" else None
     return dict(status="passed", case=case, horizon=16,
         trace_and_native_address_coverage=True, native_data_commands_checked=issued_count,
         array_open_row_checks=row_checks, independent_MAC_order_checks=order_checks,
         external_DQ_to_bank_fill_checks=fill_checks,
-        unified_gemv=slots, ffn_streams=ffn, serial_continuity=continuity,
+        unified_gemv=slots, staging=staging, rank_controller=ca, ffn_streams=ffn, serial_continuity=continuity,
         native_external_DQ_bytes=dq, native_command_counts=dict(native_counts),
         trace_sha256=digest(directory / "workload.trace"),
-        native_sha256={p.name: digest(p) for p in timelines+gemv_files},
+        native_sha256={p.name: digest(p) for p in timelines+gemv_files+stage_files+ca_files+controller_files},
         numerical_compute=False, unmeasured="GPU/nonlinear arithmetic and GPU contention")

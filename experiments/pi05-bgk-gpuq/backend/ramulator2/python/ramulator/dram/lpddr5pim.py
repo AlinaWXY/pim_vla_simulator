@@ -133,10 +133,13 @@ class LPDDR5PIM(LPDDR5):
     }
     timing_constraints = _pim_constraints()
 
-    def __init__(self, *, pim_data_path="lpddr", **kwargs):
+    def __init__(self, *, pim_data_path="lpddr", pim_rank_controller=False, **kwargs):
         if pim_data_path not in ("lpddr", "attacc"):
             raise ValueError("pim_data_path must be lpddr or attacc")
         self.pim_data_path = pim_data_path
+        if type(pim_rank_controller) is not bool:
+            raise ValueError("pim_rank_controller must be boolean")
+        self.pim_rank_controller = pim_rank_controller
         super().__init__(**kwargs)
         if pim_data_path == "attacc":
             # AttAcc HBM3-PIM.cpp:420-427: transfers share one path; MAC
@@ -152,6 +155,23 @@ class LPDDR5PIM(LPDDR5):
                 TimingConstraint("Rank", transfers, transfers, "nCCDS"),
                 TimingConstraint("BankGroup", transfers, transfers, "nCCDL"),
             ]
+
+    def to_config(self):
+        config = super().to_config()
+        if self.pim_rank_controller:
+            # The native hierarchy accounts for channel descriptor dispatch
+            # and each rank's fine command bus, including LOCALRD/LOCALWR.
+            # Remove only the auto-generated channel CA prefix. Keep every
+            # explicit DRAM timing and external DQ constraint unchanged.
+            cls = type(self)
+            cmd_idx = {name: i for i, name in enumerate(cls.commands)}
+            cmd_cycles = {name: int(cycles*cls.tick_multiplier)
+                          for name, cycles in cls.command_cycles.items()}
+            generated = cls._generate_bus_constraints(cmd_idx, cmd_cycles, cls.tick_multiplier)
+            if config["timing_constraints"][:len(generated)] != generated:
+                raise ValueError("Generated CA constraint prefix changed")
+            config["timing_constraints"] = config["timing_constraints"][len(generated):]
+        return config
 
     @classmethod
     def _generate_bus_constraints(cls, cmd_idx, cmd_cycles, tick_mult):

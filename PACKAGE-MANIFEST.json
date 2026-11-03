@@ -1,18 +1,18 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "native_build": "minimal",
-  "dataflow": "GPU GeLU/product, full BF16 Z to every rank, output-sharded PIM Down",
-  "parent_revision": "2647a3e5d3a3a9adfa5bc827fc26592039495986",
+  "dataflow": "GPU full input -> rank bank0 DRAM -> source SRF -> rank SRFs -> existing PIM compute",
+  "parent_revision": "4073452c618b40e03b43432dcc05643372d92107",
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
-  "branch": "xinyao_1101",
-  "file_count_excluding_manifest": 505,
-  "bytes_excluding_manifest": 4068176,
-  "MiB": 3.8797149658203125,
+  "branch": "xinyao_1102",
+  "file_count_excluding_manifest": 533,
+  "bytes_excluding_manifest": 5923814,
+  "MiB": 5.649389266967773,
   "categories": {
     "publication": {
-      "files": 6,
-      "bytes": 11607,
-      "MiB": 0.011069297790527344
+      "files": 7,
+      "bytes": 12723,
+      "MiB": 0.012133598327636719
     },
     "backend_metadata": {
       "files": 2,
@@ -20,9 +20,9 @@
       "MiB": 0.0015172958374023438
     },
     "native_metadata": {
-      "files": 176,
-      "bytes": 607287,
-      "MiB": 0.5791540145874023
+      "files": 177,
+      "bytes": 623741,
+      "MiB": 0.5948457717895508
     },
     "vendored": {
       "files": 209,
@@ -31,23 +31,23 @@
     },
     "python_codegen": {
       "files": 87,
-      "bytes": 312812,
-      "MiB": 0.2983207702636719
+      "bytes": 314320,
+      "MiB": 0.2997589111328125
     },
     "simulator": {
       "files": 4,
-      "bytes": 39383,
-      "MiB": 0.037558555603027344
+      "bytes": 45745,
+      "MiB": 0.043625831604003906
     },
     "experiment": {
-      "files": 13,
-      "bytes": 139957,
-      "MiB": 0.13347339630126953
+      "files": 18,
+      "bytes": 197413,
+      "MiB": 0.18826770782470703
     },
     "reference_evidence": {
-      "files": 8,
-      "bytes": 702674,
-      "MiB": 0.6701221466064453
+      "files": 29,
+      "bytes": 2475416,
+      "MiB": 2.3607406616210938
     }
   },
   "compiled_native_translation_units": [
@@ -75,16 +75,18 @@
     "controller/plugin/impl/command_counter.cpp",
     "controller/plugin/impl/cmd_trace_recorder.cpp"
   ],
-  "exclusions": [
-    "historical experiments/results/tarballs",
-    "precompiled libraries",
-    "build products",
-    "old DRAM-Z reference measurements"
-  ],
-  "preservation": "Required vendored sources/headers/build helpers/licenses and Python/C++ metadata chains retained",
   "clean_native_build_passed": true,
-  "final_native_job": 1901717,
+  "final_native_job": 1902573,
   "source_snapshot": "reference/publish-byte-verification.json",
+  "exclusions": [
+    "Precompiled native libraries",
+    "Build directories",
+    "Raw generated results"
+  ],
+  "preservation": {
+    "baseline_commit": "4073452",
+    "direct_baseline_regression": "reference/baseline-verification.json"
+  },
   "files": {
     ".gitattributes": {
       "category": "publication",
@@ -103,8 +105,8 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 6680,
-      "output_sha256": "a2df0ca95b9231d4797c4099b9f47e571dba75a68046a5717bac076bdf25e0cc"
+      "output_bytes": 5709,
+      "output_sha256": "87798167a146b234f2cd2084a8800b91a0d350c013824ad987c2ea99d8063071"
     },
     "experiments/pi05-bgk-gpuq/backend/LICENSE": {
       "category": "backend_metadata",
@@ -1283,13 +1285,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5.py": {
       "category": "python_codegen",
-      "output_bytes": 1945,
-      "output_sha256": "5c6c38a30373432ec5ae4f7213604803aaa42b8cb09ec0d5574fd3d8e3f78259"
+      "output_bytes": 2102,
+      "output_sha256": "964abf49c7f8cbc3e2a8ebece619ff66aa1341709e643ad19bf7afdd1b7fea00"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": {
       "category": "python_codegen",
-      "output_bytes": 1951,
-      "output_sha256": "7a0d0e4ebbfa7738d882bb8ca25e6e32ec9cb401b925448c35ebc3c42b909934"
+      "output_bytes": 2108,
+      "output_sha256": "b5a884362b01fc236d92a09932cf23b59f1a1359cf7631a553cf6638d51bd8ae"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr6.py": {
       "category": "python_codegen",
@@ -1458,8 +1460,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/lpddr5pim.py": {
       "category": "python_codegen",
-      "output_bytes": 11885,
-      "output_sha256": "bcb55f5d518ffd097629422d2614133c3b1bcd8f024a1f4cbe6f01b01f4e743d"
+      "output_bytes": 13079,
+      "output_sha256": "37207f8fcd7d7808b700cc2f8931d2410bcce1897422a8d4f48d5381dc4c27b5"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/lpddr5x.py": {
       "category": "python_codegen",
@@ -1688,8 +1690,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/base/request.h": {
       "category": "native_metadata",
-      "output_bytes": 2674,
-      "output_sha256": "3e584503c8442c679325732d794b91f0a69de4d903e7db2982332281efd93edb"
+      "output_bytes": 2833,
+      "output_sha256": "109756053ad1c44c51947625a41f57123cf914359190c48bb4f2d4ff31f360a4"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/base/stats.h": {
       "category": "native_metadata",
@@ -1818,8 +1820,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp": {
       "category": "native_metadata",
-      "output_bytes": 43571,
-      "output_sha256": "26b2f83ae91772395e54bed39492167c14d4683d6688d39154c3be7a03bd9efb"
+      "output_bytes": 46718,
+      "output_sha256": "949700a76e90525db509e4fe8d135028006009d1c23e2d5ce74a64bff203bad9"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr6_controller.cpp": {
       "category": "native_metadata",
@@ -1843,13 +1845,18 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_rope_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 12359,
-      "output_sha256": "e646774ab8641a815240a60cc6782f2717af76bdb75e666934f73c089614e7ff"
+      "output_bytes": 12466,
+      "output_sha256": "f2a07f94c5457276a20e7575dda87afe2ac57dcf5154d70c80a8bcb0b0306c72"
+    },
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": {
+      "category": "native_metadata",
+      "output_bytes": 11451,
+      "output_sha256": "f70834d2a9f32537565f994c57ffb9235d2e50b5aae6c2bc780c0b6f4cd90663"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 10853,
-      "output_sha256": "4685e7ff16c42ac5fa3bb1b0dab46752c1d480aede2a716b3241486c52a21efe"
+      "output_bytes": 10880,
+      "output_sha256": "d87018d3be2d1128cb89e759a5eb90029b27c179398932dfd1b04a13e8c45b22"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/plugin/controller_validation_hook.h": {
       "category": "native_metadata",
@@ -2213,13 +2220,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/device.cpp": {
       "category": "native_metadata",
-      "output_bytes": 3566,
-      "output_sha256": "92f176f3ccf5650c88aaf25fb573b28037a1161dd4240b66514ebfe397d467d2"
+      "output_bytes": 3701,
+      "output_sha256": "9919fb1c8174bc0b226d1983f2a1a8e5749923ed5271b5040eb692e17a84ae18"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/device.h": {
       "category": "native_metadata",
-      "output_bytes": 4822,
-      "output_sha256": "a6766889d7b9181af355dcbf1e74c0de16e61f0ceb227c2931590957cd13bc35"
+      "output_bytes": 5070,
+      "output_sha256": "142f5929fd783a2106a67e9ded480c7a7fcea0526f41f63c624e58401547eefb"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/dram_spec.cpp": {
       "category": "native_metadata",
@@ -2348,8 +2355,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/loadstore_trace.cpp": {
       "category": "native_metadata",
-      "output_bytes": 10256,
-      "output_sha256": "8657bac24935bb21752796a302ffe95b7f9767b60471282f51565609306efb0e"
+      "output_bytes": 11436,
+      "output_sha256": "fff6e10daae9a3d0a690a0a4149a11c07ebd6247d4c4c90cc34f9866f15cd841"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/partition_trace.cpp": {
       "category": "native_metadata",
@@ -2483,38 +2490,48 @@
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/backend.py": {
       "category": "simulator",
-      "output_bytes": 27703,
-      "output_sha256": "4b36f0ff281c44aad1206800e79e83cd4b2f35157f5e3d96a5fc8e2e5fcc09a0"
+      "output_bytes": 31748,
+      "output_sha256": "3f7f1053dc2f7e3fc6bda0f03002e339eb072fb20638149e4e8e87bd9586b609"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/config.py": {
       "category": "simulator",
-      "output_bytes": 6710,
-      "output_sha256": "4583f8cdb41aa57ec6d3af76f0e7823b2a35cb9f2b91d8641413e491cca02090"
+      "output_bytes": 7340,
+      "output_sha256": "0869ea1f2a7b20f858e2234d84510ef0ddb3ac2541d1d7ae5ba3ef5b8a13563d"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/trace.py": {
       "category": "simulator",
-      "output_bytes": 4794,
-      "output_sha256": "ffceb9b2844833539eb4b966932a0acd3e68ef0e593670f8a90a2ffb756a6c57"
+      "output_bytes": 6481,
+      "output_sha256": "992ba22ff60ddddd19028a9fdc3db8264a907aa7c2b695757afdc61bcedaf68f"
+    },
+    "experiments/pi05-unified-gemv/MODEL.md": {
+      "category": "experiment",
+      "output_bytes": 6192,
+      "output_sha256": "026ec19fa86027be4f4a19c1bc822aa9553965f6d3b3ddd6bcd355bd62298930"
     },
     "experiments/pi05-unified-gemv/build.sh": {
       "category": "experiment",
-      "output_bytes": 1303,
-      "output_sha256": "dcdcb0d0e1b73f42ab417443da3fe9202b4086adca2a5d8c0eb825aa68659cf6"
+      "output_bytes": 1477,
+      "output_sha256": "d77157cbe349b55d01396bf35923a7703596fdaa77f27104ef329f67126d30b8"
     },
     "experiments/pi05-unified-gemv/channel_analysis.py": {
       "category": "experiment",
-      "output_bytes": 18225,
-      "output_sha256": "cae5e062fc8bdd24af7b5c4129538884c233d0114819dbce6877877c6ffd8899"
+      "output_bytes": 24476,
+      "output_sha256": "f84f9f67961cb6f36bb2a5cda367cdcd80bd42266e9a47f655b01b46b977da06"
+    },
+    "experiments/pi05-unified-gemv/plot_comparison.py": {
+      "category": "experiment",
+      "output_bytes": 3224,
+      "output_sha256": "9b78bc7b168cd55776a5d87590b51892e8d7ad71ad90933bbb49098f1ab8aad9"
     },
     "experiments/pi05-unified-gemv/reproduce.py": {
       "category": "experiment",
-      "output_bytes": 9011,
-      "output_sha256": "b4f39776c6a0e8fb8d9dd3f73d475ae6c8a0812c6967f4f313c824c83ee52d09"
+      "output_bytes": 9629,
+      "output_sha256": "ee9b635001291c91b1b87c3194b0da0578f8bdc9fe9bff6c1c0cefc01a2b5a1c"
     },
     "experiments/pi05-unified-gemv/source/horizon_attention.py": {
       "category": "experiment",
-      "output_bytes": 808,
-      "output_sha256": "4f01c4e7fb8a89602ce84d422697c281fadb28810e802adeccd1a34e38b52c17"
+      "output_bytes": 979,
+      "output_sha256": "fe555fb70be8cf762432f6bf1163171e7dfeb6a647509223bf8b80d65c43e73a"
     },
     "experiments/pi05-unified-gemv/source/horizon_attention_layout.py": {
       "category": "experiment",
@@ -2523,88 +2540,213 @@
     },
     "experiments/pi05-unified-gemv/source/horizon_attention_workload.py": {
       "category": "experiment",
-      "output_bytes": 11122,
-      "output_sha256": "1fe7bbcd0f5b45dd770b443d4c40dfe3d6edd808f256a54b715fee8a1795ea61"
+      "output_bytes": 11927,
+      "output_sha256": "b89e261a2583514f2adaa3143368f2ee532904f070598ec6451ad8be1cecc483"
     },
     "experiments/pi05-unified-gemv/source/horizon_ffn.py": {
       "category": "experiment",
-      "output_bytes": 12092,
-      "output_sha256": "7ea30c2c756e44942dfc1786c04b7730a4a9c80de0948303bc95c046f0345b04"
+      "output_bytes": 13646,
+      "output_sha256": "7c53ca52688dc4d928519fcd738bfce673ef5f3036aa01c0487f7695aeb09b71"
     },
     "experiments/pi05-unified-gemv/source/horizon_value.py": {
       "category": "experiment",
-      "output_bytes": 9778,
-      "output_sha256": "05895c5c685a0513a2f5f5ab336ffd0fdfd56d461b946953426558331a9b60fa"
+      "output_bytes": 10556,
+      "output_sha256": "5d2725da97d09ffbd1c3f519ded6d21a1951bda5510bf388e91adcb6853d95c7"
+    },
+    "experiments/pi05-unified-gemv/source/rank_staging.py": {
+      "category": "experiment",
+      "output_bytes": 1908,
+      "output_sha256": "10c475559f70d46b27df7f0e506f57aef5908837e7997615f93ff9a2faa86bca"
     },
     "experiments/pi05-unified-gemv/source/workload.py": {
       "category": "experiment",
-      "output_bytes": 6598,
-      "output_sha256": "144505c44af363392a20f7ee158bbfee19fb0255d161e32ac0b4fe643f33ad0d"
+      "output_bytes": 7951,
+      "output_sha256": "cb75fc73fca0266d4d9ded3699d7233582f10a2ea44e12342a1a12003b3deea4"
     },
     "experiments/pi05-unified-gemv/validation/audit_native.py": {
       "category": "experiment",
-      "output_bytes": 26365,
-      "output_sha256": "ba8b18dfa00bff4e92e49093baecd31e2c3bf2ff124a08047e10f9658a761579"
+      "output_bytes": 30998,
+      "output_sha256": "4fe4ed26be03c3f51270313153ca48a8a57ca987ba86bd7703327cac655233fb"
     },
     "experiments/pi05-unified-gemv/validation/native_guards.py": {
       "category": "experiment",
-      "output_bytes": 10703,
-      "output_sha256": "3fe1d0834d058be45696a841fe35ed9a5cdf411106bbc9b9ee568a51d83efd20"
+      "output_bytes": 15389,
+      "output_sha256": "67d969e970e7a44699477f7f79e799ebc0405dee346f0eee27b83632cc45bd56"
+    },
+    "experiments/pi05-unified-gemv/validation/staging_audit.py": {
+      "category": "experiment",
+      "output_bytes": 14027,
+      "output_sha256": "e38d83d369ef03dd85d30147bb0c5d1ff6b4a791139b214d969cf2f65de4f2da"
     },
     "experiments/pi05-unified-gemv/validation/test_audit.py": {
       "category": "experiment",
-      "output_bytes": 12090,
-      "output_sha256": "b72b7809ead8f7d973381ef4a6c65f3331ec60d25a8189e6424188915d5615b1"
+      "output_bytes": 12373,
+      "output_sha256": "b536b68c4473eaa506657c7eee40c4fcafdb3420170ff47dcfb76c38ef8572d3"
     },
     "experiments/pi05-unified-gemv/validation/test_channel_analysis.py": {
       "category": "experiment",
-      "output_bytes": 8354,
-      "output_sha256": "bc0080cbf02fb882a63078dbe83d07e7208ad58a52f71af244be53cf024516c5"
+      "output_bytes": 10213,
+      "output_sha256": "87eb0e4af3170bcd2152241433f0878d73a25c816cf883749ccc8e104c999eff"
+    },
+    "experiments/pi05-unified-gemv/validation/test_staging_audit.py": {
+      "category": "experiment",
+      "output_bytes": 8940,
+      "output_sha256": "988a6c6dbf0f4a149ffd88eadf8579be3563f662e9690d06d95a6d2a1bbbedbe"
     },
     "reference/CHANNEL-ANALYSIS.md": {
       "category": "reference_evidence",
-      "output_bytes": 1498,
-      "output_sha256": "72d4528de79b4c2238d4bf984f761fa8d35cbe3333c57b45ab0127c7e35f02f0"
+      "output_bytes": 2878,
+      "output_sha256": "dccfcef63c68ca7998713ea42720f89cc186774f1264a2b5428dead4b6f9797c"
+    },
+    "reference/baseline-verification.json": {
+      "category": "reference_evidence",
+      "output_bytes": 218,
+      "output_sha256": "41f49caae2f6fc16a849afb1a21b6cf6797ba7fae7e9a4d20e4845bf205dfa0a"
+    },
+    "reference/baseline-xinyao_1101.json": {
+      "category": "reference_evidence",
+      "output_bytes": 237703,
+      "output_sha256": "419fda0a728aa3922fd7e56fdd886352c929f595438e8e9ca03f924dc3f13458"
+    },
+    "reference/chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 9960,
+      "output_sha256": "976e45b6b12c25bb3ec8399bb1efc3684acb221fcdd31225861cb4f1b5470fd8"
+    },
+    "reference/chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 4315,
+      "output_sha256": "9e976e4b771619326b289266a09416ddb4ecd29cf1293eed60fda27e20b32df6"
+    },
+    "reference/channel-analysis.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1054757,
+      "output_sha256": "9d3738cf2b261bfcb2479205b6c7adb2c72e1f90030c135bdeae5ee094a003fe"
     },
     "reference/channel-breakdown.png": {
       "category": "reference_evidence",
-      "output_bytes": 142340,
-      "output_sha256": "6c7387036ebccb736f8c162fe511f3f0ee3344b9b3f49d38c525ee57a75b45de"
+      "output_bytes": 145991,
+      "output_sha256": "db131d7fe6c869292338d9906c019380886511c0d33ddaa8be2b9e523e29bd33"
+    },
+    "reference/channel-command-bus.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 7145,
+      "output_sha256": "89dd17a9325617edb4762144d7ea25c9f430ccece446785bacbf439d176af253"
     },
     "reference/channel-partitions.csv": {
       "category": "reference_evidence",
-      "output_bytes": 10165,
-      "output_sha256": "2f04a85106e9d64ca54833558f62f28aded0de1ce0a5b6e6c51c116fd8269f0c"
+      "output_bytes": 12677,
+      "output_sha256": "0be78960d20dd45915094ee0e2a8946cddb5b7e9713f0125694fa625e8e46df0"
+    },
+    "reference/channel-phase-kind-breakdown.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 31402,
+      "output_sha256": "58bc6f90d4894fc2f8e1831294d43d6e395fe1fe27daa1dc56df64c363327035"
     },
     "reference/channel-phase-windows.csv": {
       "category": "reference_evidence",
-      "output_bytes": 161377,
-      "output_sha256": "2bed0c3ae1b69c05089b7c1643435b65bc3260fb947d687d286e859d5c115c57"
+      "output_bytes": 174575,
+      "output_sha256": "5caa4b8ee3bee6d15a4fd37d0860b7f1c326137362caf7bf3e03fcf7b9d2d99f"
+    },
+    "reference/combined_timing_chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 10533,
+      "output_sha256": "152e1528fcdbfe00e614345a05c1941033172830117d825c4d929fa6280ed6c2"
+    },
+    "reference/combined_timing_chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1739,
+      "output_sha256": "0381030d56be9b2ae2e33598cb79475369a7a72f59b5b5b595741f6cbc686dd8"
+    },
+    "reference/down_gpu_input/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 10512,
+      "output_sha256": "d250479d2ba07d0f68bb0a9a98eca4728af549d037a6a8e179dbb8fc0e6a14f0"
+    },
+    "reference/down_gpu_input/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1486,
+      "output_sha256": "c4a8b645561d5679d67878b04015ae086746043f40b96d36822e9bbe99bc5d46"
     },
     "reference/expected.json": {
       "category": "reference_evidence",
-      "output_bytes": 244116,
-      "output_sha256": "6066af118814ec9bf770629f6da6ee95b614f5137e239044a3508e72eddbcf4c"
+      "output_bytes": 528480,
+      "output_sha256": "79e220d7fc54c4ccd9874b94b1c2a359f87d07c3bdca17916165093f5add8b11"
+    },
+    "reference/gate_up_gpu/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 10487,
+      "output_sha256": "a9fde58a2582ca4c6d7f4eeb4c0405ddedb45c52dc88229a3b08e9472fef3101"
+    },
+    "reference/gate_up_gpu/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1489,
+      "output_sha256": "6b1b849990369f37108be07fec83ef81f60bfe4bbc0064dd155b6381a49949cc"
     },
     "reference/provenance.json": {
       "category": "reference_evidence",
-      "output_bytes": 56460,
-      "output_sha256": "fa30401de211bb2da84551ffa0bd14929917ebf2142aa496286fe22228cabfe7"
+      "output_bytes": 58761,
+      "output_sha256": "b6b7925601d4ead52a3b0395751d1aa2b28d235f2275d82370c8ea7d26905188"
     },
     "reference/publish-byte-verification.json": {
       "category": "reference_evidence",
-      "output_bytes": 78913,
-      "output_sha256": "96e002c2d6a9d35df492e30782221cd96ca728ff335652b7fa34736b6c528bd1"
+      "output_bytes": 79187,
+      "output_sha256": "fa9c0c3a70466bb264a896fbdf6217c7fc1aea31074d98d1ea4bc450f9f34fb8"
+    },
+    "reference/pv/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 9796,
+      "output_sha256": "b3474eeb1dafe6c0917c69cebbd0546fba51fad6f9d1a0f1b0d520bf7c2b48c1"
+    },
+    "reference/pv/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1424,
+      "output_sha256": "dc925e276677166002dcf9e4f9159e17e6c6e260fc482952c07b0b0013e74c78"
+    },
+    "reference/serial_layer_control/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 11061,
+      "output_sha256": "fb30667af8d8220e8cb1fbdeb27863e2ae25a87680f5f7f1c957f1e67a7c390d"
+    },
+    "reference/serial_layer_control/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5670,
+      "output_sha256": "ba3641ad75fefdbbd74f93cf2c07ffb6764f269f25fcf157900eacd1f7283f1a"
+    },
+    "reference/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 32746,
+      "output_sha256": "3bcccb4865882a6499996e05913d36e60a6c852004f4081c7356f792e850f4a5"
+    },
+    "reference/unit-tests.log": {
+      "category": "reference_evidence",
+      "output_bytes": 7493,
+      "output_sha256": "e4d9eb36498ead77f1ceaa3d7f8a67c8e675c3f4367289f40bbbd8a8f9f1fea1"
+    },
+    "reference/v/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 9813,
+      "output_sha256": "1954341ce546c8ebb30741dccc701b8d0d2de0de4755e791cb7f99e0807c3b02"
+    },
+    "reference/v/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1495,
+      "output_sha256": "6d520f838d606d1cbdefcf3b068797c95a72a8238b8821d8bc2839935f8f83ec"
     },
     "reference/validation.json": {
       "category": "reference_evidence",
-      "output_bytes": 7805,
-      "output_sha256": "dff011d3936db7004f35569394252e55f2a78346fa74ef962d822c397d93c154"
+      "output_bytes": 11623,
+      "output_sha256": "256aa25aaaf05532857253c7ebe8bf19a6ee2172e226b7f4b10095a620b550a0"
     },
     "requirements.txt": {
       "category": "publication",
       "output_bytes": 15,
       "output_sha256": "89eadaba9f081385bb56c41c62fc6e182c31bfe158a49760e7c4c0ec36b1c6ae"
+    },
+    "verify_baseline.py": {
+      "category": "publication",
+      "output_bytes": 2087,
+      "output_sha256": "8bdb9983ff8a4274168c46bb46c98303269bc8dd224890eee0a99f56b6971f47"
     },
     "verify_reference.py": {
       "category": "publication",

@@ -2,6 +2,7 @@
 #define RAMULATOR_DRAM_DEVICE_H
 
 #include <memory>
+#include <functional>
 #include <vector>
 
 #include "ramulator/base/config_node.h"
@@ -28,6 +29,9 @@ class DRAMDevice {
   std::unique_ptr<DRAMNode> m_root;        // Hierarchical node tree (for timing)
   std::vector<DRAMNode*> m_bank_nodes;     // Flat bank view (non-owning, for state dispatch)
   int m_bank_level = -1;                   // Cached level ID for "Bank" (hot-path use)
+  // Optional hierarchical-controller bus arbitration, independent of array timings.
+  std::function<bool(int, const AddrVec_t&, Clk_t)> command_admission;
+  std::function<void(int, const AddrVec_t&, Clk_t)> command_observer;
 
   void init(std::unique_ptr<DRAMSpec> spec);
   void set_channel_id(int channel_id);

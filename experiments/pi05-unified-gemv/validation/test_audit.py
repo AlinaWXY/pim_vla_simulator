@@ -8,7 +8,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source"))
 import workload
 from audit_native import (audit_slot_events, audit_trace, audit_native_commands, audit_mac_order, audit_external_fills,
-                          expected_addresses, trace_key, trace_records, decode, GEOMETRY, NATIVE)
+                          expected_addresses, expected_native_commands, trace_key, trace_records, decode, GEOMETRY, NATIVE)
 from collections import Counter
 
 
@@ -123,8 +123,8 @@ class IndependentAddressTests(unittest.TestCase):
             records = trace_records(trace)
             target = next(e for e in records if e["operation"] == "PIM_MAC_AB")
             target["address"] ^= 1 << 20
-            native = [dict(command=NATIVE[e["operation"]], **dict(zip(GEOMETRY, decode(e["address"]))))
-                      for e in records if e["operation"] in NATIVE]
+            native = [dict(command=key[0], **dict(zip(GEOMETRY, key[1:])))
+                      for key, count in expected_native_commands(records).items() for _ in range(count)]
             # Producer and consumer agree on the same wrong address, so a
             # trace-vs-native comparison alone is insufficient.
             audit_native_commands(records, native)
@@ -214,7 +214,10 @@ class FFNLayoutTests(unittest.TestCase):
                     self.assertEqual(packet["source_tensor"], "Z_gpu")
                     self.assertEqual(packet["bytes"], 32)
                     self.assertEqual(packet["target_bank_mask"], 65535)
-                    self.assertEqual(F.decode_address(packet["destination"]), (channel, 1, 0, token*32))
+                    self.assertEqual(F.decode_address(packet["destination"]),
+                                     (channel, 1, 0, 524288+(fragment*16+token)*32))
+                    self.assertEqual(packet["storage_before_srf"], "bank0 DRAM")
+                    self.assertEqual(F.decode_address(packet["gemv_destination"]), (channel, 1, 0, token*32))
                     self.assertEqual(packet["source_byte_offset"]//8192, token)
                     self.assertEqual(packet["source_byte_offset"]%8192//2, packet["feature_first"])
                     sources.add(packet["source_byte_offset"])

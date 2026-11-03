@@ -101,6 +101,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "rank_rope_extension.inc"
 #include "ffn_dram_extension.inc"
 #include "unified_gemv_extension.inc"
+#include "rank_staging_extension.inc"
 
  public:
   void init() override {
@@ -172,10 +173,27 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_ffn_z_preinstalled, bool, "ffn_z_preinstalled").default_val(false);
     RAMULATOR_PARSE_PARAM(m_ffn_events_path, std::string, "ffn_dram_events_path").default_val("");
     init_ffn_dram();
+    RAMULATOR_PARSE_PARAM(m_rank_staging, bool, "pim_rank_staging").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_rank_controller, bool, "pim_rank_controller").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_rank_ca_path, std::string, "rank_ca_events_path").default_val("");
+    RAMULATOR_PARSE_PARAM(m_staging_path, std::string, "staging_events_path").default_val("");
+    init_rank_staging();
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
     LPDDR5Controller::setup(frontend, memory_system);
+    if(m_rank_controller && (!m_device.command_admission || !m_device.command_observer))
+      throw std::runtime_error("rank controller command hooks were not installed");
+    if(m_rank_controller && !m_rank_ca_path.empty()) {
+      m_rank_ca_events.open(m_rank_ca_path);
+      if(!m_rank_ca_events) throw std::runtime_error("Cannot open rank CA events");
+      m_rank_ca_events<<"clock,ready_at,Channel,Rank,command,scope\n";
+    }
+    if(m_rank_staging && !m_staging_path.empty()) {
+      m_staging_events.open(m_staging_path);
+      if(!m_staging_events) throw std::runtime_error("Cannot open staging events");
+      m_staging_events<<"clock,ready_at,operation,Channel,Rank,BankGroup,Bank,Row,Column,buffer,bytes,stage_generation\n";
+    }
     m_stats.add("num_pim_requests", s_pim_requests);
     m_stats.add("num_pim_completed", s_pim_completed);
     m_stats.add("pim_request_latency_cycles", s_pim_latency);
@@ -215,6 +233,17 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool send(Request& req) override {
+    const bool coarse=m_rank_controller && req.type_id>=Request::Type::PIM_MAC_AB;
+    if(coarse && m_clk<m_global_ca_ready) return false;
+    const bool accepted=send_impl(req);
+    if(accepted && coarse) {
+      const Clk_t dispatch=std::max<Clk_t>(1,m_clk);
+      m_global_ca_ready=dispatch+1;
+      record_ca(dispatch,dispatch+1,req.addr_vec[m_rank_level],coarse_name(req),"global");
+    }
+    return accepted;
+  }
+  bool send_impl(Request& req) {
     if (req.pim_buffer < -1 || req.pim_buffer > 1 ||
         (req.pim_buffer >= 0 && req.type_id != Request::Type::PIM_WR_GB &&
          req.type_id != Request::Type::PIM_MAC_AB && req.type_id != Request::Type::PIM_LOCAL_GB &&
@@ -222,7 +251,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
          req.type_id != Request::Type::PIM_MAC_K && req.type_id != Request::Type::PIM_MAC_QK &&
          req.type_id != Request::Type::PIM_RD_Q && req.type_id != Request::Type::PIM_ROPE_LOAD &&
          req.type_id != Request::Type::PIM_ROPE_EXEC && req.type_id != Request::Type::PIM_Q_REMOTE &&
-         req.type_id != Request::Type::PIM_Z_LOAD && req.type_id != Request::Type::PIM_GEMV_RELEASE)) {
+         req.type_id != Request::Type::PIM_Z_LOAD && req.type_id != Request::Type::PIM_GEMV_RELEASE && req.type_id != Request::Type::PIM_STAGE_LOAD && req.type_id != Request::Type::PIM_STAGE_FRAGMENT)) {
       throw std::runtime_error("PIM buffer annotation requires WRGB/MACAB and slot 0/1");
     }
     // Map before admission so overlapping-bank requests can apply backpressure
@@ -233,6 +262,15 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if ((m_rank_rope || m_ffn_dram || m_unified_gemv) && req.type_id >= Request::Type::PIM_MAC_AB && req.addr_vec[m_rank_level] != 1)
       throw std::runtime_error("rank0 is reserved for GPU: PIM requests must address physical rank1");
     if (req.type_id < Request::Type::PIM_MAC_AB) {
+      const bool staging_write=m_rank_staging && req.type_id==Request::Type::Write && req.addr_vec[m_rank_level]==1 && stage_offset(req)>=256*2048 && stage_offset(req)<320*2048;
+      if(staging_write) {
+        for(const auto& pending:m_pim_buffer) if(pending.type_id==Request::Type::PIM_STAGE_BEGIN) return false;
+        stage_address(req);
+        const int offset=stage_offset(req);
+        if(!m_stage.active || m_stage.sealed || offset<m_stage.base || offset>=m_stage.base+m_stage.bytes)
+          throw std::runtime_error("staging write outside active payload");
+        if(m_stage.writes.count(offset)) throw std::runtime_error("duplicate staging write");
+      }
       for (const auto& buffers : m_inputs) {
         for (const auto& buffer : buffers) {
           if (m_clk < buffer.in_use_until) return false;
@@ -245,21 +283,28 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         if (!can_overlap(pim, req)) return false;
       }
       auto callback = req.callback;
-      req.callback = [this, callback](Request& done) {
+      req.callback = [this, callback, staging_write](Request& done) {
         if (done.type_id == Request::Type::Write) {
           m_normal_ready_at = std::max(m_normal_ready_at, m_clk + m_write_recovery);
+          if(staging_write) {
+            m_stage.writes.at(stage_offset(done))=m_clk+m_write_recovery;
+            record_stage(done,"WR",m_clk,m_clk+m_write_recovery);
+          }
         }
         if (callback) {
           callback(done);
         }
       };
+      if(staging_write) m_stage.writes.emplace(stage_offset(req),-1);
       bool accepted = LPDDR5Controller::send(req);
+      if(staging_write && !accepted) m_stage.writes.erase(stage_offset(req));
       req.callback = callback;
       return accepted;
     }
     if (m_pim_buffer.size() >= m_pim_buffer.max_size) {
       return false;
     }
+    if (is_stage(req)) return send_stage(req);
     if (is_gemv_release(req)) return send_gemv_release(req);
     if (m_unified_gemv && !m_rank_rope && (req.type_id==Request::Type::PIM_MAC_QK || req.type_id==Request::Type::PIM_RD_BG))
       throw std::runtime_error("Unified QKT requires rank RoPE mode for rank1-only reduction");
@@ -459,6 +504,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool can_bypass(const Request& later, const Request& earlier, bool preparing_row) const {
+    if (is_stage(later) || is_stage(earlier)) return false;
     if (is_gemv_release(later) || is_gemv_release(earlier)) return false;
     if (m_ffn_dram && (is_ffn_z(later) || is_ffn_z(earlier))) return z_bypass(later, earlier);
     if (m_rank_rope && (is_rank_rope(later) || is_rank_rope(earlier))) return rr_bypass(later, earlier);
@@ -693,6 +739,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void issue_local_ready() {
+    RankFineScope fine(m_rank_fine_context,m_rank_controller);
     issue_ffn_z_local();
     issue_rank_rope_local();
     issue_bank_local_writes();
@@ -736,8 +783,13 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool issue_pim_ready() {
+    RankFineScope fine(m_rank_fine_context,m_rank_controller);
     for (auto it = m_pim_buffer.begin(); it != m_pim_buffer.end(); ++it) {
       if (is_local(*it) || (is_rank_rope(*it) && it->type_id == Request::Type::PIM_ROPE_EXEC)) continue;
+      if(is_stage(*it)) {
+        if(it==m_pim_buffer.begin()) return issue_stage(it);
+        continue;
+      }
       if (is_gemv_release(*it)) {
         if (it==m_pim_buffer.begin()) return issue_gemv_release(it);
         continue;

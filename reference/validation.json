@@ -1,8 +1,8 @@
 {
-  "unit_tests_passed": 31,
+  "unit_tests_passed": 51,
   "native_guards": {
     "passed": true,
-    "case_count": 15,
+    "case_count": 25,
     "subprocess_isolation": true,
     "native_cases": [
       {
@@ -188,20 +188,126 @@
           "external_fill_checks": 16
         },
         "worker_returncode": 0
+      },
+      {
+        "case": "Stage_missing_write_at_seal",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging seal requires every declared input write",
+        "exception_type": "RuntimeError",
+        "message": "staging seal requires every declared input write",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_load_before_seal",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging load requires sealed input",
+        "exception_type": "RuntimeError",
+        "message": "staging load requires sealed input",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_wrong_source_bank",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging requires rank1 bank0",
+        "exception_type": "RuntimeError",
+        "message": "staging requires rank1 bank0",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_duplicate_write",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "duplicate staging write",
+        "exception_type": "RuntimeError",
+        "message": "duplicate staging write",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_out_of_bounds_load",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging load address outside payload",
+        "exception_type": "RuntimeError",
+        "message": "staging load address outside payload",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_rebegin_before_consume",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging overwrite before full consumption",
+        "exception_type": "RuntimeError",
+        "message": "staging overwrite before full consumption",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_complete_Down_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "memory_cycles": 304,
+        "native_audit": {
+          "events_checked": 21,
+          "operation_counts": {
+            "GEMV_MULTICAST": 16,
+            "GEMV_MAC": 4,
+            "GEMV_RELEASE": 1
+          },
+          "bank_generations_checked": 16,
+          "physical_bank_releases": 16,
+          "maximum_destination_fanout": 16,
+          "input_bytes_per_bank": 1024,
+          "rank_full_input_SRAM_bytes": 0,
+          "independent_mask_reconstruction": true,
+          "rank_controller": {
+            "command_intervals_checked": 82,
+            "rank_command_coverage": 56,
+            "global_CA_resources": 1,
+            "rank_CA_resources": 1,
+            "transfer_broadcast_compute_share_rank_CA": true,
+            "no_CA_interval_overlap": true,
+            "coarse_fragment_descriptors_checked": 1
+          },
+          "minimum_staged_read_issue_gap_ck": 4,
+          "staged_read_latency_ck": 25,
+          "different_tokens_pipeline_before_prior_read_completion": true,
+          "external_input_bytes": 512,
+          "internal_read_bytes": 512
+        },
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_mixed_fragment_rows",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging mixed source fragments",
+        "exception_type": "RuntimeError",
+        "message": "staging mixed source fragments",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_wrong_weight_fragment",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging source/weight fragment mismatch",
+        "exception_type": "RuntimeError",
+        "message": "staging source/weight fragment mismatch",
+        "worker_returncode": 0
+      },
+      {
+        "case": "Stage_wrong_token_rows",
+        "passed": true,
+        "compiled_backend_invoked": true,
+        "expected_message": "staging token rows do not match operator",
+        "exception_type": "RuntimeError",
+        "message": "staging token rows do not match operator",
+        "worker_returncode": 0
       }
     ]
   },
-  "serial_continuity": {
-    "single_native_simulation": true,
-    "continuous_refresh_enabled": true,
-    "native_refresh_commands": 896,
-    "refresh_observed_before_and_after_QKT": true,
-    "global_barriers_without_reset": true,
-    "all_five_stages_share_physical_bank_slots": true,
-    "excluded_producer_latencies_are_unknown": true,
-    "full_AE_end_to_end_latency_us": null
-  },
-  "final_native_job": 1901717,
+  "native_job": 1902573,
   "native_cases_passed": [
     "chain",
     "v",
@@ -211,6 +317,13 @@
     "combined_timing_chain",
     "serial_layer_control"
   ],
-  "clean_minimal_build_passed": true,
-  "historical_measurements_reused": false
+  "historical_measurements_reused": false,
+  "direct_input_baseline_regression": {
+    "status": "passed",
+    "baseline_commit": "4073452",
+    "cases": 7,
+    "native_cycles_bytes_traces_and_event_hashes_identical": true,
+    "all_channel_partitions_identical": true,
+    "stage_sum_us": 109.76288399999999
+  }
 }

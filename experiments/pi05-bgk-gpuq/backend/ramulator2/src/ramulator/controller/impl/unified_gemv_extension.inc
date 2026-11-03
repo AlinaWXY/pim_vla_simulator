@@ -115,6 +115,7 @@ Clk_t gemv_external_issued(const Request& req) {
 bool gemv_mac_ready(const Request& req) {
   const int slot=req.pim_buffer,rows=gemv_rows(req),columns=gemv_columns(req);
   if(slot<0) throw std::runtime_error("Unified GEMV MAC requires explicit input slot");
+  stage_mac_identity(req);
   if(!gemv_slot_idle(slot)) return false;
   for(int bank=16;bank<32;++bank) {
     if(m_clk<m_bank_compute_ready[bank]) return false;

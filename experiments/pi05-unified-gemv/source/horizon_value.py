@@ -5,6 +5,7 @@ one cache tail read-modify-write. Physical KV padding is shared with Q/K.
 """
 from collections import Counter
 from pathlib import Path
+from rank_staging import stage_input, input_offset, reservation
 
 
 HEADS, CHANNELS, BANKS_PER_RANK, HEAD_DIM, HIDDEN = 8, 16, 16, 256, 1024
@@ -112,10 +113,11 @@ class Writer:
             self.emit(operation, physical_address(channel, 1, 0, 0, offset), buffer)
 
 
-def generate(path, horizon, case):
+def generate(path, horizon, case, rank_staging=False):
     if case not in ('v', 'pv'):
         raise ValueError(case)
     geometry = layout(horizon)
+    geometry['input_staging'] = reservation() if rank_staging else None
     fragments = 64 if case == 'v' else geometry['kv_fragments']
     base = geometry['regions']['w_v' if case == 'v' else 'v_cache']['base']
     matrix = dict(M=horizon, K=1024 if case == 'v' else PREFIX+horizon,
@@ -127,20 +129,26 @@ def generate(path, horizon, case):
     matrix['padded_macs'] = matrix['heads']*matrix['M']*matrix['padded_K']*matrix['N']
     w = Writer(path)
     try:
+        if rank_staging:
+            stage_input(w, case, horizon, fragments)
         def compute():
             for fragment in range(fragments):
                 buffer, first = fragment % 2, w.line_no+1
-                for query in range(horizon):
-                    w.ranks('PIM_WR_GB', query*32, buffer)
+                if rank_staging:
+                    w.ranks('PIM_STAGE_FRAGMENT', input_offset(fragment, 0, horizon), buffer)
+                else:
+                    for query in range(horizon):
+                        w.ranks('PIM_WR_GB', query*32, buffer)
                 last, mac_first = w.line_no, w.line_no+1
                 for slot in range(8):
                     w.ranks('PIM_MAC_AB', base+(fragment*8+slot)*32, buffer)
                 w.input_fragments.append(dict(operator=case, fragment=fragment, buffer=buffer,
                     line_start=first, line_end=last, mac_line_first=mac_first, mac_line_last=w.line_no,
-                    command_count=horizon*16, external_bytes=horizon*16*32,
+                    command_count=16 if rank_staging else horizon*16, external_bytes=0 if rank_staging else horizon*16*32,
+                    internal_load_bursts=horizon*16 if rank_staging else 0,
                     query_count=horizon, source='X' if case == 'v' else 'post-softmax P'))
             w.fence()
-        w.phase(f'{case}_input_compute', compute, kind='pipeline', operator=case,
+        w.phase(f'{case}_local_input_compute' if rank_staging else f'{case}_input_compute', compute, kind='local_compute' if rank_staging else 'pipeline', operator=case,
                 mac_service_ck=horizon, native_mac_completion=True, query_count=horizon)
         def release():
             for slot in (0, 1):
@@ -171,13 +179,14 @@ def generate(path, horizon, case):
                 required_unmeasured_stage='GPU BF16 conversion/packing and prefix-tail merge once for all H tokens')
     finally:
         w.stream.close()
-    dq = dict(pim_input_write=w.counts['PIM_WR_GB']*32,
+    dq = dict(pim_input_write=(fragments*horizon*16 if rank_staging else w.counts['PIM_WR_GB'])*32,
               pim_result_read=w.counts['PIM_RD_RES']*32,
-              dram_read=w.counts['LD']*32, dram_write=w.counts['ST']*32)
+              dram_read=w.counts['LD']*32, dram_write=(w.counts['ST']-(fragments*horizon*16 if rank_staging else 0))*32)
     dq['total'] = sum(dq.values())
     return dict(case=case, horizon=horizon, action_horizon=horizon, attention_heads=8,
         schedule='double', matrix=matrix, layout=geometry, counts=dict(w.counts),
         segments=w.segments, input_fragments=w.input_fragments, exports=w.exports,
+        staging_inputs=getattr(w, 'staging_inputs', []), rank_staging=rank_staging,
         expected_dq_bytes=dq, expected_internal_array_read=w.counts['PIM_MAC_AB']*16*32,
         buffers=dict(input_double_per_bank=64*horizon, separate_rank_input_bytes=0,
             accumulator_per_bank=32*horizon),

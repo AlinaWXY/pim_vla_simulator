@@ -25,7 +25,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             org_preset=f"{model_name}_{config.density_gbit}Gb_x16",
             timing_preset=preset,
             rank=config.ranks,
-            **({"pim_data_path": config.pim_data_path} if config.pim else {}),
+            **({"pim_data_path": config.pim_data_path, "pim_rank_controller": config.pim_rank_controller} if config.pim else {}),
             **config.timing_overrides,
         )
 
@@ -72,6 +72,10 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_data_path": config.pim_data_path,
                     "pim_local_transfer_cycles": config.pim_local_transfer_cycles,
                     "pim_unified_gemv": config.pim_unified_gemv,
+                    "pim_rank_staging": config.pim_rank_staging,
+                    "pim_rank_controller": config.pim_rank_controller,
+                    "rank_ca_events_path": str(output / f"rank_ca_events.csv.ch{channel}") if config.pim_rank_controller else "",
+                    "staging_events_path": str(output / f"staging_events.csv.ch{channel}") if config.pim_rank_staging else "",
                     "gemv_port_cycles": config.gemv_port_cycles,
                     "unified_gemv_events_path": str(output / f"unified_gemv.csv.ch{channel}") if config.pim_unified_gemv else "",
                     "pim_rank_rope": config.pim_rank_rope,
@@ -319,7 +323,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                 counters.get("RDRES", 0)) * transaction_bytes,
         })
     else:
-        if not config.pim_ffn_dram:
+        if not config.pim_ffn_dram and not config.pim_rank_staging:
             result["issued_commands"].pop("LOCALRD", None)
         for key in ("pim_rank_rope", "rope_ii_cycles", "rope_latency_cycles", "pim_cast_cycles", "rank_reduce_cycles"):
             result["config"].pop(key, None)
@@ -416,5 +420,46 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
     else:
         result["config"].pop("pim_unified_gemv", None)
         result["config"].pop("gemv_port_cycles", None)
+    if config.pim_rank_staging:
+        result["schema_version"] = 14
+        result["bgk_model"].update(local_write_no_CA=False,
+            local_write="Bank-local array access with native row/recovery constraints and shared rank CA")
+        result["traffic_bytes"].update(
+            gpu_input_staging_write=requests.get("stage_input_declared_bytes", 0),
+            input_staging_array_read=requests.get("stage_input_read_bursts", requests.get("pim_stage_load", 0))*transaction_bytes,
+            input_srf_multicast_source=requests.get("stage_input_read_bursts", requests.get("pim_stage_load", 0))*transaction_bytes,
+            input_srf_multicast_destination=requests.get("stage_input_read_bursts", requests.get("pim_stage_load", 0))*transaction_bytes*16,
+            local_array_read=counters.get("LOCALRD", 0)*transaction_bytes)
+        result["completion_policy"] = (
+            "Input ST completes at native WR issue+CWL+BLmax+WR; SEAL waits for all declared columns; "
+            "staged local reads and SRF multicast complete within nCL+nBL_min with rank CA arbitration; "
+            "native per-bank GEMV fill/consume/release and global BARRIER completion fences")
+        result["pim_model"].update(
+            input_buffer_write_latency_ck=timings["nCL"]+timings["nBL_min"],
+            buffer_transfer_basis="GPU-to-bank0 ordinary WR; bank0-to-SRF and rank SRF multicast via internal LOCALRD")
+        result["pim_model"]["transfer_scheduling"] = (
+            "GPU broadcast inputs first use ordinary WR to dedicated bank0 DRAM; all writes complete before local loads. "
+            "Rank controller expands local reads and SRF multicast; all local read/broadcast/compute commands share rank CA.")
+        result["pim_model"]["double_buffer"] = (
+            "One physical pair of512B GEMV slots per bank; rank-local staging reads may overlap MAC on the other slot, "
+            "subject to the shared rank command bus and source-bank row hazards.")
+        result["pim_model"]["bank_input_multicast"].update(
+            completion="After source-bank DRAM column read; bank-to-SRF and rank multicast latency included in nCL+nBL_min",
+            source="Dedicated rank1 BG0 bank0 DRAM staging")
+        result["unified_gemv_model"].update(
+            external_multicast="Entire operator input written once per rank to bank0 DRAM before any SRF fill; no direct GPU-to-SRF multicast",
+            input_staging_bank=0, input_staging_base_bytes=524288, input_staging_capacity_bytes=131072,
+            input_staging_location="DRAM, separate from the unchanged1KiB per-bank GEMV SRAM",
+            port_sharing="Staging local read, SRF broadcast and compute arbitrate on one rank command bus",
+            down_layout="Output partition:64 complete output features per rank,4 per bank; complete128KiB GPU Z staged in bank0 DRAM",
+            assumption="Bank-to-SRF and intra-rank SRF multicast data latency included in DRAM column-read completion; distinct command arbitration still charged")
+        result["rank_controller_model"] = dict(enabled=config.pim_rank_controller,
+            local_read_and_broadcast_extra_data_latency_ck=0,
+            input_array_read_completion_ck=timings["nCL"]+timings["nBL_min"],
+            shared_rank_commands=["single-bank array commands", "SRF multicast", "PIM compute"])
+    if not config.pim_rank_staging:
+        result["config"].pop("pim_rank_staging", None)
+    if not config.pim_rank_controller:
+        result["config"].pop("pim_rank_controller", None)
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

@@ -15,12 +15,13 @@ void DRAMDevice::set_channel_id(int channel_id) {
 }
 
 void DRAMDevice::issue_command(int command, const AddrVec_t& addr_vec, Clk_t clk) {
+  if (command_observer) command_observer(command, addr_vec, clk);
   m_root->update_timing(command, addr_vec, clk);
   apply_action(command, addr_vec, clk);
 }
 
 bool DRAMDevice::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) {
-  return m_root->check_timing(command, addr_vec, clk);
+  return (!command_admission || command_admission(command, addr_vec, clk)) && m_root->check_timing(command, addr_vec, clk);
 }
 
 int DRAMDevice::get_preq_command(int command, const AddrVec_t& addr_vec, Clk_t clk) {

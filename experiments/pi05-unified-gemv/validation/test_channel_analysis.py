@@ -49,6 +49,39 @@ class IntervalTests(unittest.TestCase):
         self.assertEqual(C.tail_clear_window(items, 10, 15), (10, 15))
 
 
+class CommandBusAccountingTests(unittest.TestCase):
+    @staticmethod
+    def command(clock, ready, *, scope="rank", rank=1):
+        return dict(clock=clock, ready_at=ready, scope=scope, Rank=rank, command="test")
+
+    def test_independent_rank_buses_allow_simultaneous_issue_but_same_rank_rejects_overlap(self):
+        rows = [self.command(1, 3, rank=0), self.command(1, 3, rank=1)]
+        result = C.command_bus_accounting(rows, [], 20, 2, .5)
+        self.assertEqual(result["rank0"]["occupied_us"], 2)
+        self.assertEqual(result["rank1"]["occupied_us"], 2)
+        rows.append(self.command(2, 3, rank=1))
+        with self.assertRaisesRegex(ValueError, "Overlapping rank1 CA"):
+            C.command_bus_accounting(rows, [], 20, 2, .5)
+
+    def test_global_CA_and_DQ_intersection_partition(self):
+        # CK1..4 maps to frontend[1,7); DQ[3,5) overlaps exactly2 ticks.
+        rows = [self.command(1, 4, scope="global")]
+        result = C.command_bus_accounting(rows, [dict(begin=3, end=5)], 10, 2, 1)
+        self.assertEqual(result["global"]["occupied_us"], 6)
+        self.assertEqual(result["dq_idle_global_ca_busy_us"], 4)
+        self.assertEqual(result["dq_idle_global_ca_free_us"], 4)
+        self.assertEqual(result["dq_idle_global_ca_busy_us"]+result["dq_idle_global_ca_free_us"], 8)
+
+    def test_half_open_endpoints_and_wall_clipping(self):
+        rows = [self.command(1, 3, scope="global"), self.command(3, 7, scope="global")]
+        # Adjacent[1,5) and[5,13) remain nonoverlapping. Clip to wall9.
+        result = C.command_bus_accounting(rows, [dict(begin=5, end=20)], 9, 2, 1)
+        self.assertEqual(result["global"]["occupied_us"], 8)
+        self.assertEqual(result["global"]["idle_us"], 1)
+        self.assertEqual(result["dq_idle_global_ca_busy_us"], 4)
+        self.assertEqual(result["dq_idle_global_ca_free_us"], 1)
+
+
 class StageTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

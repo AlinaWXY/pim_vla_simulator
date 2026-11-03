@@ -111,6 +111,7 @@ bool rr_export(ReqBuffer::iterator it) {
     if(m_unified_gemv) {
       const int b=rr_bank(*it),q=2*(rr_column(*it)-rr_local_queries())+m_channel_id%2;
       if(m_clk<m_local_ports[1] || !gemv_q_ready(b,q)) return false;
+      if(!rank_pseudo("Q_LOCAL_FILL")) return false;
       const Clk_t ready=gemv_q_write(*it,b,q,false);
       m_rope_banks[b].query_mask|=uint64_t{1}<<q;
       m_gemv_ingress_owner=nullptr;
@@ -131,6 +132,7 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
     if (!input.valid || input.address != it->addr) throw std::runtime_error("RoPE execute needs matching loaded 32B input");
     if (bank.coefficient_token != col % rr_local_queries()) throw std::runtime_error("RoPE coefficient token mismatch");
     if (m_clk < input.ready || m_clk < bank.coefficient_ready || m_clk < bank.next_pair_issue || bank.outputs.size() >= 2) return false;
+    if(!rank_pseudo("PIM_ROPE_EXEC")) return false;
     const int use = col < 2*rr_local_queries() ? 1 : 2;
     if (bank.coefficient_uses & use) throw std::runtime_error("Duplicate RoPE vector for coefficients");
     bank.coefficient_uses |= use;

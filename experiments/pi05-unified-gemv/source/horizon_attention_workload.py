@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 
 import horizon_attention_layout as L
+from rank_staging import stage_input, input_offset
 
 OPERATORS = ("chain", "projection", "rope", "qk")
 CONTROL_OPERATORS = ()
@@ -56,13 +57,18 @@ class Writer:
         self.stream.close()
 
 
-def projection(w, schedule):
+def projection(w, schedule, rank_staging=False):
+    if rank_staging:
+        stage_input(w, "projection", L.LOCAL_QUERIES, L.HIDDEN//L.LANES)
     def compute():
         for fragment in range(L.HIDDEN // L.LANES):
             buffer = fragment % 2 if schedule == "double" else 0
             first = w.line_no + 1
-            for local_query in range(L.LOCAL_QUERIES):
-                w.ranks("PIM_WR_GB", local_query * L.BURST_BYTES, buffer)
+            if rank_staging:
+                w.ranks("PIM_STAGE_FRAGMENT", input_offset(fragment, 0, L.LOCAL_QUERIES), buffer)
+            else:
+                for local_query in range(L.LOCAL_QUERIES):
+                    w.ranks("PIM_WR_GB", local_query*L.BURST_BYTES, buffer)
             last = w.line_no
             mac_first = w.line_no + 1
             for output_column in range(len(L.PROJECTIONS) * L.FEATURES_PER_BANK):
@@ -71,11 +77,14 @@ def projection(w, schedule):
                 w.ranks("PIM_MAC_AB", offset, buffer)
             w.input_fragments.append(dict(fragment=fragment, buffer=buffer,
                 line_start=first, line_end=last, mac_line_first=mac_first,
-                mac_line_last=w.line_no, external_bytes=(last-first+1) * L.BURST_BYTES,
+                mac_line_last=w.line_no, external_bytes=0 if rank_staging else (last-first+1)*L.BURST_BYTES,
+                input_source="bank0_dram_staging" if rank_staging else "gpu_wrgb",
+                command_count=16 if rank_staging else L.LOCAL_QUERIES*16,
+                internal_load_bursts=L.LOCAL_QUERIES*16 if rank_staging else 0,
                 scope=f"rank1 shared input, {L.LOCAL_QUERIES} local tokens, Q/K reuse"))
             if schedule == "serial":
                 w.fence()
-    w.phase("projection_input_compute", compute, kind="projection", mac_service_ck=L.LOCAL_QUERIES,
+    w.phase("projection_local_input_compute" if rank_staging else "projection_input_compute", compute, kind="projection", mac_service_ck=L.LOCAL_QUERIES,
             native_mac_completion=True)
 
     def spill():
@@ -169,13 +178,13 @@ def qk(w):
             kind="gemv_release")
 
 
-def generate(path, case="chain", schedule="double"):
+def generate(path, case="chain", schedule="double", rank_staging=False):
     if case not in OPERATORS or schedule not in ("double", "serial"):
         raise ValueError((case, schedule))
     w = Writer(path)
     try:
         if case in ("chain", "projection"):
-            projection(w, schedule)
+            projection(w, schedule, rank_staging=rank_staging)
         if case in ("chain", "rope"):
             rope(w, schedule)
         if case in ("chain", "qk"):
@@ -184,7 +193,7 @@ def generate(path, case="chain", schedule="double"):
     finally:
         w.close()
     counts = dict(w.counts)
-    dq = dict(x_gpu_to_pim=w.counts["PIM_WR_GB"] * L.BURST_BYTES,
+    dq = dict(x_gpu_to_pim=(w.counts["ST"] if rank_staging else w.counts["PIM_WR_GB"]) * L.BURST_BYTES,
               q_pim_to_gpu=w.counts["PIM_Q_EXPORT"] * L.BURST_BYTES,
               q_gpu_to_remote_buffer=w.counts["PIM_Q_REMOTE"] * L.BURST_BYTES,
               score_pim_to_gpu=w.counts["PIM_RD_BG"] * L.BURST_BYTES)
@@ -197,6 +206,7 @@ def generate(path, case="chain", schedule="double"):
     return dict(case=case, variant=f"H={L.QUERIES} bank-local RoPE", schedule=schedule,
                 action_horizon=L.QUERIES, attention_heads=L.HEADS,
                 counts=counts, segments=w.segments, input_fragments=w.input_fragments,
+                staging_inputs=getattr(w, "staging_inputs", []), rank_staging=rank_staging,
                 exports=w.exports, local_writes=w.local_writes,
                 expected_dq_bytes=dq, buffers=buffers,
                 expected_local_bytes=dict(

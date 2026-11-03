@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 
 EXTERNAL = frozenset(("RD", "RDA", "WR", "WRA", "WRGB", "RDRES"))
-CONTROL = frozenset(("BARRIER", "WAIT", "PIM_GEMV_RELEASE"))
+CONTROL = frozenset(("BARRIER", "WAIT", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL"))
 PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 
 
@@ -99,6 +99,49 @@ def tail_clear_window(intervals, begin, end):
     tail = max([begin]+[e["end"] for e in intervals
                         if e["issue"] < begin and e["end"] > begin and e["begin"] < end])
     return min(tail, end), end
+
+
+def intersection_ticks(first, second, begin, end):
+    """Intersect two independently disjoint resource timelines in linear time."""
+    i = j = total = 0
+    while i < len(first) and j < len(second):
+        a, b = first[i], second[j]
+        total += max(0, min(end, a["end"], b["end"])-max(begin, a["begin"], b["begin"]))
+        if a["end"] <= b["end"]:
+            i += 1
+        else:
+            j += 1
+    return total
+
+
+def command_bus_accounting(rows, dq, wall, ratio, tick_us):
+    """Measure global and rank CA separately, without calling bus idle GPU time."""
+    resources = {"global": [], "rank0": [], "rank1": []}
+    counts = {name: Counter() for name in resources}
+    for row in rows:
+        scope, rank = row["scope"], int(row["Rank"])
+        require(scope in ("global", "rank") and rank in (-1, 0, 1), "Unknown command bus resource")
+        names = ["global"] if scope == "global" else [f"rank{r}" for r in ((0, 1) if rank == -1 else (rank,))]
+        item = dict(begin=issue_tick(row["clock"], ratio), end=issue_tick(row["ready_at"], ratio))
+        require(item["end"] > item["begin"], "Empty command bus reservation")
+        for name in names:
+            resources[name].append(item)
+            counts[name][row["command"]] += 1
+    result = {}
+    for name, items in resources.items():
+        items.sort(key=lambda e: (e["begin"], e["end"]))
+        for a, b in zip(items, items[1:]):
+            require(a["end"] <= b["begin"], f"Overlapping {name} CA commands")
+        occupied, _ = interval_accounting(items, 0, wall)
+        dq_overlap = intersection_ticks(items, dq, 0, wall)
+        result[name] = dict(occupied_us=occupied*tick_us, idle_us=(wall-occupied)*tick_us,
+            occupied_during_dq_idle_us=(occupied-dq_overlap)*tick_us,
+            command_counts=dict(counts[name]))
+    dq_occupied, _ = interval_accounting(dq, 0, wall)
+    result["dq_idle_global_ca_busy_us"] = result["global"]["occupied_during_dq_idle_us"]
+    result["dq_idle_global_ca_free_us"] = (wall-dq_occupied)*tick_us-result["dq_idle_global_ca_busy_us"]
+    require(result["dq_idle_global_ca_free_us"] >= -1e-9, "CA/DQ intersection exceeds idle")
+    return result
 
 
 def _has_work(segment):
@@ -187,7 +230,17 @@ def analyze_stage(directory, case):
         tail = sum(max(0, e["end"]-max(wall, e["begin"])) for e in intervals[channel])
         payload_ticks = len(intervals[channel])*int(timings["nBL_min"])*ratio
         require(occupied+tail == payload_ticks, "Payload/burst accounting does not close")
+        by_kind = {}
+        for phase in phases:
+            kind = phase["kind"] or "unclassified"
+            part = by_kind.setdefault(kind, dict(wall_us=0.0, dq_occupied_us=0.0,
+                dq_idle_us=0.0, tail_clear_whole_work_us=0.0))
+            part["wall_us"] += phase["duration_us"]
+            part["dq_occupied_us"] += phase["channels"][channel]["modelled_dq_occupied_us"]
+            part["dq_idle_us"] += phase["channels"][channel]["modelled_dq_idle_us"]
+            part["tail_clear_whole_work_us"] += phase["channels"][channel]["tail_clear_window_us"]
         channels.append(dict(channel=channel, stage_us=wall*tick_us,
+            phase_kind_breakdown=by_kind,
             external_commands=dict(external_counts[channel]), external_DQ_bytes=len(intervals[channel])*32,
             modelled_dq_occupied_us=occupied*tick_us, modelled_dq_idle_us=(wall-occupied)*tick_us,
             modelled_dq_idle_outside_tail_clear_work_us=(wall-occupied-clear_ticks[channel])*tick_us,
@@ -200,6 +253,12 @@ def analyze_stage(directory, case):
             other_semantic_phase_us=(phase_ticks-qualified_ticks[channel])*tick_us,
             boundary_overhead_us=(wall-phase_ticks)*tick_us,
             tail_clear_windows=windows[channel]))
+        if config.get("pim_rank_controller"):
+            ca_path = directory/f"simulation/rank_ca_events.csv.ch{channel}"
+            paths.append(ca_path)
+            ca_rows = read_csv(ca_path)
+            require(all(int(row["Channel"]) == channel for row in ca_rows), "CA log channel mismatch")
+            channels[-1]["command_bus"] = command_bus_accounting(ca_rows, intervals[channel], wall, ratio, tick_us)
         require(abs(channels[-1]["stage_us"]-sum(channels[-1][k] for k in
                 ("complete_zero_external_phase_us", "other_semantic_phase_us", "boundary_overhead_us"))) < 1e-8,
                 "Semantic partition does not close")
@@ -226,6 +285,15 @@ def analyze(root):
               "other_semantic_phase_us", "boundary_overhead_us")
     channels = [dict(channel=ch, **{key: sum(s["channels"][ch][key] for s in stages.values())
                                   for key in fields}) for ch in range(count)]
+    for channel in channels:
+        parts = [stage["channels"][channel["channel"]].get("command_bus") for stage in stages.values()]
+        if all(parts):
+            channel["command_bus"] = {resource: {
+                key: sum(part[resource][key] for part in parts)
+                for key in ("occupied_us", "idle_us", "occupied_during_dq_idle_us")}
+                for resource in ("global", "rank0", "rank1")}
+            for key in ("dq_idle_global_ca_busy_us", "dq_idle_global_ca_free_us"):
+                channel["command_bus"][key] = sum(part[key] for part in parts)
     wall = sum(s["stage_us"] for s in stages.values())
     if summary.get("measured_stage_sum_us_per_layer_step") is not None:
         require(abs(summary["measured_stage_sum_us_per_layer_step"]-wall) < 1e-8, "Stage sum differs from runner")
@@ -242,7 +310,7 @@ def analyze(root):
             "stage = complete zero-external-work phases + other semantic phases + boundary overhead",
             "complete zero-external-work phases = tail-clear suffix windows + removed incoming data tails"],
         limitations=["AttAcc movement timing is an abstraction; no validated LPDDR electrical DQ waveform",
-            "No rank0 GPU workload, CA/rank-turnaround admission or GPU dispatch simulation; GPU usable time is unknown",
+            "No concurrent rank0 GPU workload or GPU dispatch simulation; global CA and DQ idle intersection is a resource upper bound, not achieved GPU service time",
             "Five independent native stages; no invented time between stages or double-counted combined FFN",
             "Transfer-phase idle fragments and release/WAIT-only phases are excluded from whole-phase candidate windows",
             "GPU/nonlinear arithmetic and background VLM contention remain unmeasured"])
@@ -273,6 +341,29 @@ def write_report(root, output=None):
         for stage in report["stages"].values():
             for phase in stage["phases"]:
                 writer.writerows(dict(phase, **row) for row in phase["channels"])
+    with (output/"channel-phase-kind-breakdown.csv").open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=("case", "channel", "kind", "wall_us",
+            "dq_occupied_us", "dq_idle_us", "tail_clear_whole_work_us"))
+        writer.writeheader()
+        for case, stage in report["stages"].items():
+            for row in stage["channels"]:
+                writer.writerows(dict(case=case, channel=row["channel"], kind=kind, **part)
+                    for kind, part in row["phase_kind_breakdown"].items())
+    if all(row.get("command_bus") for row in report["channels"]):
+        with (output/"channel-command-bus.csv").open("w", newline="", encoding="utf-8") as stream:
+            writer = csv.DictWriter(stream, fieldnames=("case", "channel", "global_ca_occupied_us",
+                "rank0_ca_occupied_us", "rank1_ca_occupied_us", "dq_idle_global_ca_busy_us",
+                "dq_idle_global_ca_free_us"))
+            writer.writeheader()
+            for case, stage in report["stages"].items():
+                for row in stage["channels"]:
+                    bus = row["command_bus"]
+                    writer.writerow(dict(case=case, channel=row["channel"],
+                        global_ca_occupied_us=bus["global"]["occupied_us"],
+                        rank0_ca_occupied_us=bus["rank0"]["occupied_us"],
+                        rank1_ca_occupied_us=bus["rank1"]["occupied_us"],
+                        dq_idle_global_ca_busy_us=bus["dq_idle_global_ca_busy_us"],
+                        dq_idle_global_ca_free_us=bus["dq_idle_global_ca_free_us"]))
     lines = ["# Native H16 channel accounting", "",
         "All times below are microseconds per layer and denoising step. DQ intervals describe the AttAcc movement model, not a validated electrical waveform. GPU usable time is unmeasured.", "",
         "| Stage | Wall | Model DQ occupied/channel (min–max) | Model DQ idle/channel (min–max) | Whole zero-external phases, all channels | After incoming data tails |",
@@ -282,8 +373,15 @@ def write_report(root, output=None):
         span = lambda key: f"{min(values(key)):.6f}–{max(values(key)):.6f}"
         lines.append(f"| {case} | {stage['stage_us']:.6f} | {span('modelled_dq_occupied_us')} | {span('modelled_dq_idle_us')} | {stage['complete_zero_external_phase_us_all_channels']:.6f} | {stage['tail_clear_complete_zero_external_phase_us_all_channels']:.6f} |")
     lines += ["", f"Five-stage sum: {report['stage_sum_us']:.6f} us; x18x10: {report['stage_sum_ms_18x10']:.6f} ms. This is a sum of measured stages, not complete AE end-to-end latency.", "",
-        "Each channel closes exactly as wall = model DQ occupied + model DQ idle. Whole-phase candidate windows exclude transfer-phase fragments and release-only control phases. Incoming delayed data is removed before counting each remaining suffix. These windows still require GPU command/address, rank-turnaround and row-admission modelling before they can be called usable GPU time.", "",
+        "Each channel closes exactly as wall = model DQ occupied + model DQ idle. Whole-phase candidate windows exclude transfer-phase fragments and release-only control phases. Incoming delayed data is removed before counting each remaining suffix. Actual concurrent GPU request admission and service are not simulated.", "",
         "The JSON and CSV files retain every channel and semantic phase, including boundary overhead and any data tail beyond stage completion.", ""]
+    if all(row.get("command_bus") for row in report["channels"]):
+        lines += ["| Channel | Global CA busy | Rank0 CA busy | Rank1 CA busy | DQ idle, global CA busy | DQ and global CA both idle |",
+            "|---|---:|---:|---:|---:|---:|"]
+        for row in report["channels"]:
+            bus = row["command_bus"]
+            lines.append(f"| {row['channel']} | {bus['global']['occupied_us']:.6f} | {bus['rank0']['occupied_us']:.6f} | {bus['rank1']['occupied_us']:.6f} | {bus['dq_idle_global_ca_busy_us']:.6f} | {bus['dq_idle_global_ca_free_us']:.6f} |")
+        lines += ["", "Global CA and each rank CA are separate resources. Their durations must not be added to DQ time. The last two columns partition DQ idle exactly; simultaneous DQ/global-CA idle is a resource upper bound, not measured GPU usable time.", ""]
     (output/"CHANNEL-ANALYSIS.md").write_text("\n".join(lines), encoding="utf-8")
     return report
 

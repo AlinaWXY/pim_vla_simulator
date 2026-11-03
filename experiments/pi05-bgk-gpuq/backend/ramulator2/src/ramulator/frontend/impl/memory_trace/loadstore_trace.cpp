@@ -16,7 +16,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
  private:
   static constexpr int Barrier = -2;
   static constexpr int Wait = -3;
-  struct Trace { int type_id; Addr_t addr; int pim_buffer; };
+  struct Trace { int type_id; Addr_t addr; int pim_buffer; int stage_bytes=0, stage_rows=0; };
   std::vector<Trace> m_trace;
   size_t m_curr_trace_idx = 0;
   size_t m_trace_count = 0;
@@ -113,6 +113,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       }
       Request req(t.addr, t.type_id);
       req.pim_buffer = t.pim_buffer;
+      req.pim_stage_bytes = t.stage_bytes; req.pim_stage_rows = t.stage_rows;
       req.size_bytes = m_memory_system->get_tx_bytes();
       if (m_wait_for_completion) {
         req.callback = [this](Request& completed) {
@@ -147,12 +148,13 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
     while (std::getline(input, line)) {
       line_num++;
       std::istringstream fields(line);
-      std::string op, value, buffer, extra;
+      std::string op, value, buffer, extra, overflow;
       if (!(fields >> op >> value)) {
         throw std::runtime_error(fmt::format("Trace line {}: expected OP ADDRESS [BUFFER]", line_num));
       }
       fields >> buffer;
-      if (fields >> extra) throw std::runtime_error("LoadStoreTrace: too many fields");
+      fields >> extra;
+      if (fields >> overflow || (!extra.empty() && op != "PIM_STAGE_BEGIN")) throw std::runtime_error("LoadStoreTrace: too many fields");
       int type = op == "LD" ? Request::Type::Read :
           op == "ST" ? Request::Type::Write :
           op == "PIM_MAC_AB" ? Request::Type::PIM_MAC_AB :
@@ -177,21 +179,31 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
           op == "PIM_Z_STORE" ? Request::Type::PIM_Z_STORE :
           op == "PIM_Z_LOAD" ? Request::Type::PIM_Z_LOAD :
           op == "PIM_GEMV_RELEASE" ? Request::Type::PIM_GEMV_RELEASE :
+          op == "PIM_STAGE_BEGIN" ? Request::Type::PIM_STAGE_BEGIN :
+          op == "PIM_STAGE_SEAL" ? Request::Type::PIM_STAGE_SEAL :
+          op == "PIM_STAGE_LOAD" ? Request::Type::PIM_STAGE_LOAD :
+          op == "PIM_STAGE_FRAGMENT" ? Request::Type::PIM_STAGE_FRAGMENT :
           op == "BARRIER" ? Barrier : op == "WAIT" ? Wait : -1;
       if (type == -1) throw std::runtime_error("LoadStoreTrace: unknown operation " + op);
-      int pim_buffer = -1;
-      if (!buffer.empty()) {
+      int pim_buffer = -1, stage_bytes=0, stage_rows=0;
+      if (type == Request::Type::PIM_STAGE_BEGIN) {
+        size_t used=0;
+        stage_bytes=std::stoi(buffer,&used);
+        if(used!=buffer.size()) throw std::runtime_error("Invalid staging byte count");
+        stage_rows=std::stoi(extra,&used);
+        if(used!=extra.size() || stage_bytes<=0 || stage_bytes>131072 || stage_bytes%32 || (stage_rows!=8 && stage_rows!=16) || stage_bytes%(stage_rows*32)) throw std::runtime_error("Invalid staging size/rows");
+      } else if (!buffer.empty()) {
         if ((type != Request::Type::PIM_WR_GB && type != Request::Type::PIM_MAC_AB &&
              type != Request::Type::PIM_LOCAL_GB && type != Request::Type::PIM_WR_BG &&
              type != Request::Type::PIM_WR_Q && type != Request::Type::PIM_MAC_K &&
              type != Request::Type::PIM_MAC_QK && type != Request::Type::PIM_RD_Q &&
-             type != Request::Type::PIM_ROPE_LOAD && type != Request::Type::PIM_ROPE_EXEC && type != Request::Type::PIM_Q_REMOTE && type != Request::Type::PIM_Z_LOAD && type != Request::Type::PIM_GEMV_RELEASE) ||
+             type != Request::Type::PIM_ROPE_LOAD && type != Request::Type::PIM_ROPE_EXEC && type != Request::Type::PIM_Q_REMOTE && type != Request::Type::PIM_Z_LOAD && type != Request::Type::PIM_GEMV_RELEASE && type != Request::Type::PIM_STAGE_LOAD && type != Request::Type::PIM_STAGE_FRAGMENT) ||
             (buffer != "0" && buffer != "1")) {
           throw std::runtime_error("LoadStoreTrace: BUFFER must be 0/1 on WRGB or MACAB");
         }
         pim_buffer = buffer == "0" ? 0 : 1;
       }
-      if ((type == Request::Type::PIM_GEMV_RELEASE || type == Request::Type::PIM_Z_LOAD || type == Request::Type::PIM_ROPE_LOAD || type == Request::Type::PIM_ROPE_EXEC || type == Request::Type::PIM_Q_REMOTE || type == Request::Type::PIM_LOCAL_GB || type == Request::Type::PIM_RD_Q || (type >= Request::Type::PIM_WR_BG &&
+      if ((type == Request::Type::PIM_STAGE_FRAGMENT || type == Request::Type::PIM_STAGE_LOAD || type == Request::Type::PIM_GEMV_RELEASE || type == Request::Type::PIM_Z_LOAD || type == Request::Type::PIM_ROPE_LOAD || type == Request::Type::PIM_ROPE_EXEC || type == Request::Type::PIM_Q_REMOTE || type == Request::Type::PIM_LOCAL_GB || type == Request::Type::PIM_RD_Q || (type >= Request::Type::PIM_WR_BG &&
           type <= Request::Type::PIM_MAC_QK)) && pim_buffer < 0)
         throw std::runtime_error("PIM_LOCAL_GB requires BUFFER=0/1");
       size_t consumed = 0;
@@ -206,7 +218,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       if (type == Request::Type::Write && m_wait_for_completion && m_write_tail_cycles == 0) {
         throw std::runtime_error("LoadStoreTrace: writes require explicit write_tail_cycles");
       }
-      m_trace.push_back({type, addr, pim_buffer});
+      m_trace.push_back({type, addr, pim_buffer, stage_bytes, stage_rows});
     }
     if (m_trace.empty()) throw std::runtime_error("LoadStoreTrace: empty trace");
   }

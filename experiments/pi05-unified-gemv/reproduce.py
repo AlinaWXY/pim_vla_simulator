@@ -42,7 +42,7 @@ def setup(backend):
     return env
 
 
-def config_for(case, refresh=True, max_cycles=1_000_000):
+def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True):
     from simulator.config import MemoryConfig
     chain = case in ("chain", "serial_layer_control")
     timings = dict(nCCDAB=8 if chain else 16, nLOCALWR=4)
@@ -53,20 +53,21 @@ def config_for(case, refresh=True, max_cycles=1_000_000):
         pim_data_path="attacc", frontend_ratio=32, max_cycles=max_cycles,
         pim_horizon=16, pim_rank_rope=chain, pim_ffn_dram=False,
         pim_unified_gemv=True, gemv_port_cycles=2,
+        pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
         ffn_z_preinstalled=False,
         rope_ii_cycles=1, rope_latency_cycles=4, pim_cast_cycles=1, rank_reduce_cycles=4,
         timing_overrides=timings, pim_local_transfer_cycles=2)
 
 
-def run_case(output, case):
+def run_case(output, case, rank_staging=True):
     import workload
     from simulator.backend import run_trace
     from audit_native import audit_run
     directory = output / case
     directory.mkdir()
-    manifest = workload.generate(directory / "workload.trace", case)
+    manifest = workload.generate(directory / "workload.trace", case, rank_staging=rank_staging)
     dump(directory / "manifest.json", manifest)
-    config = config_for(case)
+    config = config_for(case, rank_staging=rank_staging)
     native = run_trace(config, directory / "workload.trace", directory / "simulation")
     with (directory / "simulation/barriers.csv").open(newline="") as stream:
         markers = {int(r["marker"]): int(r["frontend_tick"]) for r in csv.DictReader(stream)}
@@ -78,6 +79,7 @@ def run_case(output, case):
     if dq != manifest["expected_dq_bytes"]["total"]:
         raise AssertionError((case, "external DQ differs", dq, manifest["expected_dq_bytes"]))
     summary = dict(case=case, horizon=16, fresh_native_run=True, unified_bank_gemv=True,
+        rank_staging=rank_staging, rank_controller=rank_staging,
         latency_us=native["latency_ns"]/1000, memory_cycles=native["memory_cycles"],
         tCK_ns=native["tCK_ns"], phase_us=phases,
         phase_boundary_us=native["latency_ns"]/1000-sum(phases.values()),
@@ -109,6 +111,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--backend", type=Path, default=HERE.parent / "pi05-bgk-gpuq/backend")
     parser.add_argument("--cases", nargs="+", choices=CASES, default=list(CASES))
+    parser.add_argument("--direct-input-baseline", action="store_true", help="Reproduce xinyao_1101 direct WRGB input behavior")
     parser.add_argument("--skip-tests", action="store_true", help="For diagnostic runs only")
     args = parser.parse_args()
     backend, output = args.backend.resolve(strict=True), args.output.resolve()
@@ -130,23 +133,24 @@ def main():
         native_library_sha256=library_hash,
         source_sha256={str(p): digest(p) for p in sorted(set(source_files))},
         fresh_native_simulation=True, historical_latency_used_as_oracle=False,
-        policy="One physical pair of bank GEMV slots; explicit native fill/consume/release"))
+        policy="Single-bank whole-input DRAM staging and rank command arbitration" if not args.direct_input_baseline else "Legacy direct WRGB bank GEMV fill"))
     if not args.skip_tests:
         execute("unit-tests", [sys.executable, "-m", "unittest", "discover", "-s",
                 HERE / "validation", "-p", "test_*.py", "-v"], output, env)
         execute("native-guards", [sys.executable, HERE / "validation/native_guards.py",
                 "--backend", backend, "--output", output / "native-guards"], output, env)
-    runs = {case: run_case(output, case) for case in args.cases}
+    runs = {case: run_case(output, case, rank_staging=not args.direct_input_baseline) for case in args.cases}
     import workload
     complete = all(case in runs for case in PRIMARY)
     summary = dict(status="passed", horizon=16, attention_heads=8,
         unified_bank_gemv=True, primary_cases=list(PRIMARY), runs=runs,
+        rank_staging=not args.direct_input_baseline, rank_controller=not args.direct_input_baseline,
         down_rank_partial_reduction=False, input_broadcast_extra_cycles=0,
         measured_stage_sum_us_per_layer_step=sum(runs[c]["latency_us"] for c in PRIMARY) if complete else None,
         external_DQ_bytes_per_layer_step=sum(runs[c]["external_DQ_bytes"] for c in PRIMARY) if complete else None,
         FFN_combined_control_us=runs.get("combined_timing_chain", {}).get("latency_us"),
         serial_layer_memory_control_us=runs.get("serial_layer_control", {}).get("latency_us"),
-        layouts=workload.layouts(), complete_AE_end_to_end_latency_ms=None,
+        layouts=workload.layouts(rank_staging=not args.direct_input_baseline), complete_AE_end_to_end_latency_ms=None,
         actual_GPU_usable_time_us=None, unknown_latency_us={name: None for name in UNKNOWN},
         tests_executed=not args.skip_tests,
         aggregation="Five independently timed stages; combined FFN and serial-layer memory schedule are additional controls, excluded from the sum")

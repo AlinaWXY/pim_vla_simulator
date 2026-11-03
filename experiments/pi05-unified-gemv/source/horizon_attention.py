@@ -25,9 +25,12 @@ def layout_for(horizon):
         configure(previous)
 
 
-def generate(path, horizon=None, case="chain", schedule="double"):
+def generate(path, horizon=None, case="chain", schedule="double", rank_staging=False):
     if horizon is not None:
         configure(horizon)
-    result = W.generate(path, case=case, schedule=schedule)
+    result = W.generate(path, case=case, schedule=schedule, rank_staging=rank_staging)
     result["layout"] = layout_for(L.QUERIES)
+    if rank_staging:
+        from rank_staging import reservation
+        result["layout"]["input_staging"] = reservation()
     return result

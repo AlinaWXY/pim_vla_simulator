@@ -29,6 +29,8 @@ class MemoryConfig:
     pim_data_path: str = "lpddr"
     pim_local_transfer_cycles: int = 2
     pim_unified_gemv: bool = False
+    pim_rank_staging: bool = False
+    pim_rank_controller: bool = False
     gemv_port_cycles: int = 2
     pim_rank_rope: bool = False
     pim_horizon: int = 16
@@ -40,6 +42,12 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
+        if type(self.pim_rank_staging) is not bool or type(self.pim_rank_controller) is not bool:
+            raise ValueError("Rank staging/controller flags must be boolean")
+        if self.pim_rank_controller and not self.pim_unified_gemv:
+            raise ValueError("Rank controller requires unified GEMV")
+        if self.pim_rank_staging and (not self.pim_unified_gemv or not self.pim_rank_controller or self.pim_ffn_dram):
+            raise ValueError("Rank staging requires unified GEMV and rank controller, without legacy FFN DRAM mode")
         if type(self.pim_unified_gemv) is not bool or type(self.gemv_port_cycles) is not int or self.gemv_port_cycles < 1:
             raise ValueError("Unified GEMV flag must be boolean and port cycles positive")
         if self.pim_unified_gemv and (not self.pim or self.pim_horizon != 16 or self.ranks != 2 or self.channels != 16 or self.pim_data_path != "attacc" or self.pim_input_broadcast or self.pim_mac_scope != "rank"):

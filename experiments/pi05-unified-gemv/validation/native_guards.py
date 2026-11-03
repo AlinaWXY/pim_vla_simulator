@@ -25,6 +25,16 @@ CASES = {
     "Q_release_before_scan": "Q release requires completed 496-token K scan",
     "QKT_then_V_reuses_same_slot": None,
     "Down_GPU_input_complete": None,
+    "Stage_missing_write_at_seal": "staging seal requires every declared input write",
+    "Stage_load_before_seal": "staging load requires sealed input",
+    "Stage_wrong_source_bank": "staging requires rank1 bank0",
+    "Stage_duplicate_write": "duplicate staging write",
+    "Stage_out_of_bounds_load": "staging load address outside payload",
+    "Stage_rebegin_before_consume": "staging overwrite before full consumption",
+    "Stage_complete_Down_fragment": None,
+    "Stage_mixed_fragment_rows": "staging mixed source fragments",
+    "Stage_wrong_weight_fragment": "staging source/weight fragment mismatch",
+    "Stage_wrong_token_rows": "staging token rows do not match operator",
 }
 
 
@@ -38,9 +48,34 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
-    if name.startswith("Q"):
+    if name.startswith("Stage_"):
+        base = 524288
+        payload = 1024 if name == "Stage_mixed_fragment_rows" else 256 if name == "Stage_wrong_token_rows" else 512
+        rows = 8 if name == "Stage_wrong_token_rows" else 16
+        begin_bank = 1 if name == "Stage_wrong_source_bank" else 0
+        lines = [f"PIM_STAGE_BEGIN {address(base, bank=begin_bank)} {payload} {rows}"]
+        packets = 15 if name == "Stage_missing_write_at_seal" else payload//32
+        lines += [f"ST {address(base+32*p)}" for p in range(packets)]
+        if name == "Stage_duplicate_write":
+            lines.append(f"ST {address(base)}")
+        if name != "Stage_load_before_seal":
+            lines.append(f"PIM_STAGE_SEAL {address(base)}")
+        if name == "Stage_rebegin_before_consume":
+            lines.append(f"PIM_STAGE_BEGIN {address(base)} {payload} {rows}")
+        elif name == "Stage_mixed_fragment_rows":
+            lines += [command("PIM_STAGE_LOAD", base), command("PIM_STAGE_LOAD", base+17*32)]
+        else:
+            packets = (16,) if name == "Stage_out_of_bounds_load" else range(16)
+            if name in ("Stage_complete_Down_fragment", "Stage_wrong_weight_fragment", "Stage_wrong_token_rows"):
+                lines.append(command("PIM_STAGE_FRAGMENT", base))
+            else:
+                lines += [command("PIM_STAGE_LOAD", base+32*p) for p in packets]
+            weight_shift = 128 if name == "Stage_wrong_weight_fragment" else 0
+            lines += [command("PIM_MAC_AB", 327680+weight_shift+32*p) for p in range(4)]
+            lines.append(command("PIM_GEMV_RELEASE"))
+    elif name.startswith("Q"):
         import workload
-        manifest = workload.generate(path, "chain")
+        manifest = workload.generate(path, "chain", rank_staging=False)
         lines = path.read_text(encoding="ascii").splitlines()
         if name in ("Q_held_ordinary_write", "Q_release_before_scan"):
             segment = next(s for s in manifest["segments"] if s["name"] == "q_remote_buffer_fill")
@@ -93,6 +128,39 @@ def positive_audit(directory, name):
     from audit_native import read_csv, read_json, audit_slot_events
     events = [e for ch in range(16)
               for e in read_csv(directory / "simulation" / f"unified_gemv.csv.ch{ch}")]
+    if name == "Stage_complete_Down_fragment":
+        result = audit_slot_events(events, "down_gpu_input")
+        native = [e for ch in range(16)
+                  for e in read_csv(directory / "simulation" / f"timeline.csv.ch{ch}")]
+        staged = [e for ch in range(16)
+                  for e in read_csv(directory / "simulation" / f"staging_events.csv.ch{ch}")]
+        ca = [e for ch in range(16)
+              for e in read_csv(directory / "simulation" / f"rank_ca_events.csv.ch{ch}")]
+        from collections import Counter
+        from staging_audit import audit_rank_ca
+        from audit_native import trace_records
+        if Counter(e["operation"] for e in staged) != Counter(BEGIN=1, WR=16, SEAL=1, LOCALRD=16, BROADCAST=16):
+            raise AssertionError("Positive staging control lacks complete store/read/broadcast evidence")
+        if any(e["command"] == "WRGB" for e in native):
+            raise AssertionError("Positive staging control unexpectedly issued direct input WRGB")
+        seal = next(e for e in staged if e["operation"] == "SEAL")
+        if seal["clock"] < max(e["ready_at"] for e in staged if e["operation"] == "WR"):
+            raise AssertionError("Positive staging control sealed before complete DRAM write recovery")
+        timings = read_json(directory / "simulation/result.json")["resolved_timings_ck"]
+        reads = sorted((e for e in staged if e["operation"] == "LOCALRD"), key=lambda e: e["clock"])
+        gaps = [b["clock"]-a["clock"] for a, b in zip(reads, reads[1:])]
+        if not gaps or min(gaps) >= timings["nCL"]+timings["nBL_min"]:
+            raise AssertionError("Staged token reads incorrectly serialize on full column completion")
+        if min(gaps) < timings["nCCDL"]:
+            raise AssertionError("Pipelined staged reads violate same-bank column issue spacing")
+        result["rank_controller"] = audit_rank_ca(ca, native, staged,
+            records=trace_records(directory / "guard.trace"))
+        result["minimum_staged_read_issue_gap_ck"] = min(gaps)
+        result["staged_read_latency_ck"] = timings["nCL"]+timings["nBL_min"]
+        result["different_tokens_pipeline_before_prior_read_completion"] = True
+        result["external_input_bytes"] = 512
+        result["internal_read_bytes"] = 512
+        return result
     if name == "Down_GPU_input_complete":
         result = audit_slot_events(events, "down_gpu_input")
         if result["operation_counts"].get("GEMV_MULTICAST") != 16 or result["operation_counts"].get("GEMV_MAC") != 4:
@@ -143,8 +211,9 @@ def worker(backend, output, name):
     trace_for(trace, name)
     is_q = name.startswith("Q")
     is_down = name.startswith("Down_")
-    config = config_for("chain" if is_q else "down_gpu_input" if is_down else "v",
-                        refresh=CASES[name] is None, max_cycles=500_000)
+    staged = name.startswith("Stage_")
+    config = config_for("chain" if is_q else "down_gpu_input" if is_down or staged else "v",
+                        refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged)
     try:
         native = run_trace(config, trace, output / "simulation")
     except Exception as error:
