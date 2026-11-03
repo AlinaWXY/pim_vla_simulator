@@ -1,8 +1,8 @@
 {
   "status": "passed",
   "units": "microseconds per channel, per layer, per denoising step",
-  "stage_sum_us": 187.293274,
-  "stage_sum_ms_18x10": 33.71278932,
+  "stage_sum_us": 183.85737999999998,
+  "stage_sum_ms_18x10": 33.094328399999995,
   "primary_cases": [
     "chain",
     "v",
@@ -13,530 +13,530 @@
   "channels": [
     {
       "channel": 0,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 1,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 2,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 3,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 4,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 5,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 6,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 7,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 8,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 9,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 10,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 11,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 12,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 13,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 14,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     },
     {
       "channel": 15,
-      "stage_us": 187.293274,
-      "external_DQ_bytes": 350208,
-      "modelled_dq_occupied_us": 20.530943999999998,
-      "modelled_dq_idle_us": 166.76233,
-      "modelled_dq_idle_outside_tail_clear_work_us": 14.265104,
+      "stage_us": 183.85737999999998,
+      "external_DQ_bytes": 333824,
+      "modelled_dq_occupied_us": 19.570432,
+      "modelled_dq_idle_us": 164.28694799999997,
+      "modelled_dq_idle_outside_tail_clear_work_us": 13.762336,
       "modelled_dq_tail_after_stage_us": 0.0,
-      "complete_zero_external_phase_us": 152.49722599999998,
-      "tail_clear_complete_zero_external_phase_us": 152.49722599999998,
+      "complete_zero_external_phase_us": 150.524612,
+      "tail_clear_complete_zero_external_phase_us": 150.524612,
       "removed_boundary_data_tail_us": 0.0,
-      "other_semantic_phase_us": 34.7915045625,
+      "other_semantic_phase_us": 33.3282245625,
       "boundary_overhead_us": 0.0045434375,
       "command_bus": {
         "global": {
-          "occupied_us": 17.304223999999998,
-          "idle_us": 169.98905,
-          "occupied_during_dq_idle_us": 8.170917999999999
+          "occupied_us": 17.277959999999997,
+          "idle_us": 166.57941999999997,
+          "occupied_during_dq_idle_us": 8.602397999999999
         },
         "rank0": {
-          "occupied_us": 0.04314799999999999,
-          "idle_us": 187.25012599999997,
-          "occupied_during_dq_idle_us": 0.04221
+          "occupied_us": 0.04221,
+          "idle_us": 183.81516999999997,
+          "occupied_during_dq_idle_us": 0.041271999999999996
         },
         "rank1": {
-          "occupied_us": 34.775411999999996,
-          "idle_us": 152.51786199999998,
-          "occupied_during_dq_idle_us": 24.985505999999997
+          "occupied_us": 33.787698,
+          "idle_us": 150.069682,
+          "occupied_during_dq_idle_us": 24.455536
         },
-        "dq_idle_global_ca_busy_us": 8.170917999999999,
-        "dq_idle_global_ca_free_us": 158.591412
+        "dq_idle_global_ca_busy_us": 8.602397999999999,
+        "dq_idle_global_ca_free_us": 155.68455
       }
     }
   ],
@@ -18088,8 +18088,8 @@
       "complete_zero_external_phase_us_all_channels": 32.448234,
       "tail_clear_complete_zero_external_phase_us_all_channels": 32.448234,
       "source_sha256": {
-        "manifest.json": "44ae2b844e997433d6f69d36b4a8ead9c61e97bc7976a5a4337348d39b327e0f",
-        "simulation/result.json": "09e58c48bb975b60fba26ba9fd1449d0fd53dd686c97eb77b7ad34527419c4b4",
+        "manifest.json": "31482c1f2ee8e889c82a8be7099f74b5d01abff45f5815d15e8dec4cab825add",
+        "simulation/result.json": "8678b16da48ca960203296f2ac6dc7c2ad404308565b70b74a452d09f75ea97a",
         "simulation/barriers.csv": "c8762eb36805504c9e07f986617b89051fb2e2bd7978dc0d3e014df39d96e0d5",
         "simulation/timeline.csv.ch0": "b34eab57aca27293033413b6cca7df07ca1fdc38938409ce24fd9cf2a34ae1fa",
         "simulation/timeline.csv.ch1": "07412c2960477f2568f9d696058491c9c76dd72fd7d2c9887ce01997db29b3e4",
@@ -18127,26 +18127,26 @@
     },
     "v": {
       "case": "v",
-      "stage_us": 20.592851999999997,
+      "stage_us": 17.156958,
       "frontend_ratio": 32,
       "tCK_ns": 0.938,
       "pim_data_path": "attacc",
       "channels": [
         {
           "channel": 0,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18155,15 +18155,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18174,99 +18174,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 1,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18275,15 +18275,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18294,99 +18294,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 2,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18395,15 +18395,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18414,99 +18414,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 3,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18515,15 +18515,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18534,99 +18534,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 4,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18635,15 +18635,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18654,99 +18654,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 5,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18755,15 +18755,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18774,99 +18774,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 6,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18875,15 +18875,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -18894,99 +18894,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 7,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -18995,15 +18995,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19014,99 +19014,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 8,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19115,15 +19115,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19134,99 +19134,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 9,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19235,15 +19235,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19254,99 +19254,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 10,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19355,15 +19355,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19374,99 +19374,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 11,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19475,15 +19475,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19494,99 +19494,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 12,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19595,15 +19595,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19614,99 +19614,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 13,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19715,15 +19715,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19734,99 +19734,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 14,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19835,15 +19835,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19854,99 +19854,99 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         },
         {
           "channel": 15,
-          "stage_us": 20.592851999999997,
+          "stage_us": 17.156958,
           "phase_kind_breakdown": {
             "input_staging": {
-              "wall_us": 2.5026133125,
-              "dq_occupied_us": 1.9210239999999998,
-              "dq_idle_us": 0.5815893124999999,
+              "wall_us": 1.2456933124999998,
+              "dq_occupied_us": 0.9605119999999999,
+              "dq_idle_us": 0.28518131249999995,
               "tail_clear_whole_work_us": 0.0
             },
             "local_compute": {
-              "wall_us": 16.065126,
+              "wall_us": 14.092512,
               "dq_occupied_us": 0.0,
-              "dq_idle_us": 16.065126,
-              "tail_clear_whole_work_us": 16.065126
+              "dq_idle_us": 14.092512,
+              "tail_clear_whole_work_us": 14.092512
             },
             "gemv_release": {
               "wall_us": 0.0028139999999999997,
@@ -19955,15 +19955,15 @@
               "tail_clear_whole_work_us": 0.0
             },
             "external_read": {
-              "wall_us": 0.9830239999999999,
+              "wall_us": 0.9820859999999999,
               "dq_occupied_us": 0.48025599999999996,
-              "dq_idle_us": 0.502768,
+              "dq_idle_us": 0.50183,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_read": {
-              "wall_us": 0.505582,
+              "wall_us": 0.30016,
               "dq_occupied_us": 0.24012799999999998,
-              "dq_idle_us": 0.26545399999999997,
+              "dq_idle_us": 0.060031999999999995,
               "tail_clear_whole_work_us": 0.0
             },
             "dram_write": {
@@ -19974,82 +19974,82 @@
             }
           },
           "external_commands": {
-            "WR": 1280,
+            "WR": 768,
             "RDRES": 256,
             "RD": 128
           },
-          "external_DQ_bytes": 53248,
-          "modelled_dq_occupied_us": 3.1216639999999996,
-          "modelled_dq_idle_us": 17.471187999999998,
-          "modelled_dq_idle_outside_tail_clear_work_us": 1.406062,
+          "external_DQ_bytes": 36864,
+          "modelled_dq_occupied_us": 2.161152,
+          "modelled_dq_idle_us": 14.995805999999998,
+          "modelled_dq_idle_outside_tail_clear_work_us": 0.9032939999999999,
           "modelled_dq_tail_after_stage_us": 0.0,
-          "modelled_idle_interval_count": 289,
-          "longest_modelled_idle_interval_us": 16.107336,
-          "complete_zero_external_phase_us": 16.065126,
-          "tail_clear_complete_zero_external_phase_us": 16.065126,
+          "modelled_idle_interval_count": 281,
+          "longest_modelled_idle_interval_us": 14.134721999999998,
+          "complete_zero_external_phase_us": 14.092512,
+          "tail_clear_complete_zero_external_phase_us": 14.092512,
           "removed_boundary_data_tail_us": 0.0,
-          "other_semantic_phase_us": 4.5268173124999995,
+          "other_semantic_phase_us": 3.0635373125,
           "boundary_overhead_us": 0.0009086874999999999,
           "tail_clear_windows": [
             {
               "phase": "v_local_input_compute",
-              "begin_tick": 85378,
-              "end_tick": 633442,
-              "begin_us": 2.502642625,
-              "end_us": 18.567768625,
-              "duration_us": 16.065126
+              "begin_tick": 42498,
+              "end_tick": 523266,
+              "begin_us": 1.245722625,
+              "end_us": 15.338234624999998,
+              "duration_us": 14.092512
             }
           ],
           "command_bus": {
             "global": {
-              "occupied_us": 2.192106,
-              "idle_us": 18.400745999999998,
-              "occupied_during_dq_idle_us": 0.70819,
+              "occupied_us": 2.1658419999999996,
+              "idle_us": 14.991115999999998,
+              "occupied_during_dq_idle_us": 1.13967,
               "command_counts": {
                 "PIM_STAGE_BEGIN": 1,
-                "ACT1": 32,
-                "ACT2": 32,
-                "WR": 1280,
-                "PREpb": 14,
+                "ACT1": 24,
+                "ACT2": 24,
+                "WR": 768,
+                "PREpb": 6,
                 "PIM_STAGE_SEAL": 1,
                 "PIM_STAGE_FRAGMENT": 64,
-                "PIM_MAC_AB": 512,
-                "REFab": 10,
-                "PREab": 5,
+                "PIM_MAC_AB": 1024,
+                "REFab": 8,
+                "PREab": 3,
                 "PIM_GEMV_RELEASE": 2,
                 "PIM_RD_RES": 256,
                 "RD": 128
               }
             },
             "rank0": {
-              "occupied_us": 0.00469,
-              "idle_us": 20.588161999999997,
-              "occupied_during_dq_idle_us": 0.00469,
+              "occupied_us": 0.0037519999999999997,
+              "idle_us": 17.153205999999997,
+              "occupied_during_dq_idle_us": 0.0037519999999999997,
               "command_counts": {
-                "REFab": 5
+                "REFab": 4
               }
             },
             "rank1": {
-              "occupied_us": 4.320428,
-              "idle_us": 16.272423999999997,
-              "occupied_during_dq_idle_us": 2.816814,
+              "occupied_us": 3.3327139999999997,
+              "idle_us": 13.824243999999998,
+              "occupied_during_dq_idle_us": 2.286844,
               "command_counts": {
-                "ACT1": 96,
-                "ACT2": 96,
-                "WR": 1280,
-                "PREpb": 78,
-                "LOCALRD": 1024,
-                "BCAST": 1024,
-                "PREab": 37,
-                "ACTAB": 35,
-                "MACAB": 512,
-                "REFab": 5,
+                "ACT1": 89,
+                "ACT2": 89,
+                "WR": 768,
+                "PREpb": 70,
+                "LOCALRD": 512,
+                "BCAST": 512,
+                "PREab": 35,
+                "ACTAB": 33,
+                "MACAB": 1024,
+                "REFab": 4,
                 "RDRES": 256,
                 "RD": 128
               }
             },
-            "dq_idle_global_ca_busy_us": 0.70819,
-            "dq_idle_global_ca_free_us": 16.762998
+            "dq_idle_global_ca_busy_us": 1.13967,
+            "dq_idle_global_ca_free_us": 13.856135999999998
           }
         }
       ],
@@ -20059,153 +20059,153 @@
           "phase": "v_gpu_input_stage",
           "kind": "input_staging",
           "begin_tick": 1,
-          "end_tick": 85378,
-          "duration_us": 2.5026133125,
+          "end_tick": 42498,
+          "duration_us": 1.2456933124999998,
           "meaningful_work": true,
           "complete_zero_external_phase_all_channels": false,
           "excluded_reason": null,
           "channels": [
             {
               "channel": 0,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 1,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 2,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 3,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 4,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 5,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 6,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 7,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 8,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 9,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 10,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 11,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 12,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 13,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 14,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
             {
               "channel": 15,
-              "external_commands": 1024,
+              "external_commands": 512,
               "complete_zero_external_phase": false,
-              "modelled_dq_occupied_us": 1.9210239999999998,
-              "modelled_dq_idle_us": 0.5815893124999999,
+              "modelled_dq_occupied_us": 0.9605119999999999,
+              "modelled_dq_idle_us": 0.28518131249999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             }
@@ -20215,9 +20215,9 @@
           "case": "v",
           "phase": "v_local_input_compute",
           "kind": "local_compute",
-          "begin_tick": 85378,
-          "end_tick": 633442,
-          "duration_us": 16.065126,
+          "begin_tick": 42498,
+          "end_tick": 523266,
+          "duration_us": 14.092512,
           "meaningful_work": true,
           "complete_zero_external_phase_all_channels": true,
           "excluded_reason": null,
@@ -20227,144 +20227,144 @@
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 1,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 2,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 3,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 4,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 5,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 6,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 7,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 8,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 9,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 10,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 11,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 12,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 13,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 14,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             },
             {
               "channel": 15,
               "external_commands": 0,
               "complete_zero_external_phase": true,
               "modelled_dq_occupied_us": 0.0,
-              "modelled_dq_idle_us": 16.065126,
-              "tail_clear_begin_tick": 85378,
-              "tail_clear_window_us": 16.065126
+              "modelled_dq_idle_us": 14.092512,
+              "tail_clear_begin_tick": 42498,
+              "tail_clear_window_us": 14.092512
             }
           ]
         },
@@ -20372,8 +20372,8 @@
           "case": "v",
           "phase": "v_gemv_release",
           "kind": "gemv_release",
-          "begin_tick": 633442,
-          "end_tick": 633538,
+          "begin_tick": 523266,
+          "end_tick": 523362,
           "duration_us": 0.0028139999999999997,
           "meaningful_work": false,
           "complete_zero_external_phase_all_channels": false,
@@ -20529,9 +20529,9 @@
           "case": "v",
           "phase": "v_result_export",
           "kind": "external_read",
-          "begin_tick": 633538,
-          "end_tick": 667074,
-          "duration_us": 0.9830239999999999,
+          "begin_tick": 523362,
+          "end_tick": 556866,
+          "duration_us": 0.9820859999999999,
           "meaningful_work": true,
           "complete_zero_external_phase_all_channels": false,
           "excluded_reason": null,
@@ -20541,7 +20541,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20550,7 +20550,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20559,7 +20559,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20568,7 +20568,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20577,7 +20577,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20586,7 +20586,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20595,7 +20595,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20604,7 +20604,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20613,7 +20613,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20622,7 +20622,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20631,7 +20631,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20640,7 +20640,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20649,7 +20649,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20658,7 +20658,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20667,7 +20667,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20676,7 +20676,7 @@
               "external_commands": 256,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.48025599999999996,
-              "modelled_dq_idle_us": 0.502768,
+              "modelled_dq_idle_us": 0.50183,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             }
@@ -20686,9 +20686,9 @@
           "case": "v",
           "phase": "v_prefix_tail_read",
           "kind": "dram_read",
-          "begin_tick": 667074,
-          "end_tick": 684322,
-          "duration_us": 0.505582,
+          "begin_tick": 556866,
+          "end_tick": 567106,
+          "duration_us": 0.30016,
           "meaningful_work": true,
           "complete_zero_external_phase_all_channels": false,
           "excluded_reason": null,
@@ -20698,7 +20698,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20707,7 +20707,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20716,7 +20716,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20725,7 +20725,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20734,7 +20734,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20743,7 +20743,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20752,7 +20752,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20761,7 +20761,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20770,7 +20770,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20779,7 +20779,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20788,7 +20788,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20797,7 +20797,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20806,7 +20806,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20815,7 +20815,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20824,7 +20824,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             },
@@ -20833,7 +20833,7 @@
               "external_commands": 128,
               "complete_zero_external_phase": false,
               "modelled_dq_occupied_us": 0.24012799999999998,
-              "modelled_dq_idle_us": 0.26545399999999997,
+              "modelled_dq_idle_us": 0.060031999999999995,
               "tail_clear_begin_tick": null,
               "tail_clear_window_us": 0.0
             }
@@ -20843,8 +20843,8 @@
           "case": "v",
           "phase": "v_suffix_write",
           "kind": "dram_write",
-          "begin_tick": 684322,
-          "end_tick": 702498,
+          "begin_tick": 567106,
+          "end_tick": 585282,
           "duration_us": 0.5327839999999999,
           "meaningful_work": true,
           "complete_zero_external_phase_all_channels": false,
@@ -20997,44 +20997,44 @@
           ]
         }
       ],
-      "complete_zero_external_phase_us_all_channels": 16.065126,
-      "tail_clear_complete_zero_external_phase_us_all_channels": 16.065126,
+      "complete_zero_external_phase_us_all_channels": 14.092512,
+      "tail_clear_complete_zero_external_phase_us_all_channels": 14.092512,
       "source_sha256": {
-        "manifest.json": "c5928cdeb1a54c08c35ba65d985a8b14c0ef5ee48a83e3f7e27b18963091a477",
-        "simulation/result.json": "8ab841fea7415d572c04688b10df8e1129b493854ee309aaad498a2051bc7f90",
-        "simulation/barriers.csv": "b00c45cc68804baf04ae68ebca70e4d9154552683410fcf162aaa31e2a1892a4",
-        "simulation/timeline.csv.ch0": "80c987fa016cfa8fdef9cf8063e7ddaa2e962a89a3cf25480337b1b4b8a75cd1",
-        "simulation/timeline.csv.ch1": "aa889c78a59ceadb5f2ed82d251f3d6042096f9da5ceea80bfdf4de2a2296f40",
-        "simulation/timeline.csv.ch2": "53c84539704becb99129016296a3bb57f841093183d0b071c67a3f5511dae22b",
-        "simulation/timeline.csv.ch3": "e430dd22423b7711050f1693ace69dd2c49a4d5a4d7b76b7bf5dba9613307a1f",
-        "simulation/timeline.csv.ch4": "be826abdbc66af948aa0088506044158873beda221b6e011aece593d0abbeb1f",
-        "simulation/timeline.csv.ch5": "cc977be5915b828c6bbd55b43563aa7d034c168300ee51abe914985cf48ec174",
-        "simulation/timeline.csv.ch6": "4a5a3e99f14dcc52ae4394a3e6949be05be5f1e7bc1537dfaebf7b49fb00307b",
-        "simulation/timeline.csv.ch7": "0936238e401008d34e3c51254d7798f2751eed5b43661a9fe7a305f11ad0f1b9",
-        "simulation/timeline.csv.ch8": "2a6f079d0cbb22ae0a4a521211927141cdbc40d9d0e2c128e4ffda479fe85e63",
-        "simulation/timeline.csv.ch9": "b77577b72066e812aa363c9b294b97dba774aa9fe89cf41fb6659d3895d73f47",
-        "simulation/timeline.csv.ch10": "4dc52a4e088eacaf6d2b1a3b3ee436b76ef7a44567366004bfb1bd99884b082e",
-        "simulation/timeline.csv.ch11": "f37e4f686beb356d172645948f464afc45ba697eb0281a97de84e1063be95373",
-        "simulation/timeline.csv.ch12": "cd892560b83c023a5a5698b988c150ab80a5ac7f1b71aae906c4531e49f6e86c",
-        "simulation/timeline.csv.ch13": "3e1b3a398224c67a4d1b9382085e9979ee1e41a72d8963936ba62da2a5c62376",
-        "simulation/timeline.csv.ch14": "c44800be95ce5a4ccf112c81e63adb8e50a8dbeaeb9988ffee37ff9bedcd8d8d",
-        "simulation/timeline.csv.ch15": "d0c6e552093c711134a8fc280985cdfb77c47a58f8bb16bd7b1b88d4c396c4c1",
-        "simulation/rank_ca_events.csv.ch0": "c7372204ec7a5871e6639fe7ab439e3a4a33af23ff816e25ea1dc7fc6d19a86a",
-        "simulation/rank_ca_events.csv.ch1": "0d680932a6cfd3e020ad6e8c7a83306cb7e90b18a73e24495e237c0a978dc547",
-        "simulation/rank_ca_events.csv.ch2": "1dfb2618df5a4902368a9a95ed40726014243e863004947ad6563503453be614",
-        "simulation/rank_ca_events.csv.ch3": "47f5e608551b7c43acff620b566767e0e7fabdda9b842558de5ae59f18491a10",
-        "simulation/rank_ca_events.csv.ch4": "8051ab71907bbc99bc5c852bc408e72ab4b50ccc98ddb03ac23cba6c6915fbad",
-        "simulation/rank_ca_events.csv.ch5": "1ed46de989977637b9db36d26c3e5c4137dc1a909bf06514590655447ec890c0",
-        "simulation/rank_ca_events.csv.ch6": "b569df755f0e43044dda692e276096e372b0e39a9feb4f323ecade48d3a81bbf",
-        "simulation/rank_ca_events.csv.ch7": "a430142440e21f734da55e729d82f62b0dc9a79d2acd1d479145908ce22c5a0f",
-        "simulation/rank_ca_events.csv.ch8": "b5b769e15ed8ae0436c154d8eb891b3a65e1258abb51e5c5858980c333c73956",
-        "simulation/rank_ca_events.csv.ch9": "8ca654a6dcfce11510c7e6ff7be6e12ca501f7eba9185a7693717435f59bd073",
-        "simulation/rank_ca_events.csv.ch10": "73d4a5a8dc9a312ee612b8c0c95e1d70db5129cf1a368c3d76af4568bf84955a",
-        "simulation/rank_ca_events.csv.ch11": "fd2a2c84cd71906f524595f573d019aebc79028bd5429e69b830ae7db202dac6",
-        "simulation/rank_ca_events.csv.ch12": "5544739fa302f5d7e29c4db68e63789a06392c3568a9c9ab24168f2dfd68e4f1",
-        "simulation/rank_ca_events.csv.ch13": "ff7ec37d463374d7152fbed179863f018822bd57cffc386f57057160d70db3f4",
-        "simulation/rank_ca_events.csv.ch14": "2f31decfabe466796322893280c8f99e3dd937434b3a55f0ba919ae62d2d0e3e",
-        "simulation/rank_ca_events.csv.ch15": "c645e7b82f5e1caf0e89478ce3e038e65b629c7575574eae7ea5dc7be98dd57d"
+        "manifest.json": "5715036cf9b583870d973ff7a8377a20df9ad71864db8908aa3f4ce84f2ba9c8",
+        "simulation/result.json": "27a7baba6edd172218f199e6d3e96cc0c6ab9e97806f3778f4f9eb50ab5c6d88",
+        "simulation/barriers.csv": "42776da1907dbc2d76da7f8bbec8903bb1f4df097fb1fb6767dbfd7f6b49474f",
+        "simulation/timeline.csv.ch0": "395dc24a40340cc703b6cba366168b2c4bce25c7fe8b0fd568453f84b25e62d5",
+        "simulation/timeline.csv.ch1": "ccba8d9eed8dbec9e817b248c6587e55f3d72380a98bcf82b3a3be1001e7760c",
+        "simulation/timeline.csv.ch2": "5db314e9c39345818f5c7677e15c062820fd6ca1644fe9b91bd2ca15d8d00b80",
+        "simulation/timeline.csv.ch3": "b2a742f388bb396fbf10fad2014f8b31b630017514f3338fff37d8b9199100ff",
+        "simulation/timeline.csv.ch4": "ff26fca2833b551c06cece727ac858821bab371a527deb33cd5a7fee3a00df36",
+        "simulation/timeline.csv.ch5": "5d67f1e9090549b0e88ef6b690058fb546b30eb0e20cf26da0d6a42e6ac32695",
+        "simulation/timeline.csv.ch6": "a0c15a2edca44aec362607be0260bc7a14d0f209bfa53b1bed60b2d84592a3c1",
+        "simulation/timeline.csv.ch7": "f1c74536c7f74187b6bc923f44357a454dd4816428aba1f6d3bfca7704a8c602",
+        "simulation/timeline.csv.ch8": "d65ca9fe15e9ea2716e8a5336a95879192e4406ae28f61379ff0f45394ef529d",
+        "simulation/timeline.csv.ch9": "6897cfe405549a2ee0c19ac5c8341f980641ded24748d2c6cdf2fd1f67dab946",
+        "simulation/timeline.csv.ch10": "d6879a7c544006f544d5527a282d55790c374ccc12d9f88da2882d2c4abf5d13",
+        "simulation/timeline.csv.ch11": "fa05c7e9a91adf2e1dff1f3af2ea94174d9a9d71b643e10697fa7bc8a89d2b5e",
+        "simulation/timeline.csv.ch12": "182b097358f01369f7bb98941d03f53a54916b2e764d5a8eeddefa7c275cc39a",
+        "simulation/timeline.csv.ch13": "c000d9e79faf2c18dbd8ea9a0b514ab858b64bb1b27af618298a5e4a55ba7dcf",
+        "simulation/timeline.csv.ch14": "3bf0826caf8d8ce419ee67e3e0bc540e82d2dcbea8301c274b1bbf4b6b054397",
+        "simulation/timeline.csv.ch15": "96c32448074ed9d27435d526779a4909fa94c4b635df825dcdabb622cbe4374c",
+        "simulation/rank_ca_events.csv.ch0": "7f2107590c21cc0ba347062202d264c661b298b93d21cd7f072526202ee2b2f1",
+        "simulation/rank_ca_events.csv.ch1": "f81138fec05679d3de96c6cf35b982ad27217f5fb62c1b7574728c3dda8a135b",
+        "simulation/rank_ca_events.csv.ch2": "fecb1477e025129dbf871ea2dabe6b1538baad5c69d054f26b6f6818eb53a01a",
+        "simulation/rank_ca_events.csv.ch3": "8e88fba4930b81816a53f472f6b8f909324df0438a658658477777990cd76c17",
+        "simulation/rank_ca_events.csv.ch4": "1973f7284f6e51be0521f3ad162e01cf27f24f923b6ddcaacac0a801b32c2765",
+        "simulation/rank_ca_events.csv.ch5": "e491ceb14ec6ceafd999d80a85246c74fc7e2214c38d8818a524e916017f24ac",
+        "simulation/rank_ca_events.csv.ch6": "9fb7da460f28ea7ad06d27c848f75f05bc2d02839655b4492499194449ac032c",
+        "simulation/rank_ca_events.csv.ch7": "6232a6a9534cb884a4dc91e3b8b8e875f4d10443c2fea857ba500fc68329c84f",
+        "simulation/rank_ca_events.csv.ch8": "89ad47dc7f849447468bac0836e9efcdfc066a64112ffe52042e7c114563d532",
+        "simulation/rank_ca_events.csv.ch9": "f2068c30b0102838b70c109bf1f25d6600ccd1d7487a07bffc0952eeab01ef75",
+        "simulation/rank_ca_events.csv.ch10": "3ea1cadf99b74683a844862a49fc634830bedb84da46bfd0eed7003f284cbf8e",
+        "simulation/rank_ca_events.csv.ch11": "c466d6884ff7acfc1ea57fd440d18452180c22c0a9fdda1c8616732624df8567",
+        "simulation/rank_ca_events.csv.ch12": "929bee80383f1e199ca1e96139b7947a0ff0d2f7d4a9c344216ca79c1efd6c74",
+        "simulation/rank_ca_events.csv.ch13": "9f6361df52ab97508996c7ea28cee6f010a4213eeb2229fe1534014e2bf10c3b",
+        "simulation/rank_ca_events.csv.ch14": "19a503772f40204e65aabf5826c1c46ef536b80bf65fb8434b551302ad277e0b",
+        "simulation/rank_ca_events.csv.ch15": "6242aa0abe0b8e118f603a5c0c5eb51d16e81f428cf7a7244bd0c8ae5227eb05"
       }
     },
     "pv": {
@@ -23358,8 +23358,8 @@
       "complete_zero_external_phase_us_all_channels": 15.588621999999999,
       "tail_clear_complete_zero_external_phase_us_all_channels": 15.588621999999999,
       "source_sha256": {
-        "manifest.json": "a7ef1c214234ffacff2fcfeb58ebd66a918ad7bbe79b91058d2a9405b71b87fb",
-        "simulation/result.json": "aaa1433560670bada9cce2fc2a825ae23d2acea559c54ccf67d816ba645100da",
+        "manifest.json": "b4a91e0d7857bdad12073f8e3189b07277a90d8039e057b898cb7ae0bbeeb257",
+        "simulation/result.json": "665d14dec953220f904c6d36915d3252a3c357dfac7e2ed3caac7ff35ac3574f",
         "simulation/barriers.csv": "b3d45f1cd69271b504f422462342e673c2b78173f590f380c31a2e409b967f45",
         "simulation/timeline.csv.ch0": "45171520596a9e095844365b319aa77ca6c0963fb233d547088207cf3ad9e143",
         "simulation/timeline.csv.ch1": "1c01962119f71115f008c2e8b9820c1932f3834b99c36636f15885c07032f155",
@@ -25716,8 +25716,8 @@
       "complete_zero_external_phase_us_all_channels": 40.757037999999994,
       "tail_clear_complete_zero_external_phase_us_all_channels": 40.757037999999994,
       "source_sha256": {
-        "manifest.json": "8607b16499588479f4fd66dec6f228bf7e0dd79fcbb31de72b49be42e80401ac",
-        "simulation/result.json": "8f2fcbd851620675500be9a047a03f1c5729d218727367a2b0966cf5586ef96a",
+        "manifest.json": "a6bb7f10b7a0eeee482d26850f6913c4810c80a9b66ba28ca7275f736329ec75",
+        "simulation/result.json": "53db22fa342154e5a66f04fdce35b76284ab4d4d6b2301bee7bcaeb038f6cdbb",
         "simulation/barriers.csv": "1ee4bae814a61d1dc2486d9170a304764e351182d2dedf6b6ca05c907fd928c5",
         "simulation/timeline.csv.ch0": "f1889b7ca74b35006801b8d338fef8c38b1fba92c31e1c96df2cd28729c9d2f5",
         "simulation/timeline.csv.ch1": "a6e3cd505e7c9db32cb0317ab91c43ee9a515fc9a8bcc087cf37d18fcabeeeb8",
@@ -28074,8 +28074,8 @@
       "complete_zero_external_phase_us_all_channels": 47.638206,
       "tail_clear_complete_zero_external_phase_us_all_channels": 47.638206,
       "source_sha256": {
-        "manifest.json": "4cbc42850be2a8b5337cad560385c2fc2857001d1c66ec54e4133cbed91ae537",
-        "simulation/result.json": "591879da7bf259ee175499b397791dae3a470efc8c3d910c58a0597fc62364f4",
+        "manifest.json": "116f548a6fedd81ade06d80fe8ffb146a3ddf4782fe8aa0733e666799a5f86cc",
+        "simulation/result.json": "636f0a771a9d9468d4d3636b4516902468757918b362bd6d616c28585f32787d",
         "simulation/barriers.csv": "834f66b931e90ac70b885c6a3b008a60a1e4dee4d6c64c2f31b1d3bf6a672602",
         "simulation/timeline.csv.ch0": "2b89410061f3ba5750b77bb639f02026faddc444130ef6f00db10d781427222c",
         "simulation/timeline.csv.ch1": "3f1a85f81046b965e05f22beeff170fbdf363bd62b2af9dfdc78e6d11399910c",
@@ -28112,8 +28112,8 @@
       }
     }
   },
-  "complete_zero_external_phase_us_all_channels": 152.49722599999998,
-  "tail_clear_complete_zero_external_phase_us_all_channels": 152.49722599999998,
+  "complete_zero_external_phase_us_all_channels": 150.524612,
+  "tail_clear_complete_zero_external_phase_us_all_channels": 150.524612,
   "actual_GPU_usable_time_us": null,
   "validated_physical_DQ_waveform": false,
   "dq_interval_model": "AttAcc WRGB/RDRES: issue+[0,nBL_min); ordinary RD/WR: issue+[nCL/nCWL,nCL/nCWL+nBL_min). All intervals checked disjoint.",

@@ -232,8 +232,7 @@ void stage_mac_identity(const Request& req) const {
   const int slot=req.pim_buffer,offset=gemv_offset(req);
   if(slot<0 || m_stage_slot_generation[slot]!=m_stage.generation)
     throw std::runtime_error("staging source/weight fragment mismatch");
-  const int base=offset<65536?0:offset<100352?83968:offset<116736?100352:offset<327680?262144:327680;
-  const int fragment=(offset-base)/(gemv_columns(req)*32);
+  const int fragment=(offset-gemv_weight_base(req))/(gemv_columns(req)*32);
   if(fragment!=m_stage_slot_fragment[slot])
     throw std::runtime_error("staging source/weight fragment mismatch");
   if(m_stage.rows!=gemv_rows(req))

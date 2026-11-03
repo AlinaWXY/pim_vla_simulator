@@ -17,14 +17,14 @@ PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 CASES = (*PRIMARY, "combined_timing_chain", "serial_layer_control")
 
 
-def unified_buffers(case, rank_staging=True, staging_banks=1):
+def unified_buffers(case, rank_staging=True, staging_banks=1, v_token_sharding=False):
     buffers = dict(gemv_slots_per_bank=2, gemv_slot_bytes=512,
                 gemv_total_bytes_per_bank=1024, gemv_layout="[token16][lane16] BF16",
                 separate_rank_MAC_input_bytes=0, separate_Q_buffer_bytes=0,
                 rank_external_ingress_staging_bytes=32,
                 bank_Z_column_staging_bytes=0,
                 input_broadcast_extra_cycles=0,
-                input_rows=8 if case == "chain" else 16,
+                input_rows=8 if case == "chain" or case == "v" and v_token_sharding else 16,
                 QKT_rows=16 if case == "chain" else 0)
     if rank_staging:
         buffers.update(input_staging_dram=reservation(staging_banks), input_staging_dram_bytes_per_rank=131072,
@@ -46,7 +46,8 @@ def unified_buffers(case, rank_staging=True, staging_banks=1):
     return buffers
 
 
-def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False):
+def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False,
+             v_token_sharding=False):
     rank_descriptors = bool(rank_descriptors and rank_staging)
     channel_independent_dispatch = bool(channel_independent_dispatch and rank_staging)
     check_staging_banks(staging_banks)
@@ -54,16 +55,20 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
         raise ValueError(case)
     if case == "serial_layer_control":
         return generate_serial(path, rank_staging=rank_staging, staging_banks=staging_banks,
-            rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
+            rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
+            v_token_sharding=v_token_sharding)
     if case == "chain":
         result = attention.generate(path, horizon=16, case="chain", schedule="double", rank_staging=rank_staging, staging_banks=staging_banks, rank_descriptors=rank_descriptors)
     elif case in ("v", "pv"):
-        result = value.generate(path, 16, case, rank_staging=rank_staging, staging_banks=staging_banks)
+        result = value.generate(path, 16, case, rank_staging=rank_staging, staging_banks=staging_banks,
+                                v_token_sharding=v_token_sharding)
     else:
         result = ffn.generate(path, 16, case, local_ck=2, rank_staging=rank_staging, staging_banks=staging_banks)
-    result["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks)
+    result["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
+                                         v_token_sharding=v_token_sharding)
     if "layout" in result:
-        result["layout"]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks)
+        result["layout"]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
+                                                     v_token_sharding=v_token_sharding)
     result.setdefault("required_backend", {}).update(pim_unified_gemv=True,
         gemv_port_cycles=2, pim_horizon=16,
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
@@ -71,6 +76,7 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
         pim_rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
     result["rank_descriptors"] = rank_descriptors
     result["channel_independent_dispatch"] = channel_independent_dispatch
+    result["v_token_sharding"] = bool(v_token_sharding and case == "v")
     result.setdefault("expanded_counts", result["counts"].copy())
     result.setdefault("rank_batches", [])
     result["input_resource"] = "same two 512B slots in each physical PIM bank"
@@ -79,19 +85,21 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
     return result
 
 
-def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False):
+def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False,
+                    v_token_sharding=False):
     """One controller lifetime across all modeled stages; no invented GPU wait."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     lines, segments, parts, boundary = [], [], [], 0
-    staging_inputs, rank_batches = [], []
+    staging_inputs, rank_batches, v_mapping = [], [], None
     expanded_counts = Counter()
     dq = {}
     with tempfile.TemporaryDirectory(prefix="serial-parts-", dir=path.parent) as scratch:
         for case in PRIMARY:
             part_path = Path(scratch) / f"{case}.trace"
             manifest = generate(part_path, case, rank_staging=rank_staging, staging_banks=staging_banks,
-                rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
+                rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
+                v_token_sharding=v_token_sharding)
             expanded_counts.update(manifest["expanded_counts"])
             source = part_path.read_text(encoding="ascii").splitlines()
             skip = bool(lines)
@@ -126,8 +134,14 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
                 batch.update(stage=case, line_start=batch["line_start"]+line_shift,
                     line_end=batch["line_end"]+line_shift)
                 rank_batches.append(batch)
+            if manifest.get("v_token_mapping"):
+                from v_token_layout import shift_trace_lines
+                v_mapping = shift_trace_lines(manifest["v_token_mapping"], line_shift)
+                v_mapping["stage"] = case
             parts.append(dict(stage=case, start_marker=boundary,
                 end_marker=segments[-1]["end"], first_line=2+line_shift, last_line=len(lines)))
+            if manifest.get("v_token_sharding"):
+                parts[-1]["v_token_sharding"] = True
             boundary = segments[-1]["end"]
             dq[case] = manifest["expected_dq_bytes"]["total"]
     path.write_text("\n".join(lines)+"\n", encoding="ascii")
@@ -135,12 +149,13 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
     buffers.update(projection_accumulator_per_bank=1024, value_accumulator_per_bank=512,
         rope_input_double_per_bank=64, rope_coefficient_per_bank=32, rope_output_per_bank=64,
         score_tile_per_rank=1024, QKT_rows=16,
-        input_rows_by_operator=dict(QK_projection=8, V=16, PV=16, GU=16, Down=16))
+        input_rows_by_operator=dict(QK_projection=8, V=8 if v_token_sharding else 16, PV=16, GU=16, Down=16))
     buffers.pop("input_rows", None)
-    return dict(case="serial_layer_control", horizon=16, action_horizon=16,
+    result = dict(case="serial_layer_control", horizon=16, action_horizon=16,
         segments=segments, counts=dict(Counter(line.split()[0] for line in lines)), parts=parts,
         expanded_counts=dict(expanded_counts), rank_batches=rank_batches,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
+        v_token_sharding=bool(v_token_sharding),
         staging_inputs=staging_inputs, rank_staging=rank_staging,
         staging_banks=staging_banks if rank_staging else 0,
         expected_dq_bytes=dict(total=sum(dq.values()), by_stage=dq), buffers=buffers,
@@ -160,12 +175,17 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
             GPU_Q_forward_dispatch=None),
         excluded_boundary_policy="Consumer values are assumed ready at each excluded GPU/nonlinear boundary. No artificial zero-latency kernel or delay is modeled.",
         interpretation="Continuous native memory/resource schedule for modeled work only; not full numerical or end-to-end AE inference")
+    if v_mapping is not None:
+        result["v_token_mapping"] = v_mapping
+    return result
 
 
-def layouts(rank_staging=True, staging_banks=1):
-    result = dict(attention=attention.layout_for(16), value=value.layout(16), ffn=ffn.layout(16, rank_staging=rank_staging, staging_banks=staging_banks))
+def layouts(rank_staging=True, staging_banks=1, v_token_sharding=False):
+    result = dict(attention=attention.layout_for(16), value=value.layout(16, v_token_sharding=v_token_sharding),
+                  ffn=ffn.layout(16, rank_staging=rank_staging, staging_banks=staging_banks))
     for name, case in (("attention", "chain"), ("value", "v"), ("ffn", "combined_timing_chain")):
-        result[name]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks)
+        result[name]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
+                                                   v_token_sharding=v_token_sharding)
         if rank_staging:
             result[name]["input_staging"] = reservation(staging_banks)
         for stale in ("input_double_buffer_bytes_per_rank", "rank_input_layout"):

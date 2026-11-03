@@ -82,10 +82,11 @@ def trace_key(record):
     return (*key, record["stage_bytes"], record["stage_rows"]) if record["operation"] == "PIM_STAGE_BEGIN" else key
 
 
-def expected_addresses(case, rank_staging=True, staging_banks=1):
+def expected_addresses(case, rank_staging=True, staging_banks=1, v_token_sharding=False):
     """Derive every request independently from matrix dimensions and ownership."""
     if case == "serial_layer_control":
-        return sum((expected_addresses(stage, rank_staging=rank_staging, staging_banks=staging_banks) for stage in
+        return sum((expected_addresses(stage, rank_staging=rank_staging, staging_banks=staging_banks,
+                                       v_token_sharding=v_token_sharding) for stage in
                     ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")), Counter())
     expected = Counter()
     def add(op, ch, offset, slot=-1, bank=0):
@@ -132,7 +133,9 @@ def expected_addresses(case, rank_staging=True, staging_banks=1):
                 add("PIM_RD_BG", ch, offset)
         release((0,))
     elif case in ("v", "pv"):
-        ordinary(83968 if case == "v" else 100352, 64 if case == "v" else 62, 8, 16)
+        token_v = case == "v" and v_token_sharding
+        ordinary(131072 if token_v else 83968 if case == "v" else 100352,
+                 64 if case == "v" else 62, 16 if token_v else 8, 8 if token_v else 16)
         release()
         for ch in range(16):
             for offset in range(0, 16*16*8*4, 32):
@@ -223,7 +226,7 @@ def audit_array_rows(native):
     return checks
 
 
-def audit_slot_events(events, case, require_final_release=True, mac_context=None):
+def audit_slot_events(events, case, require_final_release=True, mac_context=None, v_token_sharding=False):
     """Replay masks per physical bank, never trusting a reported 'ready' bit."""
     states, port_until, counts = {}, defaultdict(int), Counter()
     generations, released, max_fanout = 0, 0, 0
@@ -284,12 +287,16 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
             elif op in ("GEMV_MAC", "GEMV_QK"):
                 rows = 8 if case == "chain" and op == "GEMV_MAC" else 16
                 columns = 4 if case == "down_gpu_input" else 8 if case in ("v", "pv") else 32
+                if case == "v" and v_token_sharding and op == "GEMV_MAC":
+                    rows, columns = 8, 16
                 if op == "GEMV_MAC" and mac_context is not None:
                     row = mac_context[ch, start]
                     if 0 <= row < 32:
                         rows, columns, kind = 8, 32, "X"
                     elif 41 <= row < 57:
                         rows, columns, kind = 16, 8, "X"
+                    elif 64 <= row < 80 and v_token_sharding:
+                        rows, columns, kind = 8, 16, "X"
                     elif 128 <= row < 160:
                         rows, columns, kind = 16, 32, "X"
                     elif 160 <= row < 176:
@@ -300,6 +307,7 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                 require(event["token_mask"] == (1 << rows)-1 and event["lane_mask"] == 65535, "MAC token/lane footprint wrong")
                 require(not state["released"] and all(x == 65535 for x in state["lanes"][:rows]),
                         "MAC consumes missing bank/token/lane input")
+                require(not any(state["lanes"][rows:]), "MAC input contains extra token rows for its operator")
                 require(start >= max(state["ready"], state["busy"]), "MAC begins before fill/prior consume completes")
                 require((op == "GEMV_QK") == state["held"], "QKT and ordinary MAC use incompatible slot owner")
                 limit = 496 if op == "GEMV_QK" else columns
@@ -417,21 +425,22 @@ def audit_ffn_streams(native, gemv_events, case, staging_events=None, staging_ba
         Down_cross_rank_reduction_required=False)
 
 
-def audit_trace(records, case, staging_banks=1):
+def audit_trace(records, case, staging_banks=1, v_token_sharding=False):
     from dispatch_audit import expand_rank_records
     records = expand_rank_records(records)
     actual = Counter(trace_key(e) for e in records if e["operation"] not in ("BARRIER", "WAIT"))
-    expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records), staging_banks=staging_banks)
+    expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records),
+                                  staging_banks=staging_banks, v_token_sharding=v_token_sharding)
     require(actual == expected, "Trace differs from independent matrix/address oracle: "+counter_difference(expected, actual))
     require(not any(e["operation"] == "WAIT" for e in records), "Artificial legacy completion WAIT retained")
     require(not any(e["operation"].startswith("PIM_Z_") for e in records), "GPU-fed FFN must not use local Z commands")
     if any(e["operation"] == "PIM_STAGE_BEGIN" for e in records):
         from paired_audit import audit_paired_trace
-        audit_paired_trace(records, case, staging_banks)
+        audit_paired_trace(records, case, staging_banks, v_token_sharding)
     return len(records)
 
 
-def audit_mac_order(native, case):
+def audit_mac_order(native, case, v_token_sharding=False):
     """A shared producer/consumer permutation must not evade multiset checks."""
     stages = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input") if case == "serial_layer_control" else (case,)
     ab, qk = [], []
@@ -440,7 +449,7 @@ def audit_mac_order(native, case):
             ab.extend(range(0, 65536, 32))
             qk.extend(65536+k*32 if k < 484 else 81920+(16+k-484)*32 for k in range(496))
         elif stage in ("v", "pv"):
-            base, columns = (83968, 512) if stage == "v" else (100352, 496)
+            base, columns = (131072, 1024) if stage == "v" and v_token_sharding else (83968, 512) if stage == "v" else (100352, 496)
             ab.extend(base+32*i for i in range(columns))
         elif stage in ("gate_up_gpu", "down_gpu_input", "combined_timing_chain"):
             if stage != "down_gpu_input":
@@ -487,7 +496,8 @@ def audit_run(directory):
     raw_records = trace_records(directory / "workload.trace")
     records = expand_rank_records(raw_records)
     staging_banks = native_result["config"].get("pim_staging_banks", 1)
-    audit_trace(records, case, staging_banks)
+    v_token_sharding = manifest.get("v_token_sharding", False)
+    audit_trace(records, case, staging_banks, v_token_sharding)
     simulation = directory / "simulation"
     timelines = [simulation / f"timeline.csv.ch{ch}" for ch in range(16)]
     gemv_files = [simulation / f"unified_gemv.csv.ch{ch}" for ch in range(16)]
@@ -504,9 +514,9 @@ def audit_run(directory):
     controller_events = [e for p in controller_files for e in read_csv(p)]
     issued_count = audit_native_commands(records, native)
     row_checks = audit_array_rows(native)
-    order_checks = audit_mac_order(native, case)
+    order_checks = audit_mac_order(native, case, v_token_sharding)
     mac_context = {(e["Channel"], e["clock"]): e["Row"] for e in native if e["command"] == "MACAB"}
-    slots = audit_slot_events(events, case, mac_context=mac_context)
+    slots = audit_slot_events(events, case, mac_context=mac_context, v_token_sharding=v_token_sharding)
     counts = Counter(e["operation"] for e in records)
     native_counts = Counter(e["command"] for e in native)
     require(slots["operation_counts"].get("GEMV_MAC", 0) == counts["PIM_MAC_AB"], "Missing native bank GEMV consume events")
@@ -533,9 +543,10 @@ def audit_run(directory):
     staging, ca, batching = None, None, None
     if rank_staging:
         from staging_audit import audit_staging, audit_rank_ca
-        staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"], staging_banks)
+        staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"], staging_banks, v_token_sharding)
         from paired_audit import audit_paired_staging
-        batching = audit_paired_staging(stage_events, native, events, case, staging_banks=staging_banks)
+        batching = audit_paired_staging(stage_events, native, events, case, staging_banks=staging_banks,
+                                      v_token_sharding=v_token_sharding)
         require(Counter(e["operation"] for e in controller_events)["PIM_ROPE_EXEC"] == counts["PIM_ROPE_EXEC"],
                 "RoPE execute event count differs from trace")
         ca = audit_rank_ca(ca_events, native, stage_events, controller_events, raw_records, events)
@@ -571,4 +582,8 @@ def audit_run(directory):
         result["channel_ingress"] = ingress_audit
     if descriptors:
         result["rank_descriptors"] = descriptor_audit
+    if v_token_sharding and case in ("v", "serial_layer_control"):
+        from v_token_audit import audit_v_token_native
+        result["v_token_projection"] = audit_v_token_native(manifest, records, native, events,
+            read_csv(simulation / "barriers.csv"), native_result)
     return result

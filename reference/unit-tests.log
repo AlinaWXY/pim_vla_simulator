@@ -102,8 +102,16 @@ test_same_offset_in_other_bank_is_a_different_reduction_fragment (test_two_bank_
 test_trace_write_permutation_fails_even_with_identical_address_counts (test_two_bank_audit.TwoBankAuditTests.test_trace_write_permutation_fails_even_with_identical_address_counts) ... ok
 test_two_bank_storage_preserves_full_input_and_physical_SRF_capacity (test_two_bank_audit.TwoBankAuditTests.test_two_bank_storage_preserves_full_input_and_physical_SRF_capacity) ... ok
 test_writer_short_gap_cannot_be_claimed_for_same_BG_or_serialized_WR (test_two_bank_audit.TwoBankAuditTests.test_writer_short_gap_cannot_be_claimed_for_same_BG_or_serialized_WR) ... ok
+test_PV_trace_remains_byte_identical_under_new_V_option (test_v_token_audit.TokenVTests.test_PV_trace_remains_byte_identical_under_new_V_option) ... ok
+test_export_scatter_preserves_original_cache_prefix_and_padding (test_v_token_audit.TokenVTests.test_export_scatter_preserves_original_cache_prefix_and_padding) ... ok
+test_mapping_faults_fail_even_when_trace_is_unchanged (test_v_token_audit.TokenVTests.test_mapping_faults_fail_even_when_trace_is_unchanged) ... ok
+test_new_V_and_serial_trace_match_independent_geometry_and_mapping (test_v_token_audit.TokenVTests.test_new_V_and_serial_trace_match_independent_geometry_and_mapping) ... ok
+test_new_V_rejects_sixteen_input_rows_and_missing_eighth_row (test_v_token_audit.TokenVTests.test_new_V_rejects_sixteen_input_rows_and_missing_eighth_row) ... ok
+test_new_V_requires_sixteen_columns_before_release (test_v_token_audit.TokenVTests.test_new_V_requires_sixteen_columns_before_release) ... ok
+test_token_X_coverage_is_complete_without_pair_duplication (test_v_token_audit.TokenVTests.test_token_X_coverage_is_complete_without_pair_duplication) ... ok
+test_weight_copies_cover_every_BF16_cell_and_all_features (test_v_token_audit.TokenVTests.test_weight_copies_cover_every_BF16_cell_and_all_features) ... ok
 
 ----------------------------------------------------------------------
-Ran 104 tests in 25.572s
+Ran 112 tests in 36.966s
 
 OK

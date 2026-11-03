@@ -15,6 +15,8 @@ def verify(root):
     summary, channels = read(root / "summary.json"), read(root / "channel-analysis.json")
     if summary["status"] != "passed" or channels["status"] != "passed":
         raise AssertionError("Fresh native run or channel audit did not pass")
+    if expected.get("v_token_sharding") and summary.get("v_token_sharding") is not True:
+        raise AssertionError("Expected token-sharded V projection")
     if not summary["tests_executed"]:
         raise AssertionError("Use the default runner, including native guards")
     guards = read(root / "native-guards/summary.json")
@@ -33,6 +35,11 @@ def verify(root):
         audit = read(root / case / "native-audit.json")
         if audit["status"] != "passed" or audit["native_sha256"] != reference["native_sha256"]:
             raise AssertionError((case, "native command/GEMV CSV audit or hash mismatch"))
+        if expected.get("v_token_sharding") and case in ("v", "serial_layer_control"):
+            contract = audit.get("v_token_projection", {})
+            if (not contract.get("legacy_cache_layout_preserved")
+                    or contract.get("logical_output_elements_checked") != 32768):
+                raise AssertionError((case, "V token-to-feature cache mapping audit did not pass"))
         if expected.get("full_split_activation_deadline_enforced"):
             if audit.get("split_activation", {}).get("status") != "passed":
                 raise AssertionError((case, "complete ACT1/ACT2 protocol audit did not pass"))

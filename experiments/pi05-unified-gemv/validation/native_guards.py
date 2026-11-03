@@ -49,6 +49,10 @@ CASES = {
     "Dispatch_no_peer_export": "Q_REMOTE has no preceding peer Q_EXPORT",
     "Descriptor_noncanonical_source": "rank descriptor requires canonical rank1 BG0 bank0",
     "Local_ACT2_spill_rope_refresh": None,
+    "V_token_complete_fragment": None,
+    "V_token_eight_columns_release": "release of unconsumed input fragment",
+    "V_token_wrong_rows": "staging token rows do not match operator",
+    "V_token_then_PV": None,
 }
 
 
@@ -62,7 +66,21 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
-    if name == "Local_ACT2_spill_rope_refresh":
+    if name.startswith("V_token_"):
+        rows = 16 if name == "V_token_wrong_rows" else 8
+        columns = 8 if name == "V_token_eight_columns_release" else 16
+        lines = [f"PIM_STAGE_BEGIN {address(524288)} {rows*32} {rows}"]
+        lines += [f"ST {address(524288+t*32)}" for t in range(rows)]
+        lines += [f"PIM_STAGE_SEAL {address(524288)}", command("PIM_STAGE_FRAGMENT", 524288)]
+        lines += [command("PIM_MAC_AB", 131072+c*32) for c in range(columns)]
+        lines.append(command("PIM_GEMV_RELEASE"))
+        if name == "V_token_then_PV":
+            lines += ["BARRIER 0", f"PIM_STAGE_BEGIN {address(524288)} 512 16"]
+            lines += [f"ST {address(524288+t*32)}" for t in range(16)]
+            lines += [f"PIM_STAGE_SEAL {address(524288)}", command("PIM_STAGE_FRAGMENT", 524288)]
+            lines += [command("PIM_MAC_AB", 100352+c*32) for c in range(8)]
+            lines.append(command("PIM_GEMV_RELEASE"))
+    elif name == "Local_ACT2_spill_rope_refresh":
         # Control-path guard: spills use the initialized accumulator state.
         # Every token deliberately moves all banks off row40 before SPILL
         # and again before STORE; neither activation check can pass on row hits.
@@ -282,6 +300,8 @@ def dispatch_positive_audit(directory, name):
 
 
 def positive_audit(directory, name):
+    if name.startswith("V_token_"):
+        return v_token_positive_audit(directory, name)
     if name == "Local_ACT2_spill_rope_refresh":
         return local_act2_positive_audit(directory)
     if name.startswith("Dispatch_"):
@@ -379,6 +399,33 @@ def positive_audit(directory, name):
         refresh_enabled=True, native_refresh_commands=len(refresh))
 
 
+def v_token_positive_audit(directory, name):
+    from collections import Counter
+    from act2_audit import audit_act2
+    from audit_native import read_csv, read_json, audit_slot_events, audit_native_commands, trace_records
+    from staging_audit import audit_rank_ca, require
+    simulation = directory / "simulation"
+    channels = lambda stem: [e for ch in range(16) for e in read_csv(simulation / f"{stem}.csv.ch{ch}")]
+    native, events, stage, ca = map(channels, ("timeline", "unified_gemv", "staging_events", "rank_ca_events"))
+    context = {(e["Channel"], e["clock"]): e["Row"] for e in native if e["command"] == "MACAB"}
+    slots = audit_slot_events(events, "v", mac_context=context, v_token_sharding=True)
+    macs = [e for e in events if e["operation"] == "GEMV_MAC"]
+    require(Counter((context[e["Channel"], e["clock"]], e["token_mask"], e["service_cycles"]) for e in macs) ==
+            Counter({(64, 255, 8): 16, **({(49, 65535, 16): 8} if name == "V_token_then_PV" else {})}),
+            "Token V guard must consume 16 columns with 8 rows before optional 16-row PV")
+    if name == "V_token_then_PV":
+        generations = [{e["generation"] for e in macs if context[e["Channel"], e["clock"]] == row} for row in (64, 49)]
+        require(len(generations[0]) == len(generations[1]) == 1 and
+                next(iter(generations[1])) == next(iter(generations[0]))+1,
+                "V to PV must reuse the same physical slot with the next generation")
+    result = read_json(simulation / "result.json")
+    return dict(unified_gemv=slots, token_rows=8, weight_columns=16,
+        V_to_PV_same_slot=name == "V_token_then_PV",
+        native_data_commands_checked=audit_native_commands(trace_records(directory / "guard.trace"), native),
+        split_activation=audit_act2(native, result["resolved_timings_ck"], staging_events=stage),
+        rank_controller=audit_rank_ca(ca, native, stage))
+
+
 def local_act2_positive_audit(directory):
     """Require real split activations on both LOCALWR users under refresh."""
     from collections import Counter
@@ -428,11 +475,15 @@ def worker(backend, output, name):
     is_q = name.startswith("Q")
     is_down = name.startswith("Down_")
     independent = name.startswith(("Dispatch_", "Descriptor_", "Local_ACT2_"))
-    staged = name.startswith("Stage_") or independent
-    config = config_for("chain" if is_q or independent else "down_gpu_input" if is_down or staged else "v",
+    token_v = name.startswith("V_token_")
+    staged = name.startswith("Stage_") or independent or token_v
+    config = config_for("chain" if is_q or independent else "v" if token_v else "down_gpu_input" if is_down or staged else "v",
                         refresh=CASES[name] is None, max_cycles=500_000, rank_staging=staged,
                         staging_banks=2 if name.startswith("Stage_two_bank_") or independent else 1,
                         rank_descriptors=independent, channel_independent_dispatch=independent)
+    if token_v:
+        from dataclasses import replace
+        config = replace(config, timing_overrides={**config.timing_overrides, "nCCDAB": 8})
     if name == "Dispatch_queue_capacity_one":
         from dataclasses import replace
         config = replace(config, channel_queue_capacity=1)

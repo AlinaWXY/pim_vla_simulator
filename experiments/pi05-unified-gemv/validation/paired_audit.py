@@ -3,15 +3,16 @@ from bisect import bisect_left, bisect_right
 from collections import defaultdict
 
 from staging_audit import (BASE, INPUTS, WEIGHTS, WEIGHT_INPUTS, offset, require,
-                           source_bank, source_packet, source_location)
+                           source_bank, source_packet, source_location, input_geometry)
 
 
 def address_offset(address):
     return (address >> 20)*2048+(address >> 9 & 63)*32
 
 
-def audit_paired_trace(records, case, staging_banks=1):
+def audit_paired_trace(records, case, staging_banks=1, v_token_sharding=False):
     """The address multiset is unchanged; independently check the new ordering."""
+    inputs, weights = input_geometry(case, v_token_sharding)
     actual, stores = defaultdict(list), defaultdict(list)
     generation = defaultdict(int)
     for e in records:
@@ -24,12 +25,12 @@ def audit_paired_trace(records, case, staging_banks=1):
         elif e["operation"] in ("PIM_STAGE_FRAGMENT", "PIM_MAC_AB"):
             bank = (e["address"] >> 16 & 3)*4+(e["address"] >> 18 & 3)
             actual[ch, generation[ch]].append((e["operation"], bank, address_offset(e["address"]), e["buffer"]))
-    require(set(actual) == {(ch, gen) for ch in range(16) for gen in range(1, len(INPUTS[case])+1)},
+    require(set(actual) == {(ch, gen) for ch in range(16) for gen in range(1, len(inputs)+1)},
             "Paired trace lacks an operator/channel input schedule")
     batches = 0
     for (ch, gen), sequence in sorted(actual.items()):
-        payload, rows = INPUTS[case][gen-1]
-        base = WEIGHT_INPUTS[case][gen-1]
+        payload, rows = inputs[gen-1]
+        base = weights[gen-1]
         columns = next(count for start, _, count in WEIGHTS if start == base)
         fragments = payload//(rows*32)
         require(fragments%2 == 0, "Paired schedule requires an even fragment count")
@@ -49,8 +50,9 @@ def audit_paired_trace(records, case, staging_banks=1):
     return batches
 
 
-def audit_paired_staging(staging, native, gemv, case, complete_workload=True, staging_banks=1):
+def audit_paired_staging(staging, native, gemv, case, complete_workload=True, staging_banks=1, v_token_sharding=False):
     """Reconstruct pair readiness, capacity, and source/weight row visits."""
+    inputs, weights = input_geometry(case, v_token_sharding)
     reads, broadcasts, macs = defaultdict(list), defaultdict(list), defaultdict(list)
     seals = {}
     for e in staging:
@@ -59,7 +61,7 @@ def audit_paired_staging(staging, native, gemv, case, complete_workload=True, st
             seals[e["Channel"], gen] = e["clock"]
         if e["operation"] not in ("LOCALRD", "BROADCAST"):
             continue
-        rows = INPUTS[case][gen-1][1]
+        rows = inputs[gen-1][1]
         fragment = source_packet(e, rows, staging_banks)//rows
         (reads if e["operation"] == "LOCALRD" else broadcasts)[e["Channel"], gen, fragment].append(e)
     completions = {(e["Channel"], e["clock"]): e["ready_at"] for e in gemv if e["operation"] == "GEMV_MAC"}
@@ -77,13 +79,14 @@ def audit_paired_staging(staging, native, gemv, case, complete_workload=True, st
             continue
         addr = offset(e)
         base, columns = next((base, columns) for base, end, columns in WEIGHTS if base <= addr < end)
-        gen = WEIGHT_INPUTS[case].index(base)+1
+        require(base in weights, "Paired MAC uses the wrong operator weight region")
+        gen = weights.index(base)+1
         fragment = (addr-base)//(columns*32)
         require((ch, e["clock"]) in completions, "Paired schedule MAC lacks native completion evidence")
         macs[ch, gen, fragment].append(dict(e, ready_at=completions[ch, e["clock"]]))
     for ticks in (*weight_activation_ticks.values(), *refresh_ticks.values()):
         ticks.sort()
-    expected = {(ch, gen, f) for ch in range(16) for gen, (payload, rows) in enumerate(INPUTS[case], 1)
+    expected = {(ch, gen, f) for ch in range(16) for gen, (payload, rows) in enumerate(inputs, 1)
                 for f in range(payload//(rows*32))} if complete_workload else set(reads)
     require(set(reads) == set(broadcasts) == set(macs) == expected,
             "Paired schedule requires exact read/broadcast/MAC fragment coverage")
@@ -91,8 +94,8 @@ def audit_paired_staging(staging, native, gemv, case, complete_workload=True, st
     require(len(expected) == len(pairs)*2, "Paired schedule leaves an unpaired input fragment")
     batch_rows, stage_windows = [], {}
     for ch, gen, pair in pairs:
-        rows = INPUTS[case][gen-1][1]
-        base = WEIGHT_INPUTS[case][gen-1]
+        rows = inputs[gen-1][1]
+        base = weights[gen-1]
         columns = next(count for start, _, count in WEIGHTS if start == base)
         first, second = (ch, gen, pair*2), (ch, gen, pair*2+1)
         for key, slot in ((first, 0), (second, 1)):

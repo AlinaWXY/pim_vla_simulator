@@ -26,6 +26,9 @@ int gemv_columns(const Request& r) const {
   const int off=gemv_offset(r);
   if (off<65536 || (off>=262144 && off<327680)) return 32;
   if (off>=83968 && off<116736) return 8;
+  // Token-sharded V: each rank computes eight tokens and all head features.
+  // Its separate Wv copy has sixteen output columns per input fragment.
+  if (off>=131072 && off<163840) return 16;
   if (off>=327680 && off<360448) {
     // GPU-fed Down shards 1024 output features across16 ranks/banks:
     // each bank owns4 complete outputs and consumes all256 input fragments.
@@ -34,12 +37,18 @@ int gemv_columns(const Request& r) const {
   }
   throw std::runtime_error("Unified GEMV MAC weight/cache address outside H16 layout");
 }
-int gemv_mac_column(const Request& r) const {
+int gemv_weight_base(const Request& r) const {
   const int off=gemv_offset(r);
-  const int base=off<65536?0:off<100352?83968:off<116736?100352:off<327680?262144:327680;
-  return ((off-base)/32)%gemv_columns(r);
+  if (off>=131072 && off<163840) return 131072;
+  return off<65536?0:off<100352?83968:off<116736?100352:off<327680?262144:327680;
 }
-int gemv_rows(const Request& r) const { return gemv_offset(r)<65536?8:16; }
+int gemv_mac_column(const Request& r) const {
+  return ((gemv_offset(r)-gemv_weight_base(r))/32)%gemv_columns(r);
+}
+int gemv_rows(const Request& r) const {
+  const int off=gemv_offset(r);
+  return (off<65536 || (off>=131072 && off<163840))?8:16;
+}
 int gemv_service(const Request& r) const { return m_unified_gemv?gemv_rows(r):m_mac_interval; }
 void init_unified_gemv() {
   if (m_gemv_port_cycles<1) throw std::runtime_error("gemv_port_cycles must be positive");

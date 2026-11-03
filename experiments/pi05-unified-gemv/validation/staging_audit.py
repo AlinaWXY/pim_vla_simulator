@@ -18,7 +18,17 @@ WEIGHT_INPUTS = {
     "serial_layer_control": [0, 83968, 100352, 262144, 327680],
 }
 WEIGHTS = ((0, 65536, 32), (83968, 100352, 8), (100352, 116736, 8),
+           (131072, 163840, 16),
            (262144, 327680, 32), (327680, 360448, 4))
+
+
+def input_geometry(case, v_token_sharding=False):
+    """Independent per-operator geometry; never change legacy global tables."""
+    inputs, weights = list(INPUTS[case]), list(WEIGHT_INPUTS[case])
+    if v_token_sharding and case in ("v", "serial_layer_control"):
+        index = 0 if case == "v" else 1
+        inputs[index], weights[index] = (16384, 8), 131072
+    return inputs, weights
 
 
 def require(condition, message):
@@ -89,14 +99,15 @@ def audit_write_timing(writes, timings, staging_banks=1, require_short_gap=False
         issue_gap_histogram=[dict(kind=kind, gap_ck=gap, count=count) for (kind, gap), count in sorted(gaps.items())])
 
 
-def audit_source_identity(staging, native, gemv, case, staging_banks=1):
+def audit_source_identity(staging, native, gemv, case, staging_banks=1, v_token_sharding=False):
     """A correct address multiset alone cannot detect permuted input fragments."""
+    inputs, weights = input_geometry(case, v_token_sharding)
     source_at_fill = {}
     for e in staging:
         if e["operation"] != "BROADCAST":
             continue
         generation = e["stage_generation"]
-        rows = INPUTS[case][generation-1][1]
+        rows = inputs[generation-1][1]
         fragment, token = divmod(source_packet(e, rows, staging_banks), rows)
         key = e["Channel"], e["ready_at"], e["buffer"], 1 << token
         require(key not in source_at_fill, "Ambiguous simultaneous staging source fills")
@@ -124,7 +135,7 @@ def audit_source_identity(staging, native, gemv, case, staging_banks=1):
         layout = next(((base, columns) for base, end, columns in WEIGHTS if base <= address < end), None)
         require(layout is not None, "MAC weight has no independent operator layout")
         base, columns = layout
-        require(WEIGHT_INPUTS[case][generation-1] == base,
+        require(weights[generation-1] == base,
                 "MAC consumes input from the wrong staged operator")
         require(source_fragment == (address-base)//(columns*32),
                 "Staged source fragment differs from MAC weight reduction fragment")
@@ -132,9 +143,10 @@ def audit_source_identity(staging, native, gemv, case, staging_banks=1):
     return checks
 
 
-def audit_staging(events, native, gemv, case, timings, staging_banks=1):
+def audit_staging(events, native, gemv, case, timings, staging_banks=1, v_token_sharding=False):
     """Prove full array residency before the first bank->SRF transfer."""
     require(case in INPUTS, "Unknown staging geometry")
+    inputs, _ = input_geometry(case, v_token_sharding)
     groups = defaultdict(list)
     allowed = {"BEGIN", "WR", "SEAL", "LOCALRD", "BROADCAST"}
     for event in events:
@@ -146,7 +158,7 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1):
         require(0 <= event["Channel"] < 16 and event["ready_at"] >= event["clock"],
                 "Invalid staging event channel/duration")
         groups[event["Channel"], event["stage_generation"]].append(event)
-    expected_generations = set(range(1, len(INPUTS[case])+1))
+    expected_generations = set(range(1, len(inputs)+1))
     require(set(groups) == {(ch, generation) for ch in range(16) for generation in expected_generations},
             "Missing/extra staging generation or channel")
     writes, reads, broadcasts, input_bytes = [], [], [], 0
@@ -154,7 +166,7 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1):
     write_latency = timings["nCWL"]+timings["nBL_max"]+timings["nWR"]
     read_latency = timings["nCL"]+timings["nBL_min"]
     for (ch, generation), entries in sorted(groups.items()):
-        payload, rows = INPUTS[case][generation-1]
+        payload, rows = inputs[generation-1]
         by_op = {op: [e for e in entries if e["operation"] == op] for op in allowed}
         require(len(by_op["BEGIN"]) == len(by_op["SEAL"]) == 1,
                 "Every stage requires exactly one BEGIN and one SEAL")
@@ -221,13 +233,13 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1):
                 precharge_checks += 1
     expected_fills = Counter()
     for e in broadcasts:
-        rows = INPUTS[case][e["stage_generation"]-1][1]
+        rows = inputs[e["stage_generation"]-1][1]
         token = ((offset(e)-BASE)//32)%rows
         expected_fills[e["Channel"], e["ready_at"], e["buffer"], 1 << token, 65535, 65535] += 1
     actual_fills = Counter((e["Channel"], e["clock"], e["buffer"], e["token_mask"], e["lane_mask"], e["bank_mask"])
                           for e in gemv if e["operation"] == "GEMV_MULTICAST")
     require(actual_fills == expected_fills, "Staged source reads do not exactly cover physical SRF multicast completions")
-    identity_checks = audit_source_identity(events, native, gemv, case, staging_banks)
+    identity_checks = audit_source_identity(events, native, gemv, case, staging_banks, v_token_sharding)
     result = dict(stages_checked=len(groups), source_bank=0, staging_base_row=256,
         external_input_bytes=input_bytes, internal_read_bytes=len(reads)*32,
         multicast_destination_bytes=len(broadcasts)*32*16,
@@ -237,12 +249,16 @@ def audit_staging(events, native, gemv, case, timings, staging_banks=1):
         source_fragment_to_MAC_weight_checks=identity_checks,
         external_input_bytes_unchanged=True, internal_read_and_broadcast_use_DQ=False,
         SRAM_bytes_per_bank=1024,
-        maximum_DRAM_staging_bytes_per_rank=max(size for size, _ in INPUTS[case]),
+        maximum_DRAM_staging_bytes_per_rank=max(size for size, _ in inputs),
         reserved_DRAM_staging_bytes_per_rank=131072)
+    if v_token_sharding and case in ("v", "serial_layer_control"):
+        result.update(external_input_bytes_unchanged=False,
+                      V_input_bytes_saved_vs_feature_sharding=16*16384,
+                      external_input_matches_independent_geometry=True)
     if staging_banks == 2:
         result.update(source_banks=[0, 4], source_bank_groups=[0, 1], staging_banks=2,
             reserved_DRAM_staging_bytes_per_source_bank=65536,
-            maximum_DRAM_staging_bytes_per_source_bank=max(size for size, _ in INPUTS[case])//2,
+            maximum_DRAM_staging_bytes_per_source_bank=max(size for size, _ in inputs)//2,
             source_last_reserved_row=287,
             writer=audit_write_timing(writes, timings, staging_banks, require_short_gap=True))
         result.pop("source_bank")

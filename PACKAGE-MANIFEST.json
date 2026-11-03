@@ -2,17 +2,17 @@
   "schema_version": 3,
   "native_build": "minimal",
   "dataflow": "Independent bounded channel ingress -> external CA descriptor dispatch -> rank micro-operations; two-bank whole-input staging",
-  "parent_revision": "a9876505575f7cfc01716c98f0520eaa546cc24b",
+  "parent_revision": "23e661478f136f55f11855d23529643cb060b378",
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
   "branch": "xinyao_1103",
-  "file_count_excluding_manifest": 632,
-  "bytes_excluding_manifest": 16334101,
-  "MiB": 15.577412605285645,
+  "file_count_excluding_manifest": 663,
+  "bytes_excluding_manifest": 19777660,
+  "MiB": 18.861446380615234,
   "categories": {
     "publication": {
-      "files": 22,
-      "bytes": 137781,
-      "MiB": 0.13139820098876953
+      "files": 26,
+      "bytes": 169633,
+      "MiB": 0.1617746353149414
     },
     "backend_metadata": {
       "files": 2,
@@ -21,8 +21,8 @@
     },
     "native_metadata": {
       "files": 177,
-      "bytes": 637884,
-      "MiB": 0.6083335876464844
+      "bytes": 638164,
+      "MiB": 0.6086006164550781
     },
     "vendored": {
       "files": 209,
@@ -36,18 +36,18 @@
     },
     "simulator": {
       "files": 4,
-      "bytes": 50856,
-      "MiB": 0.04850006103515625
+      "bytes": 51320,
+      "MiB": 0.04894256591796875
     },
     "experiment": {
       "files": 22,
-      "bytes": 269981,
-      "MiB": 0.2574739456176758
+      "bytes": 282265,
+      "MiB": 0.26918888092041016
     },
     "reference_evidence": {
-      "files": 109,
-      "bytes": 12668234,
-      "MiB": 12.081369400024414
+      "files": 136,
+      "bytes": 16066913,
+      "MiB": 15.322602272033691
     }
   },
   "compiled_native_translation_units": [
@@ -76,7 +76,7 @@
     "controller/plugin/impl/cmd_trace_recorder.cpp"
   ],
   "clean_native_build_passed": true,
-  "final_native_job": 1903036,
+  "final_native_job": 1904020,
   "source_snapshot": "reference/publish-byte-verification.json",
   "exclusions": [
     "Precompiled native libraries",
@@ -84,9 +84,8 @@
     "Raw generated results"
   ],
   "preservation": {
-    "before_commit": "a987650",
-    "before_regression": "reference/localwr-act2/before-regression.json",
-    "corrected_direct_input_control": "reference/localwr-act2/direct-input-control.json"
+    "before_commit": "23e6614",
+    "evidence": "reference/v-token/source-result-binding.json"
   },
   "files": {
     ".gitattributes": {
@@ -106,8 +105,8 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 10560,
-      "output_sha256": "a3c626a9e4af033f12e83a07dd2e51cdd7228be47ed52f3f9e5efbc1642a0d10"
+      "output_bytes": 6693,
+      "output_sha256": "0d9d2dac0f53a046265ecbcf378322ef4c12d66ef7f1a9ec6038d9ff53192082"
     },
     "analyze_localwr_schedule.py": {
       "category": "publication",
@@ -138,6 +137,11 @@
       "category": "publication",
       "output_bytes": 3399,
       "output_sha256": "2699dec6c75c9b27c5e01bb1c62fe05f12775e2ac453b1879ad778118c89ac52"
+    },
+    "compare_v_token.py": {
+      "category": "publication",
+      "output_bytes": 10217,
+      "output_sha256": "4ad6bd3a531dd6aa4704b6538fe211c0b41d29771cb04ddebfe64d66cb766e1d"
     },
     "experiments/pi05-bgk-gpuq/backend/LICENSE": {
       "category": "backend_metadata",
@@ -1891,13 +1895,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 13051,
-      "output_sha256": "ffe596e10229bde515cca851285fddbd36ab7ea601692b1c3cc478f82350e42e"
+      "output_bytes": 12966,
+      "output_sha256": "2e0cd784a1f5a4c79ad31590a0cc548ed0d01b48e8281d75edea903e5ceebcd2"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 10880,
-      "output_sha256": "d87018d3be2d1128cb89e759a5eb90029b27c179398932dfd1b04a13e8c45b22"
+      "output_bytes": 11245,
+      "output_sha256": "b919261c17036de67d186712e8f85f248d2e6255a8e8077c5150d491edc01937"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/plugin/controller_validation_hook.h": {
       "category": "native_metadata",
@@ -2531,8 +2535,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/backend.py": {
       "category": "simulator",
-      "output_bytes": 34868,
-      "output_sha256": "ad11aba19f28064676bfbef9b608df940835167ab5a6a7f44886f375e780c613"
+      "output_bytes": 35332,
+      "output_sha256": "c8d78d8edcce756791eedab70bfef168eaa3a65cc930ed15567cbe7d1c72cb96"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/config.py": {
       "category": "simulator",
@@ -2546,8 +2550,8 @@
     },
     "experiments/pi05-unified-gemv/MODEL.md": {
       "category": "experiment",
-      "output_bytes": 12594,
-      "output_sha256": "15587bf359b041844408fd5299d65932be648d609e1c8edf08fb8f14c19416a4"
+      "output_bytes": 14435,
+      "output_sha256": "cbd5d7f1866d0367a21adb3a646b6afbd13a1125d7a68573e229ab70af6d30a4"
     },
     "experiments/pi05-unified-gemv/ROPE-CONTROL.md": {
       "category": "experiment",
@@ -2571,8 +2575,8 @@
     },
     "experiments/pi05-unified-gemv/reproduce.py": {
       "category": "experiment",
-      "output_bytes": 11923,
-      "output_sha256": "b04fff11f75237489d83365b760249b53e0620e00702b8de951568ea1dfc15ef"
+      "output_bytes": 12687,
+      "output_sha256": "3f75f05dcf9ce24489b905006a9f28024f7b2b26cf70ac098a9c371567653ecc"
     },
     "experiments/pi05-unified-gemv/source/horizon_attention.py": {
       "category": "experiment",
@@ -2596,18 +2600,23 @@
     },
     "experiments/pi05-unified-gemv/source/horizon_value.py": {
       "category": "experiment",
-      "output_bytes": 11317,
-      "output_sha256": "0b8bff13f70a6fbdb987e535a5a71ec26ccdac0bf49e567cc70b6ac31869c3b8"
+      "output_bytes": 14021,
+      "output_sha256": "b1d5db8eef34ffc7d32d67c4a1ab1ccfb2dd4da9b635a4e7a6a236c28a9a6359"
     },
     "experiments/pi05-unified-gemv/source/rank_staging.py": {
       "category": "experiment",
       "output_bytes": 5476,
       "output_sha256": "155b368548fb6cd55e3798b4a63abfc91ebd6b2c1604def45954192b27843e4a"
     },
+    "experiments/pi05-unified-gemv/source/v_token_layout.py": {
+      "category": "publication",
+      "output_bytes": 8234,
+      "output_sha256": "11ee75329398472a7a42ab5979f981064a891716180a9d59317a0706ee5ebd89"
+    },
     "experiments/pi05-unified-gemv/source/workload.py": {
       "category": "experiment",
-      "output_bytes": 10568,
-      "output_sha256": "f78ba3a8ef8a3a487480828e07ebade3705d8eae0ffcde82188e5d615e5f4d1f"
+      "output_bytes": 11822,
+      "output_sha256": "6be512428286a08fbf4b7a01524241485355776cd451925ccd2d8e0e3ddf94f3"
     },
     "experiments/pi05-unified-gemv/validation/act2_audit.py": {
       "category": "publication",
@@ -2616,8 +2625,8 @@
     },
     "experiments/pi05-unified-gemv/validation/audit_native.py": {
       "category": "experiment",
-      "output_bytes": 33483,
-      "output_sha256": "31899a81afaeb28a7381c8098cf1847e64fe6bb983f285b893aa67321ba4228f"
+      "output_bytes": 34780,
+      "output_sha256": "f9b292d9f357575e9b0e80d34cf3e8eb2bcccec9a65079c21a405f21df3e46b9"
     },
     "experiments/pi05-unified-gemv/validation/dispatch_audit.py": {
       "category": "publication",
@@ -2626,18 +2635,18 @@
     },
     "experiments/pi05-unified-gemv/validation/native_guards.py": {
       "category": "experiment",
-      "output_bytes": 31796,
-      "output_sha256": "f972d8feff6373d3e830fa15e35c53dd1d5a59f61eddf76a5af431982e7ef191"
+      "output_bytes": 35184,
+      "output_sha256": "397b0560c8eca1e496410b2ce3e1a4823693b989d75d2a6c4915b37039cfa6d2"
     },
     "experiments/pi05-unified-gemv/validation/paired_audit.py": {
       "category": "experiment",
-      "output_bytes": 9040,
-      "output_sha256": "c6495c1c0ef4c2bf3059eb7fdaf051e705206f097c1f76ea02e43136c40b0746"
+      "output_bytes": 9245,
+      "output_sha256": "207cfe1c9541baea883a21dbf215512e48c480de79b2ecda22f4052140b534f9"
     },
     "experiments/pi05-unified-gemv/validation/staging_audit.py": {
       "category": "experiment",
-      "output_bytes": 17717,
-      "output_sha256": "76ee72ed465076e0871920a9d5695572a7d09a08102ea6567deacac00db69ad9"
+      "output_bytes": 18548,
+      "output_sha256": "18fbb71d6ccfbfd72d710ff61eae39306cf444a7ebb4e10226a2e07629f2094c"
     },
     "experiments/pi05-unified-gemv/validation/test_act2_audit.py": {
       "category": "publication",
@@ -2674,10 +2683,20 @@
       "output_bytes": 6176,
       "output_sha256": "cc4b30683a81ab33a89f57a68d9b5706338baff42a4a74f67b409ecb84fcd3a3"
     },
+    "experiments/pi05-unified-gemv/validation/test_v_token_audit.py": {
+      "category": "publication",
+      "output_bytes": 7243,
+      "output_sha256": "03550e2057e3d7687c29493e490782e31716376db93a30f2eb7ff9aabd6ccab4"
+    },
+    "experiments/pi05-unified-gemv/validation/v_token_audit.py": {
+      "category": "publication",
+      "output_bytes": 9474,
+      "output_sha256": "e7eab06979e4a1ffb6a79c4148edaffafed3d3520ad299f1e7d4424a6a05021a"
+    },
     "reference/CHANNEL-ANALYSIS.md": {
       "category": "reference_evidence",
       "output_bytes": 2878,
-      "output_sha256": "ddb9996580679b7f0b47c1f9f32b9a14032f54fec75015868ff7957392668855"
+      "output_sha256": "e2432ec251a287a47baf7687d616b0ddca3ff912924caa6d36b037792bc346c5"
     },
     "reference/RANK-DISPATCH-COMPARISON.md": {
       "category": "reference_evidence",
@@ -2751,13 +2770,13 @@
     },
     "reference/chain/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 4400,
-      "output_sha256": "9609cb20fd8a6bdbab5df37cb560b596d3b63c59569f93e38223bfe4589b6bdb"
+      "output_bytes": 4429,
+      "output_sha256": "0cd834828232504ed4fd1b076a6ae6b7557b1dcec3017c4ded0f7c020992bf58"
     },
     "reference/channel-analysis.json": {
       "category": "reference_evidence",
-      "output_bytes": 1050484,
-      "output_sha256": "d53468497d146a831520a68a07c8da122de773cb2c0a3fd1711504003bc6cd4b"
+      "output_bytes": 1051007,
+      "output_sha256": "68d21f4f608b0d3d8ba0615de221db164967cc99d07c05972f5eeaa3fb06a015"
     },
     "reference/channel-breakdown.png": {
       "category": "reference_evidence",
@@ -2766,23 +2785,23 @@
     },
     "reference/channel-command-bus.csv": {
       "category": "reference_evidence",
-      "output_bytes": 6528,
-      "output_sha256": "edbaf099ba49718b0ccf85f23896071ff2606f2b590db35b1d1a895714c38564"
+      "output_bytes": 7216,
+      "output_sha256": "65d69d9823592a1dad194d79f8ad29008f2320cf708156bfd77417bec2855eb2"
     },
     "reference/channel-partitions.csv": {
       "category": "reference_evidence",
-      "output_bytes": 11813,
-      "output_sha256": "bbbb44f52b3d4a04bbf9b1e7a7dcce77c02c376fbc6c368094cae899d6b058ca"
+      "output_bytes": 11573,
+      "output_sha256": "1865e2e46e3783215d924e4e03cbfb9440052111052019285807f0d957d0e95e"
     },
     "reference/channel-phase-kind-breakdown.csv": {
       "category": "reference_evidence",
-      "output_bytes": 30986,
-      "output_sha256": "dc5e8594b8e18a66df180b1c7bb5238580cfa027e8b6d6eaba3e5edb122364e5"
+      "output_bytes": 31082,
+      "output_sha256": "0457883ec1b262716e5d34006d6eb3df73c0ed2be0824f9a1cf9e6cc3dc80e82"
     },
     "reference/channel-phase-windows.csv": {
       "category": "reference_evidence",
-      "output_bytes": 173551,
-      "output_sha256": "6b5e37d625cfdf408652a81aa70e4ecf03c4466dcad77d1643d142cd18328f34"
+      "output_bytes": 173631,
+      "output_sha256": "130a5959bc8a581be18c2ec9790234fb2a4e9c441e3d0757334734c3808afbe9"
     },
     "reference/combined_timing_chain/native-audit.json": {
       "category": "reference_evidence",
@@ -2791,8 +2810,8 @@
     },
     "reference/combined_timing_chain/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1821,
-      "output_sha256": "d30ec8fe0f92bcae463a40436329a0a7265398c818eaafe61305681d4ef8ae85"
+      "output_bytes": 1850,
+      "output_sha256": "534d363bc69162122e890f9eed52206cce2c81e6349f760779a68b16028a0952"
     },
     "reference/down_gpu_input/native-audit.json": {
       "category": "reference_evidence",
@@ -2801,13 +2820,13 @@
     },
     "reference/down_gpu_input/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1559,
-      "output_sha256": "056537c09e8b8e7ac8728417fab05371102586e3d8e5a4f70d4b9e6ea0304f25"
+      "output_bytes": 1588,
+      "output_sha256": "d278d89c74941ace2aa41ee9c2a3324d9528c50a0ff06388d437b034ca20cea0"
     },
     "reference/expected.json": {
       "category": "reference_evidence",
-      "output_bytes": 538520,
-      "output_sha256": "767dde96f477bcb1555396eafbf3fbc7e69ed8b80c23fc3e9e52e6328f6f4515"
+      "output_bytes": 539069,
+      "output_sha256": "6df043d0e102fa7e2c2b87c009e1c567a2278e191a190f37540351a73e391fa1"
     },
     "reference/gate_up_gpu/native-audit.json": {
       "category": "reference_evidence",
@@ -2816,8 +2835,8 @@
     },
     "reference/gate_up_gpu/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1562,
-      "output_sha256": "bba0619cf19535c03e16731289492973928430eee3eaaedbc0ad3681a8ac9d07"
+      "output_bytes": 1591,
+      "output_sha256": "39a755faaa3bb1b21180f81fdebd43eb1e8d11c5a651a5816fca82794dff5ad1"
     },
     "reference/generator-batch-validation.json": {
       "category": "reference_evidence",
@@ -3124,15 +3143,115 @@
       "output_bytes": 71689,
       "output_sha256": "3f8798bb897f0122c9231c540c4ba64c473c30945e7386f494273953eeae2d19"
     },
-    "reference/provenance.json": {
+    "reference/previous-v-token/README.md": {
+      "category": "reference_evidence",
+      "output_bytes": 10560,
+      "output_sha256": "a3c626a9e4af033f12e83a07dd2e51cdd7228be47ed52f3f9e5efbc1642a0d10"
+    },
+    "reference/previous-v-token/chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19296,
+      "output_sha256": "d6edb77b6c58e5c7d4f9922477f793ed78aa1ec4db5d2cee1eb3aadf1fe821b4"
+    },
+    "reference/previous-v-token/chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 4400,
+      "output_sha256": "9609cb20fd8a6bdbab5df37cb560b596d3b63c59569f93e38223bfe4589b6bdb"
+    },
+    "reference/previous-v-token/channel-analysis.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1050484,
+      "output_sha256": "d53468497d146a831520a68a07c8da122de773cb2c0a3fd1711504003bc6cd4b"
+    },
+    "reference/previous-v-token/combined_timing_chain/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 23657,
+      "output_sha256": "81cd37abc2e964507eb5a944f1508e2f8396d4af76c0538b350890fefe70ea9c"
+    },
+    "reference/previous-v-token/combined_timing_chain/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1821,
+      "output_sha256": "d30ec8fe0f92bcae463a40436329a0a7265398c818eaafe61305681d4ef8ae85"
+    },
+    "reference/previous-v-token/down_gpu_input/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19802,
+      "output_sha256": "b70bfc1baef89fe1e52ecc68855b8fa8a2ce1c609c52b8269732e252771bc94e"
+    },
+    "reference/previous-v-token/down_gpu_input/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1559,
+      "output_sha256": "056537c09e8b8e7ac8728417fab05371102586e3d8e5a4f70d4b9e6ea0304f25"
+    },
+    "reference/previous-v-token/expected.json": {
+      "category": "reference_evidence",
+      "output_bytes": 538520,
+      "output_sha256": "767dde96f477bcb1555396eafbf3fbc7e69ed8b80c23fc3e9e52e6328f6f4515"
+    },
+    "reference/previous-v-token/gate_up_gpu/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 19615,
+      "output_sha256": "829ecb4191e420e9d4f9a298bd1b4f5b93f6f96424fe6ab4906d10605c248d84"
+    },
+    "reference/previous-v-token/gate_up_gpu/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1562,
+      "output_sha256": "bba0619cf19535c03e16731289492973928430eee3eaaedbc0ad3681a8ac9d07"
+    },
+    "reference/previous-v-token/provenance.json": {
       "category": "reference_evidence",
       "output_bytes": 60704,
       "output_sha256": "38a12ceb998338c712349ff3ecedb472195c3be239eff0aecdeb55e1c86a6464"
     },
+    "reference/previous-v-token/pv/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 18907,
+      "output_sha256": "93949985c7ae59b204865317034b30e25797a7e1714300bcaf4a9cba6746fb5f"
+    },
+    "reference/previous-v-token/pv/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1527,
+      "output_sha256": "e517f8797b5fa22cbf67afc4f6756a5571857b8e44ade0b9002b083919e7fb35"
+    },
+    "reference/previous-v-token/serial_layer_control/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 35948,
+      "output_sha256": "2776a7a3f1db5d88ba465fcd3b4af114fa992315bb725fb081a85e8836d3ad17"
+    },
+    "reference/previous-v-token/serial_layer_control/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5764,
+      "output_sha256": "1c24f19ab94eb19f609701338a27f62408a8cde88b51a157ce72389088a27416"
+    },
+    "reference/previous-v-token/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 38812,
+      "output_sha256": "17c487a59914ceef7c38283cfad84d7f4e8e1c7658946aa008df0915392b3ebc"
+    },
+    "reference/previous-v-token/v/native-audit.json": {
+      "category": "reference_evidence",
+      "output_bytes": 18960,
+      "output_sha256": "aab1fa66b485e698f3687313c3c2a0a91a7d2314fb26ae270ea7c84d6fd0411e"
+    },
+    "reference/previous-v-token/v/summary.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1585,
+      "output_sha256": "842b7661257668392d8ee5698aab65f024a31ea3a4115b17c61b4a270a29cb97"
+    },
+    "reference/previous-v-token/validation.json": {
+      "category": "reference_evidence",
+      "output_bytes": 33432,
+      "output_sha256": "b08cc3cdde7c798a39473b20f10cc9ca67b1434dfda6824f703e6a53ebd937cc"
+    },
+    "reference/provenance.json": {
+      "category": "reference_evidence",
+      "output_bytes": 59854,
+      "output_sha256": "5ff63184e719dcd07f735ca762e0c8ebe7e65860d7c941134d68da14067c17bf"
+    },
     "reference/publish-byte-verification.json": {
       "category": "reference_evidence",
-      "output_bytes": 80636,
-      "output_sha256": "7dd311132f9d1c4af0dd13bd3b178e61d85ce4412edf0c5b2f7334714970422a"
+      "output_bytes": 80931,
+      "output_sha256": "0d8d639c66213d07b2c478be99841895849898d49b556b01dedf585df7812ff4"
     },
     "reference/pv/native-audit.json": {
       "category": "reference_evidence",
@@ -3141,8 +3260,8 @@
     },
     "reference/pv/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1527,
-      "output_sha256": "e517f8797b5fa22cbf67afc4f6756a5571857b8e44ade0b9002b083919e7fb35"
+      "output_bytes": 1556,
+      "output_sha256": "da610d733dd7ae82ccfdc918a281b423758119b0ff2cf24750a4202fd7d5f965"
     },
     "reference/rank-dispatch-channel-comparison.csv": {
       "category": "reference_evidence",
@@ -3171,13 +3290,13 @@
     },
     "reference/serial_layer_control/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 35948,
-      "output_sha256": "2776a7a3f1db5d88ba465fcd3b4af114fa992315bb725fb081a85e8836d3ad17"
+      "output_bytes": 36624,
+      "output_sha256": "579f48aadef8c4770f73593f5bd0ab922b0184d64f32329334803437aaed1e35"
     },
     "reference/serial_layer_control/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 5764,
-      "output_sha256": "1c24f19ab94eb19f609701338a27f62408a8cde88b51a157ce72389088a27416"
+      "output_bytes": 5786,
+      "output_sha256": "96cadd5e421b79880ef6f05ce8806435442b41cbe916e01921ce3d5408f05a80"
     },
     "reference/single-bank-verification.json": {
       "category": "reference_evidence",
@@ -3196,28 +3315,63 @@
     },
     "reference/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 38812,
-      "output_sha256": "17c487a59914ceef7c38283cfad84d7f4e8e1c7658946aa008df0915392b3ebc"
+      "output_bytes": 39460,
+      "output_sha256": "8d74d8f460c3c282f9bb7e703cf49727d0105ded41291c7db594f60ae684bdaa"
     },
     "reference/unit-tests.log": {
       "category": "reference_evidence",
-      "output_bytes": 16061,
-      "output_sha256": "67a0b4b4ba2c3c25b2216135721c1cfc601a2f35f3298d0b3c2288b948dd8f63"
+      "output_bytes": 17321,
+      "output_sha256": "879e8ad9570a1f0729a99e7fdc3231876b677b8be7999f734bb3bb1cf8df83d5"
+    },
+    "reference/v-token/case-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 956,
+      "output_sha256": "bc10787efacf2f728f259972c8d015e4ad9c9e7c1cc37901136ae3f036285f94"
+    },
+    "reference/v-token/channel-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 182539,
+      "output_sha256": "1dd558a93453975eb1b5a5102ff2c147ab77c40effa19bd3704d18df0ec1ba6a"
+    },
+    "reference/v-token/native-command-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 6709,
+      "output_sha256": "57cf93276992fc36ca7727247c8d14649b898570e83c6b79962d9ece47283274"
+    },
+    "reference/v-token/phase-kind-dq-comparison.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 239208,
+      "output_sha256": "5d9eb87c3ef191300f47326bad2848fbde8020fe44d28eabb4606e2d546cd703"
+    },
+    "reference/v-token/phase-latency.csv": {
+      "category": "reference_evidence",
+      "output_bytes": 16354,
+      "output_sha256": "8b876a344fea947d7269f3dedf93aed1ba96a009b3a5b45704d8f9b291f18da7"
+    },
+    "reference/v-token/source-result-binding.json": {
+      "category": "reference_evidence",
+      "output_bytes": 5567,
+      "output_sha256": "83a25b9817f3b5654340bd302f4c2b6f6ad95a8b77a9ee8f40562cd6c2e787e8"
+    },
+    "reference/v-token/v-token-comparison.json": {
+      "category": "reference_evidence",
+      "output_bytes": 1026810,
+      "output_sha256": "9f1aec55ff9e15041d76212d45cd5717d6fb71688680bb9c16397da0bf5974ba"
     },
     "reference/v/native-audit.json": {
       "category": "reference_evidence",
-      "output_bytes": 18960,
-      "output_sha256": "aab1fa66b485e698f3687313c3c2a0a91a7d2314fb26ae270ea7c84d6fd0411e"
+      "output_bytes": 19626,
+      "output_sha256": "665ecb96ac863c1280fb1ad5bb0048d9ca87ed2c25e0fec037e63806022aec47"
     },
     "reference/v/summary.json": {
       "category": "reference_evidence",
-      "output_bytes": 1585,
-      "output_sha256": "842b7661257668392d8ee5698aab65f024a31ea3a4115b17c61b4a270a29cb97"
+      "output_bytes": 1618,
+      "output_sha256": "d3faf971d6e5af0c565f36cbd7e9b53241b7d3a77835106b09197094f253381b"
     },
     "reference/validation.json": {
       "category": "reference_evidence",
-      "output_bytes": 33432,
-      "output_sha256": "b08cc3cdde7c798a39473b20f10cc9ca67b1434dfda6824f703e6a53ebd937cc"
+      "output_bytes": 42462,
+      "output_sha256": "3f965b61c6fb8f0203411d06c06d80c59bd13f0db2afed4cee47da438fa29f8a"
     },
     "requirements.txt": {
       "category": "publication",
@@ -3241,8 +3395,8 @@
     },
     "verify_reference.py": {
       "category": "publication",
-      "output_bytes": 4151,
-      "output_sha256": "3ed9a29abd88156dcec8f5b987e90fa393715fe955a758292f4d6a5b256d805c"
+      "output_bytes": 4702,
+      "output_sha256": "259b14e4ccf95fa83cb5290da073dc89efbef3fe03a98d3ebbbcf68102cda8db"
     },
     "verify_single_bank.py": {
       "category": "publication",
@@ -3258,5 +3412,8 @@
   "staging_split_activation_deadline_enforced": true,
   "full_split_activation_deadline_enforced": true,
   "measured_logs_ACT1_ACT2_checks_passed": true,
-  "split_activation_audit_scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven corrected and seven direct cases, all 16 channels; not verification of all DRAM physical specifications"
+  "split_activation_audit_scope": "ACT1/ACT2 owner, deadline and interference checks over all commands in the measured logs of seven before, seven token and seven legacy cases, all 16 channels; not verification of all DRAM physical specifications",
+  "v_token_sharding": true,
+  "V_cache_and_PV_feature_sharded": true,
+  "V_weight_copies_per_head": 2
 }

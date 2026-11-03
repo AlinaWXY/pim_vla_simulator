@@ -390,7 +390,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             "transfer_scheduling": "AttAcc shared WRGB/RDRES movement path with BL/CCDS/CCDL issue constraints; "
                 "ordinary RD/WR retain CL/CWL; WRGB and RDRES complete after nBL_min; "
                 "WRGB fanout has no added latency; RDRES cannot overtake queued MACs and waits for bank compute completion",
-            "mac_completion": "Native completion: eight CK for Q/K projection, sixteen CK for other GEMV operators; "
+            "mac_completion": "Native completion: eight CK for Q/K projection and token-sharded V at [131072,163840), "
+                "sixteen CK for legacy V, PV, Gate/Up and GPU-fed Down; "
                 "the bank PE is shared by both input slots",
             "double_buffer": "One physical pair of 512B GEMV slots per bank; inactive-slot GPU writes may overlap MAC; "
                 "full token/lane coverage and completed consumption required before use/overwrite; explicit release",
@@ -417,7 +418,11 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             "down_layout": ("Legacy reduction-dimension partition with16 rank partials" if config.pim_ffn_dram else
                 "Output partition:64 complete output features per rank,4 per bank;256 input fragments and4 MAC columns per fragment; "
                 "no PIM Z DRAM allocation and no cross-rank partial-result reduction"),
-            "completion": "Native MAC completion covers eight Q/K or sixteen other input rows; slot release is explicit",
+            "completion": "Native MAC completion covers eight Q/K/token-sharded-V rows or sixteen legacy-V/PV/Gate/Up/Down rows; slot release is explicit",
+            "token_sharded_v_geometry": {"weight_base_bytes": 131072, "weight_end_bytes": 163840,
+                "input_rows_per_rank": 8, "mac_columns_per_fragment": 16,
+                "mac_service_ck": 8, "accumulator_bytes_per_bank": 512,
+                "selection": "Recognized by the MAC weight address; legacy V region remains supported"},
             "numerical_compute": False,
             "assumption": "Ordinary external WRGB broadcasts to16 banks without extra fanout latency, as specified; "
                 "configured bank-local Q port service remains an architecture parameter, not synthesized hardware",

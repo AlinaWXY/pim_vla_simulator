@@ -1,6 +1,16 @@
 # xinyao_1103 双 bank 输入暂存与 rank controller
 
-本实验从 `xinyao_1102` 的 `cbc1ee4` 派生；其直接输入基线是 `xinyao_1101` 的 `4073452`。1103 将 GPU 广播输入分布到不同 bank group 的两个 DRAM bank，并交错写入。权重、KV cache、计算指令、输出归属及每 bank 的两个 SRF slot 保持不变。当前默认模式在双 bank 数据路径上进一步启用 channel 独立派发和 rank 粗粒度描述符，修正旧模式的跨 channel 队头阻塞。[RoPE 命令说明](ROPE-CONTROL.md) 保留问题的历史证据，并解释本次控制路径修改；`--legacy-rank-dispatch` 可复现修改前的 1103。
+本实验从 `xinyao_1102` 的 `cbc1ee4` 派生；其直接输入基线是 `xinyao_1101` 的 `4073452`。1103 将 GPU 广播输入分布到不同 bank group 的两个 DRAM bank，并交错写入，启用 channel 独立派发和 rank 粗粒度描述符。在 `23e6614` 的 LOCALWR 时序修正之上，默认 runner 将 V projection 改为 token 分 rank；V cache/PV、其它算子及每 bank 两个 512 B SRF slot 保持原配置。V 权重副本和投影结果归属的变化见下文。[RoPE 命令说明](ROPE-CONTROL.md) 保留控制路径修改的历史证据。
+
+## V projection 的 token 分片与 GPU 重排
+
+每 head 的两个 channel/rank1 分别计算偶数和奇数 token。每 rank 处理 8 token、全部 256 个 V feature，每 bank 持有与 Q/K 相同的 16-feature pair 映射。新 Wv 区域为每 bank `[131072,163840)`，即 32 KiB；两 rank 各存完整 Wv，全部权重由 4 MiB 增至 8 MiB。旧 V cache 仍位于 `[100352,116736)`，按 feature 分 rank，地址和 PV trace 保持不变。新区域不覆盖 Q/K、cache、FFN 或输入暂存区。
+
+V 输入每 rank 为 16 KiB、每 fragment 256 B（8 token × 16 BF16），64 个 fragment。每 fragment 执行 16 个 MACAB，每个服务 8 CK；总 scalar MAC 数与旧的 16 token × 8 feature/bank 相同。standalone V 的 nCCDAB 从 16 调整为匹配 8-token 服务的 8；其它普通 DRAM timing 不变。serial 模式本来使用 nCCDAB=8，仍由各算子的 bank PE/SRF busy 时间保证实际服务间隔。
+
+V FP32 输出仍为 8192 B/rank，经原有 GPU cast/pack 边界，按 `(head,token,feature)` 重排至旧 feature-sharded cache。GPU 重排本身未计时；模型检查输出覆盖、源/目的映射、已有 RDRES/ST 流量、prefix-tail 保留和 padding，未执行 BF16 神经网络数值计算。P 由 GPU 提供，PV 各 rank 接收同 head 的完整 P，对各自 feature 的完整 KV 序列累加，无跨 rank partial-sum reduction。
+
+`--legacy-v-feature-sharding` 保留修改前 V；`--direct-input-baseline` 同样保留旧 V 以维持 1101 直接输入控制口径。底层 workload API 的 `v_token_sharding` 默认 false，runner 默认开启；它由不同 Wv 地址识别几何，不新增硬件模式开关。V projection 不与 Q/K 融合，输入仍单独供应。
 
 ## 输入路径与双 bank 布局
 
@@ -21,14 +31,14 @@ GPU → channel DQ → rank1 bank0 / bank4 DRAM（整批输入，交错 ST）
 | 输入阶段 | 每 rank 的输入 | 总字节/rank | 每个源 bank 实际字节 | 每个源 bank 实际使用的 DRAM rows | 每个 fragment |
 |---|---|---:|---:|---|---|
 | Q/K projection | 本 rank 的 8 token × 1024 feature X；Q/K 共享 | 16 KiB | 8 KiB | 256–259，共 4 行 | 8 × 16 BF16 = 256 B |
-| V projection | 16 × 1024 X | 32 KiB | 16 KiB | 256–263，共 8 行 | 16 × 16 BF16 = 512 B |
+| V projection | 本 rank 的 8 token × 1024 X | 16 KiB | 8 KiB | 256–259，共 4 行 | 8 × 16 BF16 = 256 B |
 | PV | 16 query × 992 physical KV position P | 31 KiB | 15.5 KiB | 256–263，共 8 行；末行使用 1.5 KiB | 16 × 16 BF16 = 512 B |
 | Gate/Up | 16 × 1024 X；Gate/Up 共享 | 32 KiB | 16 KiB | 256–263，共 8 行 | 16 × 16 BF16 = 512 B |
 | Down | 16 × 4096 GPU Z | 128 KiB | 64 KiB | 256–287，共 32 行 | 16 × 16 BF16 = 512 B |
 
 PV 的逻辑 KV 长度为 968 + 16 = 984，物理长度按原布局补齐到 992；上述字节数包含原本就传输的 padding。Q/K、V、Gate/Up 各有 64 个 fragment，PV 有 62 个，Down 有 256 个。
 
-令 `f` 为逻辑 fragment，`t` 为 fragment 内 token，`R` 为每 fragment 的 token 数（Q/K 为 8，其余为 16）。默认双 bank 映射为：
+令 `f` 为逻辑 fragment，`t` 为 fragment 内本地 token，`R` 为每 fragment 的 token 数（Q/K 和新 V 为 8，其余为 16）。Q/K 和新 V 的全局 token 为 `2*t + channel%2`。默认双 bank 映射为：
 
 ```text
 physical_rank = 1
@@ -64,7 +74,7 @@ MAC fragment 2p
 MAC fragment 2p+1
 ```
 
-每个 descriptor 内仍从自身源 bank 连续读取；本次没有把两个 descriptor 的 LOCALRD 改成跨 bank 交错流水，也没有令下一对 staged load 越过前面的 MAC。先填好两个 slot，再发对应 MAC，消费完后再装载下一对。V/PV/Gate/Up/Down 每批向每个 bank 的两个 SRF 共填入 1 KiB；Q/K 每批共 512 B，仅使用每个 slot 的前 256 B。成对策略见 [fragment_batches](source/rank_staging.py#L37)。
+每个 descriptor 内仍从自身源 bank 连续读取；两个 descriptor 的 LOCALRD 未改成跨 bank 交错流水，下一对 staged load 不能越过前面的 MAC。先填好两个 slot，再发对应 MAC，消费完后再装载下一对。PV/Gate/Up/Down 每批向每个 bank 的两个 SRF 共填入 1 KiB；Q/K 和新 V 每批共 512 B，仅使用每个 slot 的前 256 B。成对策略见 [fragment_batches](source/rank_staging.py#L37)。
 
 ## 时序与命令
 
@@ -74,7 +84,7 @@ MAC fragment 2p+1
 - `PIM_STAGE_FRAGMENT ADDRESS SLOT` 指向 fragment 的真实源 bank。rank controller 展开 8/16 次 LOCALRD 与对应 SRF 广播；`PIM_STAGE_LOAD` 的单 32 B 入口保留给局部测试。
 - bank→SRF 和 SRF→同 rank SRF 的数据延迟包含在 `nCL + nBL_min` 内，不额外增加数据传输周期。广播命令仍与读取、计算争用 rank CA。
 - 两个源 bank 都保留权重计算职责。暂存行和权重行共享各 bank 的真实行状态，加载与全 bank MAC 之间的 PRE/ACT 成本继续计入，不假设独立 array 读端口。
-- 输入覆盖、写完成、SRF 消费完成、slot 复用和 release 检查继续生效。Q/K projection 为 8 CK/MAC，其余 GEMV 为 16 CK/MAC，QKT 和 RoPE 参数保持基线。
+- 输入覆盖、写完成、SRF 消费完成、slot 复用和 release 检查继续生效。Q/K 和新 V projection 为 8 CK/MAC，其余 GEMV 为 16 CK/MAC，QKT 和 RoPE 参数保持基线。
 
 内部 staging 的 ACT1/ACT2 与 ordinary RD/WR 使用相同的 `can_start_act1` lookahead：只有下一命令周期的 ACT2 已满足 DRAM 与 rank CA 约束，才发出 ACT1。fragment 请求保留在 PIM FIFO 队首，并登记普通控制器的 bank owner 与 `ACT1_clock+nAAD` deadline。已开始的激活优先完成 ACT2，刷新和其它命令随后恢复调度；ACT2 仍占 rank CA，并保留 nRP、nRFC、nRCD 等时序。超时或 owner 丢失会报错。SRF、数据布局、预取批量及所有时序参数均不改变。
 
@@ -92,7 +102,7 @@ QKT 的 Q 按 feature 定向送到对应 bank，并非同一数据对所有 bank
 
 ## 流量与统计解释
 
-每 rank 仍只接收一份所需 GPU 输入，bank 数量变化不复制输入字节。五阶段外部流量仍为 **5472 KiB/层/步（全部 16 channel）**，其中经暂存的数据为 **3824 KiB**。rank 内读取和广播的内部流量单独记录，不重复计入 DQ。
+每 rank 仍只接收一份所需 GPU 输入，bank 数量变化不复制输入字节。新 V 令五阶段外部流量由 5472 降为 **5216 KiB/层/步（全部 16 channel）**，其中经暂存的数据由 3824 降为 **3568 KiB**；减少的 256 KiB 全部来自 V 输入。rank 内读取和广播的内部流量单独记录，不重复计入 DQ。
 
 报告区分累计 DQ 占用、完整无外部传输工作窗口和其它 DQ 空隙。未向 rank0 注入真实并发 GPU 请求，故空闲窗口不能直接称为已测量的 GPU 可用时间。GPU softmax、GeLU/multiply/cast/pack、O projection、norm/residual、GPU dispatch 和后台 VLM 竞争未计时；不计算 BF16 tensor 数值，完整 AE 端到端 latency 保持未定义。
 

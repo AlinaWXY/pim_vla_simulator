@@ -43,10 +43,10 @@ def setup(backend):
 
 
 def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, staging_banks=1,
-               rank_descriptors=False, channel_independent_dispatch=False):
+               rank_descriptors=False, channel_independent_dispatch=False, v_token_sharding=False):
     from simulator.config import MemoryConfig
     chain = case in ("chain", "serial_layer_control")
-    timings = dict(nCCDAB=8 if chain else 16, nLOCALWR=4)
+    timings = dict(nCCDAB=8 if chain or (case == "v" and v_token_sharding) else 16, nLOCALWR=4)
     if chain:
         timings.update(nCCDK=2, nCCDQK=16)
     return MemoryConfig(model="lpddr5x-8533", channels=16, ranks=2, density_gbit=8,
@@ -63,17 +63,20 @@ def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, stag
         timing_overrides=timings, pim_local_transfer_cycles=2)
 
 
-def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False):
+def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=False,
+             channel_independent_dispatch=False, v_token_sharding=False):
     import workload
     from simulator.backend import run_trace
     from audit_native import audit_run
     directory = output / case
     directory.mkdir()
     manifest = workload.generate(directory / "workload.trace", case, rank_staging=rank_staging, staging_banks=staging_banks,
-        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
+        v_token_sharding=v_token_sharding)
     dump(directory / "manifest.json", manifest)
     config = config_for(case, rank_staging=rank_staging, staging_banks=staging_banks,
-        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch)
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
+        v_token_sharding=v_token_sharding)
     native = run_trace(config, directory / "workload.trace", directory / "simulation")
     with (directory / "simulation/barriers.csv").open(newline="") as stream:
         markers = {int(r["marker"]): int(r["frontend_tick"]) for r in csv.DictReader(stream)}
@@ -85,6 +88,7 @@ def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=
     if dq != manifest["expected_dq_bytes"]["total"]:
         raise AssertionError((case, "external DQ differs", dq, manifest["expected_dq_bytes"]))
     summary = dict(case=case, horizon=16, fresh_native_run=True, unified_bank_gemv=True,
+        v_token_sharding=bool(v_token_sharding and case in ("v", "serial_layer_control")),
         rank_staging=rank_staging, rank_controller=rank_staging,
         rank_descriptors=config.pim_rank_descriptors, channel_independent_dispatch=config.channel_independent_dispatch,
         staging_banks=staging_banks if rank_staging else 0,
@@ -120,6 +124,8 @@ def main():
     parser.add_argument("--backend", type=Path, default=HERE.parent / "pi05-bgk-gpuq/backend")
     parser.add_argument("--cases", nargs="+", choices=CASES, default=list(CASES))
     parser.add_argument("--direct-input-baseline", action="store_true", help="Reproduce xinyao_1101 direct WRGB input behavior")
+    parser.add_argument("--legacy-v-feature-sharding", action="store_true",
+                        help="Keep pre-change V projection feature sharding; cache/PV are always feature sharded")
     parser.add_argument("--staging-banks", type=int, choices=(1, 2), default=2,
                         help="Number of DRAM input staging banks per PIM rank (default: 2)")
     parser.add_argument("--legacy-rank-dispatch", action="store_true",
@@ -128,6 +134,7 @@ def main():
                         help="Keep channel-independent dispatch but use per-bank PIM requests for ablation")
     parser.add_argument("--skip-tests", action="store_true", help="For diagnostic runs only")
     args = parser.parse_args()
+    v_token_sharding = not (args.legacy_v_feature_sharding or args.direct_input_baseline)
     channel_independent_dispatch = not (args.direct_input_baseline or args.legacy_rank_dispatch)
     rank_descriptors = channel_independent_dispatch and not args.no_rank_descriptors
     backend, output = args.backend.resolve(strict=True), args.output.resolve()
@@ -146,6 +153,7 @@ def main():
     library_hash = digest(library)
     dump(output / "provenance.json", dict(started_utc=datetime.now(timezone.utc).isoformat(),
         horizon=16, python=sys.executable, backend=str(backend),
+        v_token_sharding=v_token_sharding,
         native_library_sha256=library_hash,
         rank_staging=not args.direct_input_baseline,
         staging_banks=args.staging_banks if not args.direct_input_baseline else 0,
@@ -160,10 +168,12 @@ def main():
         execute("native-guards", [sys.executable, HERE / "validation/native_guards.py",
                 "--backend", backend, "--output", output / "native-guards"], output, env)
     runs = {case: run_case(output, case, rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks,
-        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch) for case in args.cases}
+        rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
+        v_token_sharding=v_token_sharding) for case in args.cases}
     import workload
     complete = all(case in runs for case in PRIMARY)
     summary = dict(status="passed", horizon=16, attention_heads=8,
+        v_token_sharding=v_token_sharding,
         unified_bank_gemv=True, primary_cases=list(PRIMARY), runs=runs,
         rank_staging=not args.direct_input_baseline, rank_controller=not args.direct_input_baseline,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
@@ -173,7 +183,8 @@ def main():
         external_DQ_bytes_per_layer_step=sum(runs[c]["external_DQ_bytes"] for c in PRIMARY) if complete else None,
         FFN_combined_control_us=runs.get("combined_timing_chain", {}).get("latency_us"),
         serial_layer_memory_control_us=runs.get("serial_layer_control", {}).get("latency_us"),
-        layouts=workload.layouts(rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks), complete_AE_end_to_end_latency_ms=None,
+        layouts=workload.layouts(rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks,
+                                v_token_sharding=v_token_sharding), complete_AE_end_to_end_latency_ms=None,
         actual_GPU_usable_time_us=None, unknown_latency_us={name: None for name in UNKNOWN},
         tests_executed=not args.skip_tests,
         aggregation="Five independently timed stages; combined FFN and serial-layer memory schedule are additional controls, excluded from the sum")
