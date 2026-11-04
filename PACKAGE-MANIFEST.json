@@ -6,8 +6,8 @@
   "dataflow": "QKT score DRAM buffering and local two-bank PV-to-O projection; common BF16 PV boundary, FP32 accumulation",
   "result_binding": "reference/o-projection/source-result-binding.json",
   "historical_package_manifest": "PACKAGE-MANIFEST.pv-token.json",
-  "file_count_excluding_manifest": 829,
-  "bytes_excluding_manifest": 36981803,
+  "file_count_excluding_manifest": 848,
+  "bytes_excluding_manifest": 64602738,
   "file_hashes": {
     ".gitattributes": {
       "bytes": 77,
@@ -22,8 +22,8 @@
       "sha256": "74a1f19701bb06cb80b4ec31e6de6472f5fd767e5949c1c4d51f70007d18b3f2"
     },
     "O-PROJECTION-SOURCE.json": {
-      "bytes": 85392,
-      "sha256": "b9c6435639c1768ab9ea7eee43aa786873684eef9d241427aae157845ef789da"
+      "bytes": 85650,
+      "sha256": "fec669431408550bf65382aed03aa061b2c02b00031c8110638ab4ccea408b7b"
     },
     "PACKAGE-MANIFEST.pv-token.json": {
       "bytes": 172795,
@@ -34,8 +34,8 @@
       "sha256": "b422188d2fb7f1d2862b5082ec1b8de99b2464fc5b7fbcf18d82f0b2ae1c4851"
     },
     "README.md": {
-      "bytes": 4431,
-      "sha256": "b6a4eaa5df030cc3fffa7257f49dbfac0a0a5d0df2fbce9ba921682fd2038207"
+      "bytes": 6715,
+      "sha256": "bee67ce72132d8e52bb20da154ee2b02c58e0c52525247f88bcb0cd46e36d887"
     },
     "analyze_localwr_schedule.py": {
       "bytes": 13597,
@@ -2014,8 +2014,8 @@
       "sha256": "5688539886d228d1affd49751376a180b9b9a70d40e0ef83fb51a95dee56a182"
     },
     "experiments/pi05-unified-gemv/O-PROJECTION.md": {
-      "bytes": 6372,
-      "sha256": "a74f1277a5f1e861cffd908035ae57005f6995726908aee417504729da85b5ed"
+      "bytes": 6933,
+      "sha256": "db563b31d6f8bfe0aa6814d867d6650158ab666be6c865c590dd3a59507f1ea9"
     },
     "experiments/pi05-unified-gemv/ROPE-CONTROL.md": {
       "bytes": 10278,
@@ -2038,8 +2038,12 @@
       "sha256": "e16d01878e9f2d347db8c9e7b2c67dce8e188fedb87cac93c79f4407c12c2983"
     },
     "experiments/pi05-unified-gemv/compare_o_projection.py": {
-      "bytes": 11753,
-      "sha256": "d1b97d67d7215dc9006c4003a2a2762d8fa894b662ff2f2e46cf86da4e2576a5"
+      "bytes": 16603,
+      "sha256": "c283a47ca1569245f079b7b12622538634573eb5a2d36c11500ae2313c3dd012"
+    },
+    "experiments/pi05-unified-gemv/continuous_dq.py": {
+      "bytes": 18724,
+      "sha256": "0bec580165968acea39804334f4d453809c883f12ac8b169fe74de34b6733929"
     },
     "experiments/pi05-unified-gemv/plot_comparison.py": {
       "bytes": 3323,
@@ -2168,6 +2172,10 @@
     "experiments/pi05-unified-gemv/validation/test_channel_analysis.py": {
       "bytes": 10213,
       "sha256": "87eb0e4af3170bcd2152241433f0878d73a25c816cf883749ccc8e104c999eff"
+    },
+    "experiments/pi05-unified-gemv/validation/test_continuous_dq.py": {
+      "bytes": 12975,
+      "sha256": "66f5bf9ab419b73f5a8acea05360115df294136b0d4f5ada604c4c9edc8fd460"
     },
     "experiments/pi05-unified-gemv/validation/test_dispatch_audit.py": {
       "bytes": 10676,
@@ -2394,12 +2402,12 @@
       "sha256": "8e76ba2b01f7ff68160449ef02eb5e8d9e8742dd7993a2c1b59cfdf8b5d74187"
     },
     "reference/o-projection/COMPARISON.md": {
-      "bytes": 2380,
-      "sha256": "2ef5cc23cb9dcbb0e69c44b14b907ffd90baf6e3500925f6c2a2851699b8a80c"
+      "bytes": 2768,
+      "sha256": "cfee9a0262c457307ef3f37d1993f859a3fd351c804949b08f13b41d7d216051"
     },
     "reference/o-projection/REPORT.zh-CN.md": {
-      "bytes": 8852,
-      "sha256": "cfdb6cfee2cc37b33b9136332b63f29d4b2b3856651892cccfce99802b64d186"
+      "bytes": 13793,
+      "sha256": "7a0837efccf99bf25c09f7b3c4d8dd44f24d36794f067f3468fbd16f4b0f61ee"
     },
     "reference/o-projection/archive-manifest.json": {
       "bytes": 285,
@@ -2458,12 +2466,52 @@
       "sha256": "79db04327fa9eb24035fb59fc576ddbd727a32b190b5cca86164e64528708420"
     },
     "reference/o-projection/comparison.csv": {
-      "bytes": 901,
-      "sha256": "cce86ba61fc7c5e09f3290baa96eaae66a02ecd3f38d43aa032aa99fa5a97209"
+      "bytes": 1543,
+      "sha256": "b676c9e9788461b6f6970765203053c1b672805c3e8a539816f924f0124a2551"
     },
     "reference/o-projection/comparison.json": {
-      "bytes": 3556,
-      "sha256": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115"
+      "bytes": 6709,
+      "sha256": "da744e2d14d8fac193d1ef97eae15414bed9fe46e36c0072332a182df26adfa5"
+    },
+    "reference/o-projection/continuous-dq/continuous-dq-complete-work-windows.csv": {
+      "bytes": 1680506,
+      "sha256": "9c957e070ec7ce3ea37521531d34766eb0667997f287257635f0b370216035c3"
+    },
+    "reference/o-projection/continuous-dq/continuous-dq-summary.csv": {
+      "bytes": 1041293,
+      "sha256": "67d93f537cf1a0c06d3a8217448f4fb8070031ce77f984454181a30bb50f82f7"
+    },
+    "reference/o-projection/continuous-dq/continuous-dq-windows.csv.gz": {
+      "bytes": 16385170,
+      "sha256": "880dc592c0627bd5616647b6806fd1da1fd7bf55a56da9ba6a839c2a6783c3fa"
+    },
+    "reference/o-projection/continuous-dq/continuous-dq.json": {
+      "bytes": 8085939,
+      "sha256": "9153d7cd8aee92123c6d1093c7f60617290cf9017f86fc10e9c71249822dab33"
+    },
+    "reference/o-projection/continuous-review-validation.json": {
+      "bytes": 2108,
+      "sha256": "930b83c1e300cbe158e58671fd7e474121108bd1366d2f4df0a5c308d1078d20"
+    },
+    "reference/o-projection/continuous-review/analysis-code.sha256": {
+      "bytes": 272,
+      "sha256": "34d03ae6228b59daf33b3248b0842868322b0a40355f293b345f032d382c36ce"
+    },
+    "reference/o-projection/continuous-review/archive.json": {
+      "bytes": 104,
+      "sha256": "1930f4c69bfabeb206ee28c78d56be13f6a075f0a2563d161b7c9ba4a35ca994"
+    },
+    "reference/o-projection/continuous-review/continuous-tests.log": {
+      "bytes": 2956,
+      "sha256": "e3cf840f402e2988fb8fab2422b549def0b6e9f5b202cb709a7d2b5498bcf0cd"
+    },
+    "reference/o-projection/continuous-review/interval-regression-tests.log": {
+      "bytes": 2214,
+      "sha256": "0e7f801683ffecf59cd106cff394fc3c257f74e2a7f5e1e557d9d2d2dd494143"
+    },
+    "reference/o-projection/continuous-review/op-continuous-review.sbatch": {
+      "bytes": 2818,
+      "sha256": "810afc6c282f9972bc7fdb7058923db8a0f0860fc1067d45fcbfe25b0f7b82cc"
     },
     "reference/o-projection/generated-build/LPDDR5XPIM.cpp": {
       "bytes": 6395,
@@ -2478,12 +2526,12 @@
       "sha256": "d6de98b77719d6fb512de460dd666d2b02e549424305c6713edd555570ef5fdb"
     },
     "reference/o-projection/latency-dq-breakdown.pdf": {
-      "bytes": 25585,
-      "sha256": "812da04126b4194dc925628ba61a01f1d3d77005b8f21b85471eb91fe112a860"
+      "bytes": 27371,
+      "sha256": "6af88c01e8bc4ed66285501e7ce3fe65deaa19ec681ef2430231b76dc44e50af"
     },
     "reference/o-projection/latency-dq-breakdown.png": {
-      "bytes": 140821,
-      "sha256": "b9be9a4cd6661745f6e1294b279fa80fecce9efa237f5e8353048a9214044bd3"
+      "bytes": 201488,
+      "sha256": "807b9ffeec6d4cece3f9e06ecad6813b9383b0c180dcc897c886a8a2f9b47288"
     },
     "reference/o-projection/legacy/chain/manifest.json": {
       "bytes": 714508,
@@ -2685,13 +2733,41 @@
       "bytes": 22360,
       "sha256": "2867dc340fccb5e7c9979309130a19e23465ca3afafef534bd8f1a7dcdc3176e"
     },
+    "reference/o-projection/previous-cumulative-report/COMPARISON.md": {
+      "bytes": 2380,
+      "sha256": "2ef5cc23cb9dcbb0e69c44b14b907ffd90baf6e3500925f6c2a2851699b8a80c"
+    },
+    "reference/o-projection/previous-cumulative-report/REPORT.zh-CN.md": {
+      "bytes": 8852,
+      "sha256": "cfdb6cfee2cc37b33b9136332b63f29d4b2b3856651892cccfce99802b64d186"
+    },
+    "reference/o-projection/previous-cumulative-report/comparison.csv": {
+      "bytes": 901,
+      "sha256": "cce86ba61fc7c5e09f3290baa96eaae66a02ecd3f38d43aa032aa99fa5a97209"
+    },
+    "reference/o-projection/previous-cumulative-report/comparison.json": {
+      "bytes": 3556,
+      "sha256": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115"
+    },
+    "reference/o-projection/previous-cumulative-report/latency-dq-breakdown.pdf": {
+      "bytes": 25585,
+      "sha256": "812da04126b4194dc925628ba61a01f1d3d77005b8f21b85471eb91fe112a860"
+    },
+    "reference/o-projection/previous-cumulative-report/latency-dq-breakdown.png": {
+      "bytes": 140821,
+      "sha256": "b9be9a4cd6661745f6e1294b279fa80fecce9efa237f5e8353048a9214044bd3"
+    },
+    "reference/o-projection/previous-cumulative-report/qkt-dq-timeline.png": {
+      "bytes": 80495,
+      "sha256": "e775b97ddccade500988ccb0eb31b30458dbcc261a91040136182316ada20f0a"
+    },
     "reference/o-projection/provenance.json": {
       "bytes": 49099,
       "sha256": "95a3ecff40d4a8d840a36d333ef97e187d1aaf5bef644f1c6b6ef89eeddc9fbb"
     },
     "reference/o-projection/qkt-dq-timeline.png": {
-      "bytes": 80495,
-      "sha256": "e775b97ddccade500988ccb0eb31b30458dbcc261a91040136182316ada20f0a"
+      "bytes": 120171,
+      "sha256": "feb248f551a7aece5c594a68dfb3816a939c009b41e0c40399a12fb8fdcb3518"
     },
     "reference/o-projection/score_only/chain/native-audit.json": {
       "bytes": 18099,
@@ -2742,8 +2818,8 @@
       "sha256": "7f0036b4f04953085c56071029002c00a69a1033b84f71d0346b0cd92f2bd515"
     },
     "reference/o-projection/source-result-binding.json": {
-      "bytes": 17364,
-      "sha256": "a674ab8f9670ee7eae5e46c82925d21ce24fe02d4e8ecb41ee6ab79630319f7c"
+      "bytes": 21424,
+      "sha256": "9c2b399cc24eeb172c44bea54bc541a3924f430ffa54e06868a81b0ae2f03339"
     },
     "reference/o-projection/stage-comparison.csv": {
       "bytes": 1916,

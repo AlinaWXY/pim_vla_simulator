@@ -15,13 +15,15 @@
   "post_measurement_changes": {
     "experiments/pi05-unified-gemv/compare_o_projection.py": {
       "measured_sha256": "f63225a193e702a8b01fd20463cc7af6ccd41a7f5efdd2efcea07fa7941ee113",
-      "published_sha256": "d1b97d67d7215dc9006c4003a2a2762d8fa894b662ff2f2e46cf86da4e2576a5",
-      "reason": "Clarify scope in plots/tables; add serial-control interaction."
+      "previous_published_sha256": "d1b97d67d7215dc9006c4003a2a2762d8fa894b662ff2f2e46cf86da4e2576a5",
+      "published_sha256": "c283a47ca1569245f079b7b12622538634573eb5a2d36c11500ae2313c3dd012",
+      "reason": "Replace summed idle presentation with uninterrupted work windows; separately label O timing and draw exact DQ bursts."
     },
     "experiments/pi05-unified-gemv/O-PROJECTION.md": {
       "measured_sha256": "a280fe0270e70fdd880628b167d1145d6fbd6eb6bba701f2245357bcb1874259",
-      "published_sha256": "a74f1277a5f1e861cffd908035ae57005f6995726908aee417504729da85b5ed",
-      "reason": "Document complete resident Wo copies and interpretation."
+      "previous_published_sha256": "a74f1277a5f1e861cffd908035ae57005f6995726908aee417504729da85b5ed",
+      "published_sha256": "db563b31d6f8bfe0aa6814d867d6650158ab666be6c865c590dd3a59507f1ea9",
+      "reason": "Document the corrected continuous-window metric and explicit O timing scope."
     },
     "experiments/pi05-unified-gemv/run-o-projection.sbatch": {
       "measured_sha256": "262a15f9bc3ec74a645b711a9389b6ebeffcc3df07cc983845c4a8dab09d3065",
@@ -57,6 +59,18 @@
       "measured_sha256": null,
       "published_sha256": "cdecc5460a0db3f4434364e4366fb5deb88959a05ef46a1be64fa0a9aa1bdc59",
       "reason": "Prove full resident weight mapping and active address compatibility."
+    },
+    "experiments/pi05-unified-gemv/continuous_dq.py": {
+      "measured_sha256": null,
+      "previous_published_sha256": null,
+      "published_sha256": "0bec580165968acea39804334f4d453809c883f12ac8b169fe74de34b6733929",
+      "reason": "Derive individual complete work and physical idle windows from existing native events; do not stitch independent stages."
+    },
+    "experiments/pi05-unified-gemv/validation/test_continuous_dq.py": {
+      "measured_sha256": null,
+      "previous_published_sha256": null,
+      "published_sha256": "66f5bf9ab419b73f5a8acea05360115df294136b0d4f5ada604c4c9edc8fd460",
+      "reason": "Nineteen interval/lifetime/schema tests for continuous-window derivation."
     }
   },
   "generated_by_native_build": {
@@ -115,14 +129,24 @@
     "both/serial_layer_control/summary.json": "9cd97e77afd16ea98534bd6524fd065068254103ff56c7b47f67daa4e7a9ae99",
     "both/summary.json": "805ba5f33cbbb290b1bb640bdddfa9c218d0894fdb24f08ec3ac523173419b6e",
     "channel-comparison.csv": "79db04327fa9eb24035fb59fc576ddbd727a32b190b5cca86164e64528708420",
-    "comparison.csv": "cce86ba61fc7c5e09f3290baa96eaae66a02ecd3f38d43aa032aa99fa5a97209",
-    "comparison.json": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115",
-    "COMPARISON.md": "2ef5cc23cb9dcbb0e69c44b14b907ffd90baf6e3500925f6c2a2851699b8a80c",
+    "comparison.csv": "b676c9e9788461b6f6970765203053c1b672805c3e8a539816f924f0124a2551",
+    "comparison.json": "da744e2d14d8fac193d1ef97eae15414bed9fe46e36c0072332a182df26adfa5",
+    "COMPARISON.md": "cfee9a0262c457307ef3f37d1993f859a3fd351c804949b08f13b41d7d216051",
+    "continuous-dq/continuous-dq-complete-work-windows.csv": "9c957e070ec7ce3ea37521531d34766eb0667997f287257635f0b370216035c3",
+    "continuous-dq/continuous-dq-summary.csv": "67d93f537cf1a0c06d3a8217448f4fb8070031ce77f984454181a30bb50f82f7",
+    "continuous-dq/continuous-dq-windows.csv.gz": "880dc592c0627bd5616647b6806fd1da1fd7bf55a56da9ba6a839c2a6783c3fa",
+    "continuous-dq/continuous-dq.json": "9153d7cd8aee92123c6d1093c7f60617290cf9017f86fc10e9c71249822dab33",
+    "continuous-review/analysis-code.sha256": "34d03ae6228b59daf33b3248b0842868322b0a40355f293b345f032d382c36ce",
+    "continuous-review/archive.json": "1930f4c69bfabeb206ee28c78d56be13f6a075f0a2563d161b7c9ba4a35ca994",
+    "continuous-review/continuous-tests.log": "e3cf840f402e2988fb8fab2422b549def0b6e9f5b202cb709a7d2b5498bcf0cd",
+    "continuous-review/interval-regression-tests.log": "0e7f801683ffecf59cd106cff394fc3c257f74e2a7f5e1e557d9d2d2dd494143",
+    "continuous-review/op-continuous-review.sbatch": "810afc6c282f9972bc7fdb7058923db8a0f0860fc1067d45fcbfe25b0f7b82cc",
+    "continuous-review-validation.json": "930b83c1e300cbe158e58671fd7e474121108bd1366d2f4df0a5c308d1078d20",
     "generated-build/lpddr5.py": "2b4de0458a4cb0f27b487b31986f63f5f576dea76f31b44f5494092fde4c08c8",
     "generated-build/lpddr5_pim.py": "d6de98b77719d6fb512de460dd666d2b02e549424305c6713edd555570ef5fdb",
     "generated-build/LPDDR5XPIM.cpp": "232fac454221a64bd72f84133a6b0003950500fb99eef064a20c7a44cfab1f70",
-    "latency-dq-breakdown.pdf": "812da04126b4194dc925628ba61a01f1d3d77005b8f21b85471eb91fe112a860",
-    "latency-dq-breakdown.png": "b9be9a4cd6661745f6e1294b279fa80fecce9efa237f5e8353048a9214044bd3",
+    "latency-dq-breakdown.pdf": "6af88c01e8bc4ed66285501e7ce3fe65deaa19ec681ef2430231b76dc44e50af",
+    "latency-dq-breakdown.png": "807b9ffeec6d4cece3f9e06ecad6813b9383b0c180dcc897c886a8a2f9b47288",
     "legacy/chain/manifest.json": "59238663c8979d781965ebf583a9aa49a47569abd4aae72cd44d4618c2f5c71d",
     "legacy/chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
     "legacy/chain/summary.json": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55",
@@ -173,9 +197,16 @@
     "postchecks/result-validation.log": "c16e3dacd7eed42536aa1091afc4a5138ef5a8662f6825d8fe98810f0dae4d74",
     "postchecks/summary.json": "858a298cc342106d9db025c70c4d330af1a7fed31987e610fff36bac0190c649",
     "postchecks/unit-tests.log": "2867dc340fccb5e7c9979309130a19e23465ca3afafef534bd8f1a7dcdc3176e",
+    "previous-cumulative-report/comparison.csv": "cce86ba61fc7c5e09f3290baa96eaae66a02ecd3f38d43aa032aa99fa5a97209",
+    "previous-cumulative-report/comparison.json": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115",
+    "previous-cumulative-report/COMPARISON.md": "2ef5cc23cb9dcbb0e69c44b14b907ffd90baf6e3500925f6c2a2851699b8a80c",
+    "previous-cumulative-report/latency-dq-breakdown.pdf": "812da04126b4194dc925628ba61a01f1d3d77005b8f21b85471eb91fe112a860",
+    "previous-cumulative-report/latency-dq-breakdown.png": "b9be9a4cd6661745f6e1294b279fa80fecce9efa237f5e8353048a9214044bd3",
+    "previous-cumulative-report/qkt-dq-timeline.png": "e775b97ddccade500988ccb0eb31b30458dbcc261a91040136182316ada20f0a",
+    "previous-cumulative-report/REPORT.zh-CN.md": "cfdb6cfee2cc37b33b9136332b63f29d4b2b3856651892cccfce99802b64d186",
     "provenance.json": "95a3ecff40d4a8d840a36d333ef97e187d1aaf5bef644f1c6b6ef89eeddc9fbb",
-    "qkt-dq-timeline.png": "e775b97ddccade500988ccb0eb31b30458dbcc261a91040136182316ada20f0a",
-    "REPORT.zh-CN.md": "cfdb6cfee2cc37b33b9136332b63f29d4b2b3856651892cccfce99802b64d186",
+    "qkt-dq-timeline.png": "feb248f551a7aece5c594a68dfb3816a939c009b41e0c40399a12fb8fdcb3518",
+    "REPORT.zh-CN.md": "7a0837efccf99bf25c09f7b3c4d8dd44f24d36794f067f3468fbd16f4b0f61ee",
     "score_only/chain/native-audit.json": "6dc69761ecf74d29f5daea9566a3a80394693c2a9e98a63e1449b28d0c340f8d",
     "score_only/chain/summary.json": "b3b3bcb40e4d950f15db38b921b7d0059fe89f5e9f4ab1bf811796d74a024a48",
     "score_only/channel-analysis.json": "038510771af654ff13f459cd1ed94ab8698bd0c2ffed0e1dbb15fac1f5caaf98",
@@ -210,5 +241,24 @@
     "tests/score-native-guards/summary.json": "9ddd62bf8a3db313e033451387de6a09f15963479b5628ab9c00b6a539cf0cba",
     "validation.json": "04fa6a56830838564c69b89a2e07675f23eddb5409ebe1351735ea2c6df59acc"
   },
-  "final_source_manifest_sha256": "b9c6435639c1768ab9ea7eee43aa786873684eef9d241427aae157845ef789da"
+  "final_source_manifest_sha256": "fec669431408550bf65382aed03aa061b2c02b00031c8110638ab4ccea408b7b",
+  "continuous_window_revision": {
+    "job": 1928919,
+    "native_simulation_rerun": false,
+    "native_latency_and_DQ_totals_unchanged": true,
+    "validation": "continuous-review-validation.json",
+    "previous_cumulative_presentation": "previous-cumulative-report/",
+    "previous_comparison_sha256": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115",
+    "tests": {
+      "continuous-tests.log": 19,
+      "interval-regression-tests.log": 14
+    },
+    "archive": {
+      "bytes": 15404112,
+      "sha256": "5514f86423a4fa71c230a5d861c2b769d9309941b0cca407c7da2936c9165756"
+    },
+    "archive_directory": "../../results/continuous-review-1928919",
+    "primary_metric": "Longest uninterrupted complete DQ-free work window; separate windows are not added.",
+    "original_validation_scope": "validation.json continues to bind the original native run and its original comparison, preserved under previous-cumulative-report. This analytical revision is bound by continuous-review-validation.json."
+  }
 }

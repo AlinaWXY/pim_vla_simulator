@@ -14,6 +14,14 @@
       "external_dq_KiB_channel": 274.5,
       "external_dq_KiB_all_channels": 4392.0,
       "serial_control_us": 171.960726,
+      "o_projection_included": false,
+      "pim_o_subflow_us": null,
+      "o_timing_scope": "GPU O projection unmeasured",
+      "pv_path_without_o_us": 14.953596,
+      "qkt_longest_complete_work_window_us": 0.559048,
+      "qkt_complete_work_window_count": 31,
+      "qkt_longest_dq_idle_us": 0.559986,
+      "pv_longest_complete_work_window_us": 11.784094,
       "latency_delta_us": 0.0,
       "latency_delta_percent": 0.0
     },
@@ -30,6 +38,14 @@
       "external_dq_KiB_channel": 274.5,
       "external_dq_KiB_all_channels": 4392.0,
       "serial_control_us": 181.253492,
+      "o_projection_included": false,
+      "pim_o_subflow_us": null,
+      "o_timing_scope": "GPU O projection unmeasured",
+      "pv_path_without_o_us": 14.953596,
+      "qkt_longest_complete_work_window_us": 19.38377,
+      "qkt_complete_work_window_count": 1,
+      "qkt_longest_dq_idle_us": 19.443772687499997,
+      "pv_longest_complete_work_window_us": 11.784094,
       "latency_delta_us": 9.549778000000003,
       "latency_delta_percent": 5.5753918272126946
     },
@@ -46,6 +62,14 @@
       "external_dq_KiB_channel": 298.5,
       "external_dq_KiB_all_channels": 4776.0,
       "serial_control_us": 201.204752,
+      "o_projection_included": true,
+      "pim_o_subflow_us": 27.997424,
+      "o_timing_scope": "PIM O input read/broadcast/compute, control and BF16 export",
+      "pv_path_without_o_us": 16.352154000000002,
+      "qkt_longest_complete_work_window_us": 0.559048,
+      "qkt_complete_work_window_count": 31,
+      "qkt_longest_dq_idle_us": 0.559986,
+      "pv_longest_complete_work_window_us": 25.124329999999997,
       "latency_delta_us": 29.395982000000004,
       "latency_delta_percent": 17.162086678422405
     },
@@ -62,6 +86,14 @@
       "external_dq_KiB_channel": 298.5,
       "external_dq_KiB_all_channels": 4776.0,
       "serial_control_us": 210.64666,
+      "o_projection_included": true,
+      "pim_o_subflow_us": 27.997424,
+      "o_timing_scope": "PIM O input read/broadcast/compute, control and BF16 export",
+      "pv_path_without_o_us": 16.352154000000002,
+      "qkt_longest_complete_work_window_us": 19.38377,
+      "qkt_complete_work_window_count": 1,
+      "qkt_longest_dq_idle_us": 19.443772687499997,
+      "pv_longest_complete_work_window_us": 25.124329999999997,
       "latency_delta_us": 38.94576000000001,
       "latency_delta_percent": 22.737478505635078
     }
@@ -73,5 +105,24 @@
   "complete_end_to_end_latency_us": null,
   "interpretation": "Sum of independently timed QKV/attention, PV or PV+O, Gate/Up and Down stages. GPU O projection is unmeasured in non-O variants; GPU reductions, softmax, nonlinearities and contention are unmeasured in all variants.",
   "dq_definition": "Occupied modeled issued-command burst intervals / native stage wall time, per channel. No concurrent GPU traffic or validated electrical DQ waveform is simulated.",
-  "whole_work_without_dq_definition": "Sum of complete semantic work phases with no external DQ commands after removing incoming burst tails. Includes local-memory waits and refresh; it is neither MAC active time nor one contiguous GPU-available window."
+  "whole_work_without_dq_definition": "Historical cumulative diagnostic only: sum of separate complete semantic work phases after incoming burst tails. Superseded for uninterrupted-window comparison; never interpret this sum as one window.",
+  "continuous_window_report": "continuous-dq/continuous-dq.json",
+  "primary_idle_metric": "Longest single complete DQ-free work window, merging adjacent work across DQ-free control bridges; never sum windows across exports or independent stages.",
+  "source_sha256": {
+    "provenance.json": "95a3ecff40d4a8d840a36d333ef97e187d1aaf5bef644f1c6b6ef89eeddc9fbb",
+    "neither/summary.json": "fc5e6d66abe80d89c924bfad00218d39697932d5375513d500e6ac4d34777320",
+    "neither/channel-analysis.json": "937d7097620f30e9bf03def95206a8ebf3571f3f96720b4ec447aa4b0e9cc301",
+    "score_only/summary.json": "7f0036b4f04953085c56071029002c00a69a1033b84f71d0346b0cd92f2bd515",
+    "score_only/channel-analysis.json": "038510771af654ff13f459cd1ed94ab8698bd0c2ffed0e1dbb15fac1f5caaf98",
+    "oproj_only/summary.json": "727e4871fad1147ba948334c441a486ee73604413ef157fa7e6dfff49e47e011",
+    "oproj_only/channel-analysis.json": "2a2886089e7735932e645cfad8862b886f5eb34a1dd71c050c068698af96abdb",
+    "both/summary.json": "805ba5f33cbbb290b1bb640bdddfa9c218d0894fdb24f08ec3ac523173419b6e",
+    "both/channel-analysis.json": "77399e6ae400326acf44df66bbfadede4c9068f1c3129bdb9bd928fcf86dd1bc"
+  },
+  "continuous_report_sha256": "9153d7cd8aee92123c6d1093c7f60617290cf9017f86fc10e9c71249822dab33",
+  "derivation_code_sha256": {
+    "compare_o_projection.py": "c283a47ca1569245f079b7b12622538634573eb5a2d36c11500ae2313c3dd012",
+    "continuous_dq.py": "0bec580165968acea39804334f4d453809c883f12ac8b169fe74de34b6733929",
+    "channel_analysis.py": "e16d01878e9f2d347db8c9e7b2c67dce8e188fedb87cac93c79f4407c12c2983"
+  }
 }

@@ -103,10 +103,18 @@ ACT1/ACT2 timing, CA arbitration and DQ overlap checks. Results include an
 independent sum of QKV/attention, PV or PV+O, Gate/Up and Down, plus a separate
 single-layer continuous-memory control. The latter is not added twice.
 
+O-enabled variants include the PIM O input-read/broadcast/compute sequence,
+control and BF16 result export in the PV+O stage and in the total latency.
 Non-O variants exclude GPU output-projection time. All variants exclude GPU
 softmax, final partial sums, norm/residual, FFN nonlinearities, GPU dispatch
 and background contention. Reported modeled latency is therefore not an
 end-to-end speedup comparison. DQ utilization is busy burst time divided by
-native wall time per channel. The breakdown is DQ busy, complete work
-windows without DQ, and remaining DQ idle; a lower percentage alone does not
-establish better performance or measured GPU bandwidth.
+native wall time per channel. Continuous-window comparisons use the longest
+single complete DQ-free work window. Adjacent work phases may connect through
+DQ-free control phases; score/result transfer phases split windows. Idle
+holes inside transfer phases are excluded, and independent runs are never
+concatenated. The exact maximal physical DQ-idle intervals are provided as
+a separate diagnostic. Earlier cumulative whole-work totals are retained
+for accounting only; they cannot represent uninterrupted available time.
+A lower utilization alone does not establish better performance or measured
+GPU bandwidth.
