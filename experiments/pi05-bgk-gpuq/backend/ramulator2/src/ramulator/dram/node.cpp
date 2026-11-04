@@ -50,11 +50,11 @@ DRAMNode::DRAMNode(DRAMSpec* spec, DRAMNode* parent, int level, int id)
   }
 }
 
-void DRAMNode::update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk, uint64_t bank_mask) {
+void DRAMNode::update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) {
   const bool half = m_spec->bank_targets[command] == BankTarget::Half;
   const int bg_level = half ? m_spec->get_level_id("BankGroup") : -1;
   const bool half_group = half && m_level == bg_level;
-  const bool matches = bank_mask ? (m_subtree_bank_mask & bank_mask)!=0 : half && m_level == m_spec->get_level_id("Bank") ? true : half_group
+  const bool matches = half && m_level == m_spec->get_level_id("Bank") ? true : half_group
       ? m_node_id / (m_spec->organization.level_sizes[bg_level] / 2) ==
             addr_vec[m_level] / (m_spec->organization.level_sizes[bg_level] / 2)
       : m_node_id == addr_vec[m_level] || addr_vec[m_level] == -1;
@@ -114,17 +114,16 @@ void DRAMNode::update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk, 
   int target_child_id = half && child_level == m_spec->get_level_id("Bank") ? -1 : addr_vec[child_level];
   bool children_have_sibling_cons = m_spec->has_sibling_cons[child_level][command];
 
-  if (bank_mask || children_have_sibling_cons || target_child_id == -1 || (half && child_level == bg_level)) {
+  if (children_have_sibling_cons || target_child_id == -1 || (half && child_level == bg_level)) {
     for (auto& child : m_child_nodes) {
-      child->update_timing(command, addr_vec, clk, bank_mask);
+      child->update_timing(command, addr_vec, clk);
     }
   } else {
-    m_child_nodes[target_child_id]->update_timing(command, addr_vec, clk, bank_mask);
+    m_child_nodes[target_child_id]->update_timing(command, addr_vec, clk);
   }
 }
 
-bool DRAMNode::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk, uint64_t bank_mask) {
-  if(bank_mask && !(m_subtree_bank_mask & bank_mask)) return true;
+bool DRAMNode::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) {
   if (m_cmd_ready_clk[command] != -1 && clk < m_cmd_ready_clk[command]) {
     return false;
   }
@@ -144,19 +143,19 @@ bool DRAMNode::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk, u
     }
     const int first = child_id / groups_per_half * groups_per_half;
     for (int i = first; i < first + groups_per_half; ++i) {
-      if (!m_child_nodes[i]->check_timing(command, addr_vec, clk, bank_mask)) return false;
+      if (!m_child_nodes[i]->check_timing(command, addr_vec, clk)) return false;
     }
     return true;
   }
 
-  if (bank_mask || child_id == -1) {
+  if (child_id == -1) {
     bool timing_ok = true;
     for (auto& child : m_child_nodes) {
-      timing_ok = timing_ok && child->check_timing(command, addr_vec, clk, bank_mask);
+      timing_ok = timing_ok && child->check_timing(command, addr_vec, clk);
     }
     return timing_ok;
   } else {
-    return m_child_nodes[child_id]->check_timing(command, addr_vec, clk, bank_mask);
+    return m_child_nodes[child_id]->check_timing(command, addr_vec, clk);
   }
 }
 

@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 
 EXTERNAL = frozenset(("RD", "RDA", "WR", "WRA", "WRGB", "RDRES"))
-CONTROL = frozenset(("BARRIER", "WAIT", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_FFN_PASS"))
+CONTROL = frozenset(("BARRIER", "WAIT", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL"))
 PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 
 
@@ -273,9 +273,8 @@ def analyze_stage(directory, case):
 def analyze(root):
     root = Path(root)
     summary = read_json(root/"summary.json")
-    primary = (("gate_up_gpu", "down_gpu_input") if summary.get("ffn_only") else
-        ("chain", "pv", "gate_up_gpu", "down_gpu_input") if summary.get("qkv_fusion") else PRIMARY)
-    require(tuple(summary["primary_cases"]) == primary, "Primary stages must match the selected FFN/fused/separate schedule")
+    primary = ("chain", "pv", "gate_up_gpu", "down_gpu_input") if summary.get("qkv_fusion") else PRIMARY
+    require(tuple(summary["primary_cases"]) == primary, "Primary stages must match the selected fused or separate projection schedule")
     stages = {case: analyze_stage(root/case, case) for case in primary}
     first = stages[primary[0]]
     count = len(first["channels"])
@@ -313,8 +312,7 @@ def analyze(root):
             "complete zero-external-work phases = tail-clear suffix windows + removed incoming data tails"],
         limitations=["AttAcc movement timing is an abstraction; no validated LPDDR electrical DQ waveform",
             "No concurrent rank0 GPU workload or GPU dispatch simulation; global CA and DQ idle intersection is a resource upper bound, not achieved GPU service time",
-            ("Two independent FFN stages; combined FFN is excluded from the sum" if summary.get("ffn_only") else
-             "Four primary stages with fused QKV; standalone V and combined FFN are excluded" if summary.get("qkv_fusion") else
+            ("Four primary stages with fused QKV; standalone V and combined FFN are excluded" if summary.get("qkv_fusion") else
              "Five independent native stages; no invented time between stages or double-counted combined FFN"),
             "Transfer-phase idle fragments and release/WAIT-only phases are excluded from whole-phase candidate windows",
             "GPU/nonlinear arithmetic and background VLM contention remain unmeasured"])
@@ -376,8 +374,7 @@ def write_report(root, output=None):
         values = lambda key: [r[key] for r in stage["channels"]]
         span = lambda key: f"{min(values(key)):.6f}–{max(values(key)):.6f}"
         lines.append(f"| {case} | {stage['stage_us']:.6f} | {span('modelled_dq_occupied_us')} | {span('modelled_dq_idle_us')} | {stage['complete_zero_external_phase_us_all_channels']:.6f} | {stage['tail_clear_complete_zero_external_phase_us_all_channels']:.6f} |")
-    stage_label = ("Two-stage FFN sum" if len(report["primary_cases"]) == 2 else
-        "Four-stage sum (fused QKV)" if len(report["primary_cases"]) == 4 else "Five-stage sum")
+    stage_label = "Four-stage sum (fused QKV)" if len(report["primary_cases"]) == 4 else "Five-stage sum"
     lines += ["", f"{stage_label}: {report['stage_sum_us']:.6f} us; x18x10: {report['stage_sum_ms_18x10']:.6f} ms. This is a sum of measured stages, not complete AE end-to-end latency.", "",
         "Each channel closes exactly as wall = model DQ occupied + model DQ idle. Whole-phase candidate windows exclude transfer-phase fragments and release-only control phases. Incoming delayed data is removed before counting each remaining suffix. Actual concurrent GPU request admission and service are not simulated.", "",
         "The JSON and CSV files retain every channel and semantic phase, including boundary overhead and any data tail beyond stage completion.", ""]

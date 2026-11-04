@@ -28,7 +28,6 @@ class DRAMDevice {
   DRAMSpec* m_spec = nullptr;              // Non-owning pointer for convenient access
   std::unique_ptr<DRAMNode> m_root;        // Hierarchical node tree (for timing)
   std::vector<DRAMNode*> m_bank_nodes;     // Flat bank view (non-owning, for state dispatch)
-  uint64_t active_bank_mask = 0; // Scoped physical-bank selection; zero preserves normal commands.
   int m_bank_level = -1;                   // Cached level ID for "Bank" (hot-path use)
   // Optional hierarchical-controller bus arbitration, independent of array timings.
   std::function<bool(int, const AddrVec_t&, Clk_t)> command_admission;
@@ -66,11 +65,6 @@ class DRAMDevice {
   /// Returns true if all banks were visited, false if visitor short-circuited.
   template <class Visitor>
   bool for_each_target_bank_while(int command, const AddrVec_t& addr_vec, Visitor&& visitor) const {
-    if (active_bank_mask) {
-      for(int i=0;i<static_cast<int>(m_bank_nodes.size());++i)
-        if((active_bank_mask & (uint64_t{1}<<i)) && !visitor(i)) return false;
-      return true;
-    }
     switch (m_spec->bank_targets[command]) {
       case BankTarget::Single:
         return visitor(get_flat_bank_id(addr_vec));

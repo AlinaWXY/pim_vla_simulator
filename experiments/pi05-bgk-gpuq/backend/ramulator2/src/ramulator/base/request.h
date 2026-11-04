@@ -20,7 +20,7 @@ struct Request {
   // Universal built-in external request types — always Read = 0, Write = 1.
   // Additional non-negative ids may exist as metadata for future extensions.
   struct Type {
-    enum : int { Read = 0, Write = 1, PIM_MAC_AB = 2, PIM_WR_GB = 3, PIM_RD_RES = 4, PIM_MAC_HB = 5, PIM_LOCAL_GB = 6, PIM_WR_BG = 7, PIM_WR_Q = 8, PIM_MAC_K = 9, PIM_MAC_QK = 10, PIM_RD_BG = 11, PIM_LOCAL_WR = 12, PIM_RD_Q = 13, PIM_SPILL = 14, PIM_ROPE_COEF = 15, PIM_ROPE_LOAD = 16, PIM_ROPE_EXEC = 17, PIM_ROPE_STORE = 18, PIM_Q_EXPORT = 19, PIM_Q_REMOTE = 20, PIM_Z_STORE = 21, PIM_Z_LOAD = 22, PIM_GEMV_RELEASE = 23, PIM_STAGE_BEGIN = 24, PIM_STAGE_SEAL = 25, PIM_STAGE_LOAD = 26, PIM_STAGE_FRAGMENT = 27, PIM_FFN_PASS = 28, PIM_FFN_RDRES = 29 };
+    enum : int { Read = 0, Write = 1, PIM_MAC_AB = 2, PIM_WR_GB = 3, PIM_RD_RES = 4, PIM_MAC_HB = 5, PIM_LOCAL_GB = 6, PIM_WR_BG = 7, PIM_WR_Q = 8, PIM_MAC_K = 9, PIM_MAC_QK = 10, PIM_RD_BG = 11, PIM_LOCAL_WR = 12, PIM_RD_Q = 13, PIM_SPILL = 14, PIM_ROPE_COEF = 15, PIM_ROPE_LOAD = 16, PIM_ROPE_EXEC = 17, PIM_ROPE_STORE = 18, PIM_Q_EXPORT = 19, PIM_Q_REMOTE = 20, PIM_Z_STORE = 21, PIM_Z_LOAD = 22, PIM_GEMV_RELEASE = 23, PIM_STAGE_BEGIN = 24, PIM_STAGE_SEAL = 25, PIM_STAGE_LOAD = 26, PIM_STAGE_FRAGMENT = 27 };
   };
 
   int type_id = -1;        // Request type. -1 is the convention for internal maintenance/direct-command requests.

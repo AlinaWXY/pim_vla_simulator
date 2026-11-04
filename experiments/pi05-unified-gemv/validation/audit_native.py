@@ -14,9 +14,9 @@ GEOMETRY = ("Channel", "Rank", "BankGroup", "Bank", "Row", "Column")
 NATIVE = dict(PIM_WR_GB="WRGB", PIM_MAC_AB="MACAB", PIM_RD_RES="RDRES",
     PIM_SPILL="LOCALWR", PIM_ROPE_COEF="LOCALRD", PIM_ROPE_LOAD="LOCALRD",
     PIM_ROPE_STORE="LOCALWR", PIM_Q_EXPORT="RD", PIM_Q_REMOTE="WRGB",
-    PIM_MAC_QK="MACQK", PIM_RD_BG="RDRES", PIM_FFN_RDRES="RDRES", LD="RD", ST="WR", PIM_STAGE_LOAD="LOCALRD")
+    PIM_MAC_QK="MACQK", PIM_RD_BG="RDRES", LD="RD", ST="WR", PIM_STAGE_LOAD="LOCALRD")
 EXTERNAL = {"RD", "RDA", "WR", "WRA", "WRGB", "RDRES"}
-RANK_COMMANDS = {"WRGB", "MACAB", "MACMASK", "MACQK", "RDRES"}
+RANK_COMMANDS = {"WRGB", "MACAB", "MACQK", "RDRES"}
 FILL_OPS = {"GEMV_MULTICAST", "GEMV_Q_LOCAL", "GEMV_Q_REMOTE"}
 
 
@@ -83,16 +83,13 @@ def trace_key(record):
 
 
 def expected_addresses(case, rank_staging=True, staging_banks=1, v_token_sharding=False,
-                        pv_token_sharding=False, qkv_fusion=False, whole_srf=False, ffn_data_banks=0):
+                        pv_token_sharding=False, qkv_fusion=False, whole_srf=False):
     """Derive every request independently from matrix dimensions and ownership."""
-    if ffn_data_banks and case in ("gate_up_gpu", "down_gpu_input", "combined_timing_chain"):
-        from ffn_split_audit import expected_addresses as split_addresses
-        return split_addresses(case, ffn_data_banks)
     if case == "serial_layer_control":
         stages = ("chain", "pv", "gate_up_gpu", "down_gpu_input") if qkv_fusion else ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
         return sum((expected_addresses(stage, rank_staging=rank_staging, staging_banks=staging_banks,
             v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding,
-            qkv_fusion=qkv_fusion, whole_srf=whole_srf, ffn_data_banks=ffn_data_banks) for stage in stages), Counter())
+            qkv_fusion=qkv_fusion, whole_srf=whole_srf) for stage in stages), Counter())
     expected = Counter()
     def add(op, ch, offset, slot=-1, bank=0):
         expected[op, ch, 1, bank//4, bank%4, offset//2048, offset%2048//32, slot] += 1
@@ -202,8 +199,7 @@ def expected_native_commands(records):
                 offset = first+token*32
                 expected[native_key("LOCALRD", (ch, rank, bg, bank, offset//2048, offset%2048//32))] += 1
         elif e["operation"] in NATIVE:
-            command = "MACMASK" if e["operation"] == "PIM_MAC_AB" and e["address"] >> 20 >= 512 else NATIVE[e["operation"]]
-            expected[native_key(command, decode(e["address"]))] += 1
+            expected[native_key(NATIVE[e["operation"]], decode(e["address"]))] += 1
             ch, rank, bg, bank, row, column = decode(e["address"])
             if e["operation"] == "PIM_SPILL" and 163840 <= row*2048+column*32 < 180224:
                 expected[native_key("LOCALRD", (ch, rank, bg, bank, row, column))] += 1
@@ -214,10 +210,10 @@ def audit_native_commands(records, native):
     expected = expected_native_commands(records)
     actual = Counter(native_key({"RDA": "RD", "WRA": "WR"}.get(e["command"], e["command"]),
                                 tuple(e[k] for k in GEOMETRY))
-                     for e in native if e["command"] in set(NATIVE.values()) | {"RDA", "WRA", "MACMASK"})
+                     for e in native if e["command"] in set(NATIVE.values()) | {"RDA", "WRA"})
     require(expected == actual, "Native issued command/address coverage differs: "+counter_difference(expected, actual))
     for event in native:
-        if event["command"] in set(NATIVE.values()) | {"RDA", "WRA", "MACMASK"}:
+        if event["command"] in set(NATIVE.values()) | {"RDA", "WRA"}:
             require(event["Rank"] == 1, "PIM work touched physical rank0")
     return sum(actual.values())
 
@@ -232,16 +228,13 @@ def audit_array_rows(native):
         if command in ("ACTAB", "PREab", "REFab"):
             groups, banks = range(4), range(4)
         targets = [(event["Channel"], r, g, b) for r in ranks for g in groups for b in banks]
-        if command in ("ACTMASK", "PREMASK", "MACMASK"):
-            require("bank_mask" in event, "Masked row audit requires bound physical bank masks")
-            targets = [t for t in targets if event["bank_mask"] >> (t[2]*4+t[3]) & 1]
-        if command in ("ACT2", "ACTAB", "ACTHB", "ACTMASK"):
+        if command in ("ACT2", "ACTAB", "ACTHB"):
             for target in targets:
                 opened[target] = event["Row"]
-        elif command in ("PREpb", "PREab", "PREHB", "REFab", "REFpb", "PREMASK"):
+        elif command in ("PREpb", "PREab", "PREHB", "REFab", "REFpb"):
             for target in targets:
                 opened.pop(target, None)
-        elif command in ("MACAB", "MACMASK", "MACQK", "LOCALRD", "LOCALWR", "RD", "RDA", "WR", "WRA"):
+        elif command in ("MACAB", "MACQK", "LOCALRD", "LOCALWR", "RD", "RDA", "WR", "WRA"):
             for target in targets:
                 require(opened.get(target) == event["Row"], f"Array command uses wrong/closed row: {event}")
                 checks += 1
@@ -252,11 +245,9 @@ def audit_array_rows(native):
 
 
 def audit_slot_events(events, case, require_final_release=True, mac_context=None, v_token_sharding=False,
-                       pv_token_sharding=False, qkv_fusion=False, whole_srf=False, ffn_data_banks=0):
+                       pv_token_sharding=False, qkv_fusion=False, whole_srf=False):
     """Replay masks per physical bank, never trusting a reported 'ready' bit."""
     states, port_until, counts = {}, defaultdict(int), Counter()
-    split_banks = [b for b in range(16) if b not in ([0] if ffn_data_banks == 1 else [0,4])] if ffn_data_banks else []
-    split_mask = sum(1 << b for b in split_banks)
     generations, released, max_fanout = 0, 0, 0
     def new_state(generation):
         return dict(generation=generation, lanes=[0]*16, ready=0, busy=0,
@@ -277,7 +268,7 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
             require(event["bytes"] == 32, "GEMV input transaction is not one 32B source burst")
             if op == "GEMV_MULTICAST":
                 require(event["service_cycles"] == 0, "External multicast must have zero added internal latency")
-                require(bank_mask in ((65535, split_mask) if ffn_data_banks else (65535,)) and event["token_mask"].bit_count() == 1 and event["lane_mask"] == 65535,
+                require(bank_mask == 65535 and event["token_mask"].bit_count() == 1 and event["lane_mask"] == 65535,
                         "Ordinary multicast must write one complete token row to all16 banks")
             else:
                 require(start >= port_until[ch], "Overlapping writes on rank Q distribution port")
@@ -286,8 +277,7 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                 require(len(banks) == 1 and event["token_mask"].bit_count() == 1 and event["lane_mask"] == 65535,
                         "Q tap/remote must fill exactly one query row in its feature-owning bank")
         else:
-            require(bank_mask == 65535 or ffn_data_banks and bank_mask & ~split_mask == 0,
-                    "Rank consume/release targets incorrect physical banks")
+            require(bank_mask == 65535, "Rank consume/release does not cover all16 physical banks")
         for bank in banks:
             key = ch, slot, bank
             state = states.get(key)
@@ -338,11 +328,6 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                         rows, columns, kind = 16, 32, "X"
                     elif 160 <= row < 176:
                         rows, columns, kind = 16, 4, "X"
-                    elif ffn_data_banks and (512 <= row < 550 or 1024 <= row < 1044):
-                        require(bank in split_banks, "FFN MAC consumed a dedicated data-bank SRF")
-                        features = 64 if row >= 1024 else 256
-                        ordinal = split_banks.index(bank)
-                        rows, columns, kind = 16, (features-ordinal+len(split_banks)-1)//len(split_banks), "X"
                     else:
                         raise AssertionError("Native MAC address outside independently defined H16 operators")
                     require(state["kind"] == kind, "Native operator consumes wrong input producer kind")
@@ -471,37 +456,23 @@ def audit_ffn_streams(native, gemv_events, case, staging_events=None, staging_ba
 
 
 def audit_trace(records, case, staging_banks=1, v_token_sharding=False,
-                 pv_token_sharding=False, qkv_fusion=False, whole_srf=False, ffn_data_banks=0):
+                 pv_token_sharding=False, qkv_fusion=False, whole_srf=False):
     from dispatch_audit import expand_rank_records
     records = expand_rank_records(records)
     actual = Counter(trace_key(e) for e in records if e["operation"] not in ("BARRIER", "WAIT"))
     expected = expected_addresses(case, rank_staging=any(e["operation"] == "PIM_STAGE_BEGIN" for e in records),
         staging_banks=staging_banks, v_token_sharding=v_token_sharding,
-        pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion, whole_srf=whole_srf, ffn_data_banks=ffn_data_banks)
+        pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion, whole_srf=whole_srf)
     require(actual == expected, "Trace differs from independent matrix/address oracle: "+counter_difference(expected, actual))
     require(not any(e["operation"] == "WAIT" for e in records), "Artificial legacy completion WAIT retained")
     require(not any(e["operation"].startswith("PIM_Z_") for e in records), "GPU-fed FFN must not use local Z commands")
-    if ffn_data_banks:
-        from ffn_split_audit import audit_trace_order
-        audit_trace_order(records, case, ffn_data_banks)
-        if case == "serial_layer_control":
-            from paired_audit import audit_paired_trace
-            cutoff = next(i for i,e in enumerate(records) if e["operation"] == "PIM_FFN_PASS")
-            attention = records[:cutoff]
-            starts = [i for i,e in enumerate(attention) if e["operation"] == "PIM_STAGE_BEGIN" and decode(e["address"])[0] == 0]
-            cases = ("chain", "pv") if qkv_fusion else ("chain", "v", "pv")
-            require(len(starts) == len(cases), "Mixed FFN trace omits an attention input stage")
-            for index, operator in enumerate(cases):
-                end = starts[index+1] if index+1 < len(starts) else len(attention)
-                audit_paired_trace(attention[starts[index]:end], operator, staging_banks,
-                    v_token_sharding, pv_token_sharding, qkv_fusion, whole_srf)
-    elif any(e["operation"] == "PIM_STAGE_BEGIN" for e in records):
+    if any(e["operation"] == "PIM_STAGE_BEGIN" for e in records):
         from paired_audit import audit_paired_trace
         audit_paired_trace(records, case, staging_banks, v_token_sharding, pv_token_sharding, qkv_fusion, whole_srf)
     return len(records)
 
 
-def audit_mac_order(native, case, v_token_sharding=False, pv_token_sharding=False, qkv_fusion=False, ffn_data_banks=0):
+def audit_mac_order(native, case, v_token_sharding=False, pv_token_sharding=False, qkv_fusion=False):
     """A shared producer/consumer permutation must not evade multiset checks."""
     stages = (("chain", "pv", "gate_up_gpu", "down_gpu_input") if qkv_fusion else
               ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")) if case == "serial_layer_control" else (case,)
@@ -515,20 +486,14 @@ def audit_mac_order(native, case, v_token_sharding=False, pv_token_sharding=Fals
                              (83968, 512) if stage == "v" else (163840,496) if pv_token_sharding else (100352, 496))
             ab.extend(base+32*i for i in range(columns))
         elif stage in ("gate_up_gpu", "down_gpu_input", "combined_timing_chain"):
-            if ffn_data_banks:
-                from ffn_split_audit import passes_for, geometry
-                for operator in passes_for(stage):
-                    g = geometry(operator, ffn_data_banks)
-                    ab.extend(range(g["base"], g["base"]+g["fragments"]*g["columns"]*32, 32))
-            else:
-                if stage != "down_gpu_input":
-                    ab.extend(range(262144, 327680, 32))
-                if stage != "gate_up_gpu":
-                    ab.extend(range(327680, 360448, 32))
+            if stage != "down_gpu_input":
+                ab.extend(range(262144, 327680, 32))
+            if stage != "gate_up_gpu":
+                ab.extend(range(327680, 360448, 32))
     for ch in range(16):
         selected = sorted((e for e in native if e["Channel"] == ch), key=lambda e: e["clock"])
         for command, expected in (("MACAB", ab), ("MACQK", qk)):
-            actual = [e["Row"]*2048+e["Column"]*32 for e in selected if e["command"] == command or command == "MACAB" and e["command"] == "MACMASK"]
+            actual = [e["Row"]*2048+e["Column"]*32 for e in selected if e["command"] == command]
             require(actual == expected, f"Native {command} order differs from independent operator/reduction order on channel{ch}")
     return 16*(len(ab)+len(qk))
 
@@ -573,24 +538,14 @@ def audit_run(directory):
     pv_token_sharding = manifest.get("pv_token_sharding", False)
     qkv_fusion = manifest.get("qkv_fusion", False)
     whole_srf = native_result["config"].get("pim_whole_srf", False)
-    ffn_data_banks = manifest.get("ffn_data_banks", 0)
-    require(ffn_data_banks == native_result["config"].get("ffn_data_banks", 0), "FFN trace/native bank partition mismatch")
     require(manifest.get("whole_srf",False) == whole_srf, "Whole-SRF trace/native mode mismatch")
-    audit_trace(records, case, staging_banks, v_token_sharding, pv_token_sharding, qkv_fusion, whole_srf, ffn_data_banks)
+    audit_trace(records, case, staging_banks, v_token_sharding, pv_token_sharding, qkv_fusion, whole_srf)
     simulation = directory / "simulation"
     timelines = [simulation / f"timeline.csv.ch{ch}" for ch in range(16)]
     gemv_files = [simulation / f"unified_gemv.csv.ch{ch}" for ch in range(16)]
     require(all(p.is_file() for p in timelines+gemv_files), "Missing channel native evidence")
     native = [e for p in timelines for e in read_csv(p)]
     events = [e for p in gemv_files for e in read_csv(p)]
-    masked_files = [simulation / f"masked_events.csv.ch{ch}" for ch in range(16)] if ffn_data_banks else []
-    split_files = [simulation / f"ffn_split.csv.ch{ch}" for ch in range(16)] if ffn_data_banks else []
-    require(all(p.is_file() for p in masked_files+split_files), "Missing masked FFN native evidence")
-    masked_events = [e for p in masked_files for e in read_csv(p)]
-    split_events = [e for p in split_files for e in read_csv(p)]
-    if ffn_data_banks:
-        from masked_audit import annotate_masked_commands
-        native = annotate_masked_commands(native, masked_events, ffn_data_banks)
     rank_staging = native_result["config"].get("pim_rank_staging", False)
     stage_files = [simulation / f"staging_events.csv.ch{ch}" for ch in range(16)] if rank_staging else []
     ca_files = [simulation / f"rank_ca_events.csv.ch{ch}" for ch in range(16)] if rank_staging else []
@@ -604,10 +559,10 @@ def audit_run(directory):
     cache_events = [e for p in cache_files for e in read_csv(p)]
     issued_count = audit_native_commands(records, native)
     row_checks = audit_array_rows(native)
-    order_checks = audit_mac_order(native, case, v_token_sharding, pv_token_sharding, qkv_fusion, ffn_data_banks)
-    mac_context = {(e["Channel"], e["clock"]): e["Row"] for e in native if e["command"] in ("MACAB", "MACMASK")}
+    order_checks = audit_mac_order(native, case, v_token_sharding, pv_token_sharding, qkv_fusion)
+    mac_context = {(e["Channel"], e["clock"]): e["Row"] for e in native if e["command"] == "MACAB"}
     slots = audit_slot_events(events, case, mac_context=mac_context, v_token_sharding=v_token_sharding,
-        pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion, whole_srf=whole_srf, ffn_data_banks=ffn_data_banks)
+        pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion, whole_srf=whole_srf)
     counts = Counter(e["operation"] for e in records)
     native_counts = Counter(e["command"] for e in native)
     require(slots["operation_counts"].get("GEMV_MAC", 0) == counts["PIM_MAC_AB"], "Missing native bank GEMV consume events")
@@ -622,7 +577,7 @@ def audit_run(directory):
     require(slots["operation_counts"].get("GEMV_Q_REMOTE", 0) == counts["PIM_Q_REMOTE"], "Missing peer Q writes to shared slots")
     for operation, command in (("GEMV_MAC", "MACAB"), ("GEMV_QK", "MACQK")):
         require(Counter((e["Channel"], e["clock"]) for e in events if e["operation"] == operation) ==
-                Counter((e["Channel"], e["clock"]) for e in native if e["command"] == command or command == "MACAB" and e["command"] == "MACMASK"),
+                Counter((e["Channel"], e["clock"]) for e in native if e["command"] == command),
                 "Shared-bank consume events do not correspond to actual native MAC issue")
     dq = sum(native_counts[c]*32 for c in EXTERNAL)
     require(dq == manifest["expected_dq_bytes"]["total"], "External DQ differs from source contract")
@@ -634,27 +589,15 @@ def audit_run(directory):
     staging, ca, batching = None, None, None
     if rank_staging:
         from staging_audit import audit_staging, audit_rank_ca
-        if ffn_data_banks:
-            from ffn_split_audit import audit_runtime, audit_attention_prefix
-            split_report = audit_runtime(manifest, raw_records, native, events, stage_events, split_events, native_result)
-            split_report["attention_prefix"] = audit_attention_prefix(manifest, native, events, stage_events, split_events, native_result)
-            staging = dict(external_input_bytes=split_report["whole_input_write_bytes"],
-                internal_read_bytes=split_report["local_input_read_bytes"],
-                full_source_row_coverage=split_report["full_source_row_coverage"],
-                data_source_cells_checked=split_report["data_source_cells_checked"],
-                internal_read_and_broadcast_use_DQ=False, SRAM_bytes_per_bank=1024)
-            batching = dict(double_buffer=True, input_slots_per_bank=2, slot_bytes=512,
-                physical_input_capacity_bytes_per_bank=1024, ffn_overlap=native_result["config"]["ffn_overlap"])
-        else:
-            staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"], staging_banks,
-                v_token_sharding, pv_token_sharding, qkv_fusion, whole_srf)
-            from paired_audit import audit_paired_staging
-            batching = audit_paired_staging(stage_events, native, events, case, staging_banks=staging_banks,
-                v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion, whole_srf=whole_srf)
+        staging = audit_staging(stage_events, native, events, case, native_result["resolved_timings_ck"], staging_banks,
+            v_token_sharding, pv_token_sharding, qkv_fusion, whole_srf)
+        from paired_audit import audit_paired_staging
+        batching = audit_paired_staging(stage_events, native, events, case, staging_banks=staging_banks,
+            v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion, whole_srf=whole_srf)
         require(Counter(e["operation"] for e in controller_events)["PIM_ROPE_EXEC"] == counts["PIM_ROPE_EXEC"],
                 "RoPE execute event count differs from trace")
         ca = audit_rank_ca(ca_events, native, stage_events, controller_events, raw_records, events, cache_events)
-    ffn = split_report if ffn_data_banks else audit_ffn_streams(native, events, case, stage_events, staging_banks) if case not in ("chain", "v", "pv") else None
+    ffn = audit_ffn_streams(native, events, case, stage_events, staging_banks) if case not in ("chain", "v", "pv") else None
     continuity = audit_serial_continuity(manifest, native_result, simulation, native, events) if case == "serial_layer_control" else None
     independent = native_result["config"].get("channel_independent_dispatch", False)
     descriptors = native_result["config"].get("pim_rank_descriptors", False)
@@ -680,10 +623,8 @@ def audit_run(directory):
         rank_controller=ca, ffn_streams=ffn, serial_continuity=continuity,
         native_external_DQ_bytes=dq, native_command_counts=dict(native_counts),
         trace_sha256=digest(directory / "workload.trace"),
-        native_sha256={p.name: digest(p) for p in timelines+gemv_files+stage_files+ca_files+controller_files+cache_files+masked_files+split_files+extra_files},
+        native_sha256={p.name: digest(p) for p in timelines+gemv_files+stage_files+ca_files+controller_files+cache_files+extra_files},
         numerical_compute=False, unmeasured="GPU/nonlinear arithmetic and GPU contention")
-    if ffn_data_banks:
-        result["ffn_split"] = split_report
     if independent:
         result["channel_ingress"] = ingress_audit
     if descriptors:

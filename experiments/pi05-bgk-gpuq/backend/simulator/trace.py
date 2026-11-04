@@ -11,7 +11,7 @@ def inspect_trace(
     path: Path, *, transaction_bytes: int, capacity_bytes: int, pim: bool = False
 ) -> dict:
     counts = dict.fromkeys(("LD", "ST", "PIM_MAC_AB", "PIM_WR_GB", "PIM_RD_RES", "PIM_MAC_HB", "PIM_LOCAL_GB", 'PIM_WR_BG', 'PIM_WR_Q', 'PIM_MAC_K', 'PIM_MAC_QK', 'PIM_RD_BG', 'PIM_LOCAL_WR', 'PIM_RD_Q'), 0)
-    new_ops = ("PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE", "PIM_Z_STORE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT", "PIM_FFN_PASS", "PIM_FFN_RDRES")
+    new_ops = ("PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE", "PIM_Z_STORE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT")
     counts.update(dict.fromkeys(new_ops, 0))
     counts.update(dict.fromkeys(RANK_BATCH_OPS, 0))
     controls = {"BARRIER": 0, "WAIT": 0}
@@ -19,8 +19,6 @@ def inspect_trace(
     staged_input_bytes = 0
     stage_rows_by_channel = {}
     stage_input_read_bursts = 0
-    ffn_channels = set()
-    ffn_stage_input_read_bursts = 0
     digest = hashlib.sha256()
     with path.open("rb") as stream:
         for number, raw in enumerate(stream, 1):
@@ -37,11 +35,6 @@ def inspect_trace(
                 raise ValueError(f"Trace line {number}: invalid address") from error
             wire_op = op
             op = RANK_BATCH_OPS.get(op, op)
-            if op in ("PIM_FFN_PASS", "PIM_FFN_RDRES"):
-                if len(fields) != 2 or (address >> 15) & 1 != 1 or (address >> 16) & 15:
-                    raise ValueError(f"Trace line {number}: FFN descriptor requires canonical rank1/BG0/bank0 and no slot")
-                if op == "PIM_FFN_PASS":
-                    ffn_channels.add((address >> 5) & 15)
             if wire_op in RANK_BATCH_OPS and ((address >> 15) & 1 != 1 or (address >> 16) & 15):
                 raise ValueError(f"Trace line {number}: rank descriptor requires canonical rank1/BG0/bank0")
             if op == "PIM_STAGE_BEGIN":
@@ -86,12 +79,8 @@ def inspect_trace(
                 if ((address >> 5) & 15) not in stage_rows_by_channel:
                     raise ValueError(f"Trace line {number}: STAGE_FRAGMENT requires preceding STAGE_BEGIN")
                 stage_input_read_bursts += stage_rows_by_channel[(address >> 5) & 15]
-                if ((address >> 5) & 15) in ffn_channels:
-                    ffn_stage_input_read_bursts += stage_rows_by_channel[(address >> 5) & 15]
             elif op == "PIM_STAGE_LOAD":
                 stage_input_read_bursts += 1
-                if ((address >> 5) & 15) in ffn_channels:
-                    ffn_stage_input_read_bursts += 1
             counts[wire_op] += 1
     if not sum(counts.values()) and not sum(controls.values()):
         raise ValueError("Empty trace")
@@ -104,7 +93,6 @@ def inspect_trace(
         **{name.lower(): counts[name] for name in RANK_BATCH_OPS if counts[name]},
         **({"rank_descriptor_requests": descriptor_count, "rank_descriptor_child_requests": 16*descriptor_count} if descriptor_count else {}),
         **({"stage_input_declared_bytes": staged_input_bytes, "stage_input_read_bursts": stage_input_read_bursts} if staged_input_bytes else {}),
-        **({"ffn_stage_input_read_bursts": ffn_stage_input_read_bursts} if ffn_channels else {}),
         reads=counts["LD"],
         writes=counts["ST"],
         pim_mac_ab=counts["PIM_MAC_AB"],

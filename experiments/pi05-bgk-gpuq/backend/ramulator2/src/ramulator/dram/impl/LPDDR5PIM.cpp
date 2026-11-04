@@ -13,7 +13,6 @@
 #include "ramulator/dram/commands/ACT2.h"
 #include "ramulator/dram/commands/ACTAB.h"
 #include "ramulator/dram/commands/ACTHB.h"
-#include "ramulator/dram/commands/ACTMASK.h"
 #include "ramulator/dram/commands/CAS_RD.h"
 #include "ramulator/dram/commands/CAS_WR.h"
 #include "ramulator/dram/commands/LOCALRD.h"
@@ -21,10 +20,8 @@
 #include "ramulator/dram/commands/MACAB.h"
 #include "ramulator/dram/commands/MACHB.h"
 #include "ramulator/dram/commands/MACK.h"
-#include "ramulator/dram/commands/MACMASK.h"
 #include "ramulator/dram/commands/MACQK.h"
 #include "ramulator/dram/commands/PREHB.h"
-#include "ramulator/dram/commands/PREMASK.h"
 #include "ramulator/dram/commands/PREab.h"
 #include "ramulator/dram/commands/PREpb.h"
 #include "ramulator/dram/commands/RD.h"
@@ -44,7 +41,7 @@ class LPDDR5PIM : public DRAMSpec {
     enum : int { Channel, Rank, BankGroup, Bank, Row, Column, COUNT };
   };
   struct Command {
-    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, ACTAB, MACAB, WRGB, RDRES, ACTHB, MACHB, PREHB, MACK, MACQK, LOCALWR, LOCALRD, ACTMASK, PREMASK, MACMASK, COUNT };
+    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, ACTAB, MACAB, WRGB, RDRES, ACTHB, MACHB, PREHB, MACK, MACQK, LOCALWR, LOCALRD, COUNT };
   };
   struct State {
     enum : int { Opened, Closed, Activating, N_A, COUNT };
@@ -63,8 +60,7 @@ class LPDDR5PIM : public DRAMSpec {
       Cmd::WRA<LPDDR5PIM>, Cmd::REFab<LPDDR5PIM>, Cmd::REFpb<LPDDR5PIM>, Cmd::ACTAB<LPDDR5PIM>,
       Cmd::MACAB<LPDDR5PIM>, Cmd::WRGB<LPDDR5PIM>, Cmd::RDRES<LPDDR5PIM>, Cmd::ACTHB<LPDDR5PIM>,
       Cmd::MACHB<LPDDR5PIM>, Cmd::PREHB<LPDDR5PIM>, Cmd::MACK<LPDDR5PIM>, Cmd::MACQK<LPDDR5PIM>,
-      Cmd::LOCALWR<LPDDR5PIM>, Cmd::LOCALRD<LPDDR5PIM>, Cmd::ACTMASK<LPDDR5PIM>, Cmd::PREMASK<LPDDR5PIM>,
-      Cmd::MACMASK<LPDDR5PIM>
+      Cmd::LOCALWR<LPDDR5PIM>, Cmd::LOCALRD<LPDDR5PIM>
   >;
 
   LPDDR5PIM(const ConfigNode& config) {
@@ -76,7 +72,7 @@ class LPDDR5PIM : public DRAMSpec {
 
     // String name maps + reverse lookup vectors
     set_names(levels, level_names, {"Channel", "Rank", "BankGroup", "Bank", "Row", "Column"});
-    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD", "ACTMASK", "PREMASK", "MACMASK"});
+    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD"});
     set_names(states, state_names, {"Opened", "Closed", "Activating", "N_A"});
     set_names(timings, timing_names, {
         "rate", "nBL_min", "nBL_max", "nCL", "nRCD", "nRP", "nRPab", "nRAS", "nRC", "nWR", "nRTP", "nCWL", "nPPD",

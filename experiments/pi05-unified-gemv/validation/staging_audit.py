@@ -291,7 +291,7 @@ def audit_rank_ca(events, native, staging, controller_events=(), records=None, g
     for event in events:
         require(event["scope"] in ("rank", "global"), "Unknown CA scope")
         require(event["ready_at"] > event["clock"], "CA command must occupy a positive interval")
-        expected_cycles = 2 if event["command"] in ("ACTAB", "ACTHB", "ACTMASK") else 1
+        expected_cycles = 2 if event["command"] in ("ACTAB", "ACTHB") else 1
         require(event["ready_at"]-event["clock"] == expected_cycles,
                 "CA duration differs from LPDDR command-cycle contract")
         require(0 <= event["Channel"] < 16, "Invalid CA channel")

@@ -228,9 +228,7 @@ bool issue_gemv_release(ReqBuffer::iterator it) {
         (!state.expected_columns || state.mac_columns!=state.expected_columns))
       throw std::runtime_error("Unified GEMV release of unconsumed input fragment");
   }
-  const int release_mask=split_active()?split_compute_mask():65535;
-  const int release_bank=16+std::countr_zero(static_cast<unsigned>(release_mask));
-  record_gemv(*it,"GEMV_RELEASE",m_clk,m_clk,release_mask,0,0,0,m_gemv_slots[release_bank][slot].generation);
+  record_gemv(*it,"GEMV_RELEASE",m_clk,m_clk,65535,0,0,0,m_gemv_slots[16][slot].generation);
   for(int bank=16;bank<32;++bank) gemv_clear_bank(bank,slot);
   enqueue_bgk_done(it,m_clk);return true;
 }

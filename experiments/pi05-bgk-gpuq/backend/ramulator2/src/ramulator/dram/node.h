@@ -26,7 +26,6 @@ struct DRAMNode {
 
   DRAMSpec* m_spec = nullptr;
 
-  uint64_t m_subtree_bank_mask = 0;
   int m_level = -1;    // The level of this node in the organization hierarchy
   int m_node_id = -1;  // The id of this node at this level
 
@@ -40,8 +39,8 @@ struct DRAMNode {
 
   DRAMNode(DRAMSpec* spec, DRAMNode* parent, int level, int id);
 
-  void update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk, uint64_t bank_mask = 0);
-  bool check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk, uint64_t bank_mask = 0);
+  void update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk);
+  bool check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk);
 
   // Generic level traversal — visit all descendants at target_level
   template <typename Func>

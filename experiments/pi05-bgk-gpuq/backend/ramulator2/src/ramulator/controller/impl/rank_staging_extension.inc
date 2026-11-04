@@ -28,8 +28,7 @@ int stage_offset(const Request& req) const {
 void stage_address(const Request& req) const {
   const bool control=req.type_id==Request::Type::PIM_STAGE_BEGIN || req.type_id==Request::Type::PIM_STAGE_SEAL;
   const int rank=req.addr_vec[m_rank_level],bg=req.addr_vec[m_bg_level],bank=req.addr_vec[m_bank_level];
-  const int sources=split_active()?m_ffn_data_banks:m_staging_banks;
-  if(sources==1) {
+  if(m_staging_banks==1) {
     if(rank!=1 || bg!=0 || bank!=0)
       throw std::runtime_error("staging requires rank1 bank0");
     return;
@@ -46,17 +45,12 @@ void stage_address(const Request& req) const {
 }
 int stage_logical_offset(const Request& req) const {
   const int physical=stage_offset(req);
-  const int sources=split_active()?m_ffn_data_banks:m_staging_banks;
-  if(sources==1) return physical;
+  if(m_staging_banks==1) return physical;
   if(!m_stage.active || m_stage.rows<=0)
     throw std::runtime_error("staging write outside active payload");
   // Alternating logical fragments occupy BG0/B0 and BG1/B0. Each
   // descriptor remains on its physical source bank for all token reads.
   if(physical<m_stage.base) return physical; // Keep below-region addresses out of the logical payload.
-  if(split_active()) {
-    const int row=(physical-m_stage.base)/2048,column=(physical-m_stage.base)%2048;
-    return m_stage.base+(row*sources+req.addr_vec[m_bg_level])*2048+column;
-  }
   const int packet=(physical-m_stage.base)/32;
   const int fragment=2*(packet/m_stage.rows)+req.addr_vec[m_bg_level];
   return m_stage.base+(fragment*m_stage.rows+packet%m_stage.rows)*32;
@@ -112,8 +106,6 @@ void init_rank_staging() {
 const char* coarse_name(const Request& req) const {
   if(req.pim_rank_batch) return rank_descriptor_name(req.type_id);
   switch(req.type_id) {
-    case Request::Type::PIM_FFN_PASS:return "PIM_FFN_PASS";
-    case Request::Type::PIM_FFN_RDRES:return "PIM_FFN_RDRES";
     case Request::Type::PIM_STAGE_BEGIN:return "PIM_STAGE_BEGIN";
     case Request::Type::PIM_STAGE_SEAL:return "PIM_STAGE_SEAL";
     case Request::Type::PIM_STAGE_LOAD:return "PIM_STAGE_LOAD";
@@ -141,7 +133,6 @@ bool send_stage(Request& req) {
   return true;
 }
 bool stage_fill_ready(const Request& req) {
-  if(split_active()) return split_fill_ready(req);
   const int row=((stage_logical_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
   if(!whole_fill_ready(req,row)) return false;
   // Distinct rows pipeline at native nCCDL. Only a new fragment waits for
@@ -162,7 +153,6 @@ bool stage_fill_ready(const Request& req) {
   return true;
 }
 void stage_fill(const Request& req,Clk_t ready) {
-  if(split_active()) { split_fill(req,ready);return; }
   const int row=((stage_logical_offset(req)-m_stage.base)/32)%m_stage.rows,slot=req.pim_buffer;
   if(row==0) {
     whole_fill_start(req);
@@ -193,8 +183,6 @@ bool issue_stage(ReqBuffer::iterator it) {
       }
     }
     if(!gemv_slot_idle(0) || !gemv_slot_idle(1)) return false;
-    if(split_active() && (it->pim_stage_rows!=16 || it->pim_stage_bytes!=m_split_fragments*512))
-      throw std::runtime_error("FFN staging payload does not match PASS");
     whole_stage_begin(it->pim_stage_rows);
     const int generation=m_stage.generation+1;
     m_stage=StagePayload{};m_stage.active=true;m_stage.base=physical_offset;m_stage.bytes=it->pim_stage_bytes;m_stage.rows=it->pim_stage_rows;m_stage.generation=generation;
@@ -241,7 +229,6 @@ bool issue_stage(ReqBuffer::iterator it) {
   if(!issue_internal_array_command(it)) return false;
   if(it->command!=m_localrd) return true;
   it->depart=m_clk+m_device.m_spec->get_timing_value("nCL")+m_bgk_input_cycles;
-  if(split_active()) split_source_read(*it,it->depart);
   it->pim_q_stage=1;record_stage(*it,"LOCALRD",m_clk,it->depart);
   return true;
 }

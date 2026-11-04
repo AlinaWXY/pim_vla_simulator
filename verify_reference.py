@@ -27,8 +27,8 @@ def verify(root):
     guards = read(root / "native-guards/summary.json")
     expected_names = {case["case"] for case in expected_guards["native_cases"]}
     actual_names = {case["case"] for case in guards["native_cases"]}
-    if (not guards["passed"] or guards["case_count"] != len(actual_names)
-            or not expected_names <= actual_names or not all(case["passed"] for case in guards["native_cases"])):
+    if (not guards["passed"] or guards["case_count"] != len(expected_names)
+            or actual_names != expected_names or not all(case["passed"] for case in guards["native_cases"])):
         raise AssertionError("Expected every published native guard to pass")
     for case, reference in expected["cases"].items():
         actual = summary["runs"][case]
@@ -77,7 +77,7 @@ def verify(root):
                 raise AssertionError((case, result["channel"], "window boundaries"))
     if abs(channels["stage_sum_us"] - expected["stage_sum_us"]) > 1e-9:
         raise AssertionError("Primary-stage sum differs")
-    return dict(status="passed", native_cases=len(expected["cases"]), native_guards=len(actual_names),
+    return dict(status="passed", native_cases=len(expected["cases"]), native_guards=len(expected_names),
                 channels=16, exact_cycles_bytes_traces_and_native_CSVs=True,
                 channel_time_partitions_and_windows_match=True,
                 stage_sum_us=channels["stage_sum_us"])

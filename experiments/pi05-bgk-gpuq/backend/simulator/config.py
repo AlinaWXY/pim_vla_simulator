@@ -43,8 +43,6 @@ class MemoryConfig:
     pim_rank_rope: bool = False
     pim_horizon: int = 16
     pim_ffn_dram: bool = False
-    ffn_data_banks: int = 0
-    ffn_overlap: bool = True
     ffn_z_preinstalled: bool = False
     rope_ii_cycles: int = 1
     rope_latency_cycles: int = 4
@@ -52,14 +50,6 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
-        if type(self.ffn_data_banks) is not int or self.ffn_data_banks not in (0, 1, 2):
-            raise ValueError("ffn_data_banks must be 0, 1 or 2")
-        if type(self.ffn_overlap) is not bool:
-            raise ValueError("ffn_overlap must be boolean")
-        if self.ffn_data_banks and (not self.pim_unified_gemv or not self.pim_rank_staging or
-                not self.pim_rank_controller or not self.pim_rank_descriptors or
-                not self.channel_independent_dispatch or self.pim_ffn_dram):
-            raise ValueError("Dedicated FFN banks require unified GEMV, rank staging/descriptors and independent channel dispatch")
         for name in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError(f"{name} must be boolean")

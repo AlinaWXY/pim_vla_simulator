@@ -101,11 +101,8 @@ def gpu_input_packet(operator, channel, fragment, token, rank_staging=True, stag
                 target_bank_mask=65535, token=token, feature_first=fragment*16)
 
 
-def layout(horizon, rank_staging=False, staging_banks=1, ffn_data_banks=0):
+def layout(horizon, rank_staging=False, staging_banks=1):
     h = check_horizon(horizon)
-    if ffn_data_banks:
-        from ffn_split_layout import layout as split_layout
-        return split_layout(ffn_data_banks)
     return dict(horizon=h, token_microbatches=1, active_physical_rank=1,
         channels=16, active_ranks=16, banks_per_rank=16, hidden=1024, intermediate=4096,
         gu_output_features_per_rank=256, gu_output_features_per_bank=16,
@@ -231,12 +228,7 @@ def export(w, operator):
             rank_partials=0, destination="GPU")
 
 
-def generate(path, horizon, case="combined_timing_chain", local_ck=2, rank_staging=False, staging_banks=1,
-             ffn_data_banks=0,ffn_overlap=True):
-    if ffn_data_banks:
-        if not rank_staging:raise ValueError("Dedicated FFN data banks require rank staging")
-        from ffn_split_workload import generate as split_generate
-        return split_generate(path,horizon,case,ffn_data_banks,ffn_overlap)
+def generate(path, horizon, case="combined_timing_chain", local_ck=2, rank_staging=False, staging_banks=1):
     info = layout(horizon, rank_staging=rank_staging, staging_banks=staging_banks)
     if case not in CASES or type(local_ck) is not int or local_ck <= 0:
         raise ValueError("invalid FFN case or local transfer cycles")

@@ -1,18 +1,18 @@
 {
   "schema_version": 3,
   "native_build": "minimal",
-  "dataflow": "FFN dedicated row-striped data banks and masked compute banks; two512B SRF views; Gate/Up output passes; all CA/DRAM constraints retained",
-  "parent_revision": "7d2730dadc0b5610c6635e800d5d306bfb4164a6",
+  "dataflow": "Fused QKV from one whole-input X payload; whole 1KiB SRF batches; local V RMW; KV-sharded P and PV; GPU partial-sum reduction",
+  "parent_revision": "810e01e8422dcf811fcfaa15c75f39bfd82e30f7",
   "repository": "https://github.com/AlinaWXY/pim_vla_simulator",
-  "branch": "xinyao_1104",
-  "file_count_excluding_manifest": 791,
-  "bytes_excluding_manifest": 30897493,
-  "MiB": 29.466145515441895,
+  "branch": "xinyao_1103",
+  "file_count_excluding_manifest": 699,
+  "bytes_excluding_manifest": 23491146,
+  "MiB": 22.402902603149414,
   "categories": {
     "publication": {
-      "files": 48,
-      "bytes": 342762,
-      "MiB": 0.32688331604003906
+      "files": 35,
+      "bytes": 247730,
+      "MiB": 0.2362537384033203
     },
     "backend_metadata": {
       "files": 2,
@@ -21,8 +21,8 @@
     },
     "native_metadata": {
       "files": 177,
-      "bytes": 644853,
-      "MiB": 0.6149797439575195
+      "bytes": 641442,
+      "MiB": 0.6117267608642578
     },
     "vendored": {
       "files": 209,
@@ -31,23 +31,23 @@
     },
     "python_codegen": {
       "files": 87,
-      "bytes": 318537,
-      "MiB": 0.30378055572509766
+      "bytes": 315397,
+      "MiB": 0.30078601837158203
     },
     "simulator": {
       "files": 4,
-      "bytes": 60541,
-      "MiB": 0.05773639678955078
+      "bytes": 55305,
+      "MiB": 0.052742958068847656
     },
     "experiment": {
       "files": 22,
-      "bytes": 321954,
-      "MiB": 0.3070392608642578
+      "bytes": 308607,
+      "MiB": 0.2943105697631836
     },
     "reference_evidence": {
-      "files": 242,
-      "bytes": 26954390,
-      "MiB": 25.70570945739746
+      "files": 163,
+      "bytes": 19668209,
+      "MiB": 18.757065773010254
     }
   },
   "compiled_native_translation_units": [
@@ -76,16 +76,16 @@
     "controller/plugin/impl/cmd_trace_recorder.cpp"
   ],
   "clean_native_build_passed": true,
-  "final_native_job": 1908477,
-  "source_snapshot": "reference/ffn-bank-split/source-byte-verification.json",
+  "final_native_job": 1904762,
+  "source_snapshot": "reference/publish-byte-verification.json",
   "exclusions": [
     "Precompiled native libraries",
     "Build directories",
     "Raw generated results"
   ],
   "preservation": {
-    "before_commit": "7d2730dadc0b5610c6635e800d5d306bfb4164a6",
-    "evidence": "reference/ffn-bank-split/source-result-binding.json"
+    "before_commit": "810e01e8422dcf811fcfaa15c75f39bfd82e30f7",
+    "evidence": "reference/pv-token/source-result-binding.json"
   },
   "files": {
     ".gitattributes": {
@@ -105,8 +105,8 @@
     },
     "README.md": {
       "category": "publication",
-      "output_bytes": 9762,
-      "output_sha256": "d05b6a1280c9edfc9eec8ce6e0eeb2a69ae5a07ef295ccd825fd3a19c1e2fc6d"
+      "output_bytes": 5742,
+      "output_sha256": "b422188d2fb7f1d2862b5082ec1b8de99b2464fc5b7fbcf18d82f0b2ae1c4851"
     },
     "analyze_localwr_schedule.py": {
       "category": "publication",
@@ -117,11 +117,6 @@
       "category": "publication",
       "output_bytes": 18585,
       "output_sha256": "2576bea014ccd1849e50000facd202e0b482a3a878c3d83ff5e28a75f78a2fad"
-    },
-    "compare_ffn_banks.py": {
-      "category": "publication",
-      "output_bytes": 12410,
-      "output_sha256": "ca75a00c10622830815c55cf8ebd382a6e6da19d140b4cd0833a3bd560122d1d"
     },
     "compare_localwr_act2.py": {
       "category": "publication",
@@ -1330,13 +1325,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5.py": {
       "category": "python_codegen",
-      "output_bytes": 2689,
-      "output_sha256": "84202198228941235b36a9ef727be038aabbe06dca690238a817d71317f6fc4f"
+      "output_bytes": 2503,
+      "output_sha256": "09d27ccaa9655f9f34eb0526824b7ee77b0a02a471840e5b3a77ac771ae41d5c"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": {
       "category": "python_codegen",
-      "output_bytes": 2695,
-      "output_sha256": "3b0cd4ab3d888f7fbc50fb243e551dcefbd2cf4e4853b7db0518fd4f982de14c"
+      "output_bytes": 2509,
+      "output_sha256": "95d0c21aeebe51636e5279911affa94f743cca6f7cafbdc5e237bd3d3adbc72b"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr6.py": {
       "category": "python_codegen",
@@ -1505,8 +1500,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/lpddr5pim.py": {
       "category": "python_codegen",
-      "output_bytes": 15847,
-      "output_sha256": "11edd30a681e8e0e7f67b029e6309add7464758a0ef847c56cc6d786032a2434"
+      "output_bytes": 13079,
+      "output_sha256": "37207f8fcd7d7808b700cc2f8931d2410bcce1897422a8d4f48d5381dc4c27b5"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/lpddr5x.py": {
       "category": "python_codegen",
@@ -1735,8 +1730,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/base/request.h": {
       "category": "native_metadata",
-      "output_bytes": 3171,
-      "output_sha256": "24b5ee3eff800e212c48d6d996bfe9eb393309d6e2ab274e71f9150db37c00bb"
+      "output_bytes": 3132,
+      "output_sha256": "05ee1e85dc7683bca4ad22a14e37a0f65dc791b87aeb260adf72c11c3a5491f4"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/base/stats.h": {
       "category": "native_metadata",
@@ -1833,11 +1828,6 @@
       "output_bytes": 11698,
       "output_sha256": "10c9af3dc5585a63a8bc997eeb145a9bfc48e30fee150ef4924c25f072a281db"
     },
-    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/ffn_split_extension.inc": {
-      "category": "publication",
-      "output_bytes": 13829,
-      "output_sha256": "efbf838b3dc699b9b49cf297b26715b8a94ec3d7f24bec0b750ca02c17fa8adf"
-    },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/gddr7_controller.cpp": {
       "category": "native_metadata",
       "output_bytes": 6239,
@@ -1870,8 +1860,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp": {
       "category": "native_metadata",
-      "output_bytes": 51465,
-      "output_sha256": "81424bf9b29fb18f55ec7b407fbf9c1e875afb086cf0d25836e1d6145cd8e399"
+      "output_bytes": 50155,
+      "output_sha256": "e4e6a0610416edf707692303f69118fcd8cb024fb35ee2622e3bdcec1d23fb26"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr6_controller.cpp": {
       "category": "native_metadata",
@@ -1910,13 +1900,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 14282,
-      "output_sha256": "2854e4de9082aeca143cfcbbe3957c17e74dc8b97458ea82b1c6a0389ea666e9"
+      "output_bytes": 13517,
+      "output_sha256": "b5f905b208cae21c8c5f80bacbfd1539ae1df99e3d95600794afd0d53cb2e6bc"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc": {
       "category": "native_metadata",
-      "output_bytes": 11985,
-      "output_sha256": "7e0633d65270847a6ce6f0b9b65ab11fc57e1162f6f8b5dc1c061a56b3fa8a5e"
+      "output_bytes": 11817,
+      "output_sha256": "64e040e85c944601bf722a8b6b87416769aebdda4eb8af0644d2a23f3dce052a"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/v_cache_extension.inc": {
       "category": "publication",
@@ -2103,11 +2093,6 @@
       "output_bytes": 544,
       "output_sha256": "2636096ec585fccc9920fd2a85ec4fa554c18402ca3a69da485746bafb4135a3"
     },
-    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/commands/ACTMASK.h": {
-      "category": "publication",
-      "output_bytes": 1148,
-      "output_sha256": "b4cb0d9b2b4b16b8f6354b10506901f7ea95f97c938735176773055a32e538bc"
-    },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/commands/CAS.h": {
       "category": "native_metadata",
       "output_bytes": 463,
@@ -2148,11 +2133,6 @@
       "output_bytes": 203,
       "output_sha256": "78db4675f1fc0b5297fbee4f95a39be1ce39db24fea5c09ceb2592a87931b97e"
     },
-    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/commands/MACMASK.h": {
-      "category": "publication",
-      "output_bytes": 1341,
-      "output_sha256": "af4a9eaba88b37ce1fdbd9892718cb52f7a8271e7c8a82e63a974f1fd1904aae"
-    },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/commands/MACQK.h": {
       "category": "native_metadata",
       "output_bytes": 206,
@@ -2162,11 +2142,6 @@
       "category": "native_metadata",
       "output_bytes": 302,
       "output_sha256": "c7972da5f9b8f40983ba94659adcff5c22facb888f577042ae337676a48a8694"
-    },
-    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/commands/PREMASK.h": {
-      "category": "publication",
-      "output_bytes": 618,
-      "output_sha256": "8e161a788b81b15eb7d4956c88848b3e951d18fff846a725e2b369bef9d6d1bc"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/commands/PREab.h": {
       "category": "native_metadata",
@@ -2305,13 +2280,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/device.cpp": {
       "category": "native_metadata",
-      "output_bytes": 3920,
-      "output_sha256": "d1532a57d13e56d0fbad5edef0d801f2d31916245311d69fc918272460a6bb4c"
+      "output_bytes": 3701,
+      "output_sha256": "9919fb1c8174bc0b226d1983f2a1a8e5749923ed5271b5040eb692e17a84ae18"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/device.h": {
       "category": "native_metadata",
-      "output_bytes": 5365,
-      "output_sha256": "29eb8c916c9c4adb4ad0c6a2dcd0bc1713801c8e59cec833fd5099c299971da4"
+      "output_bytes": 5070,
+      "output_sha256": "142f5929fd783a2106a67e9ded480c7a7fcea0526f41f63c624e58401547eefb"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/dram_spec.cpp": {
       "category": "native_metadata",
@@ -2390,8 +2365,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/impl/LPDDR5PIM.cpp": {
       "category": "native_metadata",
-      "output_bytes": 6163,
-      "output_sha256": "2a9ee7d56c6a84f28fb2622ed23ff9d30eacc114108448824e0a32d441bddf7f"
+      "output_bytes": 5887,
+      "output_sha256": "b9e23e0fe17e01e91bfe354868d10cf6d98bdabc4fe7b22db1135c8135398568"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/impl/LPDDR5X.cpp": {
       "category": "native_metadata",
@@ -2400,8 +2375,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/impl/LPDDR5XPIM.cpp": {
       "category": "native_metadata",
-      "output_bytes": 6214,
-      "output_sha256": "80dc5b3934083733fce8693ce429965ec0f87b91db2bc4468fc0a547e27ab6c0"
+      "output_bytes": 5935,
+      "output_sha256": "00aa9991bc1b919cd1d87370d922d5d13b6a21c7187660d63603a00656133277"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/impl/LPDDR6.cpp": {
       "category": "native_metadata",
@@ -2410,13 +2385,13 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/node.cpp": {
       "category": "native_metadata",
-      "output_bytes": 5942,
-      "output_sha256": "bc37a3ac3c20e7e0ed83af4336d41c23e457298bbd7d2728024922b76fa4b88e"
+      "output_bytes": 5703,
+      "output_sha256": "51f2c98e0ee39c6bcf4920aaa003608e57e0926440dfa46bbd4c1ba8cff27803"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/node.h": {
       "category": "native_metadata",
-      "output_bytes": 2599,
-      "output_sha256": "abc21171970fc974abb339e09311c31a4882858554500668c9b5995a504ce69c"
+      "output_bytes": 2515,
+      "output_sha256": "15b9db04376b88f7f79944844619b4719a4b95937ffa8c8d244d5412173f82f3"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/CMakeLists.txt": {
       "category": "native_metadata",
@@ -2440,8 +2415,8 @@
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/loadstore_trace.cpp": {
       "category": "native_metadata",
-      "output_bytes": 18420,
-      "output_sha256": "70108da0731e854e375d0acf9742a767363e9081280b7f9634d83f6f00fd8389"
+      "output_bytes": 18683,
+      "output_sha256": "dc5e9ebf70c18693a520d771d3ecb27bc7357f50c167f6585eb3a89ce168170b"
     },
     "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/partition_trace.cpp": {
       "category": "native_metadata",
@@ -2575,23 +2550,18 @@
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/backend.py": {
       "category": "simulator",
-      "output_bytes": 42041,
-      "output_sha256": "c4c3f0f503de85a924923100a0a6ba8804b2a2209703332ee7d01deccc5d756a"
+      "output_bytes": 38352,
+      "output_sha256": "b4f7bbbcb4db122712958a324699c9608377dffe6cde558f7c83b19958c7c022"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/config.py": {
       "category": "simulator",
-      "output_bytes": 10040,
-      "output_sha256": "0959e5f928730d479626b9c6ad7f545f477f36ed3154a7b441dccd5e67c29162"
+      "output_bytes": 9328,
+      "output_sha256": "21079e0a3b182b4f9e29dc76a441aef2429f55269326dd6386f95ffdea794b5e"
     },
     "experiments/pi05-bgk-gpuq/backend/simulator/trace.py": {
       "category": "simulator",
-      "output_bytes": 8284,
-      "output_sha256": "82bd3a470bb91f6f2bc3068e123551c7ccb382586951528547d98bf8513819d7"
-    },
-    "experiments/pi05-unified-gemv/FFN-BANK-SPLIT.md": {
-      "category": "publication",
-      "output_bytes": 5220,
-      "output_sha256": "390ef62c5b3059902adcb6b83fa83d990c7eba1ee88229fc87b42f25ba5dc271"
+      "output_bytes": 7449,
+      "output_sha256": "1e877bf0bf7782d8fc0b8c27afb5659456e01e922a3883c72225d4fb41659884"
     },
     "experiments/pi05-unified-gemv/MODEL.md": {
       "category": "experiment",
@@ -2615,8 +2585,8 @@
     },
     "experiments/pi05-unified-gemv/channel_analysis.py": {
       "category": "experiment",
-      "output_bytes": 25119,
-      "output_sha256": "d95de1b656a066389d354a83fb594d4d5cddd6947d1191f40d88b892c42036b6"
+      "output_bytes": 24852,
+      "output_sha256": "e16d01878e9f2d347db8c9e7b2c67dce8e188fedb87cac93c79f4407c12c2983"
     },
     "experiments/pi05-unified-gemv/plot_comparison.py": {
       "category": "experiment",
@@ -2625,18 +2595,8 @@
     },
     "experiments/pi05-unified-gemv/reproduce.py": {
       "category": "experiment",
-      "output_bytes": 16735,
-      "output_sha256": "4bafe21f223ca6db8470541059ebdd23a609927670ffeed71bad6539d7ec5130"
-    },
-    "experiments/pi05-unified-gemv/source/ffn_split_layout.py": {
-      "category": "publication",
-      "output_bytes": 8091,
-      "output_sha256": "c07ed4cced1f0c215cc93230dca3f2d68116838b3005170513ae362f0f53654c"
-    },
-    "experiments/pi05-unified-gemv/source/ffn_split_workload.py": {
-      "category": "publication",
-      "output_bytes": 9877,
-      "output_sha256": "9e8c4d8beec6552c7f3f13c4a17aaafb7180c0f7be93adf46fe2bc5f5fbb8414"
+      "output_bytes": 14628,
+      "output_sha256": "dc243002c18a9961bec8763f8fe72bd3d536c4ef1be1034cd2d6dc1c6f0bcfb9"
     },
     "experiments/pi05-unified-gemv/source/horizon_attention.py": {
       "category": "experiment",
@@ -2655,8 +2615,8 @@
     },
     "experiments/pi05-unified-gemv/source/horizon_ffn.py": {
       "category": "experiment",
-      "output_bytes": 15438,
-      "output_sha256": "271308d61e99a6a3230f527057242ca48c7060d53043a5361af3506557cae293"
+      "output_bytes": 14978,
+      "output_sha256": "ad524a05baea3b799fdf562728d53f45486d07caa229e4044e6b697552f66079"
     },
     "experiments/pi05-unified-gemv/source/horizon_value.py": {
       "category": "experiment",
@@ -2690,38 +2650,28 @@
     },
     "experiments/pi05-unified-gemv/source/workload.py": {
       "category": "experiment",
-      "output_bytes": 19875,
-      "output_sha256": "2d2eac2072f407930d37673a01d8c234fcd6214d870e9ef635c14ee82f215f58"
+      "output_bytes": 16255,
+      "output_sha256": "8cffbeaaeecd4011e91d1fd8555e325ca70e52fa9ac7836d19f9e3bd38b9a545"
     },
     "experiments/pi05-unified-gemv/validation/act2_audit.py": {
       "category": "publication",
-      "output_bytes": 12142,
-      "output_sha256": "c33782586a2de4dbb12f30f5727beda6bfd62dd2e17a6c6203f1600ad7d19228"
+      "output_bytes": 11693,
+      "output_sha256": "ffaf055c96bc560448e696c0a7d68eacef56aadf3f821f83845778f601257556"
     },
     "experiments/pi05-unified-gemv/validation/audit_native.py": {
       "category": "experiment",
-      "output_bytes": 43756,
-      "output_sha256": "57a0d2701d75d7654baded99e46b63452d8f0272d189d6fc2ca52cc2c1edaca1"
+      "output_bytes": 38837,
+      "output_sha256": "37a7228ebe127e560c7eded594d488944e05c58a7c2f05e47088822f347ffb96"
     },
     "experiments/pi05-unified-gemv/validation/dispatch_audit.py": {
       "category": "publication",
-      "output_bytes": 14029,
-      "output_sha256": "93834ad5a735aaaa76f95facf528e1f1a8edf8f1f8f107a1e1f2f0398ac69509"
-    },
-    "experiments/pi05-unified-gemv/validation/ffn_split_audit.py": {
-      "category": "publication",
-      "output_bytes": 23425,
-      "output_sha256": "3f25a7d14026cba359a984c98d9c4043872344dbff3d9f27ecbf87482671d5a3"
-    },
-    "experiments/pi05-unified-gemv/validation/masked_audit.py": {
-      "category": "publication",
-      "output_bytes": 2983,
-      "output_sha256": "655c93d8ec25a423e97df60b41826e5c5fbf3a3cdd6af343bbab2a1114f46b62"
+      "output_bytes": 13992,
+      "output_sha256": "d9dc0a8c4397bf17bae581ca007ed77b8ee305050387cb2c5ac270feb1787eb5"
     },
     "experiments/pi05-unified-gemv/validation/native_guards.py": {
       "category": "experiment",
-      "output_bytes": 45514,
-      "output_sha256": "a7c7f2ae41f55d68e605e36d236a943c4f01577725ba9c8dbc3096dce61f6967"
+      "output_bytes": 43551,
+      "output_sha256": "ad40c7b6abeeb316f41f2a6cbaf18ebb4091b43bf5a31f80720bca9322c2bcbb"
     },
     "experiments/pi05-unified-gemv/validation/paired_audit.py": {
       "category": "experiment",
@@ -2730,8 +2680,8 @@
     },
     "experiments/pi05-unified-gemv/validation/staging_audit.py": {
       "category": "experiment",
-      "output_bytes": 19883,
-      "output_sha256": "cdc13f0a990d42a4963228a3ddc29ad0a3d5467c6ec71e50e9605af7534d435e"
+      "output_bytes": 19872,
+      "output_sha256": "4f1ddc001d932cd62e242834ef6b4f23d15c8285bec6b3fa974861b9ee4447e1"
     },
     "experiments/pi05-unified-gemv/validation/test_act2_audit.py": {
       "category": "publication",
@@ -2752,16 +2702,6 @@
       "category": "publication",
       "output_bytes": 10676,
       "output_sha256": "f105172525e58e814633cb12cb50a481b5e7b5e8b192b217d483457eabb3e2d9"
-    },
-    "experiments/pi05-unified-gemv/validation/test_ffn_split_audit.py": {
-      "category": "publication",
-      "output_bytes": 6701,
-      "output_sha256": "b4c26379bf156caa1faaa0a1ac22ab662bab1fef83d6273dc30c618a6473bb18"
-    },
-    "experiments/pi05-unified-gemv/validation/test_masked_audit.py": {
-      "category": "publication",
-      "output_bytes": 3014,
-      "output_sha256": "e05987ddd1dbad4b50eca69c64ba6636d7f3392eb2bdb7d79558336842ff71b9"
     },
     "experiments/pi05-unified-gemv/validation/test_paired_audit.py": {
       "category": "experiment",
@@ -2932,401 +2872,6 @@
       "category": "reference_evidence",
       "output_bytes": 487419,
       "output_sha256": "c7ba5f9e362dfe4f23c768259b619c75850f14e7601f90aa72217d874149fb36"
-    },
-    "reference/ffn-bank-split/before/combined_timing_chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 24221,
-      "output_sha256": "ea7ecfb41e9ee376e2413685553d074abb34d2713d2ceab5025a069e5cec01b9"
-    },
-    "reference/ffn-bank-split/before/down_gpu_input/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 20162,
-      "output_sha256": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134"
-    },
-    "reference/ffn-bank-split/before/gate_up_gpu/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 19975,
-      "output_sha256": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2"
-    },
-    "reference/ffn-bank-split/before/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 61543,
-      "output_sha256": "19088087611fc385fbc315614dd9b060b74bc1c7abff5d4ed445be61fa09461b"
-    },
-    "reference/ffn-bank-split/before/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 184925,
-      "output_sha256": "377f566c1ba33727e834936005604faf4bdef25e669622a2f9db33023db2fcf5"
-    },
-    "reference/ffn-bank-split/channels.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 69993,
-      "output_sha256": "ab3ea4c9337a5a2ea9d107d2c29b29d565bf3771d1100d757615f23b70248b86"
-    },
-    "reference/ffn-bank-split/commands.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 20416,
-      "output_sha256": "56cb020c88d3d4320f100a415eeb2ef6ccb20d4515c93de6f4ad1918503a88f0"
-    },
-    "reference/ffn-bank-split/comparison.json": {
-      "category": "reference_evidence",
-      "output_bytes": 1195445,
-      "output_sha256": "c65a3600efbeb17dc39f9d625e452e4165a03fde1adc63552f8b59cf1f7c2fdb"
-    },
-    "reference/ffn-bank-split/db1/CHANNEL-ANALYSIS.md": {
-      "category": "reference_evidence",
-      "output_bytes": 2579,
-      "output_sha256": "91a6df108b82030617ea645cf9ead2d0e7b90368bc18c37dcc12fa058d1838af"
-    },
-    "reference/ffn-bank-split/db1/channel-analysis.json": {
-      "category": "reference_evidence",
-      "output_bytes": 246453,
-      "output_sha256": "63cd3bc3d3c034d79cadf094daeaef3d90d13475d2bad2ddb1db7fe90f17fc1c"
-    },
-    "reference/ffn-bank-split/db1/channel-command-bus.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 3438,
-      "output_sha256": "6f65a22f76ea61f4ce6c3cc05eaa37c6200e759cd113efd65063fade61edd117"
-    },
-    "reference/ffn-bank-split/db1/channel-partitions.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 5667,
-      "output_sha256": "8984989b27ccae766532e1b5e37f5c9abe2d43ac6497468ee9fbd88d786e2e76"
-    },
-    "reference/ffn-bank-split/db1/channel-phase-kind-breakdown.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 12586,
-      "output_sha256": "6b21b18b9c3b7c98edbdb28686c4644bb6fcba88bbe37622fcb384af5c143ca6"
-    },
-    "reference/ffn-bank-split/db1/combined_timing_chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 75073,
-      "output_sha256": "1ee301a7c1addd0bbd3159acae4e58b9e618184630d0ce75fadf6592cdcb1925"
-    },
-    "reference/ffn-bank-split/db1/down_gpu_input/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 37809,
-      "output_sha256": "ed9b8def91306cd9ffb75cdf1a96f590fb9465e523ff40e0cece785c3c136caf"
-    },
-    "reference/ffn-bank-split/db1/expected.json": {
-      "category": "reference_evidence",
-      "output_bytes": 41552,
-      "output_sha256": "20663b0be9e27432f05f9343e6abf8bcdf998c77e978102aed935742afca729d"
-    },
-    "reference/ffn-bank-split/db1/gate_up_gpu/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 56185,
-      "output_sha256": "579b5da8f99fa5967f56bbd31bfdf55e6e9c6acbb732b568d13d3576d2132d9c"
-    },
-    "reference/ffn-bank-split/db1/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65371,
-      "output_sha256": "78ebfda92d517a45cd331548846e846b7034611168e792809fce26fc2bcd972a"
-    },
-    "reference/ffn-bank-split/db1/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 204562,
-      "output_sha256": "f535b5b927baa88ff9c56ab4f417e8ad89cbb7db28e3d631a676bcd1988be7ec"
-    },
-    "reference/ffn-bank-split/db2/CHANNEL-ANALYSIS.md": {
-      "category": "reference_evidence",
-      "output_bytes": 2595,
-      "output_sha256": "aa282899a5baebbbcc8abe75fc239df48d9d576fec281fe42cc2c0fc62891688"
-    },
-    "reference/ffn-bank-split/db2/channel-analysis.json": {
-      "category": "reference_evidence",
-      "output_bytes": 245633,
-      "output_sha256": "dea824e56172755ee362c9039bb560e151e93125224356313ce72c61bf0a999f"
-    },
-    "reference/ffn-bank-split/db2/channel-command-bus.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 3086,
-      "output_sha256": "dc15086b7c16eb11b0ab1dfc0269525970235ecd072a0c8e8a806e72040ce096"
-    },
-    "reference/ffn-bank-split/db2/channel-partitions.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 5379,
-      "output_sha256": "f2c7990f5611a7df4241d3b2632091f9d508e31590a2e4b3e8cc3361d3c89f08"
-    },
-    "reference/ffn-bank-split/db2/channel-phase-kind-breakdown.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 12554,
-      "output_sha256": "827766c3c41f06c3ae873be1c68f1bf3cb5be77b1078cf9f0fad09bd2bc6e349"
-    },
-    "reference/ffn-bank-split/db2/combined_timing_chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 75041,
-      "output_sha256": "32326c3074a64d047fc89ae4ff47ac4c611fe4f5e616ba447f5c9a8b5c785e53"
-    },
-    "reference/ffn-bank-split/db2/down_gpu_input/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 38097,
-      "output_sha256": "d035c6fe75002fe0b45c2e1bd186c29c5df69169160a19759738353962d56163"
-    },
-    "reference/ffn-bank-split/db2/expected.json": {
-      "category": "reference_evidence",
-      "output_bytes": 41542,
-      "output_sha256": "8407c2e970bc5ec54ba4eca6baf60a9721a055950419ffea3b25995b7a58adb0"
-    },
-    "reference/ffn-bank-split/db2/gate_up_gpu/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 56185,
-      "output_sha256": "2c7cbfe7b2343ca195bb919b6f5e9c54d8d42c71f59c3475d3ccdd63a97ddc2f"
-    },
-    "reference/ffn-bank-split/db2/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65371,
-      "output_sha256": "0a54ababb8cb6989452388c74ed4cc9cfffe9f8c0fd194837c70b37501231aed"
-    },
-    "reference/ffn-bank-split/db2/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 204287,
-      "output_sha256": "06ab9acfbde6294735f36d941f1e1fa019533edd697a0d4c1903b06fcd38155d"
-    },
-    "reference/ffn-bank-split/latency.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 1255,
-      "output_sha256": "4b5e8a0d8117a2ee1f8b99aa02111e0fda0a747be53f455652812865bebd525d"
-    },
-    "reference/ffn-bank-split/legacy/CHANNEL-ANALYSIS.md": {
-      "category": "reference_evidence",
-      "output_bytes": 2802,
-      "output_sha256": "6f691da253021684017d2668ca7e255fb53940dcefe523602424fb7b2c24c001"
-    },
-    "reference/ffn-bank-split/legacy/chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 22445,
-      "output_sha256": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7"
-    },
-    "reference/ffn-bank-split/legacy/channel-analysis.json": {
-      "category": "reference_evidence",
-      "output_bytes": 954751,
-      "output_sha256": "6908757622b0cb5b891c576e47f661b8b5d83607b3be974aab66a6968044e8da"
-    },
-    "reference/ffn-bank-split/legacy/channel-command-bus.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 5786,
-      "output_sha256": "2dafa237e0486ad0cd137e177f79accd0f130501e10f39285c2dc4b2402a227f"
-    },
-    "reference/ffn-bank-split/legacy/channel-partitions.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 9759,
-      "output_sha256": "eef02cc2d4a4ae486b4ef429522df21eafa9cd313591a9d445247b2ec577f881"
-    },
-    "reference/ffn-bank-split/legacy/channel-phase-kind-breakdown.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 24230,
-      "output_sha256": "21d59f1b72be5aac93e827ec2bd6781ba84b01cd52743ee853a5481c5332674b"
-    },
-    "reference/ffn-bank-split/legacy/combined_timing_chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 24221,
-      "output_sha256": "ea7ecfb41e9ee376e2413685553d074abb34d2713d2ceab5025a069e5cec01b9"
-    },
-    "reference/ffn-bank-split/legacy/down_gpu_input/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 20162,
-      "output_sha256": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134"
-    },
-    "reference/ffn-bank-split/legacy/gate_up_gpu/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 19975,
-      "output_sha256": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2"
-    },
-    "reference/ffn-bank-split/legacy/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65373,
-      "output_sha256": "cea7de770b88e802ae6596a3145821479417e72754781b50c82703572951149b"
-    },
-    "reference/ffn-bank-split/legacy/pv/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 21390,
-      "output_sha256": "da1b0624ef94398e462f3a04760b1255c9a8a42d325524ecb6f3ca1781065f5b"
-    },
-    "reference/ffn-bank-split/legacy/serial_layer_control/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 36308,
-      "output_sha256": "2a3bfa9219f8c9edac9de8e278e65ddb9b8fa64460fc6e19ac08d8d6fff6a064"
-    },
-    "reference/ffn-bank-split/legacy/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 201163,
-      "output_sha256": "7560f6f660dccffd39a602e61871583174b28f3d00d88e96e1a2bed158910cc2"
-    },
-    "reference/ffn-bank-split/legacy/v/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 21942,
-      "output_sha256": "866a86129ad3c03829f9967aa1bcfe93aa4c9df08bf7611a85a7f6ca8e27776e"
-    },
-    "reference/ffn-bank-split/no-overlap1/CHANNEL-ANALYSIS.md": {
-      "category": "reference_evidence",
-      "output_bytes": 2596,
-      "output_sha256": "5618738278d66e1cd5581d8ca50c26d9642b8e9196311dbb2406c088b752df46"
-    },
-    "reference/ffn-bank-split/no-overlap1/channel-analysis.json": {
-      "category": "reference_evidence",
-      "output_bytes": 245652,
-      "output_sha256": "f70f22c2334cf249951f7a8091f6dcfed58d5e2bd63de8f0aa28b31534aff45d"
-    },
-    "reference/ffn-bank-split/no-overlap1/channel-command-bus.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 2798,
-      "output_sha256": "27e829b53d45bfa757d6b5f68fa041be5ed463879ee9f4f189dfaadcd4ce48c2"
-    },
-    "reference/ffn-bank-split/no-overlap1/channel-partitions.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 5427,
-      "output_sha256": "bcd34b67d3642ee1c70e23cd5b485811dfd21e26fed291a12376c864168dd676"
-    },
-    "reference/ffn-bank-split/no-overlap1/channel-phase-kind-breakdown.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 12426,
-      "output_sha256": "ed2b958c89283d4af7233104b5abff222edbaa3a4fd1d2aafbe6ca9689c7638d"
-    },
-    "reference/ffn-bank-split/no-overlap1/combined_timing_chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 73796,
-      "output_sha256": "f6da81c371d137b5d8cebbd16653ffdad850191275ca8a42500f4d94fd6c55b0"
-    },
-    "reference/ffn-bank-split/no-overlap1/down_gpu_input/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 37300,
-      "output_sha256": "cb1da5917a0eea2b25a8e5fb9aee7029bc8f9e30fa7001b0a2de1aa2f6c912eb"
-    },
-    "reference/ffn-bank-split/no-overlap1/expected.json": {
-      "category": "reference_evidence",
-      "output_bytes": 41576,
-      "output_sha256": "e4ea275f846421c5c16a24c2a694de4fa39bb3f9f6acc40b2cd765c3755625ee"
-    },
-    "reference/ffn-bank-split/no-overlap1/gate_up_gpu/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 55420,
-      "output_sha256": "29843e98f1042eb5c5ea6d6ec823742af8a34230186c7bd0006d30a52bb69aa8"
-    },
-    "reference/ffn-bank-split/no-overlap1/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65372,
-      "output_sha256": "7c2b3421696c120024d474ab3b85e797d3f0d2ffc8eb7746840dbd15ac04c2db"
-    },
-    "reference/ffn-bank-split/no-overlap1/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 204585,
-      "output_sha256": "f533b6bf45deb6c4c0db87ee449877fa3b294af5240f2b62a790471d3dc4e5e7"
-    },
-    "reference/ffn-bank-split/no-overlap2/CHANNEL-ANALYSIS.md": {
-      "category": "reference_evidence",
-      "output_bytes": 2596,
-      "output_sha256": "42598d764ef0ef9e5656ddbbc8970009a2f32c4210d4d5ec7adb0789a1c3dbb4"
-    },
-    "reference/ffn-bank-split/no-overlap2/channel-analysis.json": {
-      "category": "reference_evidence",
-      "output_bytes": 243873,
-      "output_sha256": "55974fb34bf2ce4af53f1af67dc8430ff1953d5d46e600c13f4f03b04b7bb174"
-    },
-    "reference/ffn-bank-split/no-overlap2/channel-command-bus.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 2622,
-      "output_sha256": "d12f4b534e43da8e207639a89ed0134487b136601d726c4204f5a8c79c206086"
-    },
-    "reference/ffn-bank-split/no-overlap2/channel-partitions.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 5475,
-      "output_sha256": "bcea6e28ae3aad123e11bf97439ef11b37392de54adbef713a8453c948dad9d1"
-    },
-    "reference/ffn-bank-split/no-overlap2/channel-phase-kind-breakdown.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 12074,
-      "output_sha256": "a8b4fd64a6bd98006cc220a05a4aeb48f52fa3a377db683b136d3e58ebe30ec3"
-    },
-    "reference/ffn-bank-split/no-overlap2/combined_timing_chain/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 73831,
-      "output_sha256": "0aa2bb01072dc92718dbc01d7e99fd2898df60be8c9b62448a32ac6267c71711"
-    },
-    "reference/ffn-bank-split/no-overlap2/down_gpu_input/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 37300,
-      "output_sha256": "fbc65183873a02414290fec37d386868b53c24a3532b7398e1b79fc6161cb166"
-    },
-    "reference/ffn-bank-split/no-overlap2/expected.json": {
-      "category": "reference_evidence",
-      "output_bytes": 41575,
-      "output_sha256": "00fd85998f30c009eecf8e170d24a4499a2e7efa7fe4f369fdfec3e6c98a13bb"
-    },
-    "reference/ffn-bank-split/no-overlap2/gate_up_gpu/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 55420,
-      "output_sha256": "c1448b66c9132fb020f3143bdf5017e57d05778f58876664cfcd262dc82b9f76"
-    },
-    "reference/ffn-bank-split/no-overlap2/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65372,
-      "output_sha256": "f1a596a5e175a0d717eb9dd79e91eb6ed7463594d4b53a828572089a1c719304"
-    },
-    "reference/ffn-bank-split/no-overlap2/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 204345,
-      "output_sha256": "f1fed85e4794d8fe8a674b3947359ae3562fafb52c042b279525516b03cb0e1a"
-    },
-    "reference/ffn-bank-split/phase-kinds.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 192431,
-      "output_sha256": "f3e82c72baccb9e71bc3fa95b973827efc8897a625d37aa688fee66724cb9d0b"
-    },
-    "reference/ffn-bank-split/phases.csv": {
-      "category": "reference_evidence",
-      "output_bytes": 33784,
-      "output_sha256": "5641b2155d15fc35dc265ce0af81db19aded7623ceec800dd7892bc7bbef797d"
-    },
-    "reference/ffn-bank-split/serial1/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65372,
-      "output_sha256": "991612ecb674d2284c13f891c093f1cdd60ec4cec36333c6970e9b682f5c0105"
-    },
-    "reference/ffn-bank-split/serial1/serial_layer_control/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 109566,
-      "output_sha256": "f0ce29c34e1528377761852d27bb0fe8ee34a86cb35cf2aeed6e14185a978595"
-    },
-    "reference/ffn-bank-split/serial1/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 204135,
-      "output_sha256": "9e14c12121d9b5139af21dcb55542287f48674356cd04fcd9ad2c6130814088f"
-    },
-    "reference/ffn-bank-split/serial2/provenance.json": {
-      "category": "reference_evidence",
-      "output_bytes": 65372,
-      "output_sha256": "b26d40d31c5accbca2836d54e5005c23576c88d19f0ea92a105db3061a48c92d"
-    },
-    "reference/ffn-bank-split/serial2/serial_layer_control/native-audit.json": {
-      "category": "reference_evidence",
-      "output_bytes": 109920,
-      "output_sha256": "281a463efebcd73556944a2d8fc367abf57f48e085c3ac9e510a15f6ab17b185"
-    },
-    "reference/ffn-bank-split/serial2/summary.json": {
-      "category": "reference_evidence",
-      "output_bytes": 203877,
-      "output_sha256": "994613e455ff867736862adec261fbc0902be23611b52abcc822a80d4618f34f"
-    },
-    "reference/ffn-bank-split/source-byte-verification.json": {
-      "category": "reference_evidence",
-      "output_bytes": 83843,
-      "output_sha256": "d253c8211eb4062993d3e3b4c6dd760fa0d58504fbeef14fba0ee8c5e8770fec"
-    },
-    "reference/ffn-bank-split/source-result-binding.json": {
-      "category": "reference_evidence",
-      "output_bytes": 5276,
-      "output_sha256": "00a1e63714d3040108881795d9a7fed2a4b226780ba22640b439950259487ea1"
-    },
-    "reference/ffn-bank-split/unit-tests.log": {
-      "category": "reference_evidence",
-      "output_bytes": 20411,
-      "output_sha256": "b6e76b831da71d796f7f5c6febf5f435ef833f4fcf2c2456345dc5fc7ca18a6b"
-    },
-    "reference/ffn-bank-split/validation.json": {
-      "category": "reference_evidence",
-      "output_bytes": 171476,
-      "output_sha256": "cf61028327b12c1734777d27674f4d9a4ca9b44dd2a6c2d73ad154410e91c09d"
     },
     "reference/gate_up_gpu/native-audit.json": {
       "category": "reference_evidence",
@@ -4023,11 +3568,6 @@
       "output_bytes": 2087,
       "output_sha256": "8bdb9983ff8a4274168c46bb46c98303269bc8dd224890eee0a99f56b6971f47"
     },
-    "verify_ffn_banks.py": {
-      "category": "publication",
-      "output_bytes": 1869,
-      "output_sha256": "25a2ff1169c18e3a47b543024945bc9db03a5163774a8d4af873aca20269f62d"
-    },
     "verify_legacy_rank_dispatch.py": {
       "category": "publication",
       "output_bytes": 2263,
@@ -4036,7 +3576,7 @@
     "verify_reference.py": {
       "category": "publication",
       "output_bytes": 5679,
-      "output_sha256": "e4a8727329f1480ffb1b11b1c7c65c5a425eacb0954ec60c8fb042b468feabd0"
+      "output_sha256": "10a5e31dbed471d9a91a15e675676c38c8f3cbbb4167fce0e53d89c0ba1e8086"
     },
     "verify_single_bank.py": {
       "category": "publication",
@@ -4060,16 +3600,5 @@
   "physical_SRF_bytes_per_bank": 1024,
   "shared_output_buffer_bytes_per_bank": 2048,
   "whole_srf": true,
-  "V_cache_and_PV_token_sharded": true,
-  "ffn_data_bank_variants": [
-    1,
-    2
-  ],
-  "ffn_compute_bank_variants": [
-    15,
-    14
-  ],
-  "ffn_input_views": 2,
-  "ffn_double_buffer_bytes_per_view": 512,
-  "default_ffn_data_banks": 0
+  "V_cache_and_PV_token_sharded": true
 }
