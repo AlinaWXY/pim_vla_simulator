@@ -1,0 +1,316 @@
+{
+  "schema_version": 1,
+  "model": "legacy_flat_shared_ca",
+  "source_root": "../../",
+  "command_cycles_ck": {
+    "ACT1": 1,
+    "ACT2": 1,
+    "ACTAB": 2,
+    "MACAB": 1,
+    "MACQK": 1,
+    "PREab": 1,
+    "PREpb": 1,
+    "RD": 1,
+    "RDRES": 1,
+    "REFab": 1,
+    "WR": 1,
+    "WRGB": 1,
+    "ACTHB": 2
+  },
+  "no_ca_commands": [
+    "LOCALRD",
+    "LOCALWR"
+  ],
+  "source_sha256": {
+    "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5.py": "b18a391e558a1f185e038dd89f04aa78cc4877a945e22ab67d9db0a8312821e5",
+    "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5pim.py": "37207f8fcd7d7808b700cc2f8931d2410bcce1897422a8d4f48d5381dc4c27b5",
+    "reference/dataflow-comparison/legacy-ca-source/historical-spec.py": "7fa69f5a2a7e5c2f944d6b9135f4de0e7bf08bede03a165b3955e12b0f6a17cf",
+    "reference/dataflow-comparison/legacy-ca-source/SOURCE-SNAPSHOT.json": "6c6f021cbc376357dc20c15b8535751f29d9f394938ea83c947c4517005a5013",
+    "reference/dataflow-comparison/legacy-ca-source/source-byte-verification.json": "1b614dab956a512c32ef46882fd0508c228bb05da12df1f8cad5faf11507df1f",
+    "reference/dataflow-comparison/legacy-ca-source/localwr-act2-run.sbatch": "8d5253e0b85b1359e74806c2ef3af21280285ffd0811264a1bf1bd5b18c6b5bb",
+    "reference/dataflow-comparison/legacy-ca-source/direct-provenance.json": "edc26348cff2cbe4b1550d05b3697dda3be3c8960a13d3abb543e3a3ca4a15f3"
+  },
+  "cases": {
+    "chain": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "7905ffd8eb4761092e00052444d9cc81951bf1796e73323296c4c6b40b00dfcc",
+        "timeline.csv.ch1": "5f9a2388b8300986c72bc4360d9d318afcb23e8632522c4e6d6959c592b41897",
+        "timeline.csv.ch2": "c95244f18c6a5bef4f0582d1fdf0fbf854c2aa36bf2f841e56192539a50bdd7d",
+        "timeline.csv.ch3": "1f774b6deb892faa4ff4904039dd0176055a44e4d0a0902e4f5143375c16a665",
+        "timeline.csv.ch4": "0e01291f2210be153c72a3bfa894a8117a5d818296fc524ffc3bc3f27cf4bb8a",
+        "timeline.csv.ch5": "d33c63c4e1097296dc2625ff404f7f0683feb2cf0d78c79738f9c1a202d2a284",
+        "timeline.csv.ch6": "66332eb71b10f9992b4f7e896ca8372e26181dc6e5f490f982ec1bc6bb904077",
+        "timeline.csv.ch7": "f1e88cb2d420c0929c94583948277ac6bc53c88a989d9e5a1ce72b2e84207638",
+        "timeline.csv.ch8": "5edefbcb197edca5a0a7e5679d1fd39c6da7b68fa1020d8b5c0edba7d54a60ff",
+        "timeline.csv.ch9": "b152219740fc188159e62abab737751a26aa80c24d05bdfcc28e455636532558",
+        "timeline.csv.ch10": "2faed4c4e0325d4e863ed9bd34202e6222af665c22f4f4fcc6ac79492289cda6",
+        "timeline.csv.ch11": "fd54c73c93764c91910d2629557ecfccef0b2369f99dda0589f1e5025247b1e1",
+        "timeline.csv.ch12": "3781f2f25a0eeabab6c2825bd1904ba8de00a40b7842c31b800ce123c729eff1",
+        "timeline.csv.ch13": "cf906b0d062899fd09afcc11baea8f4b9b061efcd8dbc3e03b2158e75061fe50",
+        "timeline.csv.ch14": "e39ea7b5c4752615af76946f4ddd3599ab64c7b32467c781b129da885dce2919",
+        "timeline.csv.ch15": "14259cb9eaf02042de012e14fd17ae32a912c4a1e516c75bcb64219f24d75693"
+      },
+      "result_sha256": "753eb9a94349228420245d7f16897ef36c6e21bb34b50469c16b7a764618f331",
+      "manifest_sha256": "a066c3162145c648b2f35d081f47a80e6cd05a0c5f6ae120cc2bf9de9ecb63e2",
+      "barriers_sha256": "fef5eaa14ce4362891248429248eff81f6a325f4b5cab7cb5a7701a08cf5e046",
+      "summary_sha256": "27e2f148e46cdb7b0db45a204d9ad249c472ede9378a3de64e33c24eb4dfecdb",
+      "workload_trace_sha256": "90949a6659a42d939f582d85874d645e1f9e764a81d9af17da06bf8424f2a56c",
+      "latency_us": 35.273489999999995
+    },
+    "v": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "3b6d8aff3c3472b673b410fe3a3d14b7f68b75b27ef06b224134c72f1853843b",
+        "timeline.csv.ch1": "447568731c56d4d447a985849727aae933dad0a7f69ecfb0ae2862b860734e96",
+        "timeline.csv.ch2": "b9fa12d332d95d1ec91ac1da6840b80e0117118654dbcfd6f9c82490df2c4b9c",
+        "timeline.csv.ch3": "67c8f8eff7c688921f999f018d38060b3bb6d4e73738f36b127d5611efb4c907",
+        "timeline.csv.ch4": "bbbdefa65fa53444ef42cf5c629fa7ae8d601ecf3af66dd8fe47e4781cd26137",
+        "timeline.csv.ch5": "dd41133e47129606cf00f0ff3f565706130aa24a1c4e7e1e3b65d3a3180c05f0",
+        "timeline.csv.ch6": "a572924c53c37c898dc6cc04c02a867e39f372402f00b5417fb2e51f0f3533c9",
+        "timeline.csv.ch7": "df6b0cb0e86f40f2e5ec4658ee71a257f94fef55dce83017bd0643194dab211d",
+        "timeline.csv.ch8": "ba5195d4125f409e79bb01445b2ca463fdd79d325209f3ee2d7229e9adc52a2a",
+        "timeline.csv.ch9": "2dc837a30b869d17378369a4ef4d0012ab10f614282bdce61601baa0c34a5e3b",
+        "timeline.csv.ch10": "7d9fd4974426173cdd43e663d77f610d08f8bbb958254fcbffab9fccb3c156fc",
+        "timeline.csv.ch11": "bdea5b92c1c2b7baa7e6f76aeb4927d418f72ad97424501ed3bdcc6028047a8d",
+        "timeline.csv.ch12": "e7d43a0e695a0fd91ed80d63156ce2f93e0250c0a572589a6acd8fefecfabbd2",
+        "timeline.csv.ch13": "2242e6f318c959ad8f2c5f718afb60dc7aa4f66c6f2c8696f1a9c20f85bf93f6",
+        "timeline.csv.ch14": "d0267851348cce29f439da499ba4570e384c851688be941cbd37973d58710d08",
+        "timeline.csv.ch15": "b4c2eb5c2d8fd8f86941c304844cad230491b296d2267ed79d3b778acde89bcf"
+      },
+      "result_sha256": "0770a01b3802927dbc815dbc6fc9abbf2ee901056a19a30f946ff2844b3d3837",
+      "manifest_sha256": "f9bdfda65a5281431e98b904ca37750660de218eb5f2895901ad98e3fc2e41c1",
+      "barriers_sha256": "25d2a15e079cd6fbaaca0f03cba66657539b74de49979add9a686e0f503bab20",
+      "summary_sha256": "36c76838cfd5e0a2b8b53e8d11cc0d8a5b31a8778bca5cbb62cfb9e021a3cd52",
+      "workload_trace_sha256": "4761a7562888f5dfaebc5bc42ebd3b3f0e8de02ecb79c061c4bb8568d5ca0088",
+      "latency_us": 10.283294
+    },
+    "pv": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "f419a8efe0ece85a63235a8d93b9972e852e4fcaddaa256658a0a9070704ef5f",
+        "timeline.csv.ch1": "5df486b8cc184356d38dd631b70ce813c0ce0791338a65d3637fb3a145d111eb",
+        "timeline.csv.ch2": "f35ad5697910f8e7c1a35373297fc3252f7bd3e9b377f3c3878412fe89c32853",
+        "timeline.csv.ch3": "5256557c55c4c429bc1b4547e6e3fe1fefc6299318ad8099448b89fff0b11f8c",
+        "timeline.csv.ch4": "ce42383c0d0ce9dd1dcfdde92e5980e544881b3b64de5b7322e35685e47ca06e",
+        "timeline.csv.ch5": "0c29fcafb2d94ec564a20b5ffe05925310f8ded67d4e3257464d011cb6fe8133",
+        "timeline.csv.ch6": "afb4c2650d2377522fc4826adb53410963c30c379748229975495aed3e4892c3",
+        "timeline.csv.ch7": "aa553e322d7f703fa7f4989409bc3ebc9b9a9d47e8db2cfba00a66b4398937b3",
+        "timeline.csv.ch8": "302e6339e70d02705d40e3491417c642b6afe4361d3d42d3951107a635fbd4c2",
+        "timeline.csv.ch9": "5628693fe0884425c6ad2a4debea577b55a33b37fa3b75ee1de691a42838e50f",
+        "timeline.csv.ch10": "60213dbc72c235dead4ca02ea32fb6eaba6392da4fb0fb3a4663938e2f5ad524",
+        "timeline.csv.ch11": "55735e235f4620a8cce5f2154aba9a059f4cdfe94f39c76fbde93627c6c72a10",
+        "timeline.csv.ch12": "326b90fe466eaed3e6a1d2fce02b66ffaa35ba1ceaf6af25085e50c1f3ccbfa8",
+        "timeline.csv.ch13": "d22011f0e6ba24e359b53509bf19db80fdb6a0acda89d9e5b8d9de2abc358244",
+        "timeline.csv.ch14": "96e1bc52467a3e50dbc637bca0a520e215341b3eb20418e7aca30a07193c81aa",
+        "timeline.csv.ch15": "a4475e9ad608abd26bb1bff9d94560f02391d56316f1feb9cb71b2300f0c0a32"
+      },
+      "result_sha256": "aaaead861c89bd30ff2993dad030b439ae60f12c33cc590f60af9c326442bf2a",
+      "manifest_sha256": "b60b02bb4e80d379702f760a70fae371f38cfb55cf552bd786f7855f357f29d8",
+      "barriers_sha256": "41ff34bd29bb7b07b68fe2ea773cde79958e85995065f4cb2211cf20301022b4",
+      "summary_sha256": "20e0cda80939d2407be823ba6f64b397551e743f604a6eb5b8f31cb14103bc4f",
+      "workload_trace_sha256": "419851451f03b782dc7cd6788892fc3a705055283ecd103a9437cbd9e076bc17",
+      "latency_us": 9.190524
+    },
+    "gate_up_gpu": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "a905ce7798c7f3064a96afbd9d10ee6fe06ea46b7779d5cb365c468991a77a94",
+        "timeline.csv.ch1": "7f1773801cfce677484b03500e52ea67b1b218bd39a1760b0588851a6ea7e469",
+        "timeline.csv.ch2": "3e4ee861ac93654c12064d31b5c8931a34e674187825f9aad6d9ee03a6bd02c8",
+        "timeline.csv.ch3": "56782769853cec5cb514bcb3ec3301ea86c075a2ef5a25e295a82bbf16dd23b2",
+        "timeline.csv.ch4": "9bbbd3c832fe8b3d5614a00f4e0e0e15e9398656d878981581b1e3c617348887",
+        "timeline.csv.ch5": "b5d5fbb50d6c51c92c100be5b00b2f844508583c537f75b5d31c404ba9b9c71f",
+        "timeline.csv.ch6": "6bd668a67ab1007443e8b3315908f135c1089c44bbcc6847ebe8d53c2890d353",
+        "timeline.csv.ch7": "843e4d57b93491551351b5797996f0dcee97eb8bd4d77956f9ceab85e81115d5",
+        "timeline.csv.ch8": "efc0b7303ce93825182c4b4bb275b80c42dc30b5a4ee1630d9a75c2638bbeff7",
+        "timeline.csv.ch9": "d0e3e00a0a89cce952e9107473deb3d1dd0d91f6fb338750e7bee9a239237605",
+        "timeline.csv.ch10": "56c483306eb8bfe890ccfd3aa33cb74fce0b61ea2ef00c08486e8849b5a802a0",
+        "timeline.csv.ch11": "22c4deac961d5a530f48aba92d557ce1074b465eda26049ebd54b8c76c00ab42",
+        "timeline.csv.ch12": "425b535c23a4c07d8e79c2df0faf76ee8bd11fdd5817e166fd93d33de8115ab7",
+        "timeline.csv.ch13": "252ac2f9872bece505cb800417f481fede9b677b7a167c7a0927cdddad52e7ee",
+        "timeline.csv.ch14": "e369636368e61be82f12fbce038e145980678fc86aad6848962bc2432086b228",
+        "timeline.csv.ch15": "57f809872a6110d93d43176077c012cf16968ddeb21490f660e2da92e021fc8d"
+      },
+      "result_sha256": "a33b1caa40c139cd5adae312852f3a287c56fa15715bca5ba6dd63afd6ed4f12",
+      "manifest_sha256": "bfb9dae237cd783dfcaf73330809af3c105fd0250f6e606afe78b59bd1ea09b2",
+      "barriers_sha256": "a35abbb54eafcf77019f0c897fbe2aaa672179bf969f704757e6cd4209031b3f",
+      "summary_sha256": "02ec0a42c2812d52f982ffd8d2effb20877bcba04c5b95b8976c87fbdc293a78",
+      "workload_trace_sha256": "968a08b9817a1acaed9e81cd1590a09ac8037a367585516fd72a015055be0c04",
+      "latency_us": 37.620366000000004
+    },
+    "down_gpu_input": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "b60c39a0cce9d8b816b36b723984a8660def5c7241deb3a95cfeb6f632cb3b9c",
+        "timeline.csv.ch1": "59e555b03963d0afe33b4cecd1d67dd430e244f7d208913e49e6366647163883",
+        "timeline.csv.ch2": "e44b9742a476715ddbb0d838f52a8615302769c36647afa077421fc3daeb47ec",
+        "timeline.csv.ch3": "e8bda298a0fcbd75dc0699d4409f8c49de440c9c98e97be3dae274c9a41d6334",
+        "timeline.csv.ch4": "c8ca666dbc570c10b72b364d3334c21f89358e1ca4b51cf268f94be0cc772d49",
+        "timeline.csv.ch5": "e107bf8f5509cc198f4458454a04a61ec6fd9105242ff1d6cdc1b6e39addd3b2",
+        "timeline.csv.ch6": "d4320d480127673c52e7479d0b78e88b7aed35666e9ce50109a2a74b22e7fec2",
+        "timeline.csv.ch7": "b4aec7db18c04bdad6633b6d1f5d9e4eef8f86b707a7966fa17418c9b3656f46",
+        "timeline.csv.ch8": "ae635b8087439f732d6eaaa85d5cfd40e86adde47bce75b0befe954a25d9bcc7",
+        "timeline.csv.ch9": "9808fe60c5b5a7dc49b8286a24eaf52fe70c05372fe89e7d8b0c1d58199d10d3",
+        "timeline.csv.ch10": "a87c9a1b1d512241f461d143cfea23e25b9e26e91a9a2a205350dee3deb3f3cf",
+        "timeline.csv.ch11": "2f91c4cfb796bc508ab16bddc46fd474b860ee0b4e76f7a8f990fc2afd975308",
+        "timeline.csv.ch12": "66602e53afb694e740987844ad8237f898a2b1bef4fdfee0aee7f679424f2ba5",
+        "timeline.csv.ch13": "175603e23706d72e849cc6ab44f3c56eef5f4fda13be9c77387b6fd25c89648a",
+        "timeline.csv.ch14": "58c7e20628b854f24cc18439c065bd58b1fb2f98db455d874895a25313e2b19c",
+        "timeline.csv.ch15": "c24d208312dce43acf24f951356de00d6c4ed645b7d351313faaaf3ba61d3439"
+      },
+      "result_sha256": "ddc19960930067c651343edf31894176956acfa0b59c0b176023577130d750ce",
+      "manifest_sha256": "6fd806c4830991b2f9c8a7803c378b95e027ac1952126a72af154710a0c34788",
+      "barriers_sha256": "0a430e619073ec4e27649ec109ca4e95a523fb38159cd5e5e2be2ac16fea2496",
+      "summary_sha256": "59422433f0d1a769722b8d3f11ecdf5b5a1b553f8fbb03e1cbc88ad4a7004812",
+      "workload_trace_sha256": "79cbfb44379e9860f58a4d0ab422926c3fe9b2ba907b2b2ddf9b81be26b61443",
+      "latency_us": 17.39521
+    },
+    "combined_timing_chain": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "90efc60396c67c86b4efc81e588f42a974016e9d83d8213b9cf6e006470b8022",
+        "timeline.csv.ch1": "22f68597332450570ed562513debada0210a90feca17c8df2169834a141475c3",
+        "timeline.csv.ch2": "4b117b596c9934a8fcbdb912d556e569ea401baad0cf1c3de3e4622593f75669",
+        "timeline.csv.ch3": "bcaefb14dd755d1b0399529281e34e493bbac03079dea33129d93252c2452200",
+        "timeline.csv.ch4": "8ee0d264626ba9435b825578feeb362726ceaf329748b58033de3cbc3ad35552",
+        "timeline.csv.ch5": "fbfd3c56c4bcfe759919ef23b6a4e943600213d14cbdc63fdaca267de49b4cf2",
+        "timeline.csv.ch6": "5b649c63885f880064f7aed07083ec4485961a2c4c4d860e722ae86cf23c8bbb",
+        "timeline.csv.ch7": "f7cf1adc9ea1035b44574f3de551ad9cc20f88cbe6fd6aad3fbbef816c92dba0",
+        "timeline.csv.ch8": "725217137d7807fc3d49aa3ff8474a92abe1edd5a953b9787c6112434d8cb5e9",
+        "timeline.csv.ch9": "53589020e290f1cc15220283f07611265aef3aded46e573447ce58fd61ce53a3",
+        "timeline.csv.ch10": "f5c4a579d18483f5e156e631c7cb174936b72bfd5011ce07de4c44455069066c",
+        "timeline.csv.ch11": "337a0534eb70e62e4c8e0260884f8a7d8abea1ba6ab01240be45b2c70a4aaa25",
+        "timeline.csv.ch12": "83ecef2db9c8c0ca9b7564b3ab4b7d7378e1e64ac315ee7386b2b4e2bcdb2300",
+        "timeline.csv.ch13": "28ce48b3dcd21ca6534a72d0fe187d73a170c7ad151869d8f9b3b9a0e902cdcd",
+        "timeline.csv.ch14": "9b11f74c9cb941f62f22a61381f2398713f401ad7d5bb8644c1da2f7de19ee77",
+        "timeline.csv.ch15": "8f4430da59be9ff283b8caf3c88f629488a250de6b7570dcd7df608187688b40"
+      },
+      "result_sha256": "7b157f89cea4b0f9650354dca00f2d582c3a588a62c917eacd9c8901befdda4c",
+      "manifest_sha256": "55be328765c2532ed79dec8e462254a81f13a03d98cefbd0cc472c3519c0fbda",
+      "barriers_sha256": "234b75a7c204719440bc940efee0cb50a9b4c261bd36ab8059bfb47e5b0ac66d",
+      "summary_sha256": "a6ff06c2a6a90d019e11c05f5ec64e9d72ddff0c781f84cd51f0c89c81d59956",
+      "workload_trace_sha256": "8ae0b8c77fc4da0e78f7eec2fe843b286c924744f66e687ac4c02ade5e413855",
+      "latency_us": 55.037150000000004
+    },
+    "serial_layer_control": {
+      "timeline_sha256": {
+        "timeline.csv.ch0": "a9c7f589cfdb82561978eee18e268c7368becb3b97ea7b832035eeb5a74cd98f",
+        "timeline.csv.ch1": "4047cea824f4d47de7f4d6d9793dd7bf6f9efb11a33bd18e8b443fef895e90b8",
+        "timeline.csv.ch2": "b4e062bdcdc82af7227971fc79f1485c98ab51ecaa88710da868f94b23c6ba65",
+        "timeline.csv.ch3": "9495c8375ed37281f6d771b891abcd4f1eb14f7921e10380f894fde966bee5a4",
+        "timeline.csv.ch4": "a7372932b8084913ae6949c308b8f19b935eef0f41e93e6ba7cc8596ca859dfa",
+        "timeline.csv.ch5": "66d82e35e28b096f8355bbbb2e1d468b2e11621179159edb6bc5388fa70d15e9",
+        "timeline.csv.ch6": "34b8750fa895b6628bc7b174f42d404c1c8926d38674e0450af47ace72ce6fac",
+        "timeline.csv.ch7": "2a102771d9b74fae6b7e5419e1bfb1781e9cab514c8b9387163fc8aa904b7ee8",
+        "timeline.csv.ch8": "01f966792fd665873874756fb1d79d56a502f3536383e01f12839556fbf9f9c7",
+        "timeline.csv.ch9": "d5ece366b2751c85687a64ec847e1bc743a23ccb9de8233e2a166c479f6e36c3",
+        "timeline.csv.ch10": "29158bd62139c71d5758266b008e59e516ba838d5410b5ff54625999482afc05",
+        "timeline.csv.ch11": "38934ac379f2e04a7e195e16a5e5dc7ce537797414105db0ac24440ab816b524",
+        "timeline.csv.ch12": "0eeed81d01d0e18bdeb209f05f5da2ef1707c9f1bf767f5b8e18d8fff4a2465e",
+        "timeline.csv.ch13": "cefeba9920bb7ad3995a39fe507fca8cf4a8b085dd30d81a19c99ff69b58ea8d",
+        "timeline.csv.ch14": "b253ae16058857b2082dda310e20a1ad596642ca89c406f4c88ae6ece867b76d",
+        "timeline.csv.ch15": "a1cca6113a02281ef98b04ff7c32c02293570f67cb102117704601b73a393d7a"
+      },
+      "result_sha256": "2ad3b07fa87cf61c820432dc6293127c2b1d1f9e09b6168862e75067c8a1c474",
+      "manifest_sha256": "a435e40f5eb46a17f5003135fa30978b46c0a9f3d12ea48e933bf8dfabaf9065",
+      "barriers_sha256": "0a7d2e730cb84eb51e36d01a9ff5d0dfbbf990f3e6ffd58316e6e201769ee828",
+      "summary_sha256": "ea0b3ad58084fe978e955ef5b1f209a7d3a0ec0bc0f8bc7ba4d0a42ae35020a0",
+      "workload_trace_sha256": "08c71d605bfe5d3ecc43fcc2b1286228058d08af58b49fc00e8b58c1547a116a",
+      "latency_us": 110.18686
+    }
+  },
+  "scope": {
+    "resource": "one physical shared CA bus per channel",
+    "rank_controller": false,
+    "global_vs_rank_split": false,
+    "rank_label": "native Rank field identifies command target, not a separately modelled rank CA bus",
+    "clock_unit": "memory CK",
+    "tick_multiplier": 1,
+    "reconstruction": "Each issued timeline command occupies [clock,clock+command_cycles_ck); LOCALRD/LOCALWR are excluded.",
+    "excluded": "No descriptor CA, hypothetical GPU requests, or additional internal-control traffic is inferred."
+  },
+  "source_evidence": [
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5.py",
+      "lines": [
+        32
+      ],
+      "claim": "LPDDR5 command_cycles is empty; superclass defaults apply."
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5pim.py",
+      "lines": [
+        117
+      ],
+      "claim": "ACTAB and ACTHB occupy two CK."
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5pim.py",
+      "lines": [
+        176,
+        184
+      ],
+      "claim": "LOCALWR and LOCALRD are removed from generated shared CA constraints."
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/historical-spec.py",
+      "lines": [
+        88,
+        297,
+        341
+      ],
+      "claim": "Unspecified command width is one CK; emitted command_cycles uses this default."
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/SOURCE-SNAPSHOT.json",
+      "claim": "All three copied source hashes match the native run source snapshot exactly.",
+      "members": {
+        "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5.py": "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/lpddr5.py",
+        "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5pim.py": "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/lpddr5pim.py",
+        "reference/dataflow-comparison/legacy-ca-source/historical-spec.py": "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/dram/spec.py"
+      }
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/source-byte-verification.json",
+      "claim": "Native run source verification passed for 508 files, no changes."
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/localwr-act2-run.sbatch",
+      "lines": [
+        14,
+        15,
+        17,
+        21
+      ],
+      "claim": "Original job built this source and ran --direct-input-baseline; EXIT copied raw outputs to runs/direct-1903036."
+    },
+    {
+      "file": "reference/dataflow-comparison/legacy-ca-source/direct-provenance.json",
+      "claim": "Original direct-run root provenance, matched to its archived member, records the native library digest and source digests."
+    }
+  ],
+  "provenance": {
+    "native_job": 1903036,
+    "raw_archive": "localwr-act2-evidence-1903036.tar.gz",
+    "raw_archive_sha256": "6172bf09cbdc3d70495bbe884d0973dc32f8dd083b926cd72b5cff06da34b6ba",
+    "raw_member_prefix": "runs/direct-1903036/",
+    "source_archive": "localwr-act2-source.tar.gz",
+    "source_archive_sha256": "2589e5b2c217285fd7b65b495bd4bd1c91378273caaf23513b1ee0b1abb30ba8",
+    "original_remote_run_root": "/fact_data/xinyaowang/pim_vla_localwr_act2_20261103/runs/direct-1903036",
+    "native_binary_sha256": "4e0ebf1fd9b4de53c0220bad0658ec39139def8050118f96d7e14613fa6afbbc",
+    "native_binary_hash_note": "Original direct-run provenance records native_library_sha256; no simulator rebuild or rerun was performed for this comparison.",
+    "matched_source_files": 3,
+    "native_source_verification": {
+      "passed": true,
+      "checked_files": 508,
+      "changed": []
+    },
+    "raw_archive_member_hash_verification": {
+      "passed": true,
+      "checked_files": 148,
+      "mismatches": []
+    },
+    "raw_root_provenance_sha256": "edc26348cff2cbe4b1550d05b3697dda3be3c8960a13d3abb543e3a3ca4a15f3"
+  },
+  "interpretation": {
+    "input": "A 32B WRGB directly multicasts to all 16 bank GEMV buffers of the addressed rank at DQ completion; no staging DRAM access.",
+    "flags": "pim_input_broadcast=False means no cross-rank fanout; unified_gemv_model.multicast_targets=16 still confirms within-rank all-bank broadcast.",
+    "historical_differences": "Separate V projection; feature-sharded PV with FP32 outputs; no QKV fusion, rank controller, rank descriptors or channel-independent dispatch. Not a controlled input-only ablation against job1924418.",
+    "gpu_O_projection_latency": "unmeasured"
+  }
+}

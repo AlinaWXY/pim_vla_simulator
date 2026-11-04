@@ -241,7 +241,7 @@
     "tests/score-native-guards/summary.json": "9ddd62bf8a3db313e033451387de6a09f15963479b5628ab9c00b6a539cf0cba",
     "validation.json": "04fa6a56830838564c69b89a2e07675f23eddb5409ebe1351735ea2c6df59acc"
   },
-  "final_source_manifest_sha256": "fec669431408550bf65382aed03aa061b2c02b00031c8110638ab4ccea408b7b",
+  "final_source_manifest_sha256": "fef341e68bf3e32b0dfdc4adb5605be91017aebc4e454141efd60de2cd7889c2",
   "continuous_window_revision": {
     "job": 1928919,
     "native_simulation_rerun": false,

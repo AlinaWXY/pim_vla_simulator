@@ -12,6 +12,12 @@ files=sorted(p for p in (root/"experiments").rglob("*") if p.is_file()
 files += [root/"requirements.txt",root/"package_o_projection.py"]
 files += [root/"reference"/case/name for case in ("chain","v","pv","gate_up_gpu","down_gpu_input","combined_timing_chain","serial_layer_control")
           for name in ("summary.json","native-audit.json")]
+# Keep the historical CA source proof portable without including raw run data.
+files += [root/"reference"/"dataflow-comparison"/"legacy-ca-source"/name for name in (
+    "historical-lpddr5.py", "historical-lpddr5pim.py", "historical-spec.py",
+    "localwr-act2-run.sbatch", "source-byte-verification.json", "SOURCE-SNAPSHOT.json",
+    "direct-provenance.json",
+)]
 manifest={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
 (root/"O-PROJECTION-SOURCE.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
 with tarfile.open(root/"o-projection-source.tar.gz","w:gz") as tar:

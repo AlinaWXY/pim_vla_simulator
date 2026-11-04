@@ -1,5 +1,24 @@
 # xinyao_1104_O_Projection：QKT score 暂存与 PIM O projection
 
+## 四条历史数据流比较（仅分析已有记录）
+
+最新比较按用户指定的四条路径排列，复用原生 jobs `1903036`、`1924418`，未重跑仿真。完整表格、DQ 时间线、DQ/CA 最长单段空闲及来源见[四条路径报告](reference/dataflow-comparison/REPORT.zh-CN.md)。
+
+| 路径 | 已建模 AE 部分 / ms（18层×10步） | O projection 是否计时 | DQ utilization（16-channel平均） |
+|---|---:|---|---:|
+| ① 直接广播至 GEMV buffer | 19.757319 | GPU O 未计时 | 18.705% |
+| ② 两 bank 暂存，score 流式导出 | 30.831197 | GPU O 未计时 | 9.621% |
+| ③ 两 bank 暂存，score 集中导出 | 32.550157 | GPU O 未计时 | 9.113% |
+| ④ 同③，PIM O projection | 37.841434 | 已计 PIM O：5.039536 ms | 8.524% |
+
+上表是独立单层阶段和的外推，**不是完整 AE 端到端测量**。①另有 QKV 融合、PV 分片、输出精度和调度差异，因此①→②不是单独改变输入路径的消融。
+
+![四条路径 AE 计时与 DQ breakdown](reference/dataflow-comparison/ae-latency-dq-utilization.png)
+
+主窗口指标不累计碎片：DQ 取最长完整工作窗口；CA 取最长实际单段空闲；joint 取完整 DQ 工作范围内最长的一段 DQ/CA 同时空闲。QKT 的 DQ 最长窗口①②③④分别为 `0.490574 / 0.559048 / 19.383770 / 19.383770 µs`，其中①②各为31个分离窗口，不能相加称为连续时间。②③④虽然都有47.638206 µs的Down DQ完整窗口，但共享CA最长单段仅1.093708 µs。
+
+## 原有两个开关的2×2实验
+
 在 `xinyao_1104` 基础上实现两个独立开关，并在 dev0 完成四组原生模拟。实验 1：每处理 16 个本地 K token，将 score tile 写回 DRAM，全部完成后统一读取到 GPU。实验 2：PV 部分结果写回 DRAM，经 bank0/4 读出并广播到 16 bank，执行 O projection。
 
 四组共同采用 PV/O 的 BF16 输入、权重和结果，FP32 累加；QKT score 保持 FP32。**主比较改为最长连续完整工作窗口，而非累计无 DQ 时间；实验 2 的时延包含 PV 和 PIM O projection。** 此前累计口径的报告保留在 [previous-cumulative-report](reference/o-projection/previous-cumulative-report/)。

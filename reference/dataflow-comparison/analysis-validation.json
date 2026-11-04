@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "analysis_job": "1929027",
+  "native_simulation_rerun": false,
+  "source_native_jobs": [
+    1903036,
+    1924418
+  ],
+  "unit_tests_reused_from_job_1928983": 19,
+  "original_native_latency_and_DQ_totals_unchanged": true,
+  "analysis_code_sha256": {
+    "experiments/pi05-unified-gemv/dq_ca_windows.py": "dfc957b37cc752f60f226307a644ecee6437422adc36d3e4eaa6395d7173f10f",
+    "experiments/pi05-unified-gemv/channel_analysis.py": "e16d01878e9f2d347db8c9e7b2c67dce8e188fedb87cac93c79f4407c12c2983",
+    "experiments/pi05-unified-gemv/compare_dataflow_history.py": "7934aeea9c0d41660f542ba26b81a07d55042d662fdecc556a0389f2ae268123",
+    "experiments/pi05-unified-gemv/legacy_direct_ca_contract.json": "173615619e2b6616b8e96d11d2bf4d230a15652bf96eb1b75f6489f4124f7bf2",
+    "experiments/pi05-unified-gemv/continuous_dq.py": "0bec580165968acea39804334f4d453809c883f12ac8b169fe74de34b6733929",
+    "experiments/pi05-unified-gemv/validation/test_dq_ca_windows.py": "163dba8c15b205dc76ba95da73b660f7fadebe4cde7ed4075b039e075b20e97d"
+  },
+  "output_sha256": {
+    "stage-comparison.csv": "0cb27dd853c107d56f0a87c5ff9f726e694e5f4e839e549fb11b81306fe6db81",
+    "dq-utilization-timeline.png": "bf735bfd7a846ef1c5e63aace51d8abb50f7b44506b47c2c9cccc5d2bcc91451",
+    "operator-idle-windows.csv": "0b36818bfcb7cce232d3190a76c609d78d4b787656222655dbd6c7f61e7adfee",
+    "comparison.json": "1b93ed779c6d2804cba40e1e62d1cd2d32f3e84c2c4852606119413e5bc7026f",
+    "operator-idle-windows.png": "63266043bee2fa32e00d5e9b2f0ed28f8ffeaab85cd9f65a7c0068d420757127",
+    "dq-ca-complete-windows.png": "a38c667afb7b7bce84768da98cf97e8182e176509be9bf574adc64423e9ff28c",
+    "ae-latency-dq-utilization.png": "5b73e195ba75e95545fb3d466de3ee6a3194957b393462f3223d6120790101f9",
+    "ae-latency-dq-utilization.pdf": "9aa9b739b3865d08d113338bdf00242d5ba93d6a64b113894bdf2e5d6902ed4e",
+    "comparison.csv": "3403cad9e4ab29d3ccff45bc14af68462f5d0110f1892c7781da5b99837b6bc4",
+    "dq-ca-complete-windows.pdf": "70955b66ca29352bbc57c862240ee6e5b8db33b6abadbe0557a7e9f53fbb2a27",
+    "all-channel-summary.csv": "15cb60e31cbffa7f0900bf35317cb88eb567fac7a76b0d750d1272e8a717620b",
+    "windows/dq-ca-summary.csv": "45448faf980ab0828161458cbea98ad0ace1366011d2f01ca2b3fc80fa03fcf2",
+    "windows/dq-ca-diagnostic-windows.csv.gz": "69f4900a7ff06ffceaaec1e87c21407466fa59b55bd642427f9120aa6c34e35e",
+    "windows/dq-ca-complete-work-windows.csv": "efb4d98fb8dca6f0924ba453ee005f8b70d00fae394e876b748d4f92541245c1",
+    "windows/dq-ca-physical-windows.csv.gz": "dc9a506f2c10c8121da3f85ded8bf0f1242200e816f3f8eab5054ed7820def25",
+    "windows/dq-ca-windows.json": "3a7dc2b3f31ae915afa2e775f5410b32a04143e39b62daa11be79f1d64392917"
+  }
+}

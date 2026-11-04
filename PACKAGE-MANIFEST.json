@@ -6,8 +6,8 @@
   "dataflow": "QKT score DRAM buffering and local two-bank PV-to-O projection; common BF16 PV boundary, FP32 accumulation",
   "result_binding": "reference/o-projection/source-result-binding.json",
   "historical_package_manifest": "PACKAGE-MANIFEST.pv-token.json",
-  "file_count_excluding_manifest": 848,
-  "bytes_excluding_manifest": 64602738,
+  "file_count_excluding_manifest": 883,
+  "bytes_excluding_manifest": 78627585,
   "file_hashes": {
     ".gitattributes": {
       "bytes": 77,
@@ -22,8 +22,8 @@
       "sha256": "74a1f19701bb06cb80b4ec31e6de6472f5fd767e5949c1c4d51f70007d18b3f2"
     },
     "O-PROJECTION-SOURCE.json": {
-      "bytes": 85650,
-      "sha256": "fec669431408550bf65382aed03aa061b2c02b00031c8110638ab4ccea408b7b"
+      "bytes": 87184,
+      "sha256": "fef341e68bf3e32b0dfdc4adb5605be91017aebc4e454141efd60de2cd7889c2"
     },
     "PACKAGE-MANIFEST.pv-token.json": {
       "bytes": 172795,
@@ -34,8 +34,8 @@
       "sha256": "b422188d2fb7f1d2862b5082ec1b8de99b2464fc5b7fbcf18d82f0b2ae1c4851"
     },
     "README.md": {
-      "bytes": 6715,
-      "sha256": "bee67ce72132d8e52bb20da154ee2b02c58e0c52525247f88bcb0cd46e36d887"
+      "bytes": 8279,
+      "sha256": "6d685bc0057a59a9ff94383b1af1033b424f1598733a6c5044b5517f29d670f1"
     },
     "analyze_localwr_schedule.py": {
       "bytes": 13597,
@@ -2037,6 +2037,10 @@
       "bytes": 24852,
       "sha256": "e16d01878e9f2d347db8c9e7b2c67dce8e188fedb87cac93c79f4407c12c2983"
     },
+    "experiments/pi05-unified-gemv/compare_dataflow_history.py": {
+      "bytes": 21363,
+      "sha256": "7934aeea9c0d41660f542ba26b81a07d55042d662fdecc556a0389f2ae268123"
+    },
     "experiments/pi05-unified-gemv/compare_o_projection.py": {
       "bytes": 16603,
       "sha256": "c283a47ca1569245f079b7b12622538634573eb5a2d36c11500ae2313c3dd012"
@@ -2044,6 +2048,14 @@
     "experiments/pi05-unified-gemv/continuous_dq.py": {
       "bytes": 18724,
       "sha256": "0bec580165968acea39804334f4d453809c883f12ac8b169fe74de34b6733929"
+    },
+    "experiments/pi05-unified-gemv/dq_ca_windows.py": {
+      "bytes": 17556,
+      "sha256": "dfc957b37cc752f60f226307a644ecee6437422adc36d3e4eaa6395d7173f10f"
+    },
+    "experiments/pi05-unified-gemv/legacy_direct_ca_contract.json": {
+      "bytes": 20803,
+      "sha256": "173615619e2b6616b8e96d11d2bf4d230a15652bf96eb1b75f6489f4124f7bf2"
     },
     "experiments/pi05-unified-gemv/plot_comparison.py": {
       "bytes": 3323,
@@ -2181,6 +2193,10 @@
       "bytes": 10676,
       "sha256": "f105172525e58e814633cb12cb50a481b5e7b5e8b192b217d483457eabb3e2d9"
     },
+    "experiments/pi05-unified-gemv/validation/test_dq_ca_windows.py": {
+      "bytes": 12774,
+      "sha256": "163dba8c15b205dc76ba95da73b660f7fadebe4cde7ed4075b039e075b20e97d"
+    },
     "experiments/pi05-unified-gemv/validation/test_o_projection_workload.py": {
       "bytes": 9595,
       "sha256": "97981f78095dbb579a2e2399a3326460a36ad2abe4450d919aa9fa9a5fc394ac"
@@ -2218,8 +2234,8 @@
       "sha256": "e7eab06979e4a1ffb6a79c4148edaffafed3d3520ad299f1e7d4424a6a05021a"
     },
     "package_o_projection.py": {
-      "bytes": 1267,
-      "sha256": "30219e50cdfbc76b16f87050e4bd2c057d16db29f649c1388720bbe451617ea7"
+      "bytes": 1631,
+      "sha256": "884c8b52a20653464ef74141e60a8363ba1fa311f6401c9914c1f88b624ddd99"
     },
     "reference/CHANNEL-ANALYSIS.md": {
       "bytes": 2802,
@@ -2316,6 +2332,130 @@
     "reference/combined_timing_chain/summary.json": {
       "bytes": 1903,
       "sha256": "b8107e2621268d091de77d78c06efe0277c220662ab75b440c3f7df6305a539c"
+    },
+    "reference/dataflow-comparison/REPORT.zh-CN.md": {
+      "bytes": 20553,
+      "sha256": "0edfe92b2ea2d2991abf95afac274ec22de7db8da1bee04b1fe05376dafe5860"
+    },
+    "reference/dataflow-comparison/ae-latency-dq-utilization.pdf": {
+      "bytes": 27252,
+      "sha256": "9aa9b739b3865d08d113338bdf00242d5ba93d6a64b113894bdf2e5d6902ed4e"
+    },
+    "reference/dataflow-comparison/ae-latency-dq-utilization.png": {
+      "bytes": 218618,
+      "sha256": "5b73e195ba75e95545fb3d466de3ee6a3194957b393462f3223d6120790101f9"
+    },
+    "reference/dataflow-comparison/all-channel-summary.csv": {
+      "bytes": 12208,
+      "sha256": "15cb60e31cbffa7f0900bf35317cb88eb567fac7a76b0d750d1272e8a717620b"
+    },
+    "reference/dataflow-comparison/analysis-review/analysis-code.sha256": {
+      "bytes": 595,
+      "sha256": "c345656dcd95eb8838ce463b67f9f98ac16437420325e2a58985e82e0ef8e616"
+    },
+    "reference/dataflow-comparison/analysis-review/dataflow-history-review.sbatch": {
+      "bytes": 2771,
+      "sha256": "388d94ce0a1cc59f4aba0f813fc368ccd4c7494f5e3e58275f6fb214c90b2dce"
+    },
+    "reference/dataflow-comparison/analysis-review/dq-ca-tests.log": {
+      "bytes": 2967,
+      "sha256": "b008cd9de26f81283d7f56b3d2d0432c13fb4708afc57cb3d4a521e24644e069"
+    },
+    "reference/dataflow-comparison/analysis-review/interval-analysis-validation.json": {
+      "bytes": 2703,
+      "sha256": "5e34ee869394b5e7decbc19150032fe2f6bf2814d1084d62cffff3a498db6d87"
+    },
+    "reference/dataflow-comparison/analysis-validation.json": {
+      "bytes": 2723,
+      "sha256": "926460f5082ddf710253b0f002907ad9c2bb886c4104e452f67fd26c6645f758"
+    },
+    "reference/dataflow-comparison/archive-manifest.json": {
+      "bytes": 2446,
+      "sha256": "cecd1cdafc42eb175c809bd6537be40d984bc8eadcdb4371727d5e70fc7a2246"
+    },
+    "reference/dataflow-comparison/ca-window-command-check.json": {
+      "bytes": 30842,
+      "sha256": "871c6ca53f15bba8fa977263adc75458cfea01b7207ab866307e2fa50d99a670"
+    },
+    "reference/dataflow-comparison/comparison.csv": {
+      "bytes": 2903,
+      "sha256": "3403cad9e4ab29d3ccff45bc14af68462f5d0110f1892c7781da5b99837b6bc4"
+    },
+    "reference/dataflow-comparison/comparison.json": {
+      "bytes": 70809,
+      "sha256": "1b93ed779c6d2804cba40e1e62d1cd2d32f3e84c2c4852606119413e5bc7026f"
+    },
+    "reference/dataflow-comparison/delivery-validation.json": {
+      "bytes": 527,
+      "sha256": "e035924c9ef45b53756d191d6c4c51fe2fb41113d9e5f6ff8c883340a23f3163"
+    },
+    "reference/dataflow-comparison/dq-ca-complete-windows.pdf": {
+      "bytes": 24010,
+      "sha256": "70955b66ca29352bbc57c862240ee6e5b8db33b6abadbe0557a7e9f53fbb2a27"
+    },
+    "reference/dataflow-comparison/dq-ca-complete-windows.png": {
+      "bytes": 164119,
+      "sha256": "a38c667afb7b7bce84768da98cf97e8182e176509be9bf574adc64423e9ff28c"
+    },
+    "reference/dataflow-comparison/dq-utilization-timeline.png": {
+      "bytes": 167765,
+      "sha256": "bf735bfd7a846ef1c5e63aace51d8abb50f7b44506b47c2c9cccc5d2bcc91451"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/SOURCE-SNAPSHOT.json": {
+      "bytes": 79845,
+      "sha256": "6c6f021cbc376357dc20c15b8535751f29d9f394938ea83c947c4517005a5013"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/direct-provenance.json": {
+      "bytes": 60651,
+      "sha256": "edc26348cff2cbe4b1550d05b3697dda3be3c8960a13d3abb543e3a3ca4a15f3"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5.py": {
+      "bytes": 14163,
+      "sha256": "b18a391e558a1f185e038dd89f04aa78cc4877a945e22ab67d9db0a8312821e5"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/historical-lpddr5pim.py": {
+      "bytes": 13079,
+      "sha256": "37207f8fcd7d7808b700cc2f8931d2410bcce1897422a8d4f48d5381dc4c27b5"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/historical-spec.py": {
+      "bytes": 18947,
+      "sha256": "7fa69f5a2a7e5c2f944d6b9135f4de0e7bf08bede03a165b3955e12b0f6a17cf"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/localwr-act2-run.sbatch": {
+      "bytes": 1320,
+      "sha256": "8d5253e0b85b1359e74806c2ef3af21280285ffd0811264a1bf1bd5b18c6b5bb"
+    },
+    "reference/dataflow-comparison/legacy-ca-source/source-byte-verification.json": {
+      "bytes": 62,
+      "sha256": "1b614dab956a512c32ef46882fd0508c228bb05da12df1f8cad5faf11507df1f"
+    },
+    "reference/dataflow-comparison/operator-idle-windows.csv": {
+      "bytes": 4126,
+      "sha256": "0b36818bfcb7cce232d3190a76c609d78d4b787656222655dbd6c7f61e7adfee"
+    },
+    "reference/dataflow-comparison/operator-idle-windows.png": {
+      "bytes": 232750,
+      "sha256": "63266043bee2fa32e00d5e9b2f0ed28f8ffeaab85cd9f65a7c0068d420757127"
+    },
+    "reference/dataflow-comparison/source-result-binding.json": {
+      "bytes": 3652,
+      "sha256": "df39820f1e8452870434149026e6569fd33fe8278e3fed2c1af7cac2a71e22d0"
+    },
+    "reference/dataflow-comparison/stage-comparison.csv": {
+      "bytes": 1111,
+      "sha256": "0cb27dd853c107d56f0a87c5ff9f726e694e5f4e839e549fb11b81306fe6db81"
+    },
+    "reference/dataflow-comparison/windows/dq-ca-complete-work-windows.csv": {
+      "bytes": 1709114,
+      "sha256": "efb4d98fb8dca6f0924ba453ee005f8b70d00fae394e876b748d4f92541245c1"
+    },
+    "reference/dataflow-comparison/windows/dq-ca-summary.csv": {
+      "bytes": 1459492,
+      "sha256": "45448faf980ab0828161458cbea98ad0ace1366011d2f01ca2b3fc80fa03fcf2"
+    },
+    "reference/dataflow-comparison/windows/dq-ca-windows.json": {
+      "bytes": 9596766,
+      "sha256": "3a7dc2b3f31ae915afa2e775f5410b32a04143e39b62daa11be79f1d64392917"
     },
     "reference/down_gpu_input/native-audit.json": {
       "bytes": 20162,
@@ -2819,7 +2959,7 @@
     },
     "reference/o-projection/source-result-binding.json": {
       "bytes": 21424,
-      "sha256": "9c2b399cc24eeb172c44bea54bc541a3924f430ffa54e06868a81b0ae2f03339"
+      "sha256": "3cd19c6a6ad797aadbabf0cc66f9ea1b993c17ad14ba67f8cafcaccf62c6fa7d"
     },
     "reference/o-projection/stage-comparison.csv": {
       "bytes": 1916,
@@ -3401,5 +3541,9 @@
       "bytes": 2302,
       "sha256": "f67241129d137bd04f028989d355eae21ff917d5225ff5cd7287dae940a37da2"
     }
-  }
+  },
+  "additional_result_bindings": [
+    "reference/dataflow-comparison/source-result-binding.json"
+  ],
+  "historical_dataflow_comparison": "Four existing input/score/O paths; no native simulation rerun; AE scope explicitly partial and longest DQ/shared-CA windows separate from cumulative gaps"
 }

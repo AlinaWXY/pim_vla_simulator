@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "checked_delivered_analysis_outputs": 14,
+  "remote_only_outputs": [
+    "windows/dq-ca-diagnostic-windows.csv.gz",
+    "windows/dq-ca-physical-windows.csv.gz"
+  ],
+  "analysis_code_hashes_match": true,
+  "interval_cache_validation_hash_matches": true,
+  "numbers_unchanged_by_layout_fix": true,
+  "visual_review": "AE/DQ breakdown, operator DQ/CA/joint windows, exact-run DQ timeline and strict-phase supplement inspected; label offsets corrected.",
+  "native_simulation_rerun": false
+}
