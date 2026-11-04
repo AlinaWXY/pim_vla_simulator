@@ -6,8 +6,8 @@
   "dataflow": "QKT score DRAM buffering and local two-bank PV-to-O projection; common BF16 PV boundary, FP32 accumulation",
   "result_binding": "reference/o-projection/source-result-binding.json",
   "historical_package_manifest": "PACKAGE-MANIFEST.pv-token.json",
-  "file_count_excluding_manifest": 826,
-  "bytes_excluding_manifest": 36969870,
+  "file_count_excluding_manifest": 829,
+  "bytes_excluding_manifest": 36981803,
   "file_hashes": {
     ".gitattributes": {
       "bytes": 77,
@@ -2465,6 +2465,18 @@
       "bytes": 3556,
       "sha256": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115"
     },
+    "reference/o-projection/generated-build/LPDDR5XPIM.cpp": {
+      "bytes": 6395,
+      "sha256": "232fac454221a64bd72f84133a6b0003950500fb99eef064a20c7a44cfab1f70"
+    },
+    "reference/o-projection/generated-build/lpddr5.py": {
+      "bytes": 2766,
+      "sha256": "2b4de0458a4cb0f27b487b31986f63f5f576dea76f31b44f5494092fde4c08c8"
+    },
+    "reference/o-projection/generated-build/lpddr5_pim.py": {
+      "bytes": 2772,
+      "sha256": "d6de98b77719d6fb512de460dd666d2b02e549424305c6713edd555570ef5fdb"
+    },
     "reference/o-projection/latency-dq-breakdown.pdf": {
       "bytes": 25585,
       "sha256": "812da04126b4194dc925628ba61a01f1d3d77005b8f21b85471eb91fe112a860"
@@ -2731,7 +2743,7 @@
     },
     "reference/o-projection/source-result-binding.json": {
       "bytes": 17364,
-      "sha256": "83b8dc79ddc7765f8057c67d9f3e0bf372f05c83ffe55f593a13b04a58772853"
+      "sha256": "a674ab8f9670ee7eae5e46c82925d21ce24fe02d4e8ecb41ee6ab79630319f7c"
     },
     "reference/o-projection/stage-comparison.csv": {
       "bytes": 1916,
