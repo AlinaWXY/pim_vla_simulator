@@ -8,6 +8,8 @@ void DRAMDevice::init(std::unique_ptr<DRAMSpec> spec) {
   m_bank_level = m_spec->get_level_id("Bank");
   m_root = std::make_unique<DRAMNode>(m_spec, nullptr, 0, 0);
   m_root->for_each_at_level(m_bank_level, [&](DRAMNode* bank) { m_bank_nodes.push_back(bank); });
+  if(m_bank_nodes.size()<=64) for(size_t i=0;i<m_bank_nodes.size();++i)
+    for(auto* node=m_bank_nodes[i];node;node=node->m_parent_node) node->m_subtree_bank_mask |= uint64_t{1}<<i;
 }
 
 void DRAMDevice::set_channel_id(int channel_id) {
@@ -16,12 +18,12 @@ void DRAMDevice::set_channel_id(int channel_id) {
 
 void DRAMDevice::issue_command(int command, const AddrVec_t& addr_vec, Clk_t clk) {
   if (command_observer) command_observer(command, addr_vec, clk);
-  m_root->update_timing(command, addr_vec, clk);
+  m_root->update_timing(command, addr_vec, clk, active_bank_mask);
   apply_action(command, addr_vec, clk);
 }
 
 bool DRAMDevice::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) {
-  return (!command_admission || command_admission(command, addr_vec, clk)) && m_root->check_timing(command, addr_vec, clk);
+  return (!command_admission || command_admission(command, addr_vec, clk)) && m_root->check_timing(command, addr_vec, clk, active_bank_mask);
 }
 
 int DRAMDevice::get_preq_command(int command, const AddrVec_t& addr_vec, Clk_t clk) {

@@ -62,6 +62,12 @@ CASES = {
     "Whole_SRF_early_refill": "Whole SRF overwrite before complete batch consumption",
     "Whole_SRF_four_views": None,
     "Whole_SRF_legal_row_preparation": None,
+    "FFNsplit_missing_PASS": "FFN MAC requires matching PASS",
+    "FFNsplit_invalid_PASS": "FFN PASS requires exact weight base",
+    "FFNsplit_Up_before_Gate": "FFN Up replay requires completed Gate input",
+    "FFNsplit_third_input_view": "FFN split requires two 512B SRF views",
+    "FFNsplit_early_export": "FFN result export requires complete pass",
+    "FFNsplit_complete_overlap": None,
 }
 
 
@@ -75,6 +81,24 @@ def command(op, offset=0, slot=0, ch=0, bank=0):
 
 
 def trace_for(path, name):
+    if name.startswith("FFNsplit_"):
+        if name == "FFNsplit_complete_overlap":
+            import workload
+            manifest = workload.generate(path, "gate_up_gpu", staging_banks=2, rank_descriptors=True,
+                channel_independent_dispatch=True, v_token_sharding=True, pv_token_sharding=True,
+                ffn_data_banks=2, ffn_overlap=True)
+            (path.parent / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            (path.parent / "workload.trace").write_bytes(path.read_bytes())
+            return
+        lines = {
+            "FFNsplit_missing_PASS": [command("PIM_MAC_AB", 1048576)],
+            "FFNsplit_invalid_PASS": [f"PIM_FFN_PASS {address(1048576+32)}"],
+            "FFNsplit_Up_before_Gate": [f"PIM_FFN_PASS {address(1087488)}"],
+            "FFNsplit_third_input_view": [f"PIM_FFN_PASS {address(1048576)}", command("PIM_MAC_AB", 1048576, 2)],
+            "FFNsplit_early_export": [f"PIM_FFN_PASS {address(1048576)}", f"PIM_FFN_RDRES {address(0)}"],
+        }[name]
+        path.write_text("\n".join(lines)+"\n", encoding="ascii")
+        return
     if name in ("Whole_SRF_four_views", "Whole_SRF_legal_row_preparation"):
         import workload
         preparation = name == "Whole_SRF_legal_row_preparation"
@@ -352,6 +376,9 @@ def dispatch_positive_audit(directory, name):
 
 
 def positive_audit(directory, name):
+    if name == "FFNsplit_complete_overlap":
+        from audit_native import audit_run
+        return audit_run(directory)
     if name in ("Whole_SRF_four_views", "Whole_SRF_legal_row_preparation"):
         from audit_native import audit_run, read_csv, read_json
         audit = audit_run(directory)
@@ -611,6 +638,10 @@ def worker(backend, output, name):
         if name=="Token_PV_missing_cache":
             from dataclasses import replace
             config=replace(config,v_cache_preinstalled=False)
+    if name.startswith("FFNsplit_"):
+        config = config_for("gate_up_gpu", refresh=CASES[name] is None, max_cycles=500_000,
+            rank_staging=True, staging_banks=2, rank_descriptors=True, channel_independent_dispatch=True,
+            v_token_sharding=True, pv_token_sharding=True, ffn_data_banks=2, ffn_overlap=True)
     if token_v:
         from dataclasses import replace
         config = replace(config, timing_overrides={**config.timing_overrides, "nCCDAB": 8})

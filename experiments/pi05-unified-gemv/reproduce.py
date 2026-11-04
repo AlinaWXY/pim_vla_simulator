@@ -17,6 +17,8 @@ import sys
 HERE = Path(__file__).resolve().parent
 PRIMARY = ("chain", "v", "pv", "gate_up_gpu", "down_gpu_input")
 FUSED_PRIMARY = ("chain", "pv", "gate_up_gpu", "down_gpu_input")
+FFN_PRIMARY = ("gate_up_gpu", "down_gpu_input")
+FFN_CASES = (*FFN_PRIMARY, "combined_timing_chain")
 CASES = (*PRIMARY, "combined_timing_chain", "serial_layer_control")
 EXTERNAL = {"RD", "RDA", "WR", "WRA", "WRGB", "RDRES"}
 UNKNOWN = ("GPU_V_cast_pack", "GPU_softmax_and_score_scaling", "GPU_O_projection",
@@ -45,7 +47,7 @@ def setup(backend):
 
 def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, staging_banks=1,
                rank_descriptors=False, channel_independent_dispatch=False, v_token_sharding=False,
-               pv_token_sharding=False, qkv_fusion=False):
+               pv_token_sharding=False, qkv_fusion=False, ffn_data_banks=0, ffn_overlap=True):
     from simulator.config import MemoryConfig
     chain = case in ("chain", "serial_layer_control")
     timings = dict(nCCDAB=8 if chain or (case == "v" and v_token_sharding) else 16, nLOCALWR=4)
@@ -59,6 +61,8 @@ def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, stag
         pim_token_pv=bool(pv_token_sharding and (case in ("v", "pv", "serial_layer_control") or case == "chain" and qkv_fusion)),
         pim_qkv_fusion=bool(qkv_fusion and case in ("chain", "serial_layer_control")),
         pim_whole_srf=bool(pv_token_sharding),
+        ffn_data_banks=ffn_data_banks if case in (*FFN_CASES, "serial_layer_control") else 0,
+        ffn_overlap=ffn_overlap,
         v_cache_preinstalled=bool(pv_token_sharding and case == "pv"),
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
         pim_staging_banks=staging_banks if rank_staging else 1,
@@ -71,7 +75,7 @@ def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, stag
 
 def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=False,
              channel_independent_dispatch=False, v_token_sharding=False, pv_token_sharding=False,
-             qkv_fusion=False):
+             qkv_fusion=False, ffn_data_banks=0, ffn_overlap=True):
     import workload
     from simulator.backend import run_trace
     from audit_native import audit_run
@@ -79,11 +83,13 @@ def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=
     directory.mkdir()
     manifest = workload.generate(directory / "workload.trace", case, rank_staging=rank_staging, staging_banks=staging_banks,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion)
+        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion,
+        ffn_data_banks=ffn_data_banks, ffn_overlap=ffn_overlap)
     dump(directory / "manifest.json", manifest)
     config = config_for(case, rank_staging=rank_staging, staging_banks=staging_banks,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion)
+        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion,
+        ffn_data_banks=ffn_data_banks, ffn_overlap=ffn_overlap)
     native = run_trace(config, directory / "workload.trace", directory / "simulation")
     with (directory / "simulation/barriers.csv").open(newline="") as stream:
         markers = {int(r["marker"]): int(r["frontend_tick"]) for r in csv.DictReader(stream)}
@@ -98,6 +104,7 @@ def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=
         v_token_sharding=bool(v_token_sharding and (case in ("v", "serial_layer_control") or case == "chain" and qkv_fusion)),
         pv_token_sharding=bool(pv_token_sharding and (case in ("v", "pv", "serial_layer_control") or case == "chain" and qkv_fusion)),
         qkv_fusion=bool(qkv_fusion and case in ("chain", "serial_layer_control")),
+        ffn_data_banks=config.ffn_data_banks, ffn_overlap=bool(config.ffn_data_banks and ffn_overlap),
         rank_staging=rank_staging, rank_controller=rank_staging,
         rank_descriptors=config.pim_rank_descriptors, channel_independent_dispatch=config.channel_independent_dispatch,
         staging_banks=staging_banks if rank_staging else 0,
@@ -141,16 +148,29 @@ def main():
                         help="Keep separate V projection as a diagnostic control")
     parser.add_argument("--staging-banks", type=int, choices=(1, 2), default=2,
                         help="Number of DRAM input staging banks per PIM rank (default: 2)")
+    parser.add_argument("--ffn-data-banks", type=int, choices=(0, 1, 2), default=0,
+                        help="FFN-only dedicated data banks: 0 preserves 1103, 1/2 leave 15/14 compute banks")
+    parser.add_argument("--no-ffn-overlap", action="store_true",
+                        help="Same FFN layout with serialized input fill/compute for overlap ablation")
+    parser.add_argument("--ffn-only", action="store_true",
+                        help="Run Gate/Up, Down and their combined control; sum only the two independent stages")
     parser.add_argument("--legacy-rank-dispatch", action="store_true",
                         help="Reproduce the original 1103 serial frontend and per-bank PIM requests")
     parser.add_argument("--no-rank-descriptors", action="store_true",
                         help="Keep channel-independent dispatch but use per-bank PIM requests for ablation")
     parser.add_argument("--skip-tests", action="store_true", help="For diagnostic runs only")
     args = parser.parse_args()
+    if args.ffn_data_banks and (args.direct_input_baseline or args.legacy_rank_dispatch or args.no_rank_descriptors):
+        parser.error("Dedicated FFN banks require staging, rank descriptors and independent channel dispatch")
+    if args.no_ffn_overlap and not args.ffn_data_banks:
+        parser.error("--no-ffn-overlap requires --ffn-data-banks 1 or 2")
+    if args.ffn_only:
+        args.cases = list(FFN_CASES)
+    ffn_overlap = not args.no_ffn_overlap
     v_token_sharding = not (args.legacy_v_feature_sharding or args.direct_input_baseline)
     pv_token_sharding = v_token_sharding and not args.legacy_pv_feature_sharding
     qkv_fusion = pv_token_sharding and not args.no_qkv_fusion
-    primary = FUSED_PRIMARY if qkv_fusion else PRIMARY
+    primary = FFN_PRIMARY if args.ffn_only else FUSED_PRIMARY if qkv_fusion else PRIMARY
     channel_independent_dispatch = not (args.direct_input_baseline or args.legacy_rank_dispatch)
     rank_descriptors = channel_independent_dispatch and not args.no_rank_descriptors
     backend, output = args.backend.resolve(strict=True), args.output.resolve()
@@ -172,6 +192,7 @@ def main():
         v_token_sharding=v_token_sharding,
         pv_token_sharding=pv_token_sharding,
         qkv_fusion=qkv_fusion,
+        ffn_data_banks=args.ffn_data_banks, ffn_overlap=bool(args.ffn_data_banks and ffn_overlap), ffn_only=args.ffn_only,
         native_library_sha256=library_hash,
         rank_staging=not args.direct_input_baseline,
         staging_banks=args.staging_banks if not args.direct_input_baseline else 0,
@@ -187,13 +208,15 @@ def main():
                 "--backend", backend, "--output", output / "native-guards"], output, env)
     runs = {case: run_case(output, case, rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion) for case in args.cases}
+        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion,
+        ffn_data_banks=args.ffn_data_banks, ffn_overlap=ffn_overlap) for case in args.cases}
     import workload
     complete = all(case in runs for case in primary)
     summary = dict(status="passed", horizon=16, attention_heads=8,
         v_token_sharding=v_token_sharding,
         pv_token_sharding=pv_token_sharding,
         qkv_fusion=qkv_fusion,
+        ffn_data_banks=args.ffn_data_banks, ffn_overlap=bool(args.ffn_data_banks and ffn_overlap), ffn_only=args.ffn_only,
         unified_bank_gemv=True, primary_cases=list(primary), runs=runs,
         rank_staging=not args.direct_input_baseline, rank_controller=not args.direct_input_baseline,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
@@ -204,11 +227,13 @@ def main():
         FFN_combined_control_us=runs.get("combined_timing_chain", {}).get("latency_us"),
         serial_layer_memory_control_us=runs.get("serial_layer_control", {}).get("latency_us"),
         layouts=workload.layouts(rank_staging=not args.direct_input_baseline, staging_banks=args.staging_banks,
-                                v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion), complete_AE_end_to_end_latency_ms=None,
+                                v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion,
+                                ffn_data_banks=args.ffn_data_banks, ffn_overlap=ffn_overlap), complete_AE_end_to_end_latency_ms=None,
         actual_GPU_usable_time_us=None, unknown_latency_us={name: None for name in
             ((*[n for n in UNKNOWN if n != "GPU_V_cast_pack"], "GPU_P_KV_partition_pack", "GPU_PV_partial_sum") if pv_token_sharding else UNKNOWN)},
         tests_executed=not args.skip_tests,
-        aggregation=("Four primary stages with QKV fusion; standalone V, combined FFN and serial layer are controls only" if qkv_fusion else
+        aggregation=("Two independent FFN stages; combined FFN is a control, excluded from the sum" if args.ffn_only else
+            "Four primary stages with QKV fusion; standalone V, combined FFN and serial layer are controls only" if qkv_fusion else
             "Five independently timed stages; combined FFN and serial-layer memory schedule are additional controls, excluded from the sum"))
     summary["measured_stage_sum_ms_18x10"] = summary["measured_stage_sum_us_per_layer_step"]*.18 if complete else None
     if digest(library) != library_hash:

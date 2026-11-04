@@ -107,6 +107,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "rank_descriptor_extension.inc"
 #include "whole_srf_extension.inc"
 #include "v_cache_extension.inc"
+#include "ffn_split_extension.inc"
 
  public:
   void init() override {
@@ -193,6 +194,11 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_v_cache_preinstalled, bool, "v_cache_preinstalled").default_val(false);
     RAMULATOR_PARSE_PARAM(m_v_cache_path, std::string, "v_cache_events_path").default_val("");
     init_v_cache();
+    RAMULATOR_PARSE_PARAM(m_ffn_data_banks, int, "ffn_data_banks").default_val(0);
+    RAMULATOR_PARSE_PARAM(m_ffn_overlap, bool, "ffn_overlap").default_val(true);
+    RAMULATOR_PARSE_PARAM(m_masked_path, std::string, "masked_events_path").default_val("");
+    RAMULATOR_PARSE_PARAM(m_ffn_split_path, std::string, "ffn_split_events_path").default_val("");
+    init_ffn_split();
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -211,6 +217,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     }
     setup_rank_descriptors();
     setup_v_cache();
+    setup_ffn_split();
     m_stats.add("num_pim_requests", s_pim_requests);
     m_stats.add("num_pim_completed", s_pim_completed);
     m_stats.add("pim_request_latency_cycles", s_pim_latency);
@@ -335,6 +342,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (m_pim_buffer.size() >= m_pim_buffer.max_size) {
       return false;
     }
+    if(is_split_control(req) || is_split_mac(req)) return send_split(req);
     if (is_stage(req)) return send_stage(req);
     if (is_gemv_release(req)) return send_gemv_release(req);
     if (m_unified_gemv && !m_rank_rope && (req.type_id==Request::Type::PIM_MAC_QK || req.type_id==Request::Type::PIM_RD_BG))
@@ -506,6 +514,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void finalize() override {
+    if(!split_outputs_retired()) throw std::runtime_error("Incomplete FFN split output at end of trace");
     if(m_whole_srf) {
       if(!output_retired() || m_clk<m_output_ready)
         throw std::runtime_error("Incomplete shared output at end of trace");
@@ -513,6 +522,9 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         if(m_gemv_slots[b][slot].kind!=GemvSlot::Empty)
           throw std::runtime_error("Unreleased SRF view at end of trace");
     }
+    // The Python adapter reads evidence before native objects are destroyed.
+    if(m_masked_events) m_masked_events.flush();
+    if(m_ffn_split_events) m_ffn_split_events.flush();
     LPDDR5Controller::finalize();
   }
 
@@ -546,6 +558,11 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       auto& done = m_pim_pending.front();
       s_pim_completed++;
       s_pim_latency += done.depart - done.arrive;
+      if(done.type_id==Request::Type::PIM_FFN_RDRES) {
+        if(++m_split_export_done>m_split_exports) throw std::runtime_error("FFN output completion before issue");
+        record_split(done,"EXPORT_COMPLETE",m_clk,32,gemv_offset(done)/64);
+        if(m_split_export_done==m_split_features*2) m_split_stage_mode=false;
+      }
       output_complete(done);
       if (done.callback) done.callback(done);
       m_pim_pending.pop_front();
@@ -841,6 +858,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 
   bool issue_pim_ready() {
     RankFineScope fine(m_rank_fine_context,m_rank_controller);
+    if(m_ffn_data_banks && (split_active() || is_split_control(*m_pim_buffer.begin()) || is_split_mac(*m_pim_buffer.begin())))
+      return issue_split_ready();
     for (auto it = m_pim_buffer.begin(); it != m_pim_buffer.end(); ++it) {
       if (is_local(*it) || (is_rank_rope(*it) && it->type_id == Request::Type::PIM_ROPE_EXEC)) continue;
       if(is_stage(*it)) {

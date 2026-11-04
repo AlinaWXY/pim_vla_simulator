@@ -18,7 +18,7 @@ CASES = (*PRIMARY, "combined_timing_chain", "serial_layer_control")
 
 
 def unified_buffers(case, rank_staging=True, staging_banks=1, v_token_sharding=False,
-                    pv_token_sharding=False,qkv_fusion=False):
+                    pv_token_sharding=False,qkv_fusion=False,ffn_data_banks=0,ffn_overlap=True):
     buffers = dict(gemv_slots_per_bank=2, gemv_slot_bytes=512,
                 gemv_total_bytes_per_bank=1024, gemv_layout="[token16][lane16] BF16",
                 separate_rank_MAC_input_bytes=0, separate_Q_buffer_bytes=0,
@@ -56,11 +56,26 @@ def unified_buffers(case, rank_staging=True, staging_banks=1, v_token_sharding=F
             buffers["projection_accumulator_per_bank"]=1536 if qkv_fusion else 1024
         elif case=="pv":
             buffers["accumulator_per_bank"]=1024
+    if ffn_data_banks and case in ffn.CASES:
+        import ffn_split_layout as split
+        buffers.update(input_srf_bytes_per_bank=1024,output_pool_bytes_per_bank=2048,
+            gemv_slots_per_bank=2,gemv_slot_bytes=512,gemv_views_per_bank=2,gemv_view_bytes=512,
+            GU_accumulator_per_bank=16*split.columns("gate",ffn_data_banks)*4,
+            Down_accumulator_per_bank=320,whole_srf_batch=False,ffn_double_buffer=True,
+            ffn_overlap=bool(ffn_overlap),ffn_data_banks=ffn_data_banks,
+            input_staging_dram=split.layout(ffn_data_banks)["input_staging"],
+            data_bank_mask=sum(1<<b for b in split.data_banks(ffn_data_banks)),
+            compute_bank_mask=sum(1<<b for b in split.compute_banks(ffn_data_banks)),
+            input_prefetch_slots=2,input_compute_order="Independent 512B slots: refill next while current computes" if ffn_overlap else
+                "Same data-bank layout and trace with native refill/MAC overlap disabled")
     return buffers
 
 
 def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False,
-             v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False):
+             v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False,ffn_data_banks=0,ffn_overlap=True):
+    if type(ffn_data_banks) is not int or ffn_data_banks not in (0,1,2):
+        raise ValueError("ffn_data_banks must be 0, 1 or 2")
+    if ffn_data_banks and not rank_staging:raise ValueError("Dedicated FFN data banks require rank staging")
     if pv_token_sharding and not v_token_sharding:
         raise ValueError("PV token sharding requires token-sharded V")
     if qkv_fusion and not pv_token_sharding:
@@ -73,7 +88,8 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
     if case == "serial_layer_control":
         return generate_serial(path, rank_staging=rank_staging, staging_banks=staging_banks,
             rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-            v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+            v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+            ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
     if case == "chain":
         result = attention.generate(path, horizon=16, case="chain", schedule="double", rank_staging=rank_staging, staging_banks=staging_banks, rank_descriptors=rank_descriptors,
             qkv_fusion=qkv_fusion,whole_srf=pv_token_sharding)
@@ -81,12 +97,15 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
         result = value.generate(path, 16, case, rank_staging=rank_staging, staging_banks=staging_banks,
                                 v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,rank_descriptors=rank_descriptors)
     else:
-        result = ffn.generate(path, 16, case, local_ck=2, rank_staging=rank_staging, staging_banks=staging_banks)
+        result = ffn.generate(path, 16, case, local_ck=2, rank_staging=rank_staging, staging_banks=staging_banks,
+            ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
     result["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
-                                         v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                                         v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+                                         ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
     if "layout" in result:
         result["layout"]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
-                                                     v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                                                     v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+                                                     ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
     result.setdefault("required_backend", {}).update(pim_unified_gemv=True,
         gemv_port_cycles=2, pim_horizon=16,
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
@@ -107,19 +126,24 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
     result.setdefault("expanded_counts", result["counts"].copy())
     result.setdefault("rank_batches", [])
     result.setdefault("input_resource", "same two 512B slots in each physical PIM bank")
+    if ffn_data_banks and case in ffn.CASES:
+        result.update(ffn_data_banks=ffn_data_banks,ffn_overlap=bool(ffn_overlap),
+            staging_banks=staging_banks,input_resource="FFN data-bank DRAM -> two 512B SRF slots in compute banks, with independent slot lifetimes")
+        result["required_backend"].update(ffn_data_banks=ffn_data_banks,ffn_overlap=bool(ffn_overlap))
     result["no_separate_rank_input_SRAM"] = True
     result["complete_ae_latency"] = False
     return result
 
 
 def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False,
-                    v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False):
+                    v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False,ffn_data_banks=0,ffn_overlap=True):
     """One controller lifetime across all modeled stages; no invented GPU wait."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     lines, segments, parts, boundary = [], [], [], 0
     staging_inputs, rank_batches, v_mapping = [], [], None
     pv_mappings,qkv_mapping={},None
+    ffn_mappings,ffn_passes={},[]
     expanded_counts = Counter()
     dq = {}
     with tempfile.TemporaryDirectory(prefix="serial-parts-", dir=path.parent) as scratch:
@@ -129,7 +153,8 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
             part_path = Path(scratch) / f"{case}.trace"
             manifest = generate(part_path, case, rank_staging=rank_staging, staging_banks=staging_banks,
                 rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-                v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+                ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
             expanded_counts.update(manifest["expanded_counts"])
             source = part_path.read_text(encoding="ascii").splitlines()
             skip = bool(lines)
@@ -176,6 +201,11 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
                 from pv_token_layout import shift_trace_lines
                 qkv_mapping=shift_trace_lines(manifest["qkv_mapping"],line_shift)
                 qkv_mapping["stage"]=case
+            if manifest.get("ffn_split_mapping"):
+                from ffn_split_layout import shift_trace_lines
+                ffn_mappings[case]=shift_trace_lines(manifest["ffn_split_mapping"],line_shift)
+                ffn_mappings[case]["stage"]=case
+                ffn_passes.extend(dict(p,stage=case) for p in ffn_mappings[case]["trace_ranges"]["passes"])
             parts.append(dict(stage=case, start_marker=boundary,
                 end_marker=segments[-1]["end"], first_line=2+line_shift, last_line=len(lines)))
             if manifest.get("v_token_sharding"):
@@ -184,11 +214,14 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
                 parts[-1]["pv_token_sharding"]=True
             if manifest.get("qkv_fusion"):
                 parts[-1]["qkv_fusion"]=True
+            if manifest.get("ffn_data_banks"):
+                parts[-1]["ffn_data_banks"]=ffn_data_banks
             boundary = segments[-1]["end"]
             dq[case] = manifest["expected_dq_bytes"]["total"]
     path.write_text("\n".join(lines)+"\n", encoding="ascii")
     buffers = unified_buffers("combined_timing_chain", rank_staging=rank_staging, staging_banks=staging_banks,
-        v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+        v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+        ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
     buffers.update(projection_accumulator_per_bank=1536 if qkv_fusion else 1024, value_accumulator_per_bank=512,
         rope_input_double_per_bank=64, rope_coefficient_per_bank=32, rope_output_per_bank=64,
         score_tile_per_rank=1024, QKT_rows=16,
@@ -239,17 +272,28 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
     if qkv_mapping is not None:
         result["qkv_mapping"]=qkv_mapping
         result["required_backend"]["pim_qkv_fusion"]=True
+    if ffn_data_banks:
+        result.update(ffn_data_banks=ffn_data_banks,ffn_overlap=bool(ffn_overlap),ffn_passes=ffn_passes,
+            ffn_split_mapping=dict(schema_version=1,enabled=True,ffn_data_banks=ffn_data_banks,
+                ffn_overlap=bool(ffn_overlap),stages=ffn_mappings),
+            input_resource="QKV/PV whole-SRF batches; FFN dedicated data banks and two independent 512B SRF slots")
+        result["required_backend"].update(ffn_data_banks=ffn_data_banks,ffn_overlap=bool(ffn_overlap))
+        result["buffers"].update(ffn_double_buffer=True,ffn_overlap=bool(ffn_overlap),
+            input_prefetch_policy="QKV/PV whole batches; FFN opposite-slot refill/compute overlap")
     return result
 
 
-def layouts(rank_staging=True, staging_banks=1, v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False):
+def layouts(rank_staging=True, staging_banks=1, v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False,
+            ffn_data_banks=0,ffn_overlap=True):
     result = dict(attention=attention.layout_for(16,qkv_fusion=qkv_fusion), value=value.layout(16, v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding),
-                  ffn=ffn.layout(16, rank_staging=rank_staging, staging_banks=staging_banks))
+                  ffn=ffn.layout(16, rank_staging=rank_staging, staging_banks=staging_banks,ffn_data_banks=ffn_data_banks))
     for name, case in (("attention", "chain"), ("value", "v"), ("ffn", "combined_timing_chain")):
         result[name]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
-                                                   v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                                                   v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+                                                   ffn_data_banks=ffn_data_banks,ffn_overlap=ffn_overlap)
         if rank_staging:
-            result[name]["input_staging"] = reservation(staging_banks)
+            if not (name=="ffn" and ffn_data_banks):
+                result[name]["input_staging"] = reservation(staging_banks)
         for stale in ("input_double_buffer_bytes_per_rank", "rank_input_layout"):
             result[name].pop(stale, None)
     return result

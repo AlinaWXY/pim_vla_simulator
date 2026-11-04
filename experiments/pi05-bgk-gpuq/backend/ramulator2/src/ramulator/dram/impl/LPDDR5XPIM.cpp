@@ -13,6 +13,7 @@
 #include "ramulator/dram/commands/ACT2.h"
 #include "ramulator/dram/commands/ACTAB.h"
 #include "ramulator/dram/commands/ACTHB.h"
+#include "ramulator/dram/commands/ACTMASK.h"
 #include "ramulator/dram/commands/CAS_RD.h"
 #include "ramulator/dram/commands/CAS_WR.h"
 #include "ramulator/dram/commands/LOCALRD.h"
@@ -20,8 +21,10 @@
 #include "ramulator/dram/commands/MACAB.h"
 #include "ramulator/dram/commands/MACHB.h"
 #include "ramulator/dram/commands/MACK.h"
+#include "ramulator/dram/commands/MACMASK.h"
 #include "ramulator/dram/commands/MACQK.h"
 #include "ramulator/dram/commands/PREHB.h"
+#include "ramulator/dram/commands/PREMASK.h"
 #include "ramulator/dram/commands/PREab.h"
 #include "ramulator/dram/commands/PREpb.h"
 #include "ramulator/dram/commands/RD.h"
@@ -41,7 +44,7 @@ class LPDDR5XPIM : public DRAMSpec {
     enum : int { Channel, Rank, BankGroup, Bank, Row, Column, COUNT };
   };
   struct Command {
-    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, ACTAB, MACAB, WRGB, RDRES, ACTHB, MACHB, PREHB, MACK, MACQK, LOCALWR, LOCALRD, COUNT };
+    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, ACTAB, MACAB, WRGB, RDRES, ACTHB, MACHB, PREHB, MACK, MACQK, LOCALWR, LOCALRD, ACTMASK, PREMASK, MACMASK, COUNT };
   };
   struct State {
     enum : int { Opened, Closed, Activating, N_A, COUNT };
@@ -60,7 +63,8 @@ class LPDDR5XPIM : public DRAMSpec {
       Cmd::RDA<LPDDR5XPIM>, Cmd::WRA<LPDDR5XPIM>, Cmd::REFab<LPDDR5XPIM>, Cmd::REFpb<LPDDR5XPIM>,
       Cmd::ACTAB<LPDDR5XPIM>, Cmd::MACAB<LPDDR5XPIM>, Cmd::WRGB<LPDDR5XPIM>, Cmd::RDRES<LPDDR5XPIM>,
       Cmd::ACTHB<LPDDR5XPIM>, Cmd::MACHB<LPDDR5XPIM>, Cmd::PREHB<LPDDR5XPIM>, Cmd::MACK<LPDDR5XPIM>,
-      Cmd::MACQK<LPDDR5XPIM>, Cmd::LOCALWR<LPDDR5XPIM>, Cmd::LOCALRD<LPDDR5XPIM>
+      Cmd::MACQK<LPDDR5XPIM>, Cmd::LOCALWR<LPDDR5XPIM>, Cmd::LOCALRD<LPDDR5XPIM>, Cmd::ACTMASK<LPDDR5XPIM>,
+      Cmd::PREMASK<LPDDR5XPIM>, Cmd::MACMASK<LPDDR5XPIM>
   >;
 
   LPDDR5XPIM(const ConfigNode& config) {
@@ -72,7 +76,7 @@ class LPDDR5XPIM : public DRAMSpec {
 
     // String name maps + reverse lookup vectors
     set_names(levels, level_names, {"Channel", "Rank", "BankGroup", "Bank", "Row", "Column"});
-    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD"});
+    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD", "ACTMASK", "PREMASK", "MACMASK"});
     set_names(states, state_names, {"Opened", "Closed", "Activating", "N_A"});
     set_names(timings, timing_names, {
         "rate", "nBL_min", "nBL_max", "nCL", "nRCD", "nRP", "nRPab", "nRAS", "nRC", "nWR", "nRTP", "nCWL", "nPPD",

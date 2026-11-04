@@ -44,7 +44,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
     requests = inspect_trace(
         snapshot, transaction_bytes=transaction_bytes, capacity_bytes=capacity, pim=config.pim
     )
-    if (requests["pim_wr_gb"] or requests["pim_rd_res"]) and config.wck_mode != "always_on":
+    if (requests["pim_wr_gb"] or requests["pim_rd_res"] or requests.get("pim_ffn_rdres", 0)) and config.wck_mode != "always_on":
         raise ValueError("PIM buffer transfers require pre-synchronized always_on WCK")
     if config.pim_input_broadcast and requests["pim_mac_hb"]:
         raise ValueError("pim_input_broadcast supports all-bank traces only")
@@ -89,6 +89,10 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_rank_rope": config.pim_rank_rope,
                     "pim_horizon": config.pim_horizon,
                     "pim_ffn_dram": config.pim_ffn_dram,
+                    "ffn_data_banks": config.ffn_data_banks,
+                    "ffn_overlap": config.ffn_overlap,
+                    "ffn_split_events_path": str(output / f"ffn_split.csv.ch{channel}") if config.ffn_data_banks else "",
+                    "masked_events_path": str(output / f"masked_events.csv.ch{channel}") if config.ffn_data_banks else "",
                     "ffn_z_preinstalled": config.ffn_z_preinstalled,
                     "ffn_dram_events_path": str(output / f"ffn_dram_events.csv.ch{channel}") if config.pim_ffn_dram else "",
                     "rope_ii_cycles": config.rope_ii_cycles,
@@ -542,5 +546,47 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
     for field in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
         if not getattr(config, field):
             result["config"].pop(field, None)
+    if config.ffn_data_banks:
+        sources = [0, 4][:config.ffn_data_banks]
+        compute_banks = [bank for bank in range(16) if bank not in sources]
+        result["ffn_bank_split_model"] = dict(data_banks=sources, compute_banks=compute_banks,
+            input_SRF_bytes_per_bank=1024, input_views=2, input_view_bytes=512,
+            output_capacity_bytes_per_bank=2048, overlap=config.ffn_overlap,
+            gu_passes=["gate", "up"], gu_X_external_writes=1, gu_X_internal_reads=2,
+            weight_bases=dict(gate=1048576, up=1087488, down=2097152),
+            source_row_bytes=2048, fragments_per_source_row=4,
+            source_layout="row-striped: bank=[0,4][(fragment//4)%D], offset=524288+(fragment//4//D)*2048+(fragment%4)*512+token*32",
+            valid_bank_mask="Only compute banks with column*compute_bank_count+ordinal < logical output features",
+            masked_commands=["ACTMASK", "PREMASK", "MACMASK"],
+            result_order="valid local feature, token16; no padding exported",
+            input_schedule="Inactive-slot read/broadcast may overlap active-slot MAC; actual DRAM and shared CA constraints apply" if config.ffn_overlap else
+                "Same layout and trace; serialized input fill and compute control",
+            numerical_compute=False)
+        ffn_input_bytes = requests.get("ffn_stage_input_read_bursts", 0)*transaction_bytes
+        masked_bank_MACs = 0
+        for channel in range(config.channels):
+            with (output / f"masked_events.csv.ch{channel}").open(newline="") as stream:
+                masked_bank_MACs += sum(int(event["bank_mask"]).bit_count()
+                    for event in csv.DictReader(stream) if event["command"] == "MACMASK")
+        masked_weight_bytes = masked_bank_MACs*transaction_bytes
+        result["traffic_bytes"]["input_srf_multicast_destination"] -= ffn_input_bytes*config.ffn_data_banks
+        result["traffic_bytes"]["pim_internal"] += masked_weight_bytes
+        result["traffic_bytes"].update(ffn_input_array_read=ffn_input_bytes,
+            ffn_input_multicast_compute_destination=ffn_input_bytes*len(compute_banks),
+            ffn_result_export=requests.get("pim_ffn_rdres", 0)*transaction_bytes,
+            ffn_weight_array_read=masked_weight_bytes)
+        result["ffn_bank_split_model"].update(valid_bank_MACs=masked_bank_MACs,
+            useful_scalar_MACs=masked_bank_MACs*16*16)
+        result["unified_gemv_model"].update(ffn_bank_split=result["ffn_bank_split_model"],
+            multicast_targets=dict(non_FFN=16,FFN=len(compute_banks)),
+            whole_batch_consumption_enforced="Non-FFN only; FFN consumes each 512B slot before its refill",
+            down_layout="64 complete output features per rank, distributed across dedicated compute banks; no cross-rank reduction")
+        result["pim_model"]["bank_input_multicast"]["targets_per_addressed_rank"] = dict(non_FFN=16,FFN=len(compute_banks))
+        result["pim_model"]["double_buffer"] = (
+            "FFN: two512B slots in the same1KiB SRF with independent fill/consume ownership. "
+            "Other paths retain configured whole-SRF behavior.")
+    else:
+        result["config"].pop("ffn_data_banks", None)
+        result["config"].pop("ffn_overlap", None)
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

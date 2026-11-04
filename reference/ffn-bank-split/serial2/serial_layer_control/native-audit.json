@@ -1,0 +1,3624 @@
+{
+  "status": "passed",
+  "case": "serial_layer_control",
+  "horizon": 16,
+  "trace_and_native_address_coverage": true,
+  "native_data_commands_checked": 406016,
+  "array_open_row_checks": 2063872,
+  "independent_MAC_order_checks": 124416,
+  "external_DQ_to_bank_fill_checks": 2048,
+  "unified_gemv": {
+    "events_checked": 243152,
+    "operation_counts": {
+      "GEMV_MULTICAST": 114432,
+      "GEMV_MAC": 116480,
+      "GEMV_RELEASE": 208,
+      "GEMV_Q_LOCAL": 2048,
+      "GEMV_Q_REMOTE": 2048,
+      "GEMV_QK": 7936
+    },
+    "bank_generations_checked": 110592,
+    "physical_bank_releases": 3136,
+    "maximum_destination_fanout": 16,
+    "input_bytes_per_bank": 1024,
+    "rank_full_input_SRAM_bytes": 0,
+    "independent_mask_reconstruction": true
+  },
+  "staging": {
+    "external_input_bytes": 2621440,
+    "internal_read_bytes": 3145728,
+    "full_source_row_coverage": [
+      {
+        "channel": 0,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 0,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 0,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      }
+    ],
+    "data_source_cells_checked": 98304,
+    "internal_read_and_broadcast_use_DQ": false,
+    "SRAM_bytes_per_bank": 1024
+  },
+  "input_batching": {
+    "double_buffer": true,
+    "input_slots_per_bank": 2,
+    "slot_bytes": 512,
+    "physical_input_capacity_bytes_per_bank": 1024,
+    "ffn_overlap": true
+  },
+  "split_activation": {
+    "status": "passed",
+    "nAAD_ck": 8,
+    "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+    "ACT1_commands": 5472,
+    "ACT2_commands": 5472,
+    "paired_ACT2": 5472,
+    "cancelled_ACT1": 0,
+    "pending_ACT2_at_end": 0,
+    "minimum_gap_ck": 1,
+    "maximum_gap_ck": 2,
+    "gap_histogram_ck": {
+      "1": 5456,
+      "2": 16
+    },
+    "maximum_pending_by_channel": {
+      "0": 1,
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1
+    },
+    "classifications": {
+      "ordinary": {
+        "ACT1": 1888,
+        "paired_ACT2": 1888,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 1872,
+          "2": 16
+        }
+      },
+      "other_internal": {
+        "ACT1": 768,
+        "paired_ACT2": 768,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 768
+        }
+      },
+      "staging": {
+        "ACT1": 2816,
+        "paired_ACT2": 2816,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 2816
+        }
+      }
+    },
+    "violation_count": 0,
+    "violations": {},
+    "violations_by_kind": {},
+    "examples": [],
+    "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+  },
+  "rank_controller": {
+    "command_intervals_checked": 837680,
+    "rank_command_coverage": 556528,
+    "global_CA_resources": 16,
+    "rank_CA_resources": 32,
+    "transfer_broadcast_compute_share_rank_CA": true,
+    "no_CA_interval_overlap": true,
+    "coarse_fragment_descriptors_checked": 7664
+  },
+  "ffn_streams": {
+    "status": "passed",
+    "data_banks": [
+      0,
+      4
+    ],
+    "compute_banks": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "input_SRF_bytes_per_bank": 1024,
+    "input_views": 2,
+    "input_view_bytes": 512,
+    "output_capacity_bytes_per_bank": 2048,
+    "no_extra_row_SRAM": true,
+    "GU_output_bytes_per_bank": 1216,
+    "Down_output_bytes_per_bank": 320,
+    "padding_MACs": 0,
+    "physical_regions_disjoint": true,
+    "passes": [
+      "gate",
+      "up",
+      "down"
+    ],
+    "ffn_overlap": true,
+    "whole_input_write_bytes": 2621440,
+    "local_input_read_bytes": 3145728,
+    "full_source_row_coverage": [
+      {
+        "channel": 0,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 0,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 0,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      }
+    ],
+    "overlap": [
+      {
+        "channel": 0,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 0,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 0,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 1,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 1,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 1,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 2,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 2,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 2,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 3,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 3,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 3,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 4,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 4,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 4,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 5,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 5,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 5,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 6,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 6,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 6,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 7,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 7,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 7,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 8,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 8,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 8,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 9,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 9,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 9,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 10,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 10,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 10,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 11,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 11,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 11,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 12,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 12,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 12,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 13,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 13,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 13,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 14,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 14,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 14,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 15,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 15,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 15,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      }
+    ],
+    "useful_scalar_MACs": 201326592,
+    "source_SRF_peak_inflight_bytes": 224,
+    "data_source_cells_checked": 98304,
+    "output_packets_checked": 18432,
+    "input_source_identity_verified": true,
+    "Gate_X_stored_once_read_twice": true,
+    "data_compute_bank_isolation": true,
+    "numerical_compute": false,
+    "attention_prefix": {
+      "chain": {
+        "staging": {
+          "stages_checked": 16,
+          "staging_base_row": 256,
+          "external_input_bytes": 262144,
+          "internal_read_bytes": 262144,
+          "multicast_destination_bytes": 4194304,
+          "write_completion_checks": 8192,
+          "full_input_seal_checks": 16,
+          "source_read_to_precharge_checks": 2736,
+          "read_to_SRF_multicast_checks": 8192,
+          "source_fragment_to_MAC_weight_checks": 49152,
+          "external_input_bytes_unchanged": false,
+          "internal_read_and_broadcast_use_DQ": false,
+          "SRAM_bytes_per_bank": 1024,
+          "maximum_DRAM_staging_bytes_per_rank": 16384,
+          "reserved_DRAM_staging_bytes_per_rank": 131072,
+          "external_input_matches_independent_geometry": true,
+          "source_banks": [
+            0,
+            4
+          ],
+          "source_bank_groups": [
+            0,
+            1
+          ],
+          "staging_banks": 2,
+          "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+          "maximum_DRAM_staging_bytes_per_source_bank": 8192,
+          "source_last_reserved_row": 287,
+          "writer": {
+            "same_BG_spacing_checks": 8160,
+            "cross_BG_short_WR_pairs": 8064,
+            "minimum_cross_BG_WR_gap_ck": 2,
+            "issue_gap_histogram": [
+              {
+                "kind": "cross_BG",
+                "gap_ck": 2,
+                "count": 8064
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 4,
+                "count": 64
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 79,
+                "count": 48
+              }
+            ]
+          }
+        },
+        "batching": {
+          "input_batches_checked": 256,
+          "physical_input_capacity_bytes_per_bank": 1024,
+          "maximum_prefetched_input_bytes_per_bank": 1024,
+          "both_slots_ready_before_first_MAC": true,
+          "no_weight_row_switch_between_paired_fills": true,
+          "MAC_counts_and_reduction_order_preserved": true,
+          "row_command_counts": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 1,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 2,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 3,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 4,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 5,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 6,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 7,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 8,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 9,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 10,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 11,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 12,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 13,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 14,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 15,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            }
+          ],
+          "first_two_batches_channel0": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 0,
+              "source_row": 256,
+              "input_begin_ck": 1370,
+              "last_input_issue_ck": 1528,
+              "both_slots_ready_ck": 1553,
+              "first_MAC_ck": 1579,
+              "last_MAC_complete_ck": 3201,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 4,
+              "view_bytes": 256,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            },
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 1,
+              "source_row": 256,
+              "input_begin_ck": 3241,
+              "last_input_issue_ck": 3399,
+              "both_slots_ready_ck": 3424,
+              "first_MAC_ck": 3450,
+              "last_MAC_complete_ck": 5339,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 4,
+              "view_bytes": 256,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            }
+          ],
+          "whole_SRF_bytes_per_bank": 1024,
+          "view_bytes_by_rows": {
+            "8": 256,
+            "16": 512
+          },
+          "full_batch_consumption_before_any_view_overwrite": true,
+          "all_views_ready_before_first_MAC": true
+        }
+      },
+      "pv": {
+        "staging": {
+          "stages_checked": 16,
+          "staging_base_row": 256,
+          "external_input_bytes": 253952,
+          "internal_read_bytes": 253952,
+          "multicast_destination_bytes": 4063232,
+          "write_completion_checks": 7936,
+          "full_input_seal_checks": 16,
+          "source_read_to_precharge_checks": 1072,
+          "read_to_SRF_multicast_checks": 7936,
+          "source_fragment_to_MAC_weight_checks": 7936,
+          "external_input_bytes_unchanged": false,
+          "internal_read_and_broadcast_use_DQ": false,
+          "SRAM_bytes_per_bank": 1024,
+          "maximum_DRAM_staging_bytes_per_rank": 15872,
+          "reserved_DRAM_staging_bytes_per_rank": 131072,
+          "external_input_matches_independent_geometry": true,
+          "source_banks": [
+            0,
+            4
+          ],
+          "source_bank_groups": [
+            0,
+            1
+          ],
+          "staging_banks": 2,
+          "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+          "maximum_DRAM_staging_bytes_per_source_bank": 8192,
+          "source_last_reserved_row": 287,
+          "writer": {
+            "same_BG_spacing_checks": 7904,
+            "cross_BG_short_WR_pairs": 7536,
+            "minimum_cross_BG_WR_gap_ck": 2,
+            "issue_gap_histogram": [
+              {
+                "kind": "cross_BG",
+                "gap_ck": 2,
+                "count": 7536
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 4,
+                "count": 80
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 79,
+                "count": 48
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 308,
+                "count": 16
+              },
+              {
+                "kind": "same_BG",
+                "gap_ck": 4,
+                "count": 240
+              }
+            ]
+          }
+        },
+        "batching": {
+          "input_batches_checked": 256,
+          "physical_input_capacity_bytes_per_bank": 1024,
+          "maximum_prefetched_input_bytes_per_bank": 1024,
+          "both_slots_ready_before_first_MAC": true,
+          "no_weight_row_switch_between_paired_fills": true,
+          "MAC_counts_and_reduction_order_preserved": true,
+          "row_command_counts": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 1,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 2,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 3,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 4,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 5,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 6,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 7,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 8,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 9,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 10,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 11,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 12,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 13,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 14,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 15,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            }
+          ],
+          "first_two_batches_channel0": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 0,
+              "source_row": 256,
+              "input_begin_ck": 55545,
+              "last_input_issue_ck": 55707,
+              "both_slots_ready_ck": 55732,
+              "first_MAC_ck": 55758,
+              "last_MAC_complete_ck": 56270,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 2,
+              "view_bytes": 512,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            },
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 1,
+              "source_row": 256,
+              "input_begin_ck": 56302,
+              "last_input_issue_ck": 56464,
+              "both_slots_ready_ck": 56489,
+              "first_MAC_ck": 56515,
+              "last_MAC_complete_ck": 57027,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 2,
+              "view_bytes": 512,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            }
+          ],
+          "whole_SRF_bytes_per_bank": 1024,
+          "view_bytes_by_rows": {
+            "8": 256,
+            "16": 512
+          },
+          "full_batch_consumption_before_any_view_overwrite": true,
+          "all_views_ready_before_first_MAC": true
+        }
+      }
+    }
+  },
+  "serial_continuity": {
+    "single_native_simulation": true,
+    "continuous_refresh_enabled": true,
+    "native_refresh_commands": 1184,
+    "refresh_observed_before_and_after_QKT": true,
+    "global_barriers_without_reset": true,
+    "excluded_producer_latencies_are_unknown": true,
+    "full_AE_end_to_end_latency_us": null,
+    "all_four_stages_share_physical_bank_slots": true,
+    "fused_QKV_avoids_repeated_V_projection": true
+  },
+  "native_external_DQ_bytes": 4628480,
+  "native_command_counts": {
+    "ACT1": 5472,
+    "ACT2": 5472,
+    "WR": 98048,
+    "PREpb": 4208,
+    "LOCALRD": 124672,
+    "PREab": 1760,
+    "ACTAB": 1360,
+    "MACAB": 57088,
+    "REFab": 1184,
+    "LOCALWR": 12288,
+    "RD": 2048,
+    "WRGB": 2048,
+    "MACQK": 7936,
+    "RDRES": 42496,
+    "ACTMASK": 1328,
+    "MACMASK": 59392,
+    "PREMASK": 960
+  },
+  "trace_sha256": "88dd06c0804bfd94bb6c166103398d52a04dce3e7c4637715ea380ad70c2a511",
+  "native_sha256": {
+    "timeline.csv.ch0": "2e42bdb7a8da65ee0b5f1b99ffe14b191ec75fd5a7c627ad260423c09c3cb6ac",
+    "timeline.csv.ch1": "5a0cdcdfbbb72c32842aac001160ec71e99832d5b0f0e4a9b95fc265d483ef1e",
+    "timeline.csv.ch2": "4ab6ffc705755311bf1d8cbc6b96260359a1a4520888c90945ebc9e3604ea915",
+    "timeline.csv.ch3": "919fc39fc847c9467adb6c5f5ffbe9b60db3b33a79ea55742cd36b15aff188fe",
+    "timeline.csv.ch4": "ad3dbfba215a9158e134c9e6281c071f39599169c324f7c94044c29c5eb16ea9",
+    "timeline.csv.ch5": "9a8bad50c157d20090055e4f2c15d221105b7a4aeac881535ab9e66c39d7c379",
+    "timeline.csv.ch6": "1bb0de4679af736de94a3ff1ae7d0ab526f156d758b59e13e94892dc8032ac8c",
+    "timeline.csv.ch7": "a476e9d43c40e2c30b9ff56cd7c8164b1e768a7fb47efdfc0c3efc7c05574442",
+    "timeline.csv.ch8": "d0b52249f138e30fecc05e57f0c6d62a1dc9b777a7146237360af379cfe4626b",
+    "timeline.csv.ch9": "3b7b7abf6e6941056da372db92d4b604cdf9a9db9c4871fc806d5dc5c695f5d6",
+    "timeline.csv.ch10": "3348d3b4d0ac65bbe2bc56faea9bfd424b6bf9f9a26dd19833be64789e26d214",
+    "timeline.csv.ch11": "7e45e57ec4d3dc09761d2e271b65efbf30a17ad7492b9fd09357f737a719ee25",
+    "timeline.csv.ch12": "49fd6ef2bf2e6cb6261d4612e08a6df95857eaa3f0b74724fb28eec509e00f0f",
+    "timeline.csv.ch13": "a30c4f9546a7e4b14560f7e965aab39719881551061495013bb82367354719ca",
+    "timeline.csv.ch14": "4c80710812f6973529d99cc8317a2fb5d88c4a95ae4bf9e802092f8be4979437",
+    "timeline.csv.ch15": "73088053e1221f0fcb935c1d3a89e1f38f3d438b773eae7d6c58bb52f649f58d",
+    "unified_gemv.csv.ch0": "b72a7aae9c14df653278ee9898e4d50eba1ca9bafce14589934fb8ba29e43f4a",
+    "unified_gemv.csv.ch1": "92129c9f70dcf5d9ec593756f85889e5c339cb5362b91d5ec0db8d9f5b38d4fa",
+    "unified_gemv.csv.ch2": "7e0ffeb39ed61fe6ff43a7ab136f16019847560a48a973da8360b3f8cb877c3d",
+    "unified_gemv.csv.ch3": "ccf90180087e203f04d3494b5de34ff046b850bab115de6c8e68d7e7eedf35ca",
+    "unified_gemv.csv.ch4": "8071b76d151a3beb3c8a4821ffaff1010795f72e78f13ebfd225254f52570b59",
+    "unified_gemv.csv.ch5": "2c14922d851ce7951147254b01a6985c051186c023787d86f0db755dd34361ad",
+    "unified_gemv.csv.ch6": "daef0533a8bedd1395f0bd411f1bc0a6ee97389baddd71f33f1bf1c25b1c4f01",
+    "unified_gemv.csv.ch7": "a0f3742f99f65acf9cfe52e5454e6da78c1eeb5f09d8def178fbb1589dca39b9",
+    "unified_gemv.csv.ch8": "1a374d2a9500a969d56b79c07cabdaf10be3360b0d3c6a64bf6bb171f5cf13cf",
+    "unified_gemv.csv.ch9": "57db86cb1bf94cd3f52c26ad8f7cf524f92b725329368a201d4632226eb77c41",
+    "unified_gemv.csv.ch10": "20d34dd22666dcfb1fa41f5bb8b6115261f7746b61f1101025ab0157feffb227",
+    "unified_gemv.csv.ch11": "f62b04b28651096a48a1c6e07ce9764ee9035bcecc27c36f07f48cf801bc78c4",
+    "unified_gemv.csv.ch12": "6e01e2db2031187a26331437ca66477ddaebb66e92730ef20dec5d64562148e0",
+    "unified_gemv.csv.ch13": "6f09af317fe72d2aaf6b230debd0c87e4ff968a83c9aaf8634713f4f2785c1e1",
+    "unified_gemv.csv.ch14": "fb50fd95ab9d0861cf339a9f7a060eb3ad5d8465d0b2d389c9fa17371c01705d",
+    "unified_gemv.csv.ch15": "8bb030cf2782db1e55299986e8957e565478f8c6694be9a7d53a5b0a34fa9654",
+    "staging_events.csv.ch0": "4afc703ee8461c9ba01bc57213067f4da1518f9d519c0e2c8b9c5f4c5a6da49c",
+    "staging_events.csv.ch1": "de621925939a32e4ace983bfec0da46fce8085fa4e51c83e710a21fd54034a00",
+    "staging_events.csv.ch2": "fddf3d85ea303ff19990319dbaf1b3435c49c9dfcc0652d13934a5208bb597ee",
+    "staging_events.csv.ch3": "7e9af91510570692318efb5650515e711177aeb169b2262b61f014d012c19565",
+    "staging_events.csv.ch4": "a13bc3977f31df9d37aacc81ddf9f33ba3b695726308ec719f1a3ec547ce65f2",
+    "staging_events.csv.ch5": "ce47120cb286d9b273d267f8c0c57bff52861d16d40e46bf1b9af3a8eecd3568",
+    "staging_events.csv.ch6": "b98c6f63bfc6d1caca8a021e1c637cfbf08767477448515daa0690d938333d05",
+    "staging_events.csv.ch7": "28066dc08cd2d5c087e218fb05fb3d0f723d48a53516e64cb00a270211cdc84c",
+    "staging_events.csv.ch8": "286f0c3cc0f349e6f401d537fe29f10537d57aaa9f65e86fbc9be1458cc03297",
+    "staging_events.csv.ch9": "fab59a811f6e3229f571b5405ce36fa3a006dde8a8c39b879477ecacb21d6051",
+    "staging_events.csv.ch10": "65f7a0eadc08f2e6406986d51fd90dfe2da935583e1921dd6e67416dab37be40",
+    "staging_events.csv.ch11": "c3a2cd9d89ce51e90be4f4495d5f0877bca07720979dfa8e4496f7d0df1919e7",
+    "staging_events.csv.ch12": "47c7862fae3325595233943ac44aacb1520463e9bb179e38c51ea0924bf6128e",
+    "staging_events.csv.ch13": "a6177844ee3e96720e380b78019b8e42b88eadd012b8c00a734770f82c6e0ae2",
+    "staging_events.csv.ch14": "d8a171c918bcf6c0c729750693d1d16850cfc20ca33def75666b267e6a82e6dd",
+    "staging_events.csv.ch15": "7c1cd4d88477891a8cf31b0ae5f5a69ccba26359ac4f57259865285ef926de6e",
+    "rank_ca_events.csv.ch0": "2499d5da661342596bec2484b251074a61d3fc2c6bb1940d27f35c0dd785d4f4",
+    "rank_ca_events.csv.ch1": "0801fef401afa29d9e0b74378dc10f3bc451a96bb4cbe6dfd5ea26ae6182d1a7",
+    "rank_ca_events.csv.ch2": "f138fb34aeafa62a29363b5660de5352774c3678bad69a33666f6db985392ac8",
+    "rank_ca_events.csv.ch3": "b742fac92284b72e15f2faeb56d941a18ff773c31a00a771485069b1ac73c74f",
+    "rank_ca_events.csv.ch4": "a528fac68c6e5d0f01d6324df416603354e673e76451151ed1b518c0d4992028",
+    "rank_ca_events.csv.ch5": "9f8f6cc87633146e84b7d7b0027a1ee8ead2ca4b6ff1499f1e95029380a48899",
+    "rank_ca_events.csv.ch6": "55508acce1000bffc0e4add54e22647cb52299aaa170836ce882cff71310ec25",
+    "rank_ca_events.csv.ch7": "ba59948e206395b4045891cf140d09470d55e1d1c0a1b6d60198705d0e2c7ca5",
+    "rank_ca_events.csv.ch8": "0aa11748d301a49459968091f1dd5e729f38a4379d0acca7a78f0bce783ce24f",
+    "rank_ca_events.csv.ch9": "7d52c721923304798078459fe79b994628a527bd70cd1223c55d9df03330e4f6",
+    "rank_ca_events.csv.ch10": "94f1e9fd4e3e077ada40d8228b6f20863ff55b59ef844c9c8b428178af422567",
+    "rank_ca_events.csv.ch11": "1cb4dc2f5467db43eb37f3cdad174bc359ea0f8c4205c3b3f0567485a90f3de0",
+    "rank_ca_events.csv.ch12": "67aec19baab7d94a889afe6c20be70fabebec15a346138f2f7b3f53664a4666f",
+    "rank_ca_events.csv.ch13": "a0218c25a02fdc035d2e160c682604c431dad89691c65f492e628284679bb6c2",
+    "rank_ca_events.csv.ch14": "afe39b82a03ea2b2ea01a03460c989509e7e13cefba38b5c135c695de04e9594",
+    "rank_ca_events.csv.ch15": "2a539aa3ad437d286b670d706326c2cb7b227fff81911a2039a6dfe884c33203",
+    "bgk_events.csv.ch0": "90f32ac056e407fb34a521ce477fef1be85af223512fc4c7e8071bfd1ab36dfe",
+    "bgk_events.csv.ch1": "78d51c660b90dd1a2d43b9d81f948c6178173dbdb2e321903c4c38c1b69a5e6d",
+    "bgk_events.csv.ch2": "00a65ddeb9d986e295138f5698ca8be72306c8f486824782223908f1518d1b1a",
+    "bgk_events.csv.ch3": "768ca0ec9b4c7a47e1655c5a32f495949a9b9c846bdcd9acb8724fde538af4af",
+    "bgk_events.csv.ch4": "af5a9ba4281fd5b0cf54e25f64095a915734ea2117bb00049ad45a150ca09c3c",
+    "bgk_events.csv.ch5": "087d474ff12641d376812115ca4f9924779a07ac3dbc27846f14e01b4374b45e",
+    "bgk_events.csv.ch6": "55c82ec642fd0e7515ced8b8f0b96c9805d33ec6de8578bbc931df1fcacd3968",
+    "bgk_events.csv.ch7": "e30c72eaa83e503916d025d3e59c1a71919c8d42854999b6bfb97e94eb8276e7",
+    "bgk_events.csv.ch8": "4bf8c624871c7a66e2c61937219f046d8d043facfd508f6879eba5dde6909843",
+    "bgk_events.csv.ch9": "43e0a24c0102250ee96182f57cbda9ca97019a0bc7fe15b9b65bf8a47e00655f",
+    "bgk_events.csv.ch10": "c5454b9da6cbe993943cb220563aa0cdd50a79c1b8950e394587ffc3ff0dc574",
+    "bgk_events.csv.ch11": "f796d57bccef4271743dc19f2500ee1583e970491bce79a35eb9e924a4221599",
+    "bgk_events.csv.ch12": "2cef2f7992f2522970010dde2721052f18c6fac030842647db289f8290b49bdd",
+    "bgk_events.csv.ch13": "6ccb6fc0dfd880291ac92c00be8a4cbd038911f85f5fd3f4b41f1b027a3fbc51",
+    "bgk_events.csv.ch14": "4d83a4753657477d11e7c1ad629be9f5e24fff321f0e6bda0e6b6c04855482b7",
+    "bgk_events.csv.ch15": "6e16107dcbe69edad0bb1e9d0de35b9066c7efb9efab9cbca7f3bdb4e162ecd7",
+    "v_cache.csv.ch0": "1d5cb658571efd73f0bc7f0adbe473018a506f97ea8aab0dfe08f89e068b8040",
+    "v_cache.csv.ch1": "0bb8fdbf813b8afcfc017d75ed53c31a2533f58f7771cd20914c72899bb1a987",
+    "v_cache.csv.ch2": "84942289688de225e855ab33e3e48394e549107a015f7299ab0216a59c7064d1",
+    "v_cache.csv.ch3": "8830e8d4930c50f3435755a818558bb85761e01509b622a4bb9e1efeea30d064",
+    "v_cache.csv.ch4": "5bbb228e58d22985f11fa902c23edf8db347854a6a5ed0859a7cd3b91be21b85",
+    "v_cache.csv.ch5": "a9e1214364e64aeb5a62852e6913f87b58a72788e03fa870921efb06bc66ee64",
+    "v_cache.csv.ch6": "4b470c793ee394ff92f773a286e1e87e59c3f38f3c7a71989904341c890dc27c",
+    "v_cache.csv.ch7": "cbbfe58db6ac87ca9690c31e19a74ede702ef91e25f64d82bfd1376f6d0f59cc",
+    "v_cache.csv.ch8": "24d43182b428d5d4db146861f7dbc168a8a5b707f12a9b36b6fc5b8f122a1d15",
+    "v_cache.csv.ch9": "6ae96a13078d1030e3a7f366ea46dc3d5298e11961fa9d8af9ff1c40d1ca31e1",
+    "v_cache.csv.ch10": "77f9edd40f4a36c6b339d778e11751481d03b03a56d2b843cf0071944b03f746",
+    "v_cache.csv.ch11": "4b62aa2424c1fe20f6140b0e9ce8dbb1a1156acf28a7f427fa4c49483be37ad4",
+    "v_cache.csv.ch12": "9a5c7ade006504b5b340226803ad146cb1b4353156a6518c987f7c4a222a4349",
+    "v_cache.csv.ch13": "821387bb2e43ae11d9d550b74a05085ec6dc200b3b5edff85df5f7583687243d",
+    "v_cache.csv.ch14": "0900d76f926ca030ed0dadaa95a8d7b2f0c4ce8bc62addb18659295779b89c62",
+    "v_cache.csv.ch15": "68b3c1cddb8443d377997bed9e437d48ad539b0d5f53d33d0e2ca5266e124b58",
+    "masked_events.csv.ch0": "a199c1bc2b9d10db7c4dfe9ce8d13c87d422ab636e254ec909740c1f23c59b7d",
+    "masked_events.csv.ch1": "b15d4f621818802da678b0634b81c0422e8aee83e9b5817898fcd9eda7052895",
+    "masked_events.csv.ch2": "26a439530ed1091263aa3d33a341f733dc661ea9d6fbbe06206f8953df9208dd",
+    "masked_events.csv.ch3": "b71b99222ce1a12bca022ba0e8cef4f5e78f1016962c5954f3eed22866e5fe32",
+    "masked_events.csv.ch4": "bdc3f80eeb9cd12f389623e7da30d1f57140c788ea7c1fa688ba0ba90395e06c",
+    "masked_events.csv.ch5": "064ffeb2201aca08f005954e1f6bbbd37b01e16915b155f7ca6eac65c3350c64",
+    "masked_events.csv.ch6": "d1e3ba1567913dfe08b5c7dbe8585c018e110becab92b5e3a22b525a477c2a4c",
+    "masked_events.csv.ch7": "926ee4e466fbcf2710bc3783d46ce4674b38704e295a1ab210254ab4098ba4af",
+    "masked_events.csv.ch8": "9e4d1d0cb7afca331ed3b4dd4ea0da4d41e6cade76565544c21da80747562f28",
+    "masked_events.csv.ch9": "41132612039a8a6809e47190424222c01af7fcd281345479e02a1323583ac6cd",
+    "masked_events.csv.ch10": "11a6d9348da3e9496feeb47821265b9d21c438f5d69a385110c4249a4d0e559b",
+    "masked_events.csv.ch11": "4107bf3c74054b1060f78f39cbd1232a4be0b02477b477e3072ebd51d2990636",
+    "masked_events.csv.ch12": "431e8e8e6b546d9718f9efe6a87204846c62d875645558817fb84b423a0ab6de",
+    "masked_events.csv.ch13": "3020a6b5683de45f131dba93aa62461333fa288bed90abc8ca0953f2b27c64bc",
+    "masked_events.csv.ch14": "a484aa62c9069114817d9d19fa4acbf34295374a8d042b1e992ab883d663818b",
+    "masked_events.csv.ch15": "3870f99eed3b15cf022916308e18c9015f33dae7dcf8a99107eb14ac470fa291",
+    "ffn_split.csv.ch0": "9093acbf28d16d14e8c0705294d03f1cc8ac96a2da924a39072a02035f88d31e",
+    "ffn_split.csv.ch1": "68644e637e1f310035e6d96bf98220c14b6626938200ec6ea2b3523f495e92ec",
+    "ffn_split.csv.ch2": "aff497b144f1a3913803860e012f862bc750eba27bc0eb246c85781b68b73326",
+    "ffn_split.csv.ch3": "1190fd1c72b2a970558170f306dd2613eb377844c985583796cf873ff66f1e6b",
+    "ffn_split.csv.ch4": "1632ab08f34ab7e9ad28740873c3a804f15a4c32faa33a2fd2deab83db8db9e2",
+    "ffn_split.csv.ch5": "ec08df719203f0ca3ead756fa50971ddbbb0535dbe6e8d55e992b0c11f92f979",
+    "ffn_split.csv.ch6": "58193fbf4e666ff0910553115c98c07409c511806251a6dbe7bd57d742ec41ea",
+    "ffn_split.csv.ch7": "184d35fb349cddfba676edb7b1e7c57f048cfea89825da67c8c761781ff605b5",
+    "ffn_split.csv.ch8": "40e665201b7404ff343bd2a78eb392a103f542902bbf1da7ada40e91093330e7",
+    "ffn_split.csv.ch9": "bd50c20b8ff6129bf5659d72b8283ae82b26031e2f84ce4c70468d687a148962",
+    "ffn_split.csv.ch10": "c0906fe30233fd3ad1146dc64c8e6d1ade2a34bf37dfb54228fc8adf8776e79d",
+    "ffn_split.csv.ch11": "65203bf9b9207055b570c572b317a87e71663357e7cecc713e95188d3664f8a2",
+    "ffn_split.csv.ch12": "3b2f774a58048ca10ff75701c42665a0848d9926a8393b1dae6489ead39769d2",
+    "ffn_split.csv.ch13": "5030e8fdf17a0d12b012431abf314d130502f9667d5bb6348836721a4f54e829",
+    "ffn_split.csv.ch14": "9495a37e3bc5ea464cc9e7b5e43c74394c9ca125418943ddfafcbfd13257e7b6",
+    "ffn_split.csv.ch15": "14be734661153e8a448439d9fad3588594698f55c242f7757fc8a352fcbfb6fb",
+    "frontend_dispatch.csv": "92d2f4546ce26768ba8dd11e6ddec40fda45fe29905b5873fc7207c2a3512eb0",
+    "channel_ingress.csv": "2547a59b426f48c98014accb5fe3b0ade03a23135b10cc4e25a7bfb38f972192",
+    "rank_descriptors.csv.ch0": "8aed2ac79c8b4624adaffe76fe5678c9069d812514b9b4797a576d53e5919e08",
+    "rank_descriptors.csv.ch1": "4a039d4cb3bd540e58f3414f9d0a8575a2f8504ffd81e7cd1318748fca5ff5de",
+    "rank_descriptors.csv.ch2": "c59a19c5a53394555b272e04d569bc7ceb84885933fd6e6ff780553b84e8cbf1",
+    "rank_descriptors.csv.ch3": "2afe84a11bba807d7d317639c457690ca8fef5d9290a9f10a63d4f0605a91f4f",
+    "rank_descriptors.csv.ch4": "5861a70845c2db08178a6a00b528189c068cedb8af191e23a614deaf22424fe7",
+    "rank_descriptors.csv.ch5": "19162222febf616595cbc04544b35cb221330b151ab5c50bb22f7ac130297225",
+    "rank_descriptors.csv.ch6": "79c986690fa77184723c048467154b8cd27219706f6ff9303816e601f8c9c9d4",
+    "rank_descriptors.csv.ch7": "6409a57e1958808c5f5adf9148df3e254b3b7cb32305efc0c0ef4c1c00191663",
+    "rank_descriptors.csv.ch8": "5ba9a5224c6212802d2d3fd0ea95487ad639eace03703fd921e9c19121d104c4",
+    "rank_descriptors.csv.ch9": "fe5b38ea55987148cafbaa805622dea327c2bfa6f14c3ede885ddb7010b763c4",
+    "rank_descriptors.csv.ch10": "9cf009319ee1044db582ecc9cf15c0d7f863c5d9b812ddf447ebe89b84931d51",
+    "rank_descriptors.csv.ch11": "70db5d046dbc99897e21db90004b353948316fb7a4c7d61ad013be08e38b7717",
+    "rank_descriptors.csv.ch12": "ca9999bf4b42f402bf6461602bfb151a087badf7867b96969351c23fac677b2c",
+    "rank_descriptors.csv.ch13": "a1ff557c56b1c384ca26dcea48b1e2e7aab53c9a098a430f04df664b25e885e0",
+    "rank_descriptors.csv.ch14": "e454d2d2578ef15331481a7971a87cfa2a4cfc872459accaad2a8e54ff60ddbe",
+    "rank_descriptors.csv.ch15": "afc1c1ae6817e5247274237c51b45af58c603bf8d1ae087fb460cc0b106898ff"
+  },
+  "numerical_compute": false,
+  "unmeasured": "GPU/nonlinear arithmetic and GPU contention",
+  "ffn_split": {
+    "status": "passed",
+    "data_banks": [
+      0,
+      4
+    ],
+    "compute_banks": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "input_SRF_bytes_per_bank": 1024,
+    "input_views": 2,
+    "input_view_bytes": 512,
+    "output_capacity_bytes_per_bank": 2048,
+    "no_extra_row_SRAM": true,
+    "GU_output_bytes_per_bank": 1216,
+    "Down_output_bytes_per_bank": 320,
+    "padding_MACs": 0,
+    "physical_regions_disjoint": true,
+    "passes": [
+      "gate",
+      "up",
+      "down"
+    ],
+    "ffn_overlap": true,
+    "whole_input_write_bytes": 2621440,
+    "local_input_read_bytes": 3145728,
+    "full_source_row_coverage": [
+      {
+        "channel": 0,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 0,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 0,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 1,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 2,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 3,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 4,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 5,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 6,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 7,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 8,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 9,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 10,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 11,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 12,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 13,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 14,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "gate",
+        "fully_read_rows": 16,
+        "fully_written_rows": 16,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "up",
+        "fully_read_rows": 16,
+        "fully_written_rows": 0,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      },
+      {
+        "channel": 15,
+        "operator": "down",
+        "fully_read_rows": 64,
+        "fully_written_rows": 64,
+        "columns_per_row": 64,
+        "bytes_per_row": 2048
+      }
+    ],
+    "overlap": [
+      {
+        "channel": 0,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 0,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 0,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 1,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 1,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 1,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 2,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 2,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 2,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 3,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 3,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 3,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 4,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 4,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 4,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 5,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 5,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 5,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 6,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 6,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 6,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 7,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 7,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 7,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 8,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 8,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 8,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 9,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 9,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 9,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 10,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 10,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 10,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 11,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 11,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 11,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 12,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 12,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 12,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 13,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 13,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 13,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 14,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 14,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 14,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      },
+      {
+        "channel": 15,
+        "operator": "gate",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 968,
+        "BCAST_issues_during_MAC": 968,
+        "LOCALRD_MAC_overlap_ck": 5153,
+        "LOCALRD_MAC_overlap_us": 4.833513999999999
+      },
+      {
+        "channel": 15,
+        "operator": "up",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1216,
+        "LOCALRD_issues_during_MAC": 964,
+        "BCAST_issues_during_MAC": 964,
+        "LOCALRD_MAC_overlap_ck": 5148,
+        "LOCALRD_MAC_overlap_us": 4.828824
+      },
+      {
+        "channel": 15,
+        "operator": "down",
+        "scalar_MACs": 4194304,
+        "MAC_commands": 1280,
+        "LOCALRD_issues_during_MAC": 3495,
+        "BCAST_issues_during_MAC": 3542,
+        "LOCALRD_MAC_overlap_ck": 17935,
+        "LOCALRD_MAC_overlap_us": 16.82303
+      }
+    ],
+    "useful_scalar_MACs": 201326592,
+    "source_SRF_peak_inflight_bytes": 224,
+    "data_source_cells_checked": 98304,
+    "output_packets_checked": 18432,
+    "input_source_identity_verified": true,
+    "Gate_X_stored_once_read_twice": true,
+    "data_compute_bank_isolation": true,
+    "numerical_compute": false,
+    "attention_prefix": {
+      "chain": {
+        "staging": {
+          "stages_checked": 16,
+          "staging_base_row": 256,
+          "external_input_bytes": 262144,
+          "internal_read_bytes": 262144,
+          "multicast_destination_bytes": 4194304,
+          "write_completion_checks": 8192,
+          "full_input_seal_checks": 16,
+          "source_read_to_precharge_checks": 2736,
+          "read_to_SRF_multicast_checks": 8192,
+          "source_fragment_to_MAC_weight_checks": 49152,
+          "external_input_bytes_unchanged": false,
+          "internal_read_and_broadcast_use_DQ": false,
+          "SRAM_bytes_per_bank": 1024,
+          "maximum_DRAM_staging_bytes_per_rank": 16384,
+          "reserved_DRAM_staging_bytes_per_rank": 131072,
+          "external_input_matches_independent_geometry": true,
+          "source_banks": [
+            0,
+            4
+          ],
+          "source_bank_groups": [
+            0,
+            1
+          ],
+          "staging_banks": 2,
+          "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+          "maximum_DRAM_staging_bytes_per_source_bank": 8192,
+          "source_last_reserved_row": 287,
+          "writer": {
+            "same_BG_spacing_checks": 8160,
+            "cross_BG_short_WR_pairs": 8064,
+            "minimum_cross_BG_WR_gap_ck": 2,
+            "issue_gap_histogram": [
+              {
+                "kind": "cross_BG",
+                "gap_ck": 2,
+                "count": 8064
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 4,
+                "count": 64
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 79,
+                "count": 48
+              }
+            ]
+          }
+        },
+        "batching": {
+          "input_batches_checked": 256,
+          "physical_input_capacity_bytes_per_bank": 1024,
+          "maximum_prefetched_input_bytes_per_bank": 1024,
+          "both_slots_ready_before_first_MAC": true,
+          "no_weight_row_switch_between_paired_fills": true,
+          "MAC_counts_and_reduction_order_preserved": true,
+          "row_command_counts": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 1,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 2,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 3,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 4,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 5,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 6,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 7,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 8,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 9,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 10,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 11,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 12,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 13,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 14,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            },
+            {
+              "channel": 15,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 33,
+              "weight_ACTAB": 54,
+              "refresh_commands": 7
+            }
+          ],
+          "first_two_batches_channel0": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 0,
+              "source_row": 256,
+              "input_begin_ck": 1370,
+              "last_input_issue_ck": 1528,
+              "both_slots_ready_ck": 1553,
+              "first_MAC_ck": 1579,
+              "last_MAC_complete_ck": 3201,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 4,
+              "view_bytes": 256,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            },
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 1,
+              "source_row": 256,
+              "input_begin_ck": 3241,
+              "last_input_issue_ck": 3399,
+              "both_slots_ready_ck": 3424,
+              "first_MAC_ck": 3450,
+              "last_MAC_complete_ck": 5339,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 4,
+              "view_bytes": 256,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            }
+          ],
+          "whole_SRF_bytes_per_bank": 1024,
+          "view_bytes_by_rows": {
+            "8": 256,
+            "16": 512
+          },
+          "full_batch_consumption_before_any_view_overwrite": true,
+          "all_views_ready_before_first_MAC": true
+        }
+      },
+      "pv": {
+        "staging": {
+          "stages_checked": 16,
+          "staging_base_row": 256,
+          "external_input_bytes": 253952,
+          "internal_read_bytes": 253952,
+          "multicast_destination_bytes": 4063232,
+          "write_completion_checks": 7936,
+          "full_input_seal_checks": 16,
+          "source_read_to_precharge_checks": 1072,
+          "read_to_SRF_multicast_checks": 7936,
+          "source_fragment_to_MAC_weight_checks": 7936,
+          "external_input_bytes_unchanged": false,
+          "internal_read_and_broadcast_use_DQ": false,
+          "SRAM_bytes_per_bank": 1024,
+          "maximum_DRAM_staging_bytes_per_rank": 15872,
+          "reserved_DRAM_staging_bytes_per_rank": 131072,
+          "external_input_matches_independent_geometry": true,
+          "source_banks": [
+            0,
+            4
+          ],
+          "source_bank_groups": [
+            0,
+            1
+          ],
+          "staging_banks": 2,
+          "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+          "maximum_DRAM_staging_bytes_per_source_bank": 8192,
+          "source_last_reserved_row": 287,
+          "writer": {
+            "same_BG_spacing_checks": 7904,
+            "cross_BG_short_WR_pairs": 7536,
+            "minimum_cross_BG_WR_gap_ck": 2,
+            "issue_gap_histogram": [
+              {
+                "kind": "cross_BG",
+                "gap_ck": 2,
+                "count": 7536
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 4,
+                "count": 80
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 79,
+                "count": 48
+              },
+              {
+                "kind": "cross_BG",
+                "gap_ck": 308,
+                "count": 16
+              },
+              {
+                "kind": "same_BG",
+                "gap_ck": 4,
+                "count": 240
+              }
+            ]
+          }
+        },
+        "batching": {
+          "input_batches_checked": 256,
+          "physical_input_capacity_bytes_per_bank": 1024,
+          "maximum_prefetched_input_bytes_per_bank": 1024,
+          "both_slots_ready_before_first_MAC": true,
+          "no_weight_row_switch_between_paired_fills": true,
+          "MAC_counts_and_reduction_order_preserved": true,
+          "row_command_counts": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 1,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 2,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 3,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 4,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 5,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 6,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 7,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 8,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 9,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 10,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 11,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 12,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 13,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 14,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            },
+            {
+              "channel": 15,
+              "stage_generation": 1,
+              "input_batches": 16,
+              "source_ACT2": 31,
+              "weight_ACTAB": 19,
+              "refresh_commands": 3
+            }
+          ],
+          "first_two_batches_channel0": [
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 0,
+              "source_row": 256,
+              "input_begin_ck": 55545,
+              "last_input_issue_ck": 55707,
+              "both_slots_ready_ck": 55732,
+              "first_MAC_ck": 55758,
+              "last_MAC_complete_ck": 56270,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 2,
+              "view_bytes": 512,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            },
+            {
+              "channel": 0,
+              "stage_generation": 1,
+              "batch": 1,
+              "source_row": 256,
+              "input_begin_ck": 56302,
+              "last_input_issue_ck": 56464,
+              "both_slots_ready_ck": 56489,
+              "first_MAC_ck": 56515,
+              "last_MAC_complete_ck": 57027,
+              "input_bytes_per_bank": 1024,
+              "refresh_commands_during_load": 0,
+              "view_count": 2,
+              "view_bytes": 512,
+              "source_rows": [
+                256
+              ],
+              "source_banks": [
+                0,
+                4
+              ]
+            }
+          ],
+          "whole_SRF_bytes_per_bank": 1024,
+          "view_bytes_by_rows": {
+            "8": 256,
+            "16": 512
+          },
+          "full_batch_consumption_before_any_view_overwrite": true,
+          "all_views_ready_before_first_MAC": true
+        }
+      }
+    }
+  },
+  "channel_ingress": {
+    "requests_checked": 274672,
+    "channel_count": 16,
+    "capacity_per_channel": 32,
+    "queue_high_water_by_channel": {
+      "0": 32,
+      "1": 32,
+      "2": 32,
+      "3": 32,
+      "4": 32,
+      "5": 32,
+      "6": 32,
+      "7": 32,
+      "8": 32,
+      "9": 32,
+      "10": 32,
+      "11": 32,
+      "12": 32,
+      "13": 32,
+      "14": 32,
+      "15": 32
+    },
+    "no_channel_FIFO_reordering": true,
+    "one_dispatch_per_channel_per_CK": true,
+    "completion_fences_checked": 96,
+    "global_barriers_checked": 98,
+    "peer_export_dependencies_checked": 128,
+    "peer_wait_events": 0,
+    "all_accepted_requests_complete": true
+  },
+  "rank_descriptors": {
+    "parent_descriptors_checked": 1664,
+    "fine_children_checked": 26624,
+    "children_per_descriptor": 16,
+    "parent_waits_for_all_children": true,
+    "one_global_CA_per_descriptor": true,
+    "fine_bank_operations_preserved": true,
+    "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+  },
+  "token_pv": {
+    "cache_base_bytes": 163840,
+    "cache_reserved_bytes_per_bank": 16384,
+    "physical_output_capacity_bytes": 2048,
+    "numerical_compute": false,
+    "output_exports_checked": 8192,
+    "local_cache": {
+      "packets": 4096,
+      "local_read_bytes": 131072,
+      "local_write_bytes": 131072,
+      "gathered_FP32_bytes": 131072,
+      "cast_BF16_bytes": 65536,
+      "external_DQ_bytes": 0,
+      "preserved_prefix_lanes": 4,
+      "suffix_lanes": 8,
+      "zero_padding_lanes": 4,
+      "source_columns": 48,
+      "store_ready_by_channel": {
+        "0": 34588,
+        "1": 34588,
+        "2": 34588,
+        "3": 34588,
+        "4": 34588,
+        "5": 34588,
+        "6": 34588,
+        "7": 34588,
+        "8": 34588,
+        "9": 34588,
+        "10": 34588,
+        "11": 34588,
+        "12": 34588,
+        "13": 34588,
+        "14": 34588,
+        "15": 34588
+      },
+      "numerical_compute": false
+    },
+    "PV": {
+      "projection_MAC_commands": 7936,
+      "scalar_MACs": 32505856,
+      "output_bytes_per_bank": 1024,
+      "input_bytes_per_rank": 15872,
+      "rank_partial_export_bytes": 262144,
+      "GPU_sum_elements": 32768,
+      "query_batches": 1,
+      "query_rows": 16,
+      "cache_preinstalled": false
+    }
+  },
+  "qkv_fusion": {
+    "logical_input_elements": 131072,
+    "projection_MAC_commands": 49152,
+    "scalar_MACs": 100663296,
+    "weight_bytes_per_bank": 98304,
+    "output_bytes_per_bank": 1536,
+    "physical_output_capacity_bytes": 2048,
+    "complete_Q_K_V_feature_coverage": true,
+    "numerical_compute": false
+  }
+}

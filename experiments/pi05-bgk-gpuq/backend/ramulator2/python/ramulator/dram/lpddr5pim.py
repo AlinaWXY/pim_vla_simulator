@@ -4,6 +4,64 @@ from ramulator.dram.lpddr5 import LPDDR5
 from ramulator.dram.spec import TimingConstraint
 
 
+def _masked_constraints(constraints):
+    """Extend the legacy table without changing any legacy command edge.
+
+    Masked activation/MAC retain shared rank and bank-group dependencies.
+    PREMASK keeps PREab's recovery duration, but array dependencies apply
+    only to the selected banks. Rank precharge spacing and refresh remain
+    shared with source-bank operations.
+    """
+    result = []
+    for tc in constraints:
+        preceding, following = list(tc.preceding), list(tc.following)
+        for ordinary, masked in (("ACTAB", "ACTMASK"), ("MACAB", "MACMASK")):
+            if ordinary in preceding:
+                preceding.append(masked)
+            if ordinary in following:
+                following.append(masked)
+        # ACTAB historically has no ACT1 phase. The new masked activation
+        # nevertheless shares the existing activation-power window with
+        # source-bank ACT1 and per-bank refresh; no legacy edge is removed.
+        if tc.shared_window and tc.latency == "nFAW" and "ACT1" in preceding:
+            preceding.append("ACTMASK")
+            following.append("ACTMASK")
+
+        def append(level, pre, post, latency):
+            result.append(TimingConstraint(
+                level, pre, post, latency, window=tc.window,
+                sibling=tc.sibling, shared_window=tc.shared_window,
+            ))
+
+        if "PREab" not in preceding + following:
+            append(tc.level, preceding, following, tc.latency)
+            continue
+        rank_array = tc.level == "Rank" and (
+            ("PREab" in following and tc.latency in (
+                "nRTP", "nRAS", "nCWL+nBL_min+1+nWR")) or
+            ("PREab" in preceding and tc.latency == "nRPab" and
+             any(c in following for c in ("ACT2", "ACTAB", "ACTHB", "ACTMASK")))
+        )
+        if rank_array:
+            append(tc.level, preceding, following, tc.latency)
+            append("Bank",
+                   ["PREMASK" if c == "PREab" else c for c in preceding],
+                   ["PREMASK" if c == "PREab" else c for c in following],
+                   tc.latency)
+        elif tc.level == "Bank" and "PREab" in preceding and tc.latency == "nRP":
+            # The legacy LOCALRD/LOCALWR table uses nRP for PREab. The new
+            # masked path explicitly retains the longer all-bank duration.
+            append(tc.level, preceding, following, tc.latency)
+            append("Bank", ["PREMASK"], following, "nRPab")
+        else:
+            if "PREab" in preceding:
+                preceding.append("PREMASK")
+            if "PREab" in following:
+                following.append("PREMASK")
+            append(tc.level, preceding, following, tc.latency)
+    return result
+
+
 def _pim_constraints(base=LPDDR5):
     # Reuse activation/refresh constraints, but NOT RD's external DQ/CAS
     # constraints. MACAB reads the local array without driving the DQ bus.
@@ -108,13 +166,13 @@ def _pim_constraints(base=LPDDR5):
         TimingConstraint("Bank", ["PREpb", "PREab", "PREHB"], ["LOCALRD"], "nRP"),
         TimingConstraint("Bank", ["REFpb", "REFab"], ["LOCALRD"], "nRFC"),
     ]
-    return constraints
+    return _masked_constraints(constraints)
 
 
 class LPDDR5PIM(LPDDR5):
     name = "LPDDR5PIM"
-    commands = LPDDR5.commands + ["ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD"]
-    command_cycles = {**LPDDR5.command_cycles, "ACTAB": 2, "ACTHB": 2}
+    commands = LPDDR5.commands + ["ACTAB", "MACAB", "WRGB", "RDRES", "ACTHB", "MACHB", "PREHB", "MACK", "MACQK", "LOCALWR", "LOCALRD", "ACTMASK", "PREMASK", "MACMASK"]
+    command_cycles = {**LPDDR5.command_cycles, "ACTAB": 2, "ACTHB": 2, "ACTMASK": 2}
     timing_params = LPDDR5.timing_params + [
         "nCCDAB", "nPIMWrLatency", "nPIMRdLatency", "nCCDK", "nCCDQK", "nLOCALWR",
     ]

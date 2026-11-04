@@ -1,0 +1,532 @@
+{
+  "status": "passed",
+  "case": "pv",
+  "horizon": 16,
+  "trace_and_native_address_coverage": true,
+  "native_data_commands_checked": 32000,
+  "array_open_row_checks": 142848,
+  "independent_MAC_order_checks": 7936,
+  "external_DQ_to_bank_fill_checks": 0,
+  "unified_gemv": {
+    "events_checked": 15904,
+    "operation_counts": {
+      "GEMV_MULTICAST": 7936,
+      "GEMV_MAC": 7936,
+      "GEMV_RELEASE": 32
+    },
+    "bank_generations_checked": 7936,
+    "physical_bank_releases": 512,
+    "maximum_destination_fanout": 16,
+    "input_bytes_per_bank": 1024,
+    "rank_full_input_SRAM_bytes": 0,
+    "independent_mask_reconstruction": true
+  },
+  "staging": {
+    "stages_checked": 16,
+    "staging_base_row": 256,
+    "external_input_bytes": 253952,
+    "internal_read_bytes": 253952,
+    "multicast_destination_bytes": 4063232,
+    "write_completion_checks": 7936,
+    "full_input_seal_checks": 16,
+    "source_read_to_precharge_checks": 1056,
+    "read_to_SRF_multicast_checks": 7936,
+    "source_fragment_to_MAC_weight_checks": 7936,
+    "external_input_bytes_unchanged": false,
+    "internal_read_and_broadcast_use_DQ": false,
+    "SRAM_bytes_per_bank": 1024,
+    "maximum_DRAM_staging_bytes_per_rank": 15872,
+    "reserved_DRAM_staging_bytes_per_rank": 131072,
+    "external_input_matches_independent_geometry": true,
+    "source_banks": [
+      0,
+      4
+    ],
+    "source_bank_groups": [
+      0,
+      1
+    ],
+    "staging_banks": 2,
+    "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+    "maximum_DRAM_staging_bytes_per_source_bank": 8192,
+    "source_last_reserved_row": 287,
+    "writer": {
+      "same_BG_spacing_checks": 7904,
+      "cross_BG_short_WR_pairs": 7568,
+      "minimum_cross_BG_WR_gap_ck": 2,
+      "issue_gap_histogram": [
+        {
+          "kind": "cross_BG",
+          "gap_ck": 2,
+          "count": 7568
+        },
+        {
+          "kind": "cross_BG",
+          "gap_ck": 4,
+          "count": 64
+        },
+        {
+          "kind": "cross_BG",
+          "gap_ck": 79,
+          "count": 48
+        },
+        {
+          "kind": "same_BG",
+          "gap_ck": 4,
+          "count": 240
+        }
+      ]
+    }
+  },
+  "input_batching": {
+    "input_batches_checked": 256,
+    "physical_input_capacity_bytes_per_bank": 1024,
+    "maximum_prefetched_input_bytes_per_bank": 1024,
+    "both_slots_ready_before_first_MAC": true,
+    "no_weight_row_switch_between_paired_fills": true,
+    "MAC_counts_and_reduction_order_preserved": true,
+    "row_command_counts": [
+      {
+        "channel": 0,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 1,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 2,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 3,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 4,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 5,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 6,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 7,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 8,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 9,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 10,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 11,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 12,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 13,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 14,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      },
+      {
+        "channel": 15,
+        "stage_generation": 1,
+        "input_batches": 16,
+        "source_ACT2": 32,
+        "weight_ACTAB": 18,
+        "refresh_commands": 3
+      }
+    ],
+    "first_two_batches_channel0": [
+      {
+        "channel": 0,
+        "stage_generation": 1,
+        "batch": 0,
+        "source_row": 256,
+        "input_begin_ck": 1368,
+        "last_input_issue_ck": 1530,
+        "both_slots_ready_ck": 1555,
+        "first_MAC_ck": 1581,
+        "last_MAC_complete_ck": 2093,
+        "input_bytes_per_bank": 1024,
+        "refresh_commands_during_load": 0,
+        "view_count": 2,
+        "view_bytes": 512,
+        "source_rows": [
+          256
+        ],
+        "source_banks": [
+          0,
+          4
+        ]
+      },
+      {
+        "channel": 0,
+        "stage_generation": 1,
+        "batch": 1,
+        "source_row": 256,
+        "input_begin_ck": 2125,
+        "last_input_issue_ck": 2287,
+        "both_slots_ready_ck": 2312,
+        "first_MAC_ck": 2338,
+        "last_MAC_complete_ck": 2850,
+        "input_bytes_per_bank": 1024,
+        "refresh_commands_during_load": 0,
+        "view_count": 2,
+        "view_bytes": 512,
+        "source_rows": [
+          256
+        ],
+        "source_banks": [
+          0,
+          4
+        ]
+      }
+    ],
+    "whole_SRF_bytes_per_bank": 1024,
+    "view_bytes_by_rows": {
+      "8": 256,
+      "16": 512
+    },
+    "full_batch_consumption_before_any_view_overwrite": true,
+    "all_views_ready_before_first_MAC": true
+  },
+  "split_activation": {
+    "status": "passed",
+    "nAAD_ck": 8,
+    "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+    "ACT1_commands": 640,
+    "ACT2_commands": 640,
+    "paired_ACT2": 640,
+    "cancelled_ACT1": 0,
+    "pending_ACT2_at_end": 0,
+    "minimum_gap_ck": 1,
+    "maximum_gap_ck": 1,
+    "gap_histogram_ck": {
+      "1": 640
+    },
+    "maximum_pending_by_channel": {
+      "0": 1,
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1
+    },
+    "classifications": {
+      "ordinary": {
+        "ACT1": 128,
+        "paired_ACT2": 128,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 128
+        }
+      },
+      "staging": {
+        "ACT1": 512,
+        "paired_ACT2": 512,
+        "late_ACT2": 0,
+        "cancelled": 0,
+        "pending_at_end": 0,
+        "gap_histogram_ck": {
+          "1": 512
+        }
+      }
+    },
+    "violation_count": 0,
+    "violations": {},
+    "violations_by_kind": {},
+    "examples": [],
+    "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+  },
+  "rank_controller": {
+    "command_intervals_checked": 67600,
+    "rank_command_coverage": 42480,
+    "global_CA_resources": 16,
+    "rank_CA_resources": 32,
+    "transfer_broadcast_compute_share_rank_CA": true,
+    "no_CA_interval_overlap": true,
+    "coarse_fragment_descriptors_checked": 496
+  },
+  "ffn_streams": null,
+  "serial_continuity": null,
+  "native_external_DQ_bytes": 516096,
+  "native_command_counts": {
+    "ACT1": 640,
+    "ACT2": 640,
+    "WR": 7936,
+    "PREpb": 576,
+    "LOCALRD": 7936,
+    "PREab": 304,
+    "ACTAB": 288,
+    "MACAB": 7936,
+    "REFab": 96,
+    "RDRES": 8192
+  },
+  "trace_sha256": "8afcd872de2bc1e38f80e3f77aa301731bdbebc437cf6ad6b6a108578d812cca",
+  "native_sha256": {
+    "timeline.csv.ch0": "6780700cd97e337d58d545bc50e68aa58c4a2ea8c1e7030a592077cfb641810a",
+    "timeline.csv.ch1": "49d09bc80604b8605eb8cfa9c90e58e911aa994230027464a2797de58e6dd773",
+    "timeline.csv.ch2": "2e51cf081a4eb63b2f6086ac014d3a79dab4a0388881159d9bbaefa130712e5a",
+    "timeline.csv.ch3": "c47fd5a293f971237a98401f4ce56639b8b031d7543259e78b90eefc7ff0c2c8",
+    "timeline.csv.ch4": "1ea59d045f268f221a72589d6bab354c76d8a69458eaebe782df98ba7b80aec2",
+    "timeline.csv.ch5": "13e4205adcefd8fd3e46ff46e20bfb00325d7bd99c294a9966fccfa16d738cfe",
+    "timeline.csv.ch6": "63a83f6bc8da3ce362b2aba8a9ae6b2ac4bd49f031fc5a39df9e9bc1793211fb",
+    "timeline.csv.ch7": "5f4e30d5d1f3abe5820d1db4b3402a398092fb1d3eaf58f87954d57d80eaef54",
+    "timeline.csv.ch8": "ce9796be68af53cdbd3da8b48f46a905078dc89287b8b1cb49f41912a46be423",
+    "timeline.csv.ch9": "49fba0999c75abdb85d2baa03d69f57a85f7a1fd0fa439df7ecc2d98f91721d5",
+    "timeline.csv.ch10": "c434da52367043eef438f24eb6f2d55d6daaa0224850b917bed514cc957ebaaf",
+    "timeline.csv.ch11": "cacf43837c49af4063bfd7cb3f407fe19a36c945bb342365171629750ef9a402",
+    "timeline.csv.ch12": "5b33ff85eb204f15e11ff8f1e7271be6e66ed13e1f813e506ddb6af3e8d29f77",
+    "timeline.csv.ch13": "81f1aec3b675c911891e4fd52ffd0d576e49d76f02c1f37cc7dce70f1c63dec6",
+    "timeline.csv.ch14": "24171bc97d82adbf1b64e79244676dd3f6dde6c516be29a61b2e391b28fa7305",
+    "timeline.csv.ch15": "e7aaeb57cc23257e6ec69ca741c8a5acc6a029bdd6561aaa88e04e024d11edf5",
+    "unified_gemv.csv.ch0": "ddd2661be4ce2930e6100761373db21ed15863f93a897cffb8f570d756c1f716",
+    "unified_gemv.csv.ch1": "e177b21c52312bc3c772d24ad8657d384da4d30592dba57b0f793dfad49ec477",
+    "unified_gemv.csv.ch2": "f1ddf60b0dcecbc382b96586ecbea741b705253464733580f0f9c7b2189603d6",
+    "unified_gemv.csv.ch3": "8d6b032de4221ed362059ebf93a977cafbc3af45acec7c571441d9cc08fd5cf8",
+    "unified_gemv.csv.ch4": "a7dc48fb4e5034189e92561270a6410944e6baef6b34074b9ae30400f5036129",
+    "unified_gemv.csv.ch5": "58e4a421e1e995f80a8950348ca4c09fe5f2fc6885954969b8f13800064639a3",
+    "unified_gemv.csv.ch6": "83c417359b64b8baa80c98d6f0094184e780f19be4d2ebd8f74cde5a5555b5c4",
+    "unified_gemv.csv.ch7": "4024e956ca288ece6371f57289e3e2b3a2c22dac135ba222816480545f3b79f0",
+    "unified_gemv.csv.ch8": "8ee8e7f291d325377cb4574b5d27040332cd9de93d57f204a43f3b8e1338ec6d",
+    "unified_gemv.csv.ch9": "de93e734ef8bbfde066f5db14237fda27138984ba85a97df56e308b109936d95",
+    "unified_gemv.csv.ch10": "9ce9aae5e01b5e1248d3ceb486e0949fe3db2cb4ad9cdf9ddfd32028ddff2ca7",
+    "unified_gemv.csv.ch11": "c13c598fdc28d1c9c481974b9d44769929b7b387eb1ff9096d0c7c4ba2f94b20",
+    "unified_gemv.csv.ch12": "944c57a6862c948ea642305a11e520f79f40ee9205ba3e91eed1010a6eef20a7",
+    "unified_gemv.csv.ch13": "4c461a965e9c3bcd75ce6a9e24972199bd26194265b269e7a1a087cef067cbcc",
+    "unified_gemv.csv.ch14": "0832d811d6d50186905af86b2faf515f113f5c373adff56c912c6f77537f7204",
+    "unified_gemv.csv.ch15": "45df49b153d46151de600f5085c70a54b66d3f89f06ebf232922b76119174de1",
+    "staging_events.csv.ch0": "8755e37b8013834609ff208381e2086499b9c02a6fabe92262353e706ba4ce63",
+    "staging_events.csv.ch1": "dca486b9f0bd8837ca07b002e3a8e5282840f8225f860755e6337fea77b970eb",
+    "staging_events.csv.ch2": "8edc4c1e9ec4dd62313e98816f2df2ebf52a980e7576059e75f1dd2929b69c1f",
+    "staging_events.csv.ch3": "feeaec5345f20cebc3ac793453aed3be29ce460480de8a855cfe071a0bf6ff81",
+    "staging_events.csv.ch4": "2906c7b2a130b4aa37827f829627860c6b1e6726f3f97601a978f8fa7345578c",
+    "staging_events.csv.ch5": "9482d8f21c51d8a4d93a87fdd67720a6dcebd4c79d0228b199d764338bb55f54",
+    "staging_events.csv.ch6": "c110f4da108722a39f7d452ad79b7846945f3a1dbb9995e329df35c76a823e44",
+    "staging_events.csv.ch7": "32f53b4abd306eb2fc5f7cb1c8eb37945d1ca1588e3a967b63b3caaec654ac51",
+    "staging_events.csv.ch8": "2c0e0baf62de8ebad6f8e8e8e6a1e27b4c0a974e4d8b90ee15024e42deed3bd1",
+    "staging_events.csv.ch9": "7d987b97a4f8d385fc2aa5a810e3ca348c59619871f9cf84828bffe80576572f",
+    "staging_events.csv.ch10": "af7b78073fa7dc03bf1c46b8f81867f84c07ad0351dae75633c2c280ea05cfd9",
+    "staging_events.csv.ch11": "fb811b884f764ec67665e23034e3f1d5f3b223e45a83d68eac18c961a078de3b",
+    "staging_events.csv.ch12": "5711e0bad22f9b189c887686e3b89139b14d8461150c10f13a33332fde33ee2e",
+    "staging_events.csv.ch13": "ce16f2c6ecb511a8676cdc58591e998df826b03a67d9ee70f0883706b5d5e7b8",
+    "staging_events.csv.ch14": "665d9f43d9407424e1bb0c74a42cd00027ec2bc21da9432dd87198d6211a321a",
+    "staging_events.csv.ch15": "f5c1f2b2527cff116ccb7bbeda7d9b61491e2f674a403c19e6c1368e1270a753",
+    "rank_ca_events.csv.ch0": "fec1e19c82891755916f41f78253400e53789f34593438c91e9761a4ca24fc39",
+    "rank_ca_events.csv.ch1": "e1ff25ec9db178dfce3f03583bc4bef4c8c39b026f5e3c28e1a068297f64602a",
+    "rank_ca_events.csv.ch2": "260d75fd245c768f8654e9c9235e1ab4b880a69ae138458641c674ca9ead7643",
+    "rank_ca_events.csv.ch3": "3ae801e78251d78c46c45ba99023f4d5a808d2f1f9b6a1231e412b0d7abaf514",
+    "rank_ca_events.csv.ch4": "02862a5acbdf3321f0dc21afcc5243283c6e98603ca75d4b754e946b865fbd5d",
+    "rank_ca_events.csv.ch5": "01184454c04313855407a6adb2471a0a3cdf0eacb3302de6412898ff7b6f29ee",
+    "rank_ca_events.csv.ch6": "032b410c8363a6e63d9f8308b021b647e9c24bcd5743536489fb9a4fb311fe53",
+    "rank_ca_events.csv.ch7": "451eb982dcf9359eb9af60f47eb9fba08aea60dedb3bfe464578e338c9ad1373",
+    "rank_ca_events.csv.ch8": "73fa6d8282fe076fc519db5932adf5965024ea4ad0535aa7d7ee7bb42022f055",
+    "rank_ca_events.csv.ch9": "31cb1ee9d25a82c06a9486bfe457418a0d5c337831cf0e1f44aa579e9f8b3f5e",
+    "rank_ca_events.csv.ch10": "936313b3206045c52179ba79b236bff74f5567c1e020ce4ed68ad8936a86bf9d",
+    "rank_ca_events.csv.ch11": "c7cbc03ed1eb6ae4ba401986aa93fe2854bec2e9d5ca760e491e7999c7f4e391",
+    "rank_ca_events.csv.ch12": "e9bc391acb72d7e41790d1a8e3e17bf8038c9a0183ec370214649b93ef69616f",
+    "rank_ca_events.csv.ch13": "2fc052006e4a1145d399ad52e2eeaa9ec8f0c177336480106dc14d5ca5ebd23f",
+    "rank_ca_events.csv.ch14": "d019c44eaf4801d91f759d8cb5d8b82f0b082ab503b9c8367a7fe9cfc45f4ad4",
+    "rank_ca_events.csv.ch15": "09db2c32fc2f9d85c3cb50ffb0d89e4c904cc5cddea6af22d8b112b77803a944",
+    "bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch3": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch4": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch5": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch6": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch7": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch8": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch9": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch10": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch11": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch12": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch13": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch14": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "bgk_events.csv.ch15": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+    "v_cache.csv.ch0": "1c142aeff8d70c52bec7e06d2e9a1be17f3b19ddf6344c8e997d6bfd538d5eb5",
+    "v_cache.csv.ch1": "1d4071f7c0dab606448adbfc722a99e7aebd81b5dea086912c915f200c5b3a9b",
+    "v_cache.csv.ch2": "54dd7182910ef78026614923748dd76600d50c967785856d3e2e46072c00a261",
+    "v_cache.csv.ch3": "1243f9ef99d83bcf73260b0cc41135205800f5553c77faff113439115fd8960a",
+    "v_cache.csv.ch4": "2ab8a4e8004f542749b4594fe23fef5f9fb6c936ad4ca9c71661a30d07e98443",
+    "v_cache.csv.ch5": "6f85c5dd08ce6c6f0e44b02c7508042bc54fe9e232cdc7eade8be12dcaa4418d",
+    "v_cache.csv.ch6": "0ccd68fc08068fdb02d6841fa8725ba28b071060a2f42839f9e07a1df4ca73e8",
+    "v_cache.csv.ch7": "834c22b5fe54167b46ead0a85e3218772a0f0bca59a6adbbc3e4c404911f552b",
+    "v_cache.csv.ch8": "9d4ffbd126635efdea594df11826a95e289cff01526acef3aa3c9a0a18b854b8",
+    "v_cache.csv.ch9": "1675a03d93e6f5dea585ed052535ff21e7b9d2a68464061ebd352bcf968030b3",
+    "v_cache.csv.ch10": "96bb56f19684fbda9aba4c86426e8b6105434d26b94b046a470957aca2921402",
+    "v_cache.csv.ch11": "847c765503bc10a7143b980161f4cfee81ec5df2c89046fc9eee1819f5b31b68",
+    "v_cache.csv.ch12": "0abac24903446406e079b4d637a65386617a304fc170c77bcc6db0bb7767b0bd",
+    "v_cache.csv.ch13": "f98e88417269e02b0f50058ab1eadba435fec334ab729fa940237ecf2527e92a",
+    "v_cache.csv.ch14": "afab57fee17cda53380afb932800be93ee0802a9ec52018b9c3f7f9532a48239",
+    "v_cache.csv.ch15": "4ee9562cc1e3f2644557fe1d49cd0d000ac0490825658228b6afde28ac397472",
+    "frontend_dispatch.csv": "94698b928e56ef2ea1592fed2a48fee99540785fc2bcbeb28844bcb3bbc7b82c",
+    "channel_ingress.csv": "a130dd46cc6bfee602581ad17876556c9b2aaf0b57a49c2a04f9dcde31ee4234",
+    "rank_descriptors.csv.ch0": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch1": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch2": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch3": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch4": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch5": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch6": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch7": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch8": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch9": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch10": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch11": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch12": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch13": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch14": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+    "rank_descriptors.csv.ch15": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7"
+  },
+  "numerical_compute": false,
+  "unmeasured": "GPU/nonlinear arithmetic and GPU contention",
+  "channel_ingress": {
+    "requests_checked": 24624,
+    "channel_count": 16,
+    "capacity_per_channel": 32,
+    "queue_high_water_by_channel": {
+      "0": 32,
+      "1": 32,
+      "2": 32,
+      "3": 32,
+      "4": 32,
+      "5": 32,
+      "6": 32,
+      "7": 32,
+      "8": 32,
+      "9": 32,
+      "10": 32,
+      "11": 32,
+      "12": 32,
+      "13": 32,
+      "14": 32,
+      "15": 32
+    },
+    "no_channel_FIFO_reordering": true,
+    "one_dispatch_per_channel_per_CK": true,
+    "completion_fences_checked": 5,
+    "global_barriers_checked": 7,
+    "peer_export_dependencies_checked": 0,
+    "peer_wait_events": 0,
+    "all_accepted_requests_complete": true
+  },
+  "rank_descriptors": {
+    "parent_descriptors_checked": 0,
+    "fine_children_checked": 0,
+    "children_per_descriptor": 16,
+    "parent_waits_for_all_children": true,
+    "one_global_CA_per_descriptor": true,
+    "fine_bank_operations_preserved": true,
+    "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+  },
+  "token_pv": {
+    "cache_base_bytes": 163840,
+    "cache_reserved_bytes_per_bank": 16384,
+    "physical_output_capacity_bytes": 2048,
+    "numerical_compute": false,
+    "output_exports_checked": 8192,
+    "PV": {
+      "projection_MAC_commands": 7936,
+      "scalar_MACs": 32505856,
+      "output_bytes_per_bank": 1024,
+      "input_bytes_per_rank": 15872,
+      "rank_partial_export_bytes": 262144,
+      "GPU_sum_elements": 32768,
+      "query_batches": 1,
+      "query_rows": 16,
+      "cache_preinstalled": true
+    }
+  }
+}

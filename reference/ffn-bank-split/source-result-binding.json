@@ -1,0 +1,87 @@
+{
+  "status": "passed",
+  "native_job": 1908477,
+  "baseline_commit": "7d2730dadc0b5610c6635e800d5d306bfb4164a6",
+  "archived_baseline_job": 1904762,
+  "fresh_modes": [
+    "before",
+    "legacy",
+    "db1",
+    "db2",
+    "no-overlap1",
+    "no-overlap2",
+    "serial1",
+    "serial2"
+  ],
+  "fresh_cases": 24,
+  "raw_files_checked": 2896,
+  "source_files_checked": 533,
+  "source_snapshot_sha256": "e106b9596b3ff8a3cd100f8e70a8ca9431bd7a529468e29bddb24218d896a817",
+  "uploaded_source_archive_sha256": "0758520accdc6ddfe047c9a6fbdb3bde6c3cce2cc9b8a82afb64fe53660aff2c",
+  "raw_evidence_archive_sha256": "99f1ebabd66698733c661701a7c785e246bca2b2db5120156eb464f39306d75b",
+  "comparison_sha256": "c65a3600efbeb17dc39f9d625e452e4165a03fde1adc63552f8b59cf1f7c2fdb",
+  "comparison_code_sha256": "ca75a00c10622830815c55cf8ebd382a6e6da19d140b4cd0833a3bd560122d1d",
+  "baseline_and_legacy_exactly_reproduce_1103": true,
+  "same_native_library_for_all_1104_modes": true,
+  "all_source_inventories_verified": true,
+  "provenance_sha256": {
+    "before": "19088087611fc385fbc315614dd9b060b74bc1c7abff5d4ed445be61fa09461b",
+    "legacy": "cea7de770b88e802ae6596a3145821479417e72754781b50c82703572951149b",
+    "db1": "78ebfda92d517a45cd331548846e846b7034611168e792809fce26fc2bcd972a",
+    "db2": "0a54ababb8cb6989452388c74ed4cc9cfffe9f8c0fd194837c70b37501231aed",
+    "no-overlap1": "7c2b3421696c120024d474ab3b85e797d3f0d2ffc8eb7746840dbd15ac04c2db",
+    "no-overlap2": "f1a596a5e175a0d717eb9dd79e91eb6ed7463594d4b53a828572089a1c719304",
+    "serial1": "991612ecb674d2284c13f891c093f1cdd60ec4cec36333c6970e9b682f5c0105",
+    "serial2": "b26d40d31c5accbca2836d54e5005c23576c88d19f0ea92a105db3061a48c92d"
+  },
+  "evidence_sha256": {
+    "before": {
+      "summary.json": "377f566c1ba33727e834936005604faf4bdef25e669622a2f9db33023db2fcf5",
+      "gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+      "down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+      "combined_timing_chain/native-audit.json": "ea7ecfb41e9ee376e2413685553d074abb34d2713d2ceab5025a069e5cec01b9"
+    },
+    "legacy": {
+      "summary.json": "7560f6f660dccffd39a602e61871583174b28f3d00d88e96e1a2bed158910cc2",
+      "chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
+      "v/native-audit.json": "866a86129ad3c03829f9967aa1bcfe93aa4c9df08bf7611a85a7f6ca8e27776e",
+      "pv/native-audit.json": "da1b0624ef94398e462f3a04760b1255c9a8a42d325524ecb6f3ca1781065f5b",
+      "gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+      "down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+      "combined_timing_chain/native-audit.json": "ea7ecfb41e9ee376e2413685553d074abb34d2713d2ceab5025a069e5cec01b9",
+      "serial_layer_control/native-audit.json": "2a3bfa9219f8c9edac9de8e278e65ddb9b8fa64460fc6e19ac08d8d6fff6a064"
+    },
+    "db1": {
+      "summary.json": "f535b5b927baa88ff9c56ab4f417e8ad89cbb7db28e3d631a676bcd1988be7ec",
+      "gate_up_gpu/native-audit.json": "579b5da8f99fa5967f56bbd31bfdf55e6e9c6acbb732b568d13d3576d2132d9c",
+      "down_gpu_input/native-audit.json": "ed9b8def91306cd9ffb75cdf1a96f590fb9465e523ff40e0cece785c3c136caf",
+      "combined_timing_chain/native-audit.json": "1ee301a7c1addd0bbd3159acae4e58b9e618184630d0ce75fadf6592cdcb1925"
+    },
+    "db2": {
+      "summary.json": "06ab9acfbde6294735f36d941f1e1fa019533edd697a0d4c1903b06fcd38155d",
+      "gate_up_gpu/native-audit.json": "2c7cbfe7b2343ca195bb919b6f5e9c54d8d42c71f59c3475d3ccdd63a97ddc2f",
+      "down_gpu_input/native-audit.json": "d035c6fe75002fe0b45c2e1bd186c29c5df69169160a19759738353962d56163",
+      "combined_timing_chain/native-audit.json": "32326c3074a64d047fc89ae4ff47ac4c611fe4f5e616ba447f5c9a8b5c785e53"
+    },
+    "no-overlap1": {
+      "summary.json": "f533b6bf45deb6c4c0db87ee449877fa3b294af5240f2b62a790471d3dc4e5e7",
+      "gate_up_gpu/native-audit.json": "29843e98f1042eb5c5ea6d6ec823742af8a34230186c7bd0006d30a52bb69aa8",
+      "down_gpu_input/native-audit.json": "cb1da5917a0eea2b25a8e5fb9aee7029bc8f9e30fa7001b0a2de1aa2f6c912eb",
+      "combined_timing_chain/native-audit.json": "f6da81c371d137b5d8cebbd16653ffdad850191275ca8a42500f4d94fd6c55b0"
+    },
+    "no-overlap2": {
+      "summary.json": "f1fed85e4794d8fe8a674b3947359ae3562fafb52c042b279525516b03cb0e1a",
+      "gate_up_gpu/native-audit.json": "c1448b66c9132fb020f3143bdf5017e57d05778f58876664cfcd262dc82b9f76",
+      "down_gpu_input/native-audit.json": "fbc65183873a02414290fec37d386868b53c24a3532b7398e1b79fc6161cb166",
+      "combined_timing_chain/native-audit.json": "0aa2bb01072dc92718dbc01d7e99fd2898df60be8c9b62448a32ac6267c71711"
+    },
+    "serial1": {
+      "summary.json": "9e14c12121d9b5139af21dcb55542287f48674356cd04fcd9ad2c6130814088f",
+      "serial_layer_control/native-audit.json": "f0ce29c34e1528377761852d27bb0fe8ee34a86cb35cf2aeed6e14185a978595"
+    },
+    "serial2": {
+      "summary.json": "994613e455ff867736862adec261fbc0902be23611b52abcc822a80d4618f34f",
+      "serial_layer_control/native-audit.json": "281a463efebcd73556944a2d8fc367abf57f48e085c3ac9e510a15f6ab17b185"
+    }
+  }
+}

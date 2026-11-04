@@ -17,6 +17,10 @@ def _targets(event, bank):
     if int(event["Channel"]) != channel or int(event["Rank"]) not in (-1, rank):
         return False
     command = event["command"]
+    if command in ("ACTMASK", "PREMASK", "MACMASK"):
+        if "bank_mask" not in event:
+            raise AssertionError("Masked ACT audit requires bound physical bank masks")
+        return bool(int(event["bank_mask"]) & (1 << (group*4+local_bank)))
     if command in ("PREab", "REFab", "ACTAB", "MACAB", "MACK", "MACQK"):
         return True
     bg, b = int(event["BankGroup"]), int(event["Bank"])
@@ -100,6 +104,8 @@ def audit_act2(native, timings, *, staging_events=(), strict=True, max_examples=
     events = sorted(enumerate(native), key=lambda pair: (int(pair[1]["Channel"]), int(pair[1]["clock"]), pair[0]))
     for _, event in events:
         command, clock = event["command"], int(event["clock"])
+        if command in ("ACTMASK", "PREMASK", "MACMASK") and "bank_mask" not in event:
+            raise AssertionError("Masked ACT audit requires bound physical bank masks")
         bank = _bank(event)
         channel = bank[0]
         if command in ("ACT1", "ACT2"):
@@ -142,7 +148,7 @@ def audit_act2(native, timings, *, staging_events=(), strict=True, max_examples=
             if command.startswith("REF") and pending_by_channel[channel]:
                 owner = pending[min(pending_by_channel[channel])]
                 fail("refresh_while_channel_ACT2_pending", event, owner)
-            closing = command.startswith(("PRE", "REF")) or command in ("RDA", "WRA", "ACTAB", "ACTHB")
+            closing = command.startswith(("PRE", "REF")) or command in ("RDA", "WRA", "ACTAB", "ACTHB", "ACTMASK")
             for target in sorted(pending_by_channel[channel]):
                 if not _targets(event, target):
                     continue
@@ -151,7 +157,7 @@ def audit_act2(native, timings, *, staging_events=(), strict=True, max_examples=
                     fail("pending_ACT1_cancelled", event, owner)
                     counts["cancelled"] += 1
                     by_kind[owner["kind"]]["cancelled"] += 1
-                elif command in ("RD", "WR", "LOCALRD", "LOCALWR", "MACAB", "MACHB", "MACK", "MACQK"):
+                elif command in ("RD", "WR", "LOCALRD", "LOCALWR", "MACAB", "MACHB", "MACK", "MACQK", "MACMASK"):
                     fail("target_bank_access_before_ACT2", event, pending[target])
     for owner in pending.values():
         fail("pending_ACT2_at_end", owner=owner)
