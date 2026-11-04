@@ -24,6 +24,10 @@ int gemv_offset(const Request& r) const {
 }
 int gemv_columns(const Request& r) const {
   const int off=gemv_offset(r);
+  if(off>=786432 && off<819200) {
+    if(!m_o_projection) throw std::runtime_error("O weights require pim_o_projection");
+    return 32;
+  }
   if (off>=393216 && off<491520) {
     if(!m_qkv_fusion) throw std::runtime_error("Fused QKV address requires pim_qkv_fusion");
     return 48;
@@ -47,6 +51,7 @@ int gemv_columns(const Request& r) const {
 }
 int gemv_weight_base(const Request& r) const {
   const int off=gemv_offset(r);
+  if(off>=786432 && off<819200) return 786432+(off-786432)/16384*16384;
   if (off>=393216 && off<491520) return 393216;
   if (off>=163840 && off<180224) return 163840;
   if (off>=131072 && off<163840) return 131072;

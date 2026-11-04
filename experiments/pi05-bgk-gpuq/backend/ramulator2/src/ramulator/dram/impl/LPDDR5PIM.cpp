@@ -115,6 +115,14 @@ class LPDDR5PIM : public DRAMSpec {
         Command::WRGB,      // PIM_Q_REMOTE -> WRGB
         Command::LOCALWR,   // PIM_Z_STORE -> LOCALWR
         Command::LOCALRD,   // PIM_Z_LOAD -> LOCALRD
+        Command::LOCALRD,   // PIM_GEMV_RELEASE: controller-only
+        Command::LOCALRD,   // PIM_STAGE_BEGIN: controller-only
+        Command::LOCALRD,   // PIM_STAGE_SEAL: controller-only
+        Command::LOCALRD,   // PIM_STAGE_LOAD
+        Command::LOCALRD,   // PIM_STAGE_FRAGMENT
+        Command::LOCALWR,   // PIM_SCORE_SPILL: composite local store
+        Command::LOCALWR,   // PIM_PV_SPILL: composite local store
+        Command::LOCALRD,   // PIM_O_REWIND: controller-only
     };
 
     // Runtime config (organization, timing values, timing constraints)

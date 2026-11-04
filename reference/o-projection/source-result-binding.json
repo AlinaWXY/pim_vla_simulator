@@ -1,0 +1,214 @@
+{
+  "branch": "xinyao_1104_O_Projection",
+  "parent_revision": "8764996de08741f248746b7094830360f666fbe6",
+  "jobs": {
+    "original_tests": 1924380,
+    "data_and_legacy": 1924418,
+    "assertion_retry": 1928781,
+    "post_validation": 1928795,
+    "archive": 1928796
+  },
+  "measured_native_library_sha256": "7079c3cde34f9ff2c5614639f3ee9fe42545e710822f52ed550489c4ed75965b",
+  "native_and_adapter_sources_byte_identical": true,
+  "measured_source_snapshot_sha256": "d5185c3485a61ca96ca7272eed20b68242cb724f405e342343697cd837777c01",
+  "measured_provenance_sha256": "95a3ecff40d4a8d840a36d333ef97e187d1aaf5bef644f1c6b6ef89eeddc9fbb",
+  "post_measurement_changes": {
+    "experiments/pi05-unified-gemv/compare_o_projection.py": {
+      "measured_sha256": "f63225a193e702a8b01fd20463cc7af6ccd41a7f5efdd2efcea07fa7941ee113",
+      "published_sha256": "d1b97d67d7215dc9006c4003a2a2762d8fa894b662ff2f2e46cf86da4e2576a5",
+      "reason": "Clarify scope in plots/tables; add serial-control interaction."
+    },
+    "experiments/pi05-unified-gemv/O-PROJECTION.md": {
+      "measured_sha256": "a280fe0270e70fdd880628b167d1145d6fbd6eb6bba701f2245357bcb1874259",
+      "published_sha256": "a74f1277a5f1e861cffd908035ae57005f6995726908aee417504729da85b5ed",
+      "reason": "Document complete resident Wo copies and interpretation."
+    },
+    "experiments/pi05-unified-gemv/run-o-projection.sbatch": {
+      "measured_sha256": "262a15f9bc3ec74a645b711a9389b6ebeffcc3df07cc983845c4a8dab09d3065",
+      "published_sha256": "505646e17a53038c073b29858a3d5e20aa6859f788925f88bf742fd11d73ffb7",
+      "reason": "Increase future job limit to one hour."
+    },
+    "experiments/pi05-unified-gemv/validate_o_projection_results.py": {
+      "measured_sha256": "341e72c0e4a1bd58c6db142592e04d31f33cd6a6e006a9cc85dd8763c5a3a73e",
+      "published_sha256": "5378fd2466b729925bdef056d0ee017585f87a9d5a7d6067876613fda7bac88b",
+      "reason": "Bind split validation evidence and legacy native/source identity."
+    },
+    "experiments/pi05-unified-gemv/source/o_projection_layout.py": {
+      "measured_sha256": "f8ec6d0b3aba89ac379a937e8f92247682eebbaa1bfeb4906cf9beba5017cda1",
+      "published_sha256": "23eaa9620fe9d54606feb9373ffb8e41336ff9e52a9df4f3386d0c94fae5cd1b",
+      "reason": "Add complete dormant Wo residency; preserve every active address."
+    },
+    "experiments/pi05-unified-gemv/validation/audit_o_projection.py": {
+      "measured_sha256": "9253704287b388d50649a56cc30f40c68356cb9bdde2d613093718969a5d2fe2",
+      "published_sha256": "a476247daefef25cdde698135eeeea078c37de1aabc1eff2b0c5d460200dd954",
+      "reason": "Add scratch and staging generation lifetime checks."
+    },
+    "experiments/pi05-unified-gemv/validation/new_o_native_guards.py": {
+      "measured_sha256": "a6cf4e4963a633a83bad5097064a7351e295c2e368f27147b0dd45907b19e67d",
+      "published_sha256": "dee8d18550f5ba2f7157aee0a663a8f2e781ec27fb3cf05b90b6e85b89312f7e",
+      "reason": "Correct one expected exception text; actual invariant already rejected trace."
+    },
+    "experiments/pi05-unified-gemv/validation/test_audit_o_projection.py": {
+      "measured_sha256": "4e002fca72caea7ba824039e605037edb8c2d0306f3e182e6e0b2072ee4f550c",
+      "published_sha256": "2d75032a7d6444370846eac899b5d65ad9b8768610319325d67816fa517065bb",
+      "reason": "Add mutation tests for new audit invariants."
+    },
+    "experiments/pi05-unified-gemv/validation/test_o_weight_residency.py": {
+      "measured_sha256": null,
+      "published_sha256": "cdecc5460a0db3f4434364e4366fb5deb88959a05ef46a1be64fa0a9aa1bdc59",
+      "reason": "Prove full resident weight mapping and active address compatibility."
+    }
+  },
+  "generated_by_native_build": {
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5.py": {
+      "prebuild_sha256": "09d27ccaa9655f9f34eb0526824b7ee77b0a02a471840e5b3a77ac771ae41d5c",
+      "measured_and_published_sha256": "2b4de0458a4cb0f27b487b31986f63f5f576dea76f31b44f5494092fde4c08c8"
+    },
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": {
+      "prebuild_sha256": "95d0c21aeebe51636e5279911affa94f743cca6f7cafbdc5e237bd3d3adbc72b",
+      "measured_and_published_sha256": "d6de98b77719d6fb512de460dd666d2b02e549424305c6713edd555570ef5fdb"
+    },
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/dram/impl/LPDDR5XPIM.cpp": {
+      "prebuild_sha256": "82860c863a87ac531e8240fee41c12eaf5bbb088ded445d854ba3f4b5c256717",
+      "measured_and_published_sha256": "232fac454221a64bd72f84133a6b0003950500fb99eef064a20c7a44cfab1f70"
+    }
+  },
+  "exact_issued_traces_and_native_configurations": 20,
+  "legacy_exact_trace_cycles_and_native_events": 5,
+  "final_unit_tests": 141,
+  "native_guards": {
+    "legacy": 52,
+    "score": 8,
+    "o_projection": 13
+  },
+  "guard_retry_record": "tests/assertion-correction.json",
+  "supplemental_validation": "postchecks/summary.json",
+  "weights": {
+    "resident_bytes": 67108864,
+    "active_bytes": 8388608,
+    "initialization_simulated": false,
+    "note": "Complete resident layout added after measurement; active addresses and all measured commands/configurations unchanged."
+  },
+  "raw_artifact_directory": "../../results/o-projection-1924418",
+  "archives": {
+    "metadata-1924418.tar.gz": {
+      "bytes": 4299087,
+      "sha256": "75e3dc29b32d3358fa35a66b5b843a449e67b49de60073c8af61d47f679a1ef6"
+    },
+    "raw-native-1924418.tar.gz": {
+      "bytes": 374233261,
+      "sha256": "49c87b5d7b8cc86e1c2f1ac4fdce5b408a126f348cd9a528497ec0b088852b52"
+    }
+  },
+  "final_result_sha256": {
+    "archive-manifest.json": "0236644d2c3dbc6aa6a1da62103932e131e14065d20b21e11a7969f5063a82c0",
+    "both/chain/native-audit.json": "6dc69761ecf74d29f5daea9566a3a80394693c2a9e98a63e1449b28d0c340f8d",
+    "both/chain/summary.json": "b3b3bcb40e4d950f15db38b921b7d0059fe89f5e9f4ab1bf811796d74a024a48",
+    "both/channel-analysis.json": "77399e6ae400326acf44df66bbfadede4c9068f1c3129bdb9bd928fcf86dd1bc",
+    "both/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "both/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "both/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "both/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "both/pv/native-audit.json": "31a665c453d61d763d1f6b1ee4e0e0d37c477d883e83a7636a365d8f5bc96f66",
+    "both/pv/summary.json": "c4a6114abda2be955916fa067b176f101d3e70c4b7f2870d394b8428b926ba1c",
+    "both/serial_layer_control/native-audit.json": "51695dc1bd3014c123ea223ea50e272521e67122347d1610fe834e3ec0fee116",
+    "both/serial_layer_control/summary.json": "9cd97e77afd16ea98534bd6524fd065068254103ff56c7b47f67daa4e7a9ae99",
+    "both/summary.json": "805ba5f33cbbb290b1bb640bdddfa9c218d0894fdb24f08ec3ac523173419b6e",
+    "build-generated/lpddr5.py": "2b4de0458a4cb0f27b487b31986f63f5f576dea76f31b44f5494092fde4c08c8",
+    "build-generated/lpddr5_pim.py": "d6de98b77719d6fb512de460dd666d2b02e549424305c6713edd555570ef5fdb",
+    "build-generated/LPDDR5XPIM.cpp": "232fac454221a64bd72f84133a6b0003950500fb99eef064a20c7a44cfab1f70",
+    "channel-comparison.csv": "79db04327fa9eb24035fb59fc576ddbd727a32b190b5cca86164e64528708420",
+    "comparison.csv": "cce86ba61fc7c5e09f3290baa96eaae66a02ecd3f38d43aa032aa99fa5a97209",
+    "comparison.json": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115",
+    "COMPARISON.md": "2ef5cc23cb9dcbb0e69c44b14b907ffd90baf6e3500925f6c2a2851699b8a80c",
+    "latency-dq-breakdown.pdf": "812da04126b4194dc925628ba61a01f1d3d77005b8f21b85471eb91fe112a860",
+    "latency-dq-breakdown.png": "b9be9a4cd6661745f6e1294b279fa80fecce9efa237f5e8353048a9214044bd3",
+    "legacy/chain/manifest.json": "59238663c8979d781965ebf583a9aa49a47569abd4aae72cd44d4618c2f5c71d",
+    "legacy/chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
+    "legacy/chain/summary.json": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55",
+    "legacy/channel-analysis.json": "b1159bed184a8d05157b70179392d345a768b9cc9979e766af2ae88937eeadb0",
+    "legacy/down_gpu_input/manifest.json": "46e7fc99130a355b9aeda2f4c864f4bcf272d968b56b428bb1d935e1aa030887",
+    "legacy/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "legacy/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "legacy/gate_up_gpu/manifest.json": "c5e955e588ce1cdf11dc51986e8ed55da3b65402e6e15efdf8de8d483fa545dc",
+    "legacy/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "legacy/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "legacy/provenance.json": "779c84eec0eeef54d5c75483ac0c56fe6454d680eeedbe7247e63dda21567bd5",
+    "legacy/pv/manifest.json": "056b8a89f37587c081c058461be71da93dd53696840224bf8a0402f54a344870",
+    "legacy/pv/native-audit.json": "da1b0624ef94398e462f3a04760b1255c9a8a42d325524ecb6f3ca1781065f5b",
+    "legacy/pv/summary.json": "3221a9a44f81fc5b7283298865b9094a334ff3a32b0b9479b0f5ecffa25623ae",
+    "legacy/serial_layer_control/manifest.json": "d69acb96d9d1a01305e2d34258c9d028590792bb24d4b2efb88aa7f790411944",
+    "legacy/serial_layer_control/native-audit.json": "2a3bfa9219f8c9edac9de8e278e65ddb9b8fa64460fc6e19ac08d8d6fff6a064",
+    "legacy/serial_layer_control/summary.json": "63385dbecce2cfc541a49f8f87702983a8f960464706b585ff35289b8b8bd8cf",
+    "legacy/summary.json": "5983a114a2bef0ac0657254830a8e4fed2257afc112e04db9143c0dc441563bc",
+    "measured-source-manifest.json": "d5185c3485a61ca96ca7272eed20b68242cb724f405e342343697cd837777c01",
+    "neither/chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
+    "neither/chain/summary.json": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55",
+    "neither/channel-analysis.json": "937d7097620f30e9bf03def95206a8ebf3571f3f96720b4ec447aa4b0e9cc301",
+    "neither/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "neither/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "neither/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "neither/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "neither/pv/native-audit.json": "a4f71347e80dae2cb27da510828a8688eb043b7bb4070355bc5e48e2059497a7",
+    "neither/pv/summary.json": "054a37d391838307b380c45828dc0fc8bb99ff4d7f1361a08c69e980fb533283",
+    "neither/serial_layer_control/native-audit.json": "5c31f8175bd9e556252fc5e5d01dcffa7549ea6cb007a1362393c299810a73b9",
+    "neither/serial_layer_control/summary.json": "3e9c6a12167cd2838416307c71b9239ba43fa0fd3ce85513fc25c5d40007818e",
+    "neither/summary.json": "fc5e6d66abe80d89c924bfad00218d39697932d5375513d500e6ac4d34777320",
+    "o-projection-layout.json": "153d954d64ce1ea6c4be3bcbc58cd8fd97c7370c10954ff815498376ff34832f",
+    "oproj_only/chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
+    "oproj_only/chain/summary.json": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55",
+    "oproj_only/channel-analysis.json": "2a2886089e7735932e645cfad8862b886f5eb34a1dd71c050c068698af96abdb",
+    "oproj_only/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "oproj_only/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "oproj_only/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "oproj_only/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "oproj_only/pv/native-audit.json": "31a665c453d61d763d1f6b1ee4e0e0d37c477d883e83a7636a365d8f5bc96f66",
+    "oproj_only/pv/summary.json": "c4a6114abda2be955916fa067b176f101d3e70c4b7f2870d394b8428b926ba1c",
+    "oproj_only/serial_layer_control/native-audit.json": "6c04aa26a51f9e17fd668dd6e09986a4f35d8618a5f771015135fe01455a3923",
+    "oproj_only/serial_layer_control/summary.json": "49e8ea1df2c6d0ff4747a1319d52bc86a2e0440c1661084a455c0aa4fd85eef1",
+    "oproj_only/summary.json": "727e4871fad1147ba948334c441a486ee73604413ef157fa7e6dfff49e47e011",
+    "phase-comparison.csv": "096b1087c4887da882d69a9a9d90afa4c706e0d066b06579416a90ac613e15c3",
+    "post-update-manifest.json": "aa8b82a3f7a2f1bf39250631538a85edbd637a9ddeb7482aba1a7f04415c5d4c",
+    "postchecks/compare.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "postchecks/result-validation.log": "c16e3dacd7eed42536aa1091afc4a5138ef5a8662f6825d8fe98810f0dae4d74",
+    "postchecks/summary.json": "858a298cc342106d9db025c70c4d330af1a7fed31987e610fff36bac0190c649",
+    "postchecks/unit-tests.log": "2867dc340fccb5e7c9979309130a19e23465ca3afafef534bd8f1a7dcdc3176e",
+    "provenance.json": "95a3ecff40d4a8d840a36d333ef97e187d1aaf5bef644f1c6b6ef89eeddc9fbb",
+    "qkt-dq-timeline.png": "e775b97ddccade500988ccb0eb31b30458dbcc261a91040136182316ada20f0a",
+    "REPORT.zh-CN.md": "cfdb6cfee2cc37b33b9136332b63f29d4b2b3856651892cccfce99802b64d186",
+    "score_only/chain/native-audit.json": "6dc69761ecf74d29f5daea9566a3a80394693c2a9e98a63e1449b28d0c340f8d",
+    "score_only/chain/summary.json": "b3b3bcb40e4d950f15db38b921b7d0059fe89f5e9f4ab1bf811796d74a024a48",
+    "score_only/channel-analysis.json": "038510771af654ff13f459cd1ed94ab8698bd0c2ffed0e1dbb15fac1f5caaf98",
+    "score_only/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "score_only/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "score_only/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "score_only/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "score_only/pv/native-audit.json": "a4f71347e80dae2cb27da510828a8688eb043b7bb4070355bc5e48e2059497a7",
+    "score_only/pv/summary.json": "054a37d391838307b380c45828dc0fc8bb99ff4d7f1361a08c69e980fb533283",
+    "score_only/serial_layer_control/native-audit.json": "d4a7cdc53f298fd985bd57a6996ce81353c66cb3620ffae8a690a9b11e03dad3",
+    "score_only/serial_layer_control/summary.json": "468af7ad0fab6e2aca764b828ff59711c0452a8b1c9f7eefefc00e7ac337322d",
+    "score_only/summary.json": "7f0036b4f04953085c56071029002c00a69a1033b84f71d0346b0cd92f2bd515",
+    "stage-comparison.csv": "baf8defd5dbd16a2a0c4466c0a7e3416b5369fdce69e13bd5b4d0b4efa992fd9",
+    "summary.json": "eb857742c69b4b5715281424c6e12e15d27c1776da589ce0cfb166845a745165",
+    "tests/assertion-correction.json": "226c77dc9cea83033979ba778694eeb2a3af711c7ff3981bafe3be57daef6e67",
+    "tests/drivers/guard-retry-1928781.log": "745c8e8b9165a4d855f2657e43d2f1e3e43acb95dce29e6ae33e77ccbf6b8e56",
+    "tests/drivers/op-guard-evidence.py": "ad5e5aa7e043451896b850c213aaeaebb9ac83289098af95c55dcf6935f68b8c",
+    "tests/drivers/op-guard-retry.py": "7efecf92a7f4e016afe97478e8c1c7bef5b641340c96d8b5223d96373b626d69",
+    "tests/drivers/op-guard-retry.sbatch": "344054b606bedf0697820be962df4875cf66a88401deccafd3aa0da2c7f1c568",
+    "tests/evidence-assembly.json": "48cabfa0bf237028349e930d11bb84f8559a6998573de0e3266e6237d6a37e25",
+    "tests/legacy-native-guards/summary.json": "39e2515385c4eeac9fd7437a3d5278a3eeebfce448df004a4d7b3f21fced5dc1",
+    "tests/o-native-guards/summary.json": "95d20f1bfd89c78b7152ec2a9ab00c819dd6912308e05c9a574549f0d2ddf2fb",
+    "tests/o-native-guards-corrected/summary.json": "95d20f1bfd89c78b7152ec2a9ab00c819dd6912308e05c9a574549f0d2ddf2fb",
+    "tests/original/case-result.json": "de936ef09b95c3d61d39b5acf58993a8d7a05f038b150d2fd18a00b997b0f63d",
+    "tests/original/suite-runner.log": "e3dcdd2135126fbb1ee0bceec4ff749e4adbbe818fcf32470b5b069f63979a55",
+    "tests/original/summary.json": "e3dcdd2135126fbb1ee0bceec4ff749e4adbbe818fcf32470b5b069f63979a55",
+    "tests/original/worker.log": "0e35e98866f31580826b949e0422c836c9423cf003ff0147a63c84fa3cfb0313",
+    "tests/provenance.json": "f00ab34b8046908eaf9d13bf57af4d3ef380283d95670233e79e0dcbd2a73c60",
+    "tests/retry-case/case-result.json": "ef2d17e43135655004c6c09a40718881a7b322ca7d26fb74fff0cc9a4b43a0eb",
+    "tests/retry-worker.log": "c9a8c2fb5f84bf1eafe957fe8ca408393e17a90b4ca71517879985274fdf58bc",
+    "tests/runner-logs/unit-tests.log": "277a0a5c88cae60dd31bcd04dc1f148d566335aaba683d1ad4dc2b0c1d3fc296",
+    "tests/score-native-guards/summary.json": "9ddd62bf8a3db313e033451387de6a09f15963479b5628ab9c00b6a539cf0cba",
+    "validation.json": "04fa6a56830838564c69b89a2e07675f23eddb5409ebe1351735ea2c6df59acc"
+  },
+  "final_source_manifest_sha256": "b9c6435639c1768ab9ea7eee43aa786873684eef9d241427aae157845ef789da"
+}

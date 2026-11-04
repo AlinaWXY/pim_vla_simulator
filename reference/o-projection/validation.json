@@ -1,0 +1,2760 @@
+{
+  "status": "passed",
+  "legacy_regression": {
+    "chain": {
+      "exact_timing": true,
+      "exact_trace": true,
+      "exact_native_events": true,
+      "memory_cycles": 53850,
+      "latency_us": 50.511300000000006
+    },
+    "pv": {
+      "exact_timing": true,
+      "exact_trace": true,
+      "exact_native_events": true,
+      "memory_cycles": 15940,
+      "latency_us": 14.95172
+    },
+    "gate_up_gpu": {
+      "exact_timing": true,
+      "exact_trace": true,
+      "exact_native_events": true,
+      "memory_cycles": 50243,
+      "latency_us": 47.127934
+    },
+    "down_gpu_input": {
+      "exact_timing": true,
+      "exact_trace": true,
+      "exact_native_events": true,
+      "memory_cycles": 62571,
+      "latency_us": 58.691598
+    },
+    "serial_layer_control": {
+      "exact_timing": true,
+      "exact_trace": true,
+      "exact_native_events": true,
+      "memory_cycles": 183327,
+      "latency_us": 171.960726
+    }
+  },
+  "native_guards": {
+    "legacy-native-guards": {
+      "passed": true,
+      "case_count": 52,
+      "subprocess_isolation": true,
+      "native_cases": [
+        {
+          "case": "missing_token",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "requires every token and lane",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV MAC requires every token and lane in every target bank",
+          "worker_returncode": 0
+        },
+        {
+          "case": "duplicate_token",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "overwrite before full fragment consumption",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV overwrite before full fragment consumption",
+          "worker_returncode": 0
+        },
+        {
+          "case": "overwrite_incomplete_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "overwrite before full fragment consumption",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV overwrite before full fragment consumption",
+          "worker_returncode": 0
+        },
+        {
+          "case": "release_incomplete_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "release of unconsumed input fragment",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV release of unconsumed input fragment",
+          "worker_returncode": 0
+        },
+        {
+          "case": "operator_switch_without_release",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Unified GEMV MAC column order or operator switch before release",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV MAC column order or operator switch before release",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Down_missing_GPU_token",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "requires every token and lane",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV MAC requires every token and lane in every target bank",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Down_wrong_weight_column",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "column order or operator switch",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV MAC column order or operator switch before release",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Down_release_incomplete_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "release of unconsumed input fragment",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV release of unconsumed input fragment",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Down_overwrite_incomplete_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "overwrite before full fragment consumption",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV overwrite before full fragment consumption",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Q_held_ordinary_write",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Q slot held until PIM_GEMV_RELEASE",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV Q slot held until PIM_GEMV_RELEASE",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Q_fill_without_projection_release",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Q fill requires explicit release",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV Q fill requires explicit release of projection slot",
+          "worker_returncode": 0
+        },
+        {
+          "case": "QKT_missing_query",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Unified QKT missing query/lane coverage",
+          "exception_type": "RuntimeError",
+          "message": "Unified QKT missing query/lane coverage",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Q_release_before_scan",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Q release requires completed 496-token K scan",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV Q release requires completed 496-token K scan",
+          "worker_returncode": 0
+        },
+        {
+          "case": "QKT_then_V_reuses_same_slot",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 37873,
+          "native_audit": {
+            "QKT": {
+              "events_checked": 53040,
+              "operation_counts": {
+                "GEMV_MULTICAST": 8192,
+                "GEMV_MAC": 32768,
+                "GEMV_RELEASE": 48,
+                "GEMV_Q_LOCAL": 2048,
+                "GEMV_Q_REMOTE": 2048,
+                "GEMV_QK": 7936
+              },
+              "bank_generations_checked": 16640,
+              "physical_bank_releases": 768,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "V": {
+              "events_checked": 25,
+              "operation_counts": {
+                "GEMV_MULTICAST": 16,
+                "GEMV_MAC": 8,
+                "GEMV_RELEASE": 1
+              },
+              "bank_generations_checked": 16,
+              "physical_bank_releases": 16,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "same_bank_slot_reused": true,
+            "generation_continues_without_reset": true,
+            "single_native_simulation": true,
+            "refresh_enabled": true,
+            "native_refresh_commands": 288
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Down_GPU_input_complete",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 128,
+          "native_audit": {
+            "events_checked": 21,
+            "operation_counts": {
+              "GEMV_MULTICAST": 16,
+              "GEMV_MAC": 4,
+              "GEMV_RELEASE": 1
+            },
+            "bank_generations_checked": 16,
+            "physical_bank_releases": 16,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true,
+            "external_fill_checks": 16
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_missing_write_at_seal",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging seal requires every declared input write",
+          "exception_type": "RuntimeError",
+          "message": "staging seal requires every declared input write",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_load_before_seal",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging load requires sealed input",
+          "exception_type": "RuntimeError",
+          "message": "staging load requires sealed input",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_wrong_source_bank",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging requires rank1 bank0",
+          "exception_type": "RuntimeError",
+          "message": "staging requires rank1 bank0",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_duplicate_write",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "duplicate staging write",
+          "exception_type": "RuntimeError",
+          "message": "duplicate staging write",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_out_of_bounds_load",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging load address outside payload",
+          "exception_type": "RuntimeError",
+          "message": "staging load address outside payload",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_rebegin_before_consume",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging overwrite before full consumption",
+          "exception_type": "RuntimeError",
+          "message": "staging overwrite before full consumption",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_complete_Down_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 304,
+          "native_audit": {
+            "events_checked": 21,
+            "operation_counts": {
+              "GEMV_MULTICAST": 16,
+              "GEMV_MAC": 4,
+              "GEMV_RELEASE": 1
+            },
+            "bank_generations_checked": 16,
+            "physical_bank_releases": 16,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true,
+            "rank_controller": {
+              "command_intervals_checked": 82,
+              "rank_command_coverage": 56,
+              "global_CA_resources": 1,
+              "rank_CA_resources": 1,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 1
+            },
+            "minimum_staged_read_issue_gap_ck": 4,
+            "staged_read_latency_ck": 25,
+            "different_tokens_pipeline_before_prior_read_completion": true,
+            "external_input_bytes": 512,
+            "internal_read_bytes": 512
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_mixed_fragment_rows",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging mixed source fragments",
+          "exception_type": "RuntimeError",
+          "message": "staging mixed source fragments",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_wrong_weight_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging source/weight fragment mismatch",
+          "exception_type": "RuntimeError",
+          "message": "staging source/weight fragment mismatch",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_wrong_token_rows",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging token rows do not match operator",
+          "exception_type": "RuntimeError",
+          "message": "staging token rows do not match operator",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_slot_Down_batch",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 496,
+          "native_audit": {
+            "events_checked": 42,
+            "operation_counts": {
+              "GEMV_MULTICAST": 32,
+              "GEMV_MAC": 8,
+              "GEMV_RELEASE": 2
+            },
+            "bank_generations_checked": 32,
+            "physical_bank_releases": 32,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true,
+            "rank_controller": {
+              "command_intervals_checked": 156,
+              "rank_command_coverage": 108,
+              "global_CA_resources": 1,
+              "rank_CA_resources": 1,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 2
+            },
+            "minimum_staged_read_issue_gap_ck": 4,
+            "staged_read_latency_ck": 25,
+            "different_tokens_pipeline_before_prior_read_completion": true,
+            "external_input_bytes": 1024,
+            "internal_read_bytes": 1024,
+            "input_batching": {
+              "input_batches_checked": 1,
+              "slots_per_bank": 2,
+              "slot_capacity_bytes": 512,
+              "physical_input_capacity_bytes_per_bank": 1024,
+              "maximum_prefetched_input_bytes_per_bank": 1024,
+              "both_slots_ready_before_first_MAC": true,
+              "no_weight_row_switch_between_paired_fills": true,
+              "MAC_counts_and_reduction_order_preserved": true,
+              "row_command_counts": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "input_batches": 1,
+                  "source_ACT2": 0,
+                  "weight_ACTAB": 1,
+                  "refresh_commands": 0
+                }
+              ],
+              "first_two_batches_channel0": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "batch": 0,
+                  "source_row": 256,
+                  "input_begin_ck": 192,
+                  "last_input_issue_ck": 316,
+                  "both_slots_ready_ck": 341,
+                  "first_MAC_ck": 367,
+                  "last_MAC_complete_ck": 495,
+                  "input_bytes_per_bank": 1024,
+                  "refresh_commands_during_load": 0
+                }
+              ]
+            }
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_three_fragments_overflow",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging overwrite before full consumption",
+          "exception_type": "RuntimeError",
+          "message": "staging overwrite before full consumption",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_bank_Down_batch",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 434,
+          "native_audit": {
+            "events_checked": 42,
+            "operation_counts": {
+              "GEMV_MULTICAST": 32,
+              "GEMV_MAC": 8,
+              "GEMV_RELEASE": 2
+            },
+            "bank_generations_checked": 32,
+            "physical_bank_releases": 32,
+            "maximum_destination_fanout": 16,
+            "input_bytes_per_bank": 1024,
+            "rank_full_input_SRAM_bytes": 0,
+            "independent_mask_reconstruction": true,
+            "rank_controller": {
+              "command_intervals_checked": 160,
+              "rank_command_coverage": 110,
+              "global_CA_resources": 1,
+              "rank_CA_resources": 1,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 2
+            },
+            "minimum_staged_read_issue_gap_ck": 2,
+            "staged_read_latency_ck": 25,
+            "different_tokens_pipeline_before_prior_read_completion": true,
+            "external_input_bytes": 1024,
+            "internal_read_bytes": 1024,
+            "input_batching": {
+              "input_batches_checked": 1,
+              "slots_per_bank": 2,
+              "slot_capacity_bytes": 512,
+              "physical_input_capacity_bytes_per_bank": 1024,
+              "maximum_prefetched_input_bytes_per_bank": 1024,
+              "both_slots_ready_before_first_MAC": true,
+              "no_weight_row_switch_between_paired_fills": true,
+              "MAC_counts_and_reduction_order_preserved": true,
+              "row_command_counts": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "input_batches": 1,
+                  "source_ACT2": 0,
+                  "weight_ACTAB": 1,
+                  "refresh_commands": 0
+                }
+              ],
+              "first_two_batches_channel0": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "batch": 0,
+                  "source_row": 256,
+                  "input_begin_ck": 132,
+                  "last_input_issue_ck": 254,
+                  "both_slots_ready_ck": 279,
+                  "first_MAC_ck": 305,
+                  "last_MAC_complete_ck": 433,
+                  "input_bytes_per_bank": 1024,
+                  "refresh_commands_during_load": 0,
+                  "source_banks": [
+                    0,
+                    4
+                  ]
+                }
+              ]
+            },
+            "writer": {
+              "same_BG_spacing_checks": 30,
+              "cross_BG_short_WR_pairs": 30,
+              "minimum_cross_BG_WR_gap_ck": 2,
+              "issue_gap_histogram": [
+                {
+                  "kind": "cross_BG",
+                  "gap_ck": 2,
+                  "count": 30
+                },
+                {
+                  "kind": "cross_BG",
+                  "gap_ck": 4,
+                  "count": 1
+                }
+              ]
+            },
+            "source_fragment_to_MAC_weight_checks": 8
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_bank_same_BG_source",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging requires rank1 BG0/BG1 bank0",
+          "exception_type": "RuntimeError",
+          "message": "staging requires rank1 BG0/BG1 bank0",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_bank_unreserved_source",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging requires rank1 BG0/BG1 bank0",
+          "exception_type": "RuntimeError",
+          "message": "staging requires rank1 BG0/BG1 bank0",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_bank_missing_write",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging seal requires every declared input write",
+          "exception_type": "RuntimeError",
+          "message": "staging seal requires every declared input write",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_bank_wrong_weight_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging source/weight fragment mismatch",
+          "exception_type": "RuntimeError",
+          "message": "staging source/weight fragment mismatch",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Stage_two_bank_bank_capacity",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging source bank capacity exceeded",
+          "exception_type": "RuntimeError",
+          "message": "staging source bank capacity exceeded",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Dispatch_queue_capacity_one",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 13233,
+          "native_audit": {
+            "channel_ingress": {
+              "requests_checked": 290,
+              "channel_count": 2,
+              "capacity_per_channel": 1,
+              "queue_high_water_by_channel": {
+                "0": 1,
+                "1": 1
+              },
+              "no_channel_FIFO_reordering": true,
+              "one_dispatch_per_channel_per_CK": true,
+              "completion_fences_checked": 2,
+              "global_barriers_checked": 4,
+              "peer_export_dependencies_checked": 0,
+              "peer_wait_events": 0,
+              "all_accepted_requests_complete": true
+            },
+            "native_data_commands_checked": 290,
+            "rank_controller": {
+              "command_intervals_checked": 1932,
+              "rank_command_coverage": 966,
+              "global_CA_resources": 16,
+              "rank_CA_resources": 32,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 0
+            },
+            "rank_descriptors": {
+              "parent_descriptors_checked": 0,
+              "fine_children_checked": 0,
+              "children_per_descriptor": 16,
+              "parent_waits_for_all_children": true,
+              "one_global_CA_per_descriptor": true,
+              "fine_bank_operations_preserved": true,
+              "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+            },
+            "other_channel_dispatches_during_channel0_backpressure": 58,
+            "write_barrier_covers_DRAM_recovery": true
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Dispatch_late_peer",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 45522,
+          "native_audit": {
+            "channel_ingress": {
+              "requests_checked": 67336,
+              "channel_count": 16,
+              "capacity_per_channel": 32,
+              "queue_high_water_by_channel": {
+                "0": 32,
+                "1": 32,
+                "2": 32,
+                "3": 32,
+                "4": 32,
+                "5": 32,
+                "6": 32,
+                "7": 32,
+                "8": 32,
+                "9": 32,
+                "10": 32,
+                "11": 32,
+                "12": 32,
+                "13": 32,
+                "14": 32,
+                "15": 32
+              },
+              "no_channel_FIFO_reordering": true,
+              "one_dispatch_per_channel_per_CK": true,
+              "completion_fences_checked": 70,
+              "global_barriers_checked": 70,
+              "peer_export_dependencies_checked": 128,
+              "peer_wait_events": 127,
+              "all_accepted_requests_complete": true
+            },
+            "native_data_commands_checked": 92032,
+            "rank_controller": {
+              "command_intervals_checked": 181400,
+              "rank_command_coverage": 113248,
+              "global_CA_resources": 16,
+              "rank_CA_resources": 32,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 1024
+            },
+            "rank_descriptors": {
+              "parent_descriptors_checked": 1464,
+              "fine_children_checked": 23424,
+              "children_per_descriptor": 16,
+              "parent_waits_for_all_children": true,
+              "one_global_CA_per_descriptor": true,
+              "fine_bank_operations_preserved": true,
+              "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+            },
+            "unified_gemv": {
+              "events_checked": 53040,
+              "operation_counts": {
+                "GEMV_MULTICAST": 8192,
+                "GEMV_MAC": 32768,
+                "GEMV_RELEASE": 48,
+                "GEMV_Q_LOCAL": 2048,
+                "GEMV_Q_REMOTE": 2048,
+                "GEMV_QK": 7936
+              },
+              "bank_generations_checked": 16640,
+              "physical_bank_releases": 768,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "external_fill_checks": 2048,
+            "unrelated_channel_completions_during_peer_wait": 16
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Dispatch_repeated_peer_source",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 90507,
+          "native_audit": {
+            "channel_ingress": {
+              "requests_checked": 134616,
+              "channel_count": 16,
+              "capacity_per_channel": 32,
+              "queue_high_water_by_channel": {
+                "0": 32,
+                "1": 32,
+                "2": 32,
+                "3": 32,
+                "4": 32,
+                "5": 32,
+                "6": 32,
+                "7": 32,
+                "8": 32,
+                "9": 32,
+                "10": 32,
+                "11": 32,
+                "12": 32,
+                "13": 32,
+                "14": 32,
+                "15": 32
+              },
+              "no_channel_FIFO_reordering": true,
+              "one_dispatch_per_channel_per_CK": true,
+              "completion_fences_checked": 142,
+              "global_barriers_checked": 141,
+              "peer_export_dependencies_checked": 256,
+              "peer_wait_events": 128,
+              "all_accepted_requests_complete": true
+            },
+            "native_data_commands_checked": 183424,
+            "rank_controller": {
+              "command_intervals_checked": 362584,
+              "rank_command_coverage": 226192,
+              "global_CA_resources": 16,
+              "rank_CA_resources": 32,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 2048
+            },
+            "rank_descriptors": {
+              "parent_descriptors_checked": 2872,
+              "fine_children_checked": 45952,
+              "children_per_descriptor": 16,
+              "parent_waits_for_all_children": true,
+              "one_global_CA_per_descriptor": true,
+              "fine_bank_operations_preserved": true,
+              "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 4096
+            },
+            "unified_gemv": {
+              "events_checked": 106080,
+              "operation_counts": {
+                "GEMV_MULTICAST": 16384,
+                "GEMV_MAC": 65536,
+                "GEMV_RELEASE": 96,
+                "GEMV_Q_LOCAL": 4096,
+                "GEMV_Q_REMOTE": 4096,
+                "GEMV_QK": 15872
+              },
+              "bank_generations_checked": 33280,
+              "physical_bank_releases": 1536,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "external_fill_checks": 4096,
+            "unrelated_channel_completions_during_peer_wait": 16,
+            "repeated_address_waits_for_latest_export_instance": true
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Dispatch_no_peer_export",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Q_REMOTE has no preceding peer Q_EXPORT",
+          "exception_type": "RuntimeError",
+          "message": "Q_REMOTE has no preceding peer Q_EXPORT",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Descriptor_noncanonical_source",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "rank descriptor requires canonical rank1 BG0 bank0",
+          "exception_type": "RuntimeError",
+          "message": "rank descriptor requires canonical rank1 BG0 bank0",
+          "python_trace_precheck_bypassed": true,
+          "native_input_retains_invalid_address": true,
+          "worker_returncode": 0
+        },
+        {
+          "case": "Local_ACT2_spill_rope_refresh",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 10252,
+          "native_audit": {
+            "split_activation": {
+              "status": "passed",
+              "nAAD_ck": 8,
+              "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+              "ACT1_commands": 552,
+              "ACT2_commands": 552,
+              "paired_ACT2": 552,
+              "cancelled_ACT1": 0,
+              "pending_ACT2_at_end": 0,
+              "minimum_gap_ck": 1,
+              "maximum_gap_ck": 3,
+              "gap_histogram_ck": {
+                "1": 464,
+                "2": 82,
+                "3": 6
+              },
+              "maximum_pending_by_channel": {
+                "0": 1
+              },
+              "classifications": {
+                "ordinary": {
+                  "ACT1": 256,
+                  "paired_ACT2": 256,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 168,
+                    "2": 82,
+                    "3": 6
+                  }
+                },
+                "other_internal": {
+                  "ACT1": 296,
+                  "paired_ACT2": 296,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 296
+                  }
+                }
+              },
+              "violation_count": 0,
+              "violations": {},
+              "violations_by_kind": {},
+              "examples": [],
+              "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+            },
+            "forced_localwrite_activations": {
+              "PIM_SPILL": {
+                "ACT1_commands": 128,
+                "LOCALWR_commands": 256,
+                "minimum_ACT1_per_bank": 8
+              },
+              "PIM_ROPE_STORE": {
+                "ACT1_commands": 128,
+                "LOCALWR_commands": 256,
+                "minimum_ACT1_per_bank": 8
+              }
+            },
+            "native_data_commands_checked": 1152,
+            "rank_controller": {
+              "command_intervals_checked": 5044,
+              "rank_command_coverage": 3436,
+              "global_CA_resources": 16,
+              "rank_CA_resources": 32,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": null
+            },
+            "native_refresh_commands": 39,
+            "conflicting_row_writes": 256,
+            "localwrite_bytes": 16384,
+            "guard_only_nREFI_ck": 512
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "V_token_complete_fragment",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 304,
+          "native_audit": {
+            "unified_gemv": {
+              "events_checked": 25,
+              "operation_counts": {
+                "GEMV_MULTICAST": 8,
+                "GEMV_MAC": 16,
+                "GEMV_RELEASE": 1
+              },
+              "bank_generations_checked": 16,
+              "physical_bank_releases": 16,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "token_rows": 8,
+            "weight_columns": 16,
+            "V_to_PV_same_slot": false,
+            "native_data_commands_checked": 32,
+            "split_activation": {
+              "status": "passed",
+              "nAAD_ck": 8,
+              "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+              "ACT1_commands": 1,
+              "ACT2_commands": 1,
+              "paired_ACT2": 1,
+              "cancelled_ACT1": 0,
+              "pending_ACT2_at_end": 0,
+              "minimum_gap_ck": 1,
+              "maximum_gap_ck": 1,
+              "gap_histogram_ck": {
+                "1": 1
+              },
+              "maximum_pending_by_channel": {
+                "0": 1
+              },
+              "classifications": {
+                "ordinary": {
+                  "ACT1": 1,
+                  "paired_ACT2": 1,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 1
+                  }
+                }
+              },
+              "violation_count": 0,
+              "violations": {},
+              "violations_by_kind": {},
+              "examples": [],
+              "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+            },
+            "rank_controller": {
+              "command_intervals_checked": 74,
+              "rank_command_coverage": 44,
+              "global_CA_resources": 1,
+              "rank_CA_resources": 1,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": null
+            }
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "V_token_eight_columns_release",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "release of unconsumed input fragment",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV release of unconsumed input fragment",
+          "worker_returncode": 0
+        },
+        {
+          "case": "V_token_wrong_rows",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "staging token rows do not match operator",
+          "exception_type": "RuntimeError",
+          "message": "staging token rows do not match operator",
+          "worker_returncode": 0
+        },
+        {
+          "case": "V_token_then_PV",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 691,
+          "native_audit": {
+            "unified_gemv": {
+              "events_checked": 50,
+              "operation_counts": {
+                "GEMV_MULTICAST": 24,
+                "GEMV_MAC": 24,
+                "GEMV_RELEASE": 2
+              },
+              "bank_generations_checked": 32,
+              "physical_bank_releases": 32,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "token_rows": 8,
+            "weight_columns": 16,
+            "V_to_PV_same_slot": true,
+            "native_data_commands_checked": 72,
+            "split_activation": {
+              "status": "passed",
+              "nAAD_ck": 8,
+              "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+              "ACT1_commands": 2,
+              "ACT2_commands": 2,
+              "paired_ACT2": 2,
+              "cancelled_ACT1": 0,
+              "pending_ACT2_at_end": 0,
+              "minimum_gap_ck": 1,
+              "maximum_gap_ck": 1,
+              "gap_histogram_ck": {
+                "1": 2
+              },
+              "maximum_pending_by_channel": {
+                "0": 1
+              },
+              "classifications": {
+                "ordinary": {
+                  "ACT1": 2,
+                  "paired_ACT2": 2,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 2
+                  }
+                }
+              },
+              "violation_count": 0,
+              "violations": {},
+              "violations_by_kind": {},
+              "examples": [],
+              "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+            },
+            "rank_controller": {
+              "command_intervals_checked": 166,
+              "rank_command_coverage": 105,
+              "global_CA_resources": 1,
+              "rank_CA_resources": 1,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": null
+            }
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Token_cache_missing_projection",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "V cache spill requires complete V projection",
+          "exception_type": "RuntimeError",
+          "message": "V cache spill requires complete V projection",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Token_cache_wrong_tail",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "V cache spill requires final KV block",
+          "exception_type": "RuntimeError",
+          "message": "V cache spill requires final KV block",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Token_cache_duplicate_spill",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "duplicate V cache spill",
+          "exception_type": "RuntimeError",
+          "message": "duplicate V cache spill",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Token_PV_missing_cache",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "PV requires complete local V cache",
+          "exception_type": "RuntimeError",
+          "message": "PV requires complete local V cache",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Token_PV_wrong_export",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Output export address/count mismatch",
+          "exception_type": "RuntimeError",
+          "message": "Output export address/count mismatch",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Whole_SRF_early_compute",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Whole SRF compute before full batch fill",
+          "exception_type": "RuntimeError",
+          "message": "Whole SRF compute before full batch fill",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Whole_SRF_early_refill",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "expected_message": "Whole SRF overwrite before complete batch consumption",
+          "exception_type": "RuntimeError",
+          "message": "Whole SRF overwrite before complete batch consumption",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Whole_SRF_four_views",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 54824,
+          "native_audit": {
+            "status": "passed",
+            "case": "chain",
+            "horizon": 16,
+            "trace_and_native_address_coverage": true,
+            "native_data_commands_checked": 115968,
+            "array_open_row_checks": 954368,
+            "independent_MAC_order_checks": 57088,
+            "external_DQ_to_bank_fill_checks": 2048,
+            "unified_gemv": {
+              "events_checked": 69456,
+              "operation_counts": {
+                "GEMV_MULTICAST": 8192,
+                "GEMV_MAC": 49152,
+                "GEMV_RELEASE": 80,
+                "GEMV_Q_LOCAL": 2048,
+                "GEMV_Q_REMOTE": 2048,
+                "GEMV_QK": 7936
+              },
+              "bank_generations_checked": 16640,
+              "physical_bank_releases": 1280,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "staging": {
+              "stages_checked": 16,
+              "source_bank": 0,
+              "staging_base_row": 256,
+              "external_input_bytes": 262144,
+              "internal_read_bytes": 262144,
+              "multicast_destination_bytes": 4194304,
+              "write_completion_checks": 8192,
+              "full_input_seal_checks": 16,
+              "source_read_to_precharge_checks": 1392,
+              "read_to_SRF_multicast_checks": 8192,
+              "source_fragment_to_MAC_weight_checks": 49152,
+              "external_input_bytes_unchanged": false,
+              "internal_read_and_broadcast_use_DQ": false,
+              "SRAM_bytes_per_bank": 1024,
+              "maximum_DRAM_staging_bytes_per_rank": 16384,
+              "reserved_DRAM_staging_bytes_per_rank": 131072,
+              "external_input_matches_independent_geometry": true
+            },
+            "input_batching": {
+              "input_batches_checked": 256,
+              "physical_input_capacity_bytes_per_bank": 1024,
+              "maximum_prefetched_input_bytes_per_bank": 1024,
+              "both_slots_ready_before_first_MAC": true,
+              "no_weight_row_switch_between_paired_fills": true,
+              "MAC_counts_and_reduction_order_preserved": true,
+              "row_command_counts": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 1,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 2,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 3,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 4,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 5,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 6,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 7,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 8,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 9,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 10,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 11,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 12,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 13,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 14,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                },
+                {
+                  "channel": 15,
+                  "stage_generation": 1,
+                  "input_batches": 16,
+                  "source_ACT2": 17,
+                  "weight_ACTAB": 55,
+                  "refresh_commands": 8
+                }
+              ],
+              "first_two_batches_channel0": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "batch": 0,
+                  "source_row": 256,
+                  "input_begin_ck": 2692,
+                  "last_input_issue_ck": 2816,
+                  "both_slots_ready_ck": 2841,
+                  "first_MAC_ck": 2867,
+                  "last_MAC_complete_ck": 4756,
+                  "input_bytes_per_bank": 1024,
+                  "refresh_commands_during_load": 0,
+                  "view_count": 4,
+                  "view_bytes": 256,
+                  "source_rows": [
+                    256
+                  ]
+                },
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "batch": 1,
+                  "source_row": 256,
+                  "input_begin_ck": 4796,
+                  "last_input_issue_ck": 4920,
+                  "both_slots_ready_ck": 4945,
+                  "first_MAC_ck": 4971,
+                  "last_MAC_complete_ck": 6593,
+                  "input_bytes_per_bank": 1024,
+                  "refresh_commands_during_load": 0,
+                  "view_count": 4,
+                  "view_bytes": 256,
+                  "source_rows": [
+                    256
+                  ]
+                }
+              ],
+              "whole_SRF_bytes_per_bank": 1024,
+              "view_bytes_by_rows": {
+                "8": 256,
+                "16": 512
+              },
+              "full_batch_consumption_before_any_view_overwrite": true,
+              "all_views_ready_before_first_MAC": true
+            },
+            "split_activation": {
+              "status": "passed",
+              "nAAD_ck": 8,
+              "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+              "ACT1_commands": 1168,
+              "ACT2_commands": 1168,
+              "paired_ACT2": 1168,
+              "cancelled_ACT1": 0,
+              "pending_ACT2_at_end": 0,
+              "minimum_gap_ck": 1,
+              "maximum_gap_ck": 1,
+              "gap_histogram_ck": {
+                "1": 1168
+              },
+              "maximum_pending_by_channel": {
+                "0": 1,
+                "1": 1,
+                "2": 1,
+                "3": 1,
+                "4": 1,
+                "5": 1,
+                "6": 1,
+                "7": 1,
+                "8": 1,
+                "9": 1,
+                "10": 1,
+                "11": 1,
+                "12": 1,
+                "13": 1,
+                "14": 1,
+                "15": 1
+              },
+              "classifications": {
+                "ordinary": {
+                  "ACT1": 384,
+                  "paired_ACT2": 384,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 384
+                  }
+                },
+                "other_internal": {
+                  "ACT1": 512,
+                  "paired_ACT2": 512,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 512
+                  }
+                },
+                "staging": {
+                  "ACT1": 272,
+                  "paired_ACT2": 272,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 272
+                  }
+                }
+              },
+              "violation_count": 0,
+              "violations": {},
+              "violations_by_kind": {},
+              "examples": [],
+              "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+            },
+            "rank_controller": {
+              "command_intervals_checked": 229280,
+              "rank_command_coverage": 144336,
+              "global_CA_resources": 16,
+              "rank_CA_resources": 32,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 1024
+            },
+            "ffn_streams": null,
+            "serial_continuity": null,
+            "native_external_DQ_bytes": 901120,
+            "native_command_counts": {
+              "ACT1": 1168,
+              "ACT2": 1168,
+              "WR": 8192,
+              "PREpb": 880,
+              "LOCALRD": 18432,
+              "PREab": 1120,
+              "ACTAB": 1088,
+              "MACAB": 49152,
+              "REFab": 416,
+              "LOCALWR": 12288,
+              "RD": 2048,
+              "WRGB": 2048,
+              "MACQK": 7936,
+              "RDRES": 15872
+            },
+            "trace_sha256": "af9f60be2d7498f0fb1370aac9ea064add60e7eedaac38ab8349f678f994c4dc",
+            "native_sha256": {
+              "timeline.csv.ch0": "778719f8055f7db68985e41e4a4424a088369327ef7ef80f8f5c8b8e84795555",
+              "timeline.csv.ch1": "b954d8725e989286b48ef6185744e61e86bd1e4844c24b5c81954ec00f375460",
+              "timeline.csv.ch2": "c5e937887a855be355296dd9cfab56527564ef9876fd562d9ab348032544d6d9",
+              "timeline.csv.ch3": "89092e54555bc4f3f395efa49564a6ee8a5385b3fb16a12f041aeeb9aaaa628b",
+              "timeline.csv.ch4": "e845f14ad88d6740987df269c3a798116574b93576484a6ae48cc99510b794d9",
+              "timeline.csv.ch5": "46fa09ace1b82decbca75651ba5feb2e372490ef0cb231047f6ba9bd472327cc",
+              "timeline.csv.ch6": "2f4c39dd48e855421de8ff667915a403c60aab95127699ef7a31dd1c44bbb18b",
+              "timeline.csv.ch7": "e6000f6ab8bc42066de9fcf7c1acaed47b70828f310ca954afc547edbde5eb71",
+              "timeline.csv.ch8": "de561447b70c9d44d58998bbd1ee00d2900979cbf00bd59817105271ddd46977",
+              "timeline.csv.ch9": "f9c406cbaa1659df97fc8c5b1af8e68a072c7e7e1fb475be0df19bb9c6bffcc5",
+              "timeline.csv.ch10": "6d7416600d214c6e83a9f7e8f6fdcaf6df410e25a9fa3c890d9d07b453f38a9a",
+              "timeline.csv.ch11": "a5eee6135f143f49befcaa26be4c325d985dd760d0933b5f03afb6abf2247f34",
+              "timeline.csv.ch12": "7098f5ab5cc4d5be7ef9e3197b445d4fe7439d726b14df959ce72ed0e658dadc",
+              "timeline.csv.ch13": "25bb7ed2a57ffc11f50644b586d916c1b4ff58cb90dc364e8dce6d426b7c8292",
+              "timeline.csv.ch14": "14dbc5f412a12148b463c54ebef1670dace0bfcb5a42537ffdc70a3e3aaacfdc",
+              "timeline.csv.ch15": "613d8dfc24be1b9a45fd52cac9efbe3aee019a7ad62fc9b5504a862a82de3b0a",
+              "unified_gemv.csv.ch0": "ce1696ea4c85861c38479e3e89efee5343675ca0c55b4df6f1211105fc373d9d",
+              "unified_gemv.csv.ch1": "bacd59cfac9e9876559910c887d4550391fe9b435b9198d7bdd77679cadfd8db",
+              "unified_gemv.csv.ch2": "527be2d6615c90f97c8d8a3e0b1d9bbb6dfded215c13927590051e0f06663d24",
+              "unified_gemv.csv.ch3": "47b36dc283be62c48a05db2bd96030d03fbba56a535c531cd694d2545e196769",
+              "unified_gemv.csv.ch4": "54f6890e06f3136f5d29c06e71e92569e70ae084bcad20bd1e200898da4d42e1",
+              "unified_gemv.csv.ch5": "b2815f396543d161191103f3f9a94d3eff42e7a0b99e8f85831d5ec0a988c200",
+              "unified_gemv.csv.ch6": "568c62e5d5865ea8fd600068d9db556d29df05ebda60cfae8984a57ca0a72052",
+              "unified_gemv.csv.ch7": "42bbddf8f12c2ab94fd42eb666e14b9eb786a3cabc6c32a9f087e58e40718183",
+              "unified_gemv.csv.ch8": "28a14da8d52cdddcbec0924e2256494715ba86509bc58cb04308d5c846130d9c",
+              "unified_gemv.csv.ch9": "1a217e37c83a73185f1a055998b6088846948441b90b29d2e8ab0795dd7d5988",
+              "unified_gemv.csv.ch10": "25c23bcf45408621bf75986077cb9697bd3f1f1074eb8b44c4f87635172e93af",
+              "unified_gemv.csv.ch11": "21ee4e6cced9edb47df43c592abefaba9fb0f9c1fdadd7a1f38e8fbdda55ffcd",
+              "unified_gemv.csv.ch12": "addcc11fea61e7142c7a8b64b80233b6bd5c582a0107d90498017024e8c54c84",
+              "unified_gemv.csv.ch13": "d0b3b5160036d2b641e04cb6553147c5719748572e47c8ecd59dafa8d6bae7a8",
+              "unified_gemv.csv.ch14": "1eca21b790bca15e31141c1e918cdc537c0149aab6ec4f18d067cd6dbffa96b5",
+              "unified_gemv.csv.ch15": "cc4ae0ccd648684b85928f04ef0349a2d2bf7b0d2e3317408668af7f92896c83",
+              "staging_events.csv.ch0": "bc02ed0e3d6123f5cb310b380ad12354a0dfde49ace0ef8b8d90d90a342f4cc8",
+              "staging_events.csv.ch1": "e3a1e4ad98d27e80593076fd4775891cc72596f8c57b15a9b831a9eebf9a8120",
+              "staging_events.csv.ch2": "fe425ed5369a02f7b9b8e98f3eb1cfe437607ccb2f45e82da09137cc8cf0e331",
+              "staging_events.csv.ch3": "f7558abb2a28788fe9625c2e54230fb0f3906d24ce6f9ccc04797692c9c14419",
+              "staging_events.csv.ch4": "11b70be74da840250f628daed72765dcd111ba71cfb81f7211b5e12e9493b8b9",
+              "staging_events.csv.ch5": "6189678ea1380062e3a6295b2dcbac5501dbf13459d52b77a2dcf1d4cd39be39",
+              "staging_events.csv.ch6": "785b4a92baa6245664637752a6d748ac0a7bd22e5f7e9ac6f09c680e70042af1",
+              "staging_events.csv.ch7": "1d93770bf8a6ac71f984c9c9ad3e2dccc0b96a8965f0c592fb995ecaee55fd49",
+              "staging_events.csv.ch8": "407c492935a5181ee62ca8b606abc379e06e751805e32a089753ff6f7eba948f",
+              "staging_events.csv.ch9": "45ec5a2d3ea1805254ad7b36b711b144d00365db0779f57ad4969844cacec2e1",
+              "staging_events.csv.ch10": "88206dd3af8c800fe620738a82bab11ef07d15390caba928cc76a5ae7514973c",
+              "staging_events.csv.ch11": "2c11a9ae49b8306246989bafcce8f6267faa1bfea03ee5fc96369534d49919b6",
+              "staging_events.csv.ch12": "dc4ea5c10b32ae38b368855d4e7cdd66554d09da35a1051e0f190fdfd2bf78b5",
+              "staging_events.csv.ch13": "b32b7162cbd5073289ba95d118843251d03ab6fec5e2517acfdc32e6dc68c533",
+              "staging_events.csv.ch14": "523f7f8b71eb392e902aca7519429c2861cd198c8bb54d461f6a3831abeacc90",
+              "staging_events.csv.ch15": "b72706f454d1ec53a626cdcc0630c10aa333dcb7fe136607c5bca664f1335393",
+              "rank_ca_events.csv.ch0": "f9a672575d30abad31a99923535803427031741c66278677e5545a201c2448a8",
+              "rank_ca_events.csv.ch1": "9a307fa1c541160052d819b6589d7e306013bdca330b1f76223fc0232df46c4b",
+              "rank_ca_events.csv.ch2": "212c8b52a9b6aa381b865ed87d185bbc84fd5d55ad469467031a211d213b1093",
+              "rank_ca_events.csv.ch3": "2fe7aa8024f40a3f2d766af88e5529d7c96140ae78ccf66ad181972e37d6ddad",
+              "rank_ca_events.csv.ch4": "d1b0e3746004dd0d0a8c0e6bea6e439d234822349c9fd8cf93f5570158dc92a7",
+              "rank_ca_events.csv.ch5": "69676df6b027d95779ff14845e07915dabdd2c391016dfa30101ebe2f685c85c",
+              "rank_ca_events.csv.ch6": "dc411077c36c3ca91b4a4814e0183574361af7f5ab3a6aa36f260b672d509778",
+              "rank_ca_events.csv.ch7": "662abca16ad9eafd9f945fb7d33c2977bcf7b990501c552a018c21974974bcec",
+              "rank_ca_events.csv.ch8": "b62b6697cc167fbaf5a1f6c1dcc3c32f1cd5c07aa109277c628f80633eab1afe",
+              "rank_ca_events.csv.ch9": "c5f89f947973602f76f3b25a483ca8e15208a3e497bf55e64c4e835c9b075cb4",
+              "rank_ca_events.csv.ch10": "ca9c26a2c38803c5c74c177c45aec00c8187f0c297e72a950930fc5f15aa2969",
+              "rank_ca_events.csv.ch11": "85ed6e3e7bcfbfcfe3aa09317cd173e1036433c420eb9e067b5f431f1bbb245c",
+              "rank_ca_events.csv.ch12": "925991655bc1f4b920e7b70d0756a3b8db471aeed668b96b7e4e3399b4a55d28",
+              "rank_ca_events.csv.ch13": "e4affb9e8e9d35a23a6c504a80deddfd93e33c123e155459efdd1072f3e187b2",
+              "rank_ca_events.csv.ch14": "5baac6be19449711bc97f36d265566bf0e28d212bb037cdbd64de079519afc59",
+              "rank_ca_events.csv.ch15": "7604550d8846a6e15aa56076e0da9287f42713a3b44b486f2b9fcb3eb4072b08",
+              "bgk_events.csv.ch0": "e70c3890f459f424b32a392fd795eea987ca9b54f820ddd520b161b9c581bb06",
+              "bgk_events.csv.ch1": "4fd06033243ce93421dc03b0160f90e0047ded859cdc0ca445f72807ed1835c4",
+              "bgk_events.csv.ch2": "42dbc601c30f407bbb1105fd666fb76b8ddd58864c595bff607f77a874230a4e",
+              "bgk_events.csv.ch3": "ce278e6ee105996a8f88f4e228d260a4609fe18a7f6da25c45fac7bf4377a3d4",
+              "bgk_events.csv.ch4": "b696d835df3f01dbf45746980b0eb2e78553c124a8a714a9c25c5a3668e16a8b",
+              "bgk_events.csv.ch5": "c379d7cac47a30df5066605edc627150d02a4658533e5dcd292b5b9fe9c88504",
+              "bgk_events.csv.ch6": "788fb93ef2152d863caf66a72e07a9ec95b20d342af398cf7d7a0a6e245d8aac",
+              "bgk_events.csv.ch7": "a089f14359a65801a8b3b911c3e23b154dd9d7097549f3c9cccd26bf5dbbe666",
+              "bgk_events.csv.ch8": "2c16aa8484655949c21616fc07ca0a0932528ec2f3b4a762655c4c8c1132aad4",
+              "bgk_events.csv.ch9": "0b74799434cfeaea537651033094c4d8e1b3973caaf2ce91adeccd746c815427",
+              "bgk_events.csv.ch10": "3b4291ea248214af0eb87e2a95150a5fc3956ca81766f8aa18c52ce9dcf0a1cb",
+              "bgk_events.csv.ch11": "a98329fa9099d3f9e28f52dc58eebc6d15966659cfbadefd23ca1980cb1890ee",
+              "bgk_events.csv.ch12": "4bb073c3d02182b36ee42b4267ed1ea6757831a83f3e955a51258a56f3275494",
+              "bgk_events.csv.ch13": "d07e2900233205a066176911cd5a35808e89b6a514b003c0e50efcb979575eac",
+              "bgk_events.csv.ch14": "29abc9f38170d3c6cbe34fe07b369ef6a879cc68b11a2dd421ed30566a5575db",
+              "bgk_events.csv.ch15": "54c75aee3d02a43e89efcec7a9b8900aa9cfecb753a7f884c83012f7580e3f17",
+              "v_cache.csv.ch0": "d2ca2c9a8cd8a4e9c5c66a6ea0f77099bced9831c7856a9cb666bc0a73801943",
+              "v_cache.csv.ch1": "5c9d48e75c609af0c73a4bca6e7b965216f27318a4dc1d7ceef1fd081d6c7f8f",
+              "v_cache.csv.ch2": "491fdb4e52f06422fcc0bb9dd9df8d48b5ab64b1277548c9c75e90d14f3349c9",
+              "v_cache.csv.ch3": "f605dbc49ccd3c0d6e2a91ac039461f81869d555ae73672bf04f40eff81feb5c",
+              "v_cache.csv.ch4": "a220777e1297df7bd41a4eeee8134fe2426c74667a955d5cd30f3dc0db87ee6a",
+              "v_cache.csv.ch5": "d6044617f150b878e9a006d1d127c732ed3739a76debea0e419fb563ea0a879d",
+              "v_cache.csv.ch6": "84d340897fcfb7c15652203e8ef65ba08c9c97339b8add304ddbe5d333fe4e94",
+              "v_cache.csv.ch7": "29199bd984642d0cc482207dd507688fee540b4dbbb49b8634cfbcf4425d6cf5",
+              "v_cache.csv.ch8": "6f0cb8a0530fc74bf8b4b745597c72b784c79781cfec3cb825850545c13bc452",
+              "v_cache.csv.ch9": "8595cb7e5cb128ee174f0cf08be67aa9a6a4b1bea5ef2ad6a29959a7d0d87cd2",
+              "v_cache.csv.ch10": "6fa3bc5d4c459ceae2f7b90a4c32d0f2aef036c36ba5ae5e945211d7a0ec3f25",
+              "v_cache.csv.ch11": "5d453094da86e243344a8ff2eea7537c077235677efe6177254df3e932426fc6",
+              "v_cache.csv.ch12": "9f4cb80460ec9c7d7c9ef465529f4f7ac92085ec2a5318d864feeee660e277e9",
+              "v_cache.csv.ch13": "b2562fdd74f2bd71cfde1be6c17fb42b194866b3cfda7e7e33eae8af0d346620",
+              "v_cache.csv.ch14": "dbd6f3aa11905c0cc6aa206e5689489b1ea0b5806c3bdfb489cdc009d913ac8e",
+              "v_cache.csv.ch15": "011325b9ab71f4c8877efc09e11fdde8d37f5658a81ffdcf0414c6f15ff2dc77",
+              "frontend_dispatch.csv": "121ba0d961e288004dc302efddda2777cb969c70cb25fde39d755bc92d5ed0fa",
+              "channel_ingress.csv": "e14febba8cb41243c682a2fa045fe5b18d30571049621a524d53a7a71bdab3b9",
+              "rank_descriptors.csv.ch0": "848a94b574ec4e246ed47c7cf212acb7c8bf64a4f45a6c4c131bf75d647b7dbb",
+              "rank_descriptors.csv.ch1": "20eda67965b5a678920494b49513edf30149e792d5a9e62d07adad30def534e1",
+              "rank_descriptors.csv.ch2": "eaff0418897d034b4a82c904e7c212ddce1ef88546a8b3e050412f06de4bb34d",
+              "rank_descriptors.csv.ch3": "71aa0938c46c84d464ec6ad77f184e7ab2a22c62669135d85df52205c8659e4d",
+              "rank_descriptors.csv.ch4": "c3324c9ce0c4fbae5dfc0a5dbf8a6154d5e405efdcf0ac6c600130d41d52168b",
+              "rank_descriptors.csv.ch5": "d5bf8e3da54b77ab4151161aa4a35ab4918e864ea179f389ce327b6bd8f09744",
+              "rank_descriptors.csv.ch6": "d50016ccfb2521e78a21d2aa721a382767d87d3031b7a2bf2cc727b8b9fad58f",
+              "rank_descriptors.csv.ch7": "a4af614379f152cf70c1b42430eadcefd5bb4620e52ef141a208729eb54bb5c0",
+              "rank_descriptors.csv.ch8": "061297837202fab3b1f168980674ec4f1e168f689be178ec28c1c255732ea291",
+              "rank_descriptors.csv.ch9": "1fe6646b8f0189aeafba7d961fbeb42c8d5b10a709914bba12aa3760527db49b",
+              "rank_descriptors.csv.ch10": "eb35f2cddf97958204765d1c935d64714796665746813af8711806ad73674f09",
+              "rank_descriptors.csv.ch11": "cbc863447b5f492f1f65b57cc46d71a0a429d906bd2d5bc0136273c21ff4298c",
+              "rank_descriptors.csv.ch12": "ef94212ec1c9e084375f2a2d56993adf1c29d4946959800f1d23bd59b91b78b6",
+              "rank_descriptors.csv.ch13": "f37a5baabf8515a95692b998340fbdf7786d9cc759dd943b2953963e3c8fa1e0",
+              "rank_descriptors.csv.ch14": "59a321d63ba4fedc1546291c2d392b2a414d402c42516e7ef7861b252c9cfe4d",
+              "rank_descriptors.csv.ch15": "deaf2f61e5ae3b14ad5f6814418f11b51396dfe138c84ddee4546390f3859553"
+            },
+            "numerical_compute": false,
+            "unmeasured": "GPU/nonlinear arithmetic and GPU contention",
+            "channel_ingress": {
+              "requests_checked": 83952,
+              "channel_count": 16,
+              "capacity_per_channel": 32,
+              "queue_high_water_by_channel": {
+                "0": 32,
+                "1": 32,
+                "2": 32,
+                "3": 32,
+                "4": 32,
+                "5": 32,
+                "6": 32,
+                "7": 32,
+                "8": 32,
+                "9": 32,
+                "10": 32,
+                "11": 32,
+                "12": 32,
+                "13": 32,
+                "14": 32,
+                "15": 32
+              },
+              "no_channel_FIFO_reordering": true,
+              "one_dispatch_per_channel_per_CK": true,
+              "completion_fences_checked": 72,
+              "global_barriers_checked": 72,
+              "peer_export_dependencies_checked": 128,
+              "peer_wait_events": 0,
+              "all_accepted_requests_complete": true
+            },
+            "rank_descriptors": {
+              "parent_descriptors_checked": 1664,
+              "fine_children_checked": 26624,
+              "children_per_descriptor": 16,
+              "parent_waits_for_all_children": true,
+              "one_global_CA_per_descriptor": true,
+              "fine_bank_operations_preserved": true,
+              "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+            },
+            "token_pv": {
+              "cache_base_bytes": 163840,
+              "cache_reserved_bytes_per_bank": 16384,
+              "physical_output_capacity_bytes": 2048,
+              "numerical_compute": false,
+              "output_exports_checked": 0,
+              "local_cache": {
+                "packets": 4096,
+                "local_read_bytes": 131072,
+                "local_write_bytes": 131072,
+                "gathered_FP32_bytes": 131072,
+                "cast_BF16_bytes": 65536,
+                "external_DQ_bytes": 0,
+                "preserved_prefix_lanes": 4,
+                "suffix_lanes": 8,
+                "zero_padding_lanes": 4,
+                "source_columns": 48,
+                "store_ready_by_channel": {
+                  "0": 35337,
+                  "1": 35337,
+                  "2": 35337,
+                  "3": 35337,
+                  "4": 35337,
+                  "5": 35337,
+                  "6": 35337,
+                  "7": 35337,
+                  "8": 35337,
+                  "9": 35337,
+                  "10": 35337,
+                  "11": 35337,
+                  "12": 35337,
+                  "13": 35337,
+                  "14": 35337,
+                  "15": 35337
+                },
+                "numerical_compute": false
+              }
+            },
+            "qkv_fusion": {
+              "logical_input_elements": 131072,
+              "projection_MAC_commands": 49152,
+              "scalar_MACs": 100663296,
+              "weight_bytes_per_bank": 98304,
+              "output_bytes_per_bank": 1536,
+              "physical_output_capacity_bytes": 2048,
+              "complete_Q_K_V_feature_coverage": true,
+              "numerical_compute": false
+            }
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Whole_SRF_legal_row_preparation",
+          "passed": true,
+          "compiled_backend_invoked": true,
+          "memory_cycles": 50243,
+          "native_audit": {
+            "status": "passed",
+            "case": "gate_up_gpu",
+            "horizon": 16,
+            "trace_and_native_address_coverage": true,
+            "native_data_commands_checked": 81920,
+            "array_open_row_checks": 557056,
+            "independent_MAC_order_checks": 32768,
+            "external_DQ_to_bank_fill_checks": 0,
+            "unified_gemv": {
+              "events_checked": 49184,
+              "operation_counts": {
+                "GEMV_MULTICAST": 16384,
+                "GEMV_MAC": 32768,
+                "GEMV_RELEASE": 32
+              },
+              "bank_generations_checked": 16384,
+              "physical_bank_releases": 512,
+              "maximum_destination_fanout": 16,
+              "input_bytes_per_bank": 1024,
+              "rank_full_input_SRAM_bytes": 0,
+              "independent_mask_reconstruction": true
+            },
+            "staging": {
+              "stages_checked": 16,
+              "staging_base_row": 256,
+              "external_input_bytes": 524288,
+              "internal_read_bytes": 524288,
+              "multicast_destination_bytes": 8388608,
+              "write_completion_checks": 16384,
+              "full_input_seal_checks": 16,
+              "source_read_to_precharge_checks": 2368,
+              "read_to_SRF_multicast_checks": 16384,
+              "source_fragment_to_MAC_weight_checks": 32768,
+              "external_input_bytes_unchanged": true,
+              "internal_read_and_broadcast_use_DQ": false,
+              "SRAM_bytes_per_bank": 1024,
+              "maximum_DRAM_staging_bytes_per_rank": 32768,
+              "reserved_DRAM_staging_bytes_per_rank": 131072,
+              "source_banks": [
+                0,
+                4
+              ],
+              "source_bank_groups": [
+                0,
+                1
+              ],
+              "staging_banks": 2,
+              "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+              "maximum_DRAM_staging_bytes_per_source_bank": 16384,
+              "source_last_reserved_row": 287,
+              "writer": {
+                "same_BG_spacing_checks": 16352,
+                "cross_BG_short_WR_pairs": 16128,
+                "minimum_cross_BG_WR_gap_ck": 2,
+                "issue_gap_histogram": [
+                  {
+                    "kind": "cross_BG",
+                    "gap_ck": 2,
+                    "count": 16128
+                  },
+                  {
+                    "kind": "cross_BG",
+                    "gap_ck": 4,
+                    "count": 128
+                  },
+                  {
+                    "kind": "cross_BG",
+                    "gap_ck": 79,
+                    "count": 112
+                  }
+                ]
+              }
+            },
+            "input_batching": {
+              "input_batches_checked": 512,
+              "physical_input_capacity_bytes_per_bank": 1024,
+              "maximum_prefetched_input_bytes_per_bank": 1024,
+              "both_slots_ready_before_first_MAC": true,
+              "no_weight_row_switch_between_paired_fills": true,
+              "MAC_counts_and_reduction_order_preserved": true,
+              "row_command_counts": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 1,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 2,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 3,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 4,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 5,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 6,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 7,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 8,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 9,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 10,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 11,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 12,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 13,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 14,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                },
+                {
+                  "channel": 15,
+                  "stage_generation": 1,
+                  "input_batches": 32,
+                  "source_ACT2": 64,
+                  "weight_ACTAB": 42,
+                  "refresh_commands": 11
+                }
+              ],
+              "first_two_batches_channel0": [
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "batch": 0,
+                  "source_row": 256,
+                  "input_begin_ck": 2710,
+                  "last_input_issue_ck": 2872,
+                  "both_slots_ready_ck": 2897,
+                  "first_MAC_ck": 2923,
+                  "last_MAC_complete_ck": 3947,
+                  "input_bytes_per_bank": 1024,
+                  "refresh_commands_during_load": 0,
+                  "view_count": 2,
+                  "view_bytes": 512,
+                  "source_rows": [
+                    256
+                  ],
+                  "source_banks": [
+                    0,
+                    4
+                  ]
+                },
+                {
+                  "channel": 0,
+                  "stage_generation": 1,
+                  "batch": 1,
+                  "source_row": 256,
+                  "input_begin_ck": 3979,
+                  "last_input_issue_ck": 4141,
+                  "both_slots_ready_ck": 4166,
+                  "first_MAC_ck": 4416,
+                  "last_MAC_complete_ck": 5440,
+                  "input_bytes_per_bank": 1024,
+                  "refresh_commands_during_load": 0,
+                  "view_count": 2,
+                  "view_bytes": 512,
+                  "source_rows": [
+                    256
+                  ],
+                  "source_banks": [
+                    0,
+                    4
+                  ]
+                }
+              ],
+              "whole_SRF_bytes_per_bank": 1024,
+              "view_bytes_by_rows": {
+                "8": 256,
+                "16": 512
+              },
+              "full_batch_consumption_before_any_view_overwrite": true,
+              "all_views_ready_before_first_MAC": true
+            },
+            "split_activation": {
+              "status": "passed",
+              "nAAD_ck": 8,
+              "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+              "ACT1_commands": 1280,
+              "ACT2_commands": 1280,
+              "paired_ACT2": 1280,
+              "cancelled_ACT1": 0,
+              "pending_ACT2_at_end": 0,
+              "minimum_gap_ck": 1,
+              "maximum_gap_ck": 1,
+              "gap_histogram_ck": {
+                "1": 1280
+              },
+              "maximum_pending_by_channel": {
+                "0": 1,
+                "1": 1,
+                "2": 1,
+                "3": 1,
+                "4": 1,
+                "5": 1,
+                "6": 1,
+                "7": 1,
+                "8": 1,
+                "9": 1,
+                "10": 1,
+                "11": 1,
+                "12": 1,
+                "13": 1,
+                "14": 1,
+                "15": 1
+              },
+              "classifications": {
+                "ordinary": {
+                  "ACT1": 256,
+                  "paired_ACT2": 256,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 256
+                  }
+                },
+                "staging": {
+                  "ACT1": 1024,
+                  "paired_ACT2": 1024,
+                  "late_ACT2": 0,
+                  "cancelled": 0,
+                  "pending_at_end": 0,
+                  "gap_histogram_ck": {
+                    "1": 1024
+                  }
+                }
+              },
+              "violation_count": 0,
+              "violations": {},
+              "violations_by_kind": {},
+              "examples": [],
+              "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+            },
+            "rank_controller": {
+              "command_intervals_checked": 171776,
+              "rank_command_coverage": 103856,
+              "global_CA_resources": 16,
+              "rank_CA_resources": 32,
+              "transfer_broadcast_compute_share_rank_CA": true,
+              "no_CA_interval_overlap": true,
+              "coarse_fragment_descriptors_checked": 1024
+            },
+            "ffn_streams": {
+              "GU_GPU_input_bytes": 524288,
+              "GU_GPU_FP32_export_bytes": 524288,
+              "Down_GPU_BF16_input_bytes": 0,
+              "Down_GPU_FP32_output_bytes": 0,
+              "GPU_input_multicast_destination_bytes": 8388608,
+              "Z_local_read_bytes": 0,
+              "Z_local_write_bytes": 0,
+              "GPU_Z_DRAM_store_bytes": 0,
+              "separate_Z_staging_bytes": 0,
+              "direct_GPU_input": false,
+              "GPU_input_via_single_DRAM_bank": false,
+              "extra_internal_broadcast_cycles": 0,
+              "combined_GPU_export_before_Down_input": false,
+              "GPU_GeLU_multiply_cast_latency_us": null,
+              "Down_output_features_per_rank": 64,
+              "Down_outputs_are_complete": true,
+              "Down_cross_rank_reduction_required": false
+            },
+            "serial_continuity": null,
+            "native_external_DQ_bytes": 1048576,
+            "native_command_counts": {
+              "ACT1": 1280,
+              "ACT2": 1280,
+              "WR": 16384,
+              "PREpb": 1248,
+              "LOCALRD": 16384,
+              "PREab": 688,
+              "ACTAB": 672,
+              "MACAB": 32768,
+              "REFab": 384,
+              "RDRES": 16384
+            },
+            "trace_sha256": "9e89b94ba0d944c3fb4f66004b29727026f55f4d093305fcdf00e790e2d50558",
+            "native_sha256": {
+              "timeline.csv.ch0": "f1889b7ca74b35006801b8d338fef8c38b1fba92c31e1c96df2cd28729c9d2f5",
+              "timeline.csv.ch1": "a6e3cd505e7c9db32cb0317ab91c43ee9a515fc9a8bcc087cf37d18fcabeeeb8",
+              "timeline.csv.ch2": "18f22d4377792e5e4625664ef3816f1c0655bf11d0f5c3237bdb9259b2b0d908",
+              "timeline.csv.ch3": "795565817b8452a80292ac14d7b6428f350547eebb27180e8a7be1eb0c9c8f8f",
+              "timeline.csv.ch4": "ccd5363e045f36a80810d3c14670d8b593d28112f2b03004257c2a17909c07e5",
+              "timeline.csv.ch5": "8650875167e7e69c5ceb42b4beaef4f478bcf0d6c40043c7eea6119853cf5d31",
+              "timeline.csv.ch6": "6ed0e242be60634618666c29ca67e4a74858a55f422bfb2eaa8230c623ce388d",
+              "timeline.csv.ch7": "b3136d5518d2b4cc1e70c36e97aadbdafa77a7bcf8f0cfe6c6e8f87f6a062ab2",
+              "timeline.csv.ch8": "9c420b555fc2ddb719e189f3a15cfa590d2cd1d6dd30cbfb360829e4049c781e",
+              "timeline.csv.ch9": "d35eac7587045209d0c8a9b616669b48cfaacd65ec86845af86e249207da2a91",
+              "timeline.csv.ch10": "bce738104f84849ebfde50e46f835d4f9bd1e05bab20cb16ae0c6ac5f8c67bf7",
+              "timeline.csv.ch11": "c9a724fc4ecb31fe33c310a15b9092079586765963dcc9ace9d70ff847fc2a9f",
+              "timeline.csv.ch12": "2fc51f8738d89ce658d5bc1d85605fa2dadf65afc423c89266569abf7095cb5b",
+              "timeline.csv.ch13": "31a5359a6320d0f29a610a0a7b28a223cf1af47f3a205203684cac2f63d4448b",
+              "timeline.csv.ch14": "0beb74376389db5075ca567d0d667e38598c2e1dbe08d77079f593b77ac0075c",
+              "timeline.csv.ch15": "b4d46aa9344a9041560846eb2fdf797744dc00f0336c9799917ae6f65e70d372",
+              "unified_gemv.csv.ch0": "d84b3af3f033dba063665268e5fabcbcf9d5aa5ac22f5a678a6085dd601013a8",
+              "unified_gemv.csv.ch1": "e00881358e0ed9c861baaa5662577a955ff78f29fcd6dd529f3a3e80369a7a4f",
+              "unified_gemv.csv.ch2": "3db6748a08fe530214a3f913add0632c7597c8525c1787899a90e761df3baaa9",
+              "unified_gemv.csv.ch3": "2023684f0421c4447798aaf918d377aeeff52fa37de1a0eb1c79ec9224633b49",
+              "unified_gemv.csv.ch4": "6ac9951728a0654b2343d8846f347ba5fbf5ac69ba67cbe27e05aacf23347ecd",
+              "unified_gemv.csv.ch5": "29fdc54f10e7f3d47f052f65f7446742d9e95d28688afcacb1c8d56a2aabd69a",
+              "unified_gemv.csv.ch6": "96c49584b3de97f4979b1b6c421bc0cd9b268da3e99d3989b98e3b5b63b5d42f",
+              "unified_gemv.csv.ch7": "8fde0bbfb0ba9f8ae4ec3f68c0011c504fb800ce7e8791c26c3322a1049f545e",
+              "unified_gemv.csv.ch8": "6adca56d1427d748127d56523e4c1e9235593e5eecf71a59a09678ca0346fec5",
+              "unified_gemv.csv.ch9": "87a94bf4f73149c95b02ebddeb43ca71872f159fac718e7d5ea13685a2c65732",
+              "unified_gemv.csv.ch10": "ced7353cefcc52396270339c6de07ae72e37f54e8e66769ddc7202f9b173f03a",
+              "unified_gemv.csv.ch11": "7f83b917bae950c3c5d53db69283a53e052ea8eae7e2c4865860b0a28fd1a4eb",
+              "unified_gemv.csv.ch12": "06fa7703625ebf6d38fce3897727ca2ad011b63ef792567b31dffb066c976086",
+              "unified_gemv.csv.ch13": "c1dcb2dd27ef2da0ad6d4caf1203a40588fc618bdc480c138a365c05f84bce1e",
+              "unified_gemv.csv.ch14": "58c1719c0581d0b0dfe8fec1a00009daf1e39a24cbbeeccff9591e25585a8e6e",
+              "unified_gemv.csv.ch15": "4348340b8002c9e4e6810478ba045216cec44fcd304e1fe325650be57e4e834d",
+              "staging_events.csv.ch0": "b17e46cffee45d3468245d39da9e44c353b0b5cfc18bb05207123039f74765f5",
+              "staging_events.csv.ch1": "0f76db8377f57d2c796fede1d89b860521c7f2f6ae6a669ac719973cf165ba8a",
+              "staging_events.csv.ch2": "ccc4ebafb2ea0bad963d4ff5edecbf076db1ee480801810215c954f70df934c4",
+              "staging_events.csv.ch3": "2143489f827e5e565a282df6298f0318a6f18797de21e813e75fb953f0def7ac",
+              "staging_events.csv.ch4": "008397a754d5540f9b6ac8a0984afd7658e46f2059bcca216af12c8d3d713414",
+              "staging_events.csv.ch5": "2d77f4c54b7d63aebdea89f6e2dcf4d13cd09e4dca0460a67969e4aa9d5364f0",
+              "staging_events.csv.ch6": "22e396ed612764a9482eec814c200a66a6aea4e433a31ff46dc8b31d303b148c",
+              "staging_events.csv.ch7": "1038f73cda1f20c97a6fdfa18f757c9f3d9b735fa3bd8aae8380bbd8b5eb6b46",
+              "staging_events.csv.ch8": "b15135967940c4b705f98b8f7f4ede043fc5626751781986be7fce22dcadd0ca",
+              "staging_events.csv.ch9": "0ab7d4f34493290d790661244a26e83b97c17f2b9790b67ac86ebcd0f3396eaa",
+              "staging_events.csv.ch10": "e62e296c49e0a60c44667d0b4e941785359b6b314d0db41a5c6bad40cf3b8e12",
+              "staging_events.csv.ch11": "4795004f2029e2ef7a670f4fdffbe5b15821764e0efd68476c00c0850f92b516",
+              "staging_events.csv.ch12": "2ab6132ba828081ee0e354eaf95d17218f39abadbdee34919cf0614edfada6b9",
+              "staging_events.csv.ch13": "519de60ab74a67ee3d3b8ae945326c0d60668601e6d414701e045fc42c6ca070",
+              "staging_events.csv.ch14": "9bee517579e9b52549a4de41bbb95195e6b83567cfea6d8482cc6ea6648c9436",
+              "staging_events.csv.ch15": "82fe440068da356ee958ee2d5cf0c347e2c4e9a1efe7b84ccd7779016665dca2",
+              "rank_ca_events.csv.ch0": "50ad869f301599461a4769d9a7c94ea75480b2e1fa15421143edae2c1613d827",
+              "rank_ca_events.csv.ch1": "8331b595f7c57a688988c1b17547517f99618fe18f1f67b6d266452336db8455",
+              "rank_ca_events.csv.ch2": "6c3f94e1f872de12385df332b982b10a106489b0d179f7e1bc814b443a17bb67",
+              "rank_ca_events.csv.ch3": "5a5897f75e9f817210240dd5494dcb41cbf8431334afb0c8d090fd747aa04ab4",
+              "rank_ca_events.csv.ch4": "b7099c0e5a6258e3d2e18eec94549425ce8461979a83b5908fcede5a1000b8bb",
+              "rank_ca_events.csv.ch5": "6bc1bdcef44c1e1ba4ac59fee6b1fc584d7d55055200900420a85f6f191bd687",
+              "rank_ca_events.csv.ch6": "a4d0bd9952d9db4e0a2d77472d78c92c7f694d2ecbb7cef60086f504c7c66f11",
+              "rank_ca_events.csv.ch7": "96861d631d16a4785d8f16bba330441955935563a6d387d9d6b47239690560e6",
+              "rank_ca_events.csv.ch8": "80fd4ea1318900ab59162462435b7908b088493d0f63b065e339be884eef8417",
+              "rank_ca_events.csv.ch9": "d23af525a28d7e89d0b0aa078e05c201acfa4b8ab4c64a402e1d3fab34388185",
+              "rank_ca_events.csv.ch10": "667abf615d060c50783b57538dc02bbdfcdbf1358a0fbfeba3d7e9dd5aec3406",
+              "rank_ca_events.csv.ch11": "e47d0446a62f604235f1e1841098b6b40ab625874cc43a483eeae34fd6d5a23d",
+              "rank_ca_events.csv.ch12": "8a075d2c10d7874dd45a445b1ac9fe6a5bb0b8f835ee861355afe33d10aec73e",
+              "rank_ca_events.csv.ch13": "62d699519387deed939e7b0f8318ad8d5c307d57757cb7f7d4d04373350ee771",
+              "rank_ca_events.csv.ch14": "2d5e7ce395adcbab3f9c7c0f321ab5052a8f41f3d6b5a12e41957bc605b41ae4",
+              "rank_ca_events.csv.ch15": "9c1b352041873765b99a6da87d7e13c5ebe636ad3c66b144fc91e287cef19e9c",
+              "bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch3": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch4": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch5": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch6": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch7": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch8": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch9": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch10": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch11": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch12": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch13": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch14": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "bgk_events.csv.ch15": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+              "frontend_dispatch.csv": "a9b146f1b341979953b281f437034df84093c114cc0daa913f279fec76e50dbb",
+              "channel_ingress.csv": "a689233dd59f1567e97d031d8a1a59d0270194fcdf5c86275375e303f2786f40",
+              "rank_descriptors.csv.ch0": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch1": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch2": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch3": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch4": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch5": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch6": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch7": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch8": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch9": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch10": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch11": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch12": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch13": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch14": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+              "rank_descriptors.csv.ch15": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7"
+            },
+            "numerical_compute": false,
+            "unmeasured": "GPU/nonlinear arithmetic and GPU contention",
+            "channel_ingress": {
+              "requests_checked": 66624,
+              "channel_count": 16,
+              "capacity_per_channel": 32,
+              "queue_high_water_by_channel": {
+                "0": 32,
+                "1": 32,
+                "2": 32,
+                "3": 32,
+                "4": 32,
+                "5": 32,
+                "6": 32,
+                "7": 32,
+                "8": 32,
+                "9": 32,
+                "10": 32,
+                "11": 32,
+                "12": 32,
+                "13": 32,
+                "14": 32,
+                "15": 32
+              },
+              "no_channel_FIFO_reordering": true,
+              "one_dispatch_per_channel_per_CK": true,
+              "completion_fences_checked": 5,
+              "global_barriers_checked": 7,
+              "peer_export_dependencies_checked": 0,
+              "peer_wait_events": 0,
+              "all_accepted_requests_complete": true
+            },
+            "rank_descriptors": {
+              "parent_descriptors_checked": 0,
+              "fine_children_checked": 0,
+              "children_per_descriptor": 16,
+              "parent_waits_for_all_children": true,
+              "one_global_CA_per_descriptor": true,
+              "fine_bank_operations_preserved": true,
+              "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+            },
+            "whole_SRF_row_preparation": {
+              "batch_transitions_checked": 496,
+              "all_next_LOCALRD_wait_for_whole_batch": true,
+              "channels_with_legal_row_preparation_overlap": 16,
+              "overlapped_preparation_commands": 496,
+              "minimum_next_LOCALRD_after_MAC_ready_ck": 32,
+              "maximum_row_preparation_lead_ck": 8,
+              "first_witness_per_channel": [
+                {
+                  "channel": 0,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 1,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 2,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 3,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 4,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 5,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 6,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 7,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 8,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 9,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 10,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 11,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 12,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 13,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 14,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                },
+                {
+                  "channel": 15,
+                  "next_batch": 1,
+                  "last_MAC_issue_ck": 3931,
+                  "whole_batch_MAC_ready_ck": 3947,
+                  "preparation_command": "PREpb",
+                  "preparation_issue_ck": 3939,
+                  "next_LOCALRD_ck": 3979
+                }
+              ]
+            }
+          },
+          "worker_returncode": 0
+        }
+      ]
+    },
+    "score-native-guards": {
+      "passed": true,
+      "case_count": 8,
+      "subprocess_isolation": true,
+      "native_cases": [
+        {
+          "case": "Score_complete",
+          "passed": true,
+          "memory_cycles": 64031,
+          "message": "Native lifetime checks completed",
+          "native_audit": {
+            "channels": 16,
+            "tiles_per_channel": 31,
+            "native_local_writes": 15872,
+            "internal_phase_external_commands": 0,
+            "score_read_bytes": 507904
+          },
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_disabled",
+          "passed": true,
+          "expected_message": "PIM_SCORE_SPILL requires pim_score_dram_spill",
+          "exception_type": "RuntimeError",
+          "message": "PIM_SCORE_SPILL requires pim_score_dram_spill",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_missing_tile_spill",
+          "passed": true,
+          "expected_message": "Score tile overwritten before complete local spill",
+          "exception_type": "RuntimeError",
+          "message": "Score tile overwritten before complete local spill",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_spill_before_compute",
+          "passed": true,
+          "expected_message": "Score spill tile order or complete MAC coverage mismatch",
+          "exception_type": "RuntimeError",
+          "message": "Score spill tile order or complete MAC coverage mismatch",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_read_before_complete_store",
+          "passed": true,
+          "expected_message": "Score export before complete DRAM store",
+          "exception_type": "RuntimeError",
+          "message": "Score export before complete DRAM store",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_duplicate_read",
+          "passed": true,
+          "expected_message": "Duplicate score DRAM read",
+          "exception_type": "RuntimeError",
+          "message": "Duplicate score DRAM read",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_missing_final_read",
+          "passed": true,
+          "expected_message": "Incomplete QKT score spill/export at end of trace",
+          "exception_type": "RuntimeError",
+          "message": "Incomplete QKT score spill/export at end of trace",
+          "worker_returncode": 0
+        },
+        {
+          "case": "Score_unaligned_descriptor",
+          "passed": true,
+          "expected_message": "Score spill requires canonical rank1 tile descriptor",
+          "exception_type": "RuntimeError",
+          "message": "Score spill requires canonical rank1 tile descriptor",
+          "worker_returncode": 0
+        }
+      ]
+    },
+    "o-native-guards": {
+      "passed": true,
+      "case_count": 13,
+      "subprocess_isolation": true,
+      "native_cases": [
+        {
+          "case": "PV_BF16_complete",
+          "passed": true,
+          "memory_cycles": 15942,
+          "message": "Native lifetime/capacity checks completed",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_local_complete",
+          "passed": true,
+          "memory_cycles": 47281,
+          "message": "Native lifetime/capacity checks completed",
+          "worker_returncode": 0
+        },
+        {
+          "case": "PV_spill_missing_producer",
+          "passed": true,
+          "expected_message": "PV spill requires complete PV accumulators",
+          "exception_type": "RuntimeError",
+          "message": "PV spill requires complete PV accumulators",
+          "worker_returncode": 0
+        },
+        {
+          "case": "PV_spill_missing_packet",
+          "passed": true,
+          "expected_message": "staging seal requires every declared input write",
+          "exception_type": "RuntimeError",
+          "message": "staging seal requires every declared input write",
+          "worker_returncode": 0
+        },
+        {
+          "case": "PV_spill_duplicate_packet",
+          "passed": true,
+          "expected_message": "Duplicate PV local input packet",
+          "exception_type": "RuntimeError",
+          "message": "Duplicate PV local input packet",
+          "worker_returncode": 0
+        },
+        {
+          "case": "PV_spill_wrong_destination",
+          "passed": true,
+          "expected_message": "staging requires rank1 BG0/BG1 bank0",
+          "exception_type": "RuntimeError",
+          "message": "staging requires rank1 BG0/BG1 bank0",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_input_without_seal",
+          "passed": true,
+          "expected_message": "staging load requires sealed input",
+          "exception_type": "RuntimeError",
+          "message": "staging load requires sealed input",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_rewind_before_export",
+          "passed": true,
+          "expected_message": "Output owner change before complete result drain",
+          "exception_type": "RuntimeError",
+          "message": "Output owner change before complete result drain",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_duplicate_rewind",
+          "passed": true,
+          "expected_message": "O rewind requires complete first tile",
+          "exception_type": "RuntimeError",
+          "message": "O rewind requires complete first tile and full first input scan",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_missing_rewind",
+          "passed": true,
+          "expected_message": "duplicate staging load",
+          "exception_type": "RuntimeError",
+          "message": "duplicate staging load",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_missing_final_export",
+          "passed": true,
+          "expected_message": "Incomplete local PV to O projection chain",
+          "exception_type": "RuntimeError",
+          "message": "Incomplete local PV to O projection chain",
+          "worker_returncode": 0
+        },
+        {
+          "case": "O_wrong_weight_column",
+          "passed": true,
+          "expected_message": "Unified GEMV MAC column order or operator switch before release",
+          "exception_type": "RuntimeError",
+          "message": "Unified GEMV MAC column order or operator switch before release",
+          "worker_returncode": 0
+        },
+        {
+          "case": "PV_BF16_excess_export",
+          "passed": true,
+          "expected_message": "Output export address/count mismatch",
+          "exception_type": "RuntimeError",
+          "message": "Output export address/count mismatch",
+          "worker_returncode": 0
+        }
+      ],
+      "correction": {
+        "case": "O_missing_rewind",
+        "metadata": "../assertion-correction.json",
+        "metadata_sha256": "226c77dc9cea83033979ba778694eeb2a3af711c7ff3981bafe3be57daef6e67",
+        "original_summary": "../original/summary.json",
+        "original_case": "../original/case-result.json",
+        "retry_case": "../retry-case/case-result.json",
+        "separate_retry_execution": true,
+        "replaced_case_count": 1,
+        "original_passed_case_count": 12
+      },
+      "provenance_policy": "Original full-suite provenance preserved verbatim; this aggregate substitutes one separately retried assertion result."
+    }
+  },
+  "unit_tests": 134,
+  "tests_run_separately": true,
+  "validation_evidence": "/fact_data/xinyaowang/pim_vla_o_projection_20261104/guard-retry-1928781",
+  "same_tested_native_library_and_sources": true,
+  "same_legacy_control_native_library_and_sources": true,
+  "four_way_switch_independence": true,
+  "common_PV_BF16_precision": true,
+  "result_hashes": {
+    "comparison.json": "c51b1742c8fa11b2a3a399faad0ca1ded660bb15d7e9feebb57b7f8f9cc4b115",
+    "summary.json": "eb857742c69b4b5715281424c6e12e15d27c1776da589ce0cfb166845a745165",
+    "provenance.json": "95a3ecff40d4a8d840a36d333ef97e187d1aaf5bef644f1c6b6ef89eeddc9fbb",
+    "both/summary.json": "805ba5f33cbbb290b1bb640bdddfa9c218d0894fdb24f08ec3ac523173419b6e",
+    "both/channel-analysis.json": "77399e6ae400326acf44df66bbfadede4c9068f1c3129bdb9bd928fcf86dd1bc",
+    "both/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "both/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "both/pv/summary.json": "c4a6114abda2be955916fa067b176f101d3e70c4b7f2870d394b8428b926ba1c",
+    "both/pv/native-audit.json": "31a665c453d61d763d1f6b1ee4e0e0d37c477d883e83a7636a365d8f5bc96f66",
+    "both/chain/summary.json": "b3b3bcb40e4d950f15db38b921b7d0059fe89f5e9f4ab1bf811796d74a024a48",
+    "both/chain/native-audit.json": "6dc69761ecf74d29f5daea9566a3a80394693c2a9e98a63e1449b28d0c340f8d",
+    "both/serial_layer_control/summary.json": "9cd97e77afd16ea98534bd6524fd065068254103ff56c7b47f67daa4e7a9ae99",
+    "both/serial_layer_control/native-audit.json": "51695dc1bd3014c123ea223ea50e272521e67122347d1610fe834e3ec0fee116",
+    "both/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "both/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "oproj_only/summary.json": "727e4871fad1147ba948334c441a486ee73604413ef157fa7e6dfff49e47e011",
+    "oproj_only/channel-analysis.json": "2a2886089e7735932e645cfad8862b886f5eb34a1dd71c050c068698af96abdb",
+    "oproj_only/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "oproj_only/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "oproj_only/pv/summary.json": "c4a6114abda2be955916fa067b176f101d3e70c4b7f2870d394b8428b926ba1c",
+    "oproj_only/pv/native-audit.json": "31a665c453d61d763d1f6b1ee4e0e0d37c477d883e83a7636a365d8f5bc96f66",
+    "oproj_only/chain/summary.json": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55",
+    "oproj_only/chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
+    "oproj_only/serial_layer_control/summary.json": "49e8ea1df2c6d0ff4747a1319d52bc86a2e0440c1661084a455c0aa4fd85eef1",
+    "oproj_only/serial_layer_control/native-audit.json": "6c04aa26a51f9e17fd668dd6e09986a4f35d8618a5f771015135fe01455a3923",
+    "oproj_only/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "oproj_only/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "neither/summary.json": "fc5e6d66abe80d89c924bfad00218d39697932d5375513d500e6ac4d34777320",
+    "neither/channel-analysis.json": "937d7097620f30e9bf03def95206a8ebf3571f3f96720b4ec447aa4b0e9cc301",
+    "neither/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "neither/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "neither/pv/summary.json": "054a37d391838307b380c45828dc0fc8bb99ff4d7f1361a08c69e980fb533283",
+    "neither/pv/native-audit.json": "a4f71347e80dae2cb27da510828a8688eb043b7bb4070355bc5e48e2059497a7",
+    "neither/chain/summary.json": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55",
+    "neither/chain/native-audit.json": "8ba44b9737ebfc0def239ae8c5bd1dd5bc7965ff17cc388aa9fc237e6cc647e7",
+    "neither/serial_layer_control/summary.json": "3e9c6a12167cd2838416307c71b9239ba43fa0fd3ce85513fc25c5d40007818e",
+    "neither/serial_layer_control/native-audit.json": "5c31f8175bd9e556252fc5e5d01dcffa7549ea6cb007a1362393c299810a73b9",
+    "neither/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "neither/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2",
+    "score_only/summary.json": "7f0036b4f04953085c56071029002c00a69a1033b84f71d0346b0cd92f2bd515",
+    "score_only/channel-analysis.json": "038510771af654ff13f459cd1ed94ab8698bd0c2ffed0e1dbb15fac1f5caaf98",
+    "score_only/down_gpu_input/summary.json": "9986d55b53d6c503c03e549ec8a7ada2ce9a2664e455f4d947e97966a2c71dcc",
+    "score_only/down_gpu_input/native-audit.json": "4801a141c059e204640554061647f61ea34de3e7f6850a2d50f34d3cac657134",
+    "score_only/pv/summary.json": "054a37d391838307b380c45828dc0fc8bb99ff4d7f1361a08c69e980fb533283",
+    "score_only/pv/native-audit.json": "a4f71347e80dae2cb27da510828a8688eb043b7bb4070355bc5e48e2059497a7",
+    "score_only/chain/summary.json": "b3b3bcb40e4d950f15db38b921b7d0059fe89f5e9f4ab1bf811796d74a024a48",
+    "score_only/chain/native-audit.json": "6dc69761ecf74d29f5daea9566a3a80394693c2a9e98a63e1449b28d0c340f8d",
+    "score_only/serial_layer_control/summary.json": "468af7ad0fab6e2aca764b828ff59711c0452a8b1c9f7eefefc00e7ac337322d",
+    "score_only/serial_layer_control/native-audit.json": "d4a7cdc53f298fd985bd57a6996ce81353c66cb3620ffae8a690a9b11e03dad3",
+    "score_only/gate_up_gpu/summary.json": "aabe46e657329bb834c161eba0432cc0d059d69493d201d67e6f2dcd4b57b44e",
+    "score_only/gate_up_gpu/native-audit.json": "7678ea7d9a3307146588bcc19424da067ab5b7343ca328018b267ca691fdb7e2"
+  },
+  "numerical_validation": false,
+  "complete_end_to_end_latency_us": null,
+  "test_assertion_correction": {
+    "schema_version": 1,
+    "case": "O_missing_rewind",
+    "created_utc": "2026-11-04T11:47:18.273178+00:00",
+    "reason": "The missing rewind is rejected by the earlier duplicate-load guard before the whole-SRF batch-order guard.",
+    "scope": "Expected error substring only; original native binary, workload generator and mutant trace unchanged.",
+    "original_suite": "/fact_data/xinyaowang/pim_vla_o_projection_20261104/r3/runs/four-way-1924380",
+    "original_summary_sha256": "e3dcdd2135126fbb1ee0bceec4ff749e4adbbe818fcf32470b5b069f63979a55",
+    "original_case": {
+      "case": "O_missing_rewind",
+      "passed": false,
+      "expected_message": "Whole SRF batch order mismatch",
+      "exception_type": "RuntimeError",
+      "message": "duplicate staging load",
+      "worker_returncode": 1
+    },
+    "original_actual_error": "duplicate staging load",
+    "expectation_before": "Whole SRF batch order mismatch",
+    "expectation_after": "duplicate staging load",
+    "original_provenance_sha256": "f00ab34b8046908eaf9d13bf57af4d3ef380283d95670233e79e0dcbd2a73c60",
+    "native_library_sha256": "7079c3cde34f9ff2c5614639f3ee9fe42545e710822f52ed550489c4ed75965b",
+    "frozen_guard_source_sha256": "a6cf4e4963a633a83bad5097064a7351e295c2e368f27147b0dd45907b19e67d",
+    "retry_driver_sha256": "7efecf92a7f4e016afe97478e8c1c7bef5b641340c96d8b5223d96373b626d69",
+    "original_artifact_sha256": {
+      "summary.json": "e3dcdd2135126fbb1ee0bceec4ff749e4adbbe818fcf32470b5b069f63979a55",
+      "case-result.json": "de936ef09b95c3d61d39b5acf58993a8d7a05f038b150d2fd18a00b997b0f63d",
+      "worker.log": "0e35e98866f31580826b949e0422c836c9423cf003ff0147a63c84fa3cfb0313",
+      "guard.trace": "7f8cb1522fd0eca8ca885d922c35789b0d22481288c4df33881e1f77cd84972c"
+    },
+    "retry_artifact_sha256": {
+      "retry-worker.log": "c9a8c2fb5f84bf1eafe957fe8ca408393e17a90b4ca71517879985274fdf58bc",
+      "provenance.json": "f00ab34b8046908eaf9d13bf57af4d3ef380283d95670233e79e0dcbd2a73c60",
+      "retry-case/case-result.json": "ef2d17e43135655004c6c09a40718881a7b322ca7d26fb74fff0cc9a4b43a0eb",
+      "retry-case/guard.trace": "7f8cb1522fd0eca8ca885d922c35789b0d22481288c4df33881e1f77cd84972c",
+      "retry-case/simulation/rank_ca_events.csv.ch14": "dbba8c71c7412f8bcb8a4fb6745b5e539a87789304f0848ea394751c1b022bf5",
+      "retry-case/simulation/bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/staging_events.csv.ch6": "5f7f1161d51b46f9631ad64074f80936c20448f1da982ddbd09d3234277a1407",
+      "retry-case/simulation/timeline.csv.ch12": "5d5a1fa1f5bc2ecfc083203c1fe1c8edda21c09dd8cf36fa4749429ea2999731",
+      "retry-case/simulation/timeline.csv.ch7": "a7454b3b0493088bdf42befd10482342ab6a20ebd234ec29ab0742ba4bc3d074",
+      "retry-case/simulation/staging_events.csv.ch1": "d647d2ac73dc841196555945f0faf8cf4b58ddb201110580644f79a7c0fd99db",
+      "retry-case/simulation/o_projection.csv.ch15": "297c674e8201d981fae34ef9905bd49a5c20a8ea61803837c6b4a7f07724c209",
+      "retry-case/simulation/unified_gemv.csv.ch2": "9ebf0eaff49e9416f7d90f538a2b2d62e47f3673f4abdaedac918929a477ae6f",
+      "retry-case/simulation/rank_descriptors.csv.ch13": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/unified_gemv.csv.ch5": "3d68e734dd27485ffe5e5d81cc2796e05463f307fc1d1ccafa8642ceef0b0876",
+      "retry-case/simulation/timeline.csv.ch8": "4d263d8ef24ccce7a684e0c0ef058aeef2b6efe977009750f48dd1e24919c954",
+      "retry-case/simulation/timeline.csv.ch13": "ef95853cff5bda0b5ed74c1d4f771721e8179f84d38a55377a6fa2da5dc8ac51",
+      "retry-case/simulation/bgk_events.csv.ch3": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/unified_gemv.csv.ch6": "2a9ae47f8048ea9214a4856090009a9a9f23382e70a3d177914d1475e93dd627",
+      "retry-case/simulation/rank_ca_events.csv.ch10": "a94e47b41372f1d9b05d4a29764c406bde41e254d2f1e7ccb31fba7dcde044b2",
+      "retry-case/simulation/rank_descriptors.csv.ch12": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/local_input.csv.ch3": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/timeline.csv.ch5": "6f2281e48ebe90d2e3b4d8c4ef45d50c7a1781a82e0e9d5acff228957fd05a9c",
+      "retry-case/simulation/bgk_events.csv.ch4": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/v_cache.csv.ch9": "e8023e48a4f8f17eff637a6bfc9aa9a384705904ceb74ec7a58b7550b61a253f",
+      "retry-case/simulation/barriers.csv": "488a134e36adbec2bb9e5f9f830cfdc2506601cf9eb7c7bb5059f2b6e3a2c852",
+      "retry-case/simulation/bgk_events.csv.ch12": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/o_projection.csv.ch1": "f8571f9d7ba309a71a7637b9d1395e3458639cf745eb88993dbede1598656082",
+      "retry-case/simulation/unified_gemv.csv.ch3": "5ce66c31228b457f0fdf2ccdc74e4654ea635c96815945f1d4c658a8ca4dadae",
+      "retry-case/simulation/rank_ca_events.csv.ch5": "7576e9348ffd2b705ce67dc704e973c395cfae66cb9eedb462a20ecc13812d0e",
+      "retry-case/simulation/unified_gemv.csv.ch15": "f65715bdd14aea274176f40d76f04288cd7b12348605aca01439c857797e86f3",
+      "retry-case/simulation/rank_ca_events.csv.ch7": "2da67359902eb47f0f3fa0b1e55d7be5fcf927320b3d2edb57197a36181f74ef",
+      "retry-case/simulation/o_projection.csv.ch13": "7421dc652c5831042030555bb599d33bc079a9723a62593f300f28566ddc4f0b",
+      "retry-case/simulation/o_projection.csv.ch14": "a653898eae33a784944412753acc0bc56cec9d5f2591f9920cd0be9acdbb86d8",
+      "retry-case/simulation/rank_ca_events.csv.ch4": "1bb64a1d2c2fdabb2f9a2aee28b8b5a5026913ef01eb4d9405f7fe391bea9f62",
+      "retry-case/simulation/timeline.csv.ch14": "86e5558f38638fb269d2813dc5fd1b79ef62e05ca2ad080f66e75f6d6c2a855d",
+      "retry-case/simulation/rank_ca_events.csv.ch1": "ffa49dab0981570878ac71cca2250f0dc63656e36fba85ba5f5b8420f7675f05",
+      "retry-case/simulation/input.trace": "7f8cb1522fd0eca8ca885d922c35789b0d22481288c4df33881e1f77cd84972c",
+      "retry-case/simulation/bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/timeline.csv.ch2": "55ebc22c91d26a17ea8553633c473ac99ee78eec02b505de58008f36a03e7f92",
+      "retry-case/simulation/rank_ca_events.csv.ch13": "8e1aabf02257b93e7dd0c8414fb63a44cd0ec1a69d8a022beeed7d1224f873f6",
+      "retry-case/simulation/rank_ca_events.csv.ch11": "ace52d65c7fe32f2060640fb6550896bc7a746ddce3a6cb6a44dd95fae955bf0",
+      "retry-case/simulation/v_cache.csv.ch6": "698dd6fa8cd404a4f7b63d7a7d17e1cc01f39879f4f86f96c65efa2c6dbd7e29",
+      "retry-case/simulation/unified_gemv.csv.ch10": "bfe5818cb2b32ee93870983e08afc74d76b053852c5446d54c858c4fda2cd56b",
+      "retry-case/simulation/rank_descriptors.csv.ch2": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/local_input.csv.ch2": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/staging_events.csv.ch5": "79486292d7d92c90191e0d5176d2cbb95fc6d0925e884dcb7a14a67655b3c8e6",
+      "retry-case/simulation/staging_events.csv.ch13": "a093cd6922a24a041ac0f33ded4f9421f9521fe84312546a4ba54eacabf3a421",
+      "retry-case/simulation/staging_events.csv.ch8": "a065710d30384fe633766bbc4a6263cc1e15fd6f35f3c993bb94f5b4596cfbed",
+      "retry-case/simulation/rank_descriptors.csv.ch8": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/rank_ca_events.csv.ch15": "df100126991f93648a615c785d7d490f44804032ed63eebd1edb0525fd74d550",
+      "retry-case/simulation/staging_events.csv.ch3": "348c379406ace33eedb307eabe44f65fb6faf01e7ad2be9cf8a9cbfccad4e668",
+      "retry-case/simulation/local_input.csv.ch15": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/timeline.csv.ch3": "804b46004910183014eaeb137743c9df357e55c82d6686ecc401fee1fcd1b013",
+      "retry-case/simulation/staging_events.csv.ch0": "a7a99dc3eefbf5598ffd0b28b7b180d42bcf2def4dd9945660c7529cd2d1c764",
+      "retry-case/simulation/staging_events.csv.ch14": "234be4e08cdc68789a8e56c61366e281cf6a7f87d6727db73e7f970af432489f",
+      "retry-case/simulation/rank_descriptors.csv.ch3": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/o_projection.csv.ch12": "78e4ddc5213ff747791f1158dd05d3d9e06f76f12b910c7708d72bbfccf90511",
+      "retry-case/simulation/unified_gemv.csv.ch1": "e62321ab7966c2889ec1545655aca6a5f3ca0d2c887afb213b2554109e0e1e79",
+      "retry-case/simulation/staging_events.csv.ch12": "1aea383936b4430d9cb5eabc8435848d1108cd7ec017e2400068f4cbc906aad2",
+      "retry-case/simulation/rank_descriptors.csv.ch4": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/o_projection.csv.ch7": "4f79414d62f7159881b1663af3e520b378f1cf6c92bef8e3e643961c93d6d43c",
+      "retry-case/simulation/o_projection.csv.ch9": "5f4ac204940685016e4e037ac2defac68f117e57f966ee732ff0e107b8344efc",
+      "retry-case/simulation/v_cache.csv.ch1": "f5126526736c02fec1dee70be3df7d3def4927380219a23efa6e3cef806b8052",
+      "retry-case/simulation/local_input.csv.ch6": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/bgk_events.csv.ch8": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/staging_events.csv.ch11": "0d89402c0faa02b91807f69dd42b2df6dd0efa704b198a4e33182857680bb710",
+      "retry-case/simulation/o_projection.csv.ch3": "73404597b58a628190f52a63ba360dbc529783fc74cdb5df97789c282f9a3531",
+      "retry-case/simulation/bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/rank_ca_events.csv.ch2": "457333063bf852ee0aefc72499bb738476456272d6a885673a66c4f51c840389",
+      "retry-case/simulation/unified_gemv.csv.ch4": "6f50a2739146ec55d0b60dfb394f9056d9abd5f3371da2f063f6c3d98beb391a",
+      "retry-case/simulation/timeline.csv.ch15": "b2ba0596f910db4e91a7ebe1d4d3b38d96f7f1e578ff8d2b291a60d935514618",
+      "retry-case/simulation/v_cache.csv.ch14": "055cecb299ec20aa9d0a2e52a9f837a5921289a472912b4253b562b9dbb7b8a6",
+      "retry-case/simulation/unified_gemv.csv.ch12": "72b488fb31236670d2232b49782c7bfb6db8b752bb684f4b5f040f4f3abe6c30",
+      "retry-case/simulation/rank_descriptors.csv.ch14": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/timeline.csv.ch6": "2de8ce962b37d15c8f73ef01d81aed3daddeea629b2d607d0d07f1d3b1246860",
+      "retry-case/simulation/unified_gemv.csv.ch0": "48e37ad5a96b53f4e3fca089c85fe94010810367b38886d9fee1a84274258f53",
+      "retry-case/simulation/timeline.csv.ch11": "258091ad515f11f4f8ef67c0275e0155473e54764477b24a9d812951445811e5",
+      "retry-case/simulation/bgk_events.csv.ch6": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/rank_descriptors.csv.ch7": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/local_input.csv.ch11": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/v_cache.csv.ch13": "6a1206eda77c60a1bfd74b033e632ccfc8493f0867d89da2bb7a862e6f60330b",
+      "retry-case/simulation/bgk_events.csv.ch11": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/timeline.csv.ch10": "6afa3ab5f26083ba3f16583e9ce3f5a25c1a00e5f55241a38255efe7f1bab51f",
+      "retry-case/simulation/rank_descriptors.csv.ch1": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/v_cache.csv.ch8": "176cf1269fac0addbd02f88eb0e6fba3d4e8e0585e05ba019932379500ec57df",
+      "retry-case/simulation/unified_gemv.csv.ch14": "3a038c862cf327912f5b40fa8bacf7db2ee6bfc3f2cb1b7e8ca69c42cfedbfdc",
+      "retry-case/simulation/rank_ca_events.csv.ch3": "caeb93b7badf5389082bde1321da9ee4fbde69768ae5034e17441e3b0ce7bdcb",
+      "retry-case/simulation/frontend_dispatch.csv": "6d1028ed85cc9b20336864415dc9167ff654541d5bc12ffdf41c655437f65f6f",
+      "retry-case/simulation/unified_gemv.csv.ch8": "c028ab614d255facf2485daaa43a0b3dae6e1feeceabece155d0890e460b603f",
+      "retry-case/simulation/rank_descriptors.csv.ch5": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/rank_ca_events.csv.ch12": "3267675a326265a8d74f0b015fecda57ecf0691735475f735b1420320f276e10",
+      "retry-case/simulation/rank_descriptors.csv.ch0": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/rank_ca_events.csv.ch9": "ae67b1200144e48b40d1464ab051173a03700526081e7ea3fdecb6b240d473eb",
+      "retry-case/simulation/bgk_events.csv.ch14": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/bgk_events.csv.ch9": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/rank_ca_events.csv.ch6": "a3bafdb072a1aba09a8d39bafb4b30d7eac42e2cf13abde60079df07b8bb72d9",
+      "retry-case/simulation/bgk_events.csv.ch13": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/bgk_events.csv.ch5": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/staging_events.csv.ch7": "19bd1f4711f66f322be051381372d6ea281897b014edc30fc9818ea114973e1c",
+      "retry-case/simulation/v_cache.csv.ch11": "a66f11c4cdbbf9a5b4829404bf5cad31a99ce1fef6ca840c9bbfbac543bc8356",
+      "retry-case/simulation/unified_gemv.csv.ch13": "34609be3e64cea3e78f64a655a64247d71c2922cb6dfe59fc65848d9b4a11047",
+      "retry-case/simulation/v_cache.csv.ch10": "1fc468c524fb5e9ac07cfb289e07e555e22635caf9ea7b2641b505aeb2da8bc4",
+      "retry-case/simulation/rank_descriptors.csv.ch11": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/local_input.csv.ch8": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/local_input.csv.ch0": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/timeline.csv.ch1": "4a7b8e021d5615fe036ada67edf3c62d60a1f0539f83be504108715f463011d4",
+      "retry-case/simulation/channel_ingress.csv": "6f5aaa9b5c66cb0ee0086fc7719835f9c05d478f9cc2f058985dd18dc85ccc71",
+      "retry-case/simulation/o_projection.csv.ch2": "0e05b914056046137a6ec9a70f6af2d532642b563c9f6b01ab907815e357fc97",
+      "retry-case/simulation/v_cache.csv.ch12": "e60d0e82b1080582f5aa124621609083123e1d1d03faf14dec07afeb04ec4b2f",
+      "retry-case/simulation/rank_descriptors.csv.ch9": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/v_cache.csv.ch7": "081a30fce093bdc192416d6e95b4ad967311e30e62ef6b4c5628030d088ec83e",
+      "retry-case/simulation/o_projection.csv.ch5": "b5e13ffdcf05d9fa32da50f8f00abcb03b0044dc8e0909390b6787cddc6179cb",
+      "retry-case/simulation/bgk_events.csv.ch7": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/staging_events.csv.ch10": "6b5b2956340326ab6efb6cf4b729caa2c5d6597e92952c0dd9aba76c87bd2ca2",
+      "retry-case/simulation/o_projection.csv.ch10": "0e3801632ab1f3538edf4dfec232c5606a7bc4ff47a05001304d69d06d6dbff6",
+      "retry-case/simulation/o_projection.csv.ch0": "53183de2601a12b5a8300f80a6a523cb2f4de58d6d0862eaefeaa572fd0f3515",
+      "retry-case/simulation/v_cache.csv.ch3": "4246d6af0e66a276596a84fb8c544dde8f5a8c436c78cef09efa07f573066b05",
+      "retry-case/simulation/local_input.csv.ch14": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/local_input.csv.ch12": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/local_input.csv.ch4": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/rank_descriptors.csv.ch10": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/staging_events.csv.ch4": "74b25977d95418489d0ec92a4f883733840913cc91c74cd96486758237d62831",
+      "retry-case/simulation/local_input.csv.ch1": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/timeline.csv.ch4": "8e102c855290e6f1152b42343e37067d776048a06de0af3413ca645b3406ede6",
+      "retry-case/simulation/rank_descriptors.csv.ch15": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/unified_gemv.csv.ch11": "442664e770bcef2a97377aa74c56dfae597a2dee25fd22c1760442f7d794fae0",
+      "retry-case/simulation/v_cache.csv.ch0": "314c4848a8d7ca9f20917defbf9b606cbcd0d27e307db8651594b1d6d7f15785",
+      "retry-case/simulation/o_projection.csv.ch4": "23cd956f74290543c8933e3955c02bdcd93601c84f39b15a317361d736ea7734",
+      "retry-case/simulation/v_cache.csv.ch15": "a5988e4360e73944242670dfb080d72e3db6d3475f4cfd90d68d6098d7f12322",
+      "retry-case/simulation/unified_gemv.csv.ch7": "b211a6b54fbc6885d877cb4f1d5280aca56c5d0f6c9c15521d7445fe1e1b238e",
+      "retry-case/simulation/local_input.csv.ch5": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/local_input.csv.ch7": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/timeline.csv.ch9": "a0038705db6feef9aeb8fcb9485ff124cd23bef674c686cc88091e15a9abb947",
+      "retry-case/simulation/timeline.csv.ch0": "a224e847640d7674543def884c445cc918408c37bbb9551e9e903b596595147a",
+      "retry-case/simulation/bgk_events.csv.ch15": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/local_input.csv.ch9": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/bgk_events.csv.ch10": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+      "retry-case/simulation/v_cache.csv.ch5": "b0d2a6f75ca5a939517403b2411ee3fb78b6b09e2e147f1590ff4fe5ec062c99",
+      "retry-case/simulation/staging_events.csv.ch15": "14766255781ca31879629350e18afd73bbd8b663ead57c4c3d1b45d239c3eaea",
+      "retry-case/simulation/rank_ca_events.csv.ch0": "a5f668abbab9565f0756cd18015a40c2e9164606b220768cae449cc9b5baf690",
+      "retry-case/simulation/local_input.csv.ch13": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/rank_ca_events.csv.ch8": "56b816334dcd7e7af8c21619217f5c685f1525eeadb9dbd06c5d53b1596f0e78",
+      "retry-case/simulation/o_projection.csv.ch6": "205431300e78acaf72364c59fa33fb1e49d75de5184c3fcba32b02aae72b2dfa",
+      "retry-case/simulation/local_input.csv.ch10": "481aa867e27a8ae0f2d72f1dca0a0b764fb259b48264781227289cdb71bcff8f",
+      "retry-case/simulation/rank_descriptors.csv.ch6": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+      "retry-case/simulation/o_projection.csv.ch11": "5b0c19f68743e4409d88dbc345d615fae4daec52fdbeb6b29f4715544257eba6",
+      "retry-case/simulation/staging_events.csv.ch2": "16a3c186266b79b20130c544cc4ee0bb8f651fd6cb9aa807eb3d593af4fe76ab",
+      "retry-case/simulation/v_cache.csv.ch2": "de1e1dc1d3078ad0df5250ef1e5ff1c863a0446cdf571239d5ee00b17d94fb58",
+      "retry-case/simulation/unified_gemv.csv.ch9": "e3ca6ddc52f743bc2dd256903f8b8a1eb726410524bfaab6324e280ef7cd4872",
+      "retry-case/simulation/staging_events.csv.ch9": "21ce4d6a6bdc57b81063b36a8b8d3cb1f5c8f2b08e3c8702cc9a12c6a0ce5c6b",
+      "retry-case/simulation/o_projection.csv.ch8": "234d5761546af5cef50a9d3d1301d72de1c05a1dcc994b6377e988109b31079e",
+      "retry-case/simulation/v_cache.csv.ch4": "4785b88bf36b422dff0a0e0547153a28ede1407244eac2c52d2d4bd9bf85daeb"
+    },
+    "original_and_retry_trace_identical": true,
+    "frozen_and_original_artifacts_unchanged": true,
+    "retry_result": {
+      "case": "O_missing_rewind",
+      "passed": true,
+      "expected_message": "duplicate staging load",
+      "exception_type": "RuntimeError",
+      "message": "duplicate staging load",
+      "worker_returncode": 0
+    },
+    "separate_retry_execution": true,
+    "all_tests_rerun": false
+  }
+}

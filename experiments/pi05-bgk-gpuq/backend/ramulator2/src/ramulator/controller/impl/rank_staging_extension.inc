@@ -106,6 +106,9 @@ void init_rank_staging() {
 const char* coarse_name(const Request& req) const {
   if(req.pim_rank_batch) return rank_descriptor_name(req.type_id);
   switch(req.type_id) {
+    case Request::Type::PIM_SCORE_SPILL:return "PIM_SCORE_SPILL";
+    case Request::Type::PIM_PV_SPILL:return "PIM_PV_SPILL";
+    case Request::Type::PIM_O_REWIND:return "PIM_O_REWIND";
     case Request::Type::PIM_STAGE_BEGIN:return "PIM_STAGE_BEGIN";
     case Request::Type::PIM_STAGE_SEAL:return "PIM_STAGE_SEAL";
     case Request::Type::PIM_STAGE_LOAD:return "PIM_STAGE_LOAD";
@@ -198,7 +201,12 @@ bool issue_stage(ReqBuffer::iterator it) {
       if(found==m_stage.writes.end()) throw std::runtime_error("staging seal requires every declared input write");
       if(found->second<0 || m_clk<found->second) return false;
     }
-    m_stage.sealed=true;record_stage(*it,"SEAL",m_clk,m_clk,m_stage.bytes);enqueue_bgk_done(it,m_clk);return true;
+    m_stage.sealed=true;record_stage(*it,"SEAL",m_clk,m_clk,m_stage.bytes);
+    if(m_o_projection && m_output_base==163840 && m_stage.bytes==8192) {
+      if(!output_all(m_o_pv_spills)) throw std::runtime_error("O input seal requires all PV source banks and queries");
+      record_o(*it,"PV_INPUT_SEAL",m_clk,8192);
+    }
+    enqueue_bgk_done(it,m_clk);return true;
   }
   if(!m_stage.active || !m_stage.sealed) throw std::runtime_error("staging load requires sealed input");
   const int offset=stage_logical_offset(*it);

@@ -11,7 +11,7 @@ def inspect_trace(
     path: Path, *, transaction_bytes: int, capacity_bytes: int, pim: bool = False
 ) -> dict:
     counts = dict.fromkeys(("LD", "ST", "PIM_MAC_AB", "PIM_WR_GB", "PIM_RD_RES", "PIM_MAC_HB", "PIM_LOCAL_GB", 'PIM_WR_BG', 'PIM_WR_Q', 'PIM_MAC_K', 'PIM_MAC_QK', 'PIM_RD_BG', 'PIM_LOCAL_WR', 'PIM_RD_Q'), 0)
-    new_ops = ("PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE", "PIM_Z_STORE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT")
+    new_ops = ("PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE", "PIM_Z_STORE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT", "PIM_SCORE_SPILL", "PIM_PV_SPILL", "PIM_O_REWIND")
     counts.update(dict.fromkeys(new_ops, 0))
     counts.update(dict.fromkeys(RANK_BATCH_OPS, 0))
     controls = {"BARRIER": 0, "WAIT": 0}

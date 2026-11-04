@@ -85,6 +85,11 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_qkv_fusion": config.pim_qkv_fusion,
                     "pim_whole_srf": config.pim_whole_srf,
                     "v_cache_preinstalled": config.v_cache_preinstalled,
+                    "pim_score_dram_spill": config.pim_score_dram_spill,
+                    "pim_o_projection": config.pim_o_projection,
+                    "pim_pv_bf16_output": config.pim_pv_bf16_output,
+                    "score_spill_events_path": str(output / f"score_spill.csv.ch{channel}") if config.pim_score_dram_spill else "",
+                    "o_projection_events_path": str(output / f"o_projection.csv.ch{channel}") if (config.pim_o_projection or config.pim_pv_bf16_output) else "",
                     "v_cache_events_path": str(output / f"v_cache.csv.ch{channel}") if config.pim_token_pv else "",
                     "pim_rank_rope": config.pim_rank_rope,
                     "pim_horizon": config.pim_horizon,
@@ -539,6 +544,26 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
             v_cache_array_write=v_stat(stats, "v_cache_array_writes")*32,
             v_cache_fp32_gather=v_stat(stats, "v_cache_gather_bytes"),
             v_cache_bf16_cast_output=v_stat(stats, "v_cache_cast_bytes"))
+        if config.pim_pv_bf16_output:
+            result["pv_output_precision"] = dict(operands="BF16", accumulator="FP32", result="BF16",
+                cast_elements_per_cycle=8, packet_scratch_bytes=64,
+                packet_gather_cycles=2*config.gemv_port_cycles, packet_cast_cycles=2*config.pim_cast_cycles)
+            result["traffic_bytes"].update(output_fp32_gather=v_stat(stats,"o_gather_bytes"),
+                output_bf16_cast=v_stat(stats,"o_cast_bytes"),
+                pv_to_staging_internal_transfer=v_stat(stats,"o_transfer_bytes"),
+                pv_to_staging_array_write=v_stat(stats,"o_local_write_bytes"))
+        if config.pim_o_projection:
+            result["o_projection_model"] = dict(weight_shape_per_rank=[256,1024],weight_copies_per_head=2,
+                weight_bytes_all_ranks=8*1024**2,weight_base=786432,
+                source_banks=[0,4],local_input_bytes_per_rank=8192,input_scans=2,
+                output_tiles=2,output_columns_per_bank_per_tile=32,accumulator_bytes_per_bank=2048,
+                output_dtype="BF16",result_bytes_all_ranks=512*1024,
+                final_reduction="GPU sum over eight heads and two KV parity partials; latency unmeasured")
+    if config.pim_score_dram_spill:
+        result["score_dram_model"] = dict(score_dtype="FP32",tiles_per_rank=31,tile_bytes=1024,
+            destination_banks=[0,4],base_bytes=655360,stored_bytes_per_rank=31744,
+            local_port_cycles_per_32B=config.gemv_port_cycles,
+            final_export="ordinary LD after complete local score store; no intermediate score DQ")
     for field in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
         if not getattr(config, field):
             result["config"].pop(field, None)

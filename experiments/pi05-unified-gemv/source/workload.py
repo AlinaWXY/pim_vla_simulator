@@ -18,7 +18,7 @@ CASES = (*PRIMARY, "combined_timing_chain", "serial_layer_control")
 
 
 def unified_buffers(case, rank_staging=True, staging_banks=1, v_token_sharding=False,
-                    pv_token_sharding=False,qkv_fusion=False):
+                    pv_token_sharding=False,qkv_fusion=False,o_projection=False):
     buffers = dict(gemv_slots_per_bank=2, gemv_slot_bytes=512,
                 gemv_total_bytes_per_bank=1024, gemv_layout="[token16][lane16] BF16",
                 separate_rank_MAC_input_bytes=0, separate_Q_buffer_bytes=0,
@@ -56,15 +56,25 @@ def unified_buffers(case, rank_staging=True, staging_banks=1, v_token_sharding=F
             buffers["projection_accumulator_per_bank"]=1536 if qkv_fusion else 1024
         elif case=="pv":
             buffers["accumulator_per_bank"]=1024
+    if o_projection and case in ("pv","serial_layer_control"):
+        buffers.update(o_projection_accumulator_per_bank=2048,
+            o_projection_input_dram_bytes_per_rank=8192,o_projection_output_tiles=2)
     return buffers
 
 
 def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False,
-             v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False):
+             v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False,
+             score_dram_spill=False,o_projection=False,pv_bf16_output=False):
     if pv_token_sharding and not v_token_sharding:
         raise ValueError("PV token sharding requires token-sharded V")
     if qkv_fusion and not pv_token_sharding:
         raise ValueError("QKV fusion requires token-parity V/PV cache mode")
+    if (pv_bf16_output or o_projection) and not pv_token_sharding:
+        raise ValueError("BF16 PV/O experiment requires token-parity PV")
+    if o_projection and (not pv_bf16_output or not rank_staging or staging_banks!=2):
+        raise ValueError("O projection requires BF16 PV and two-bank rank staging")
+    if score_dram_spill and not rank_staging:
+        raise ValueError("Score DRAM spill requires rank staging/controller")
     rank_descriptors = bool(rank_descriptors and rank_staging)
     channel_independent_dispatch = bool(channel_independent_dispatch and rank_staging)
     check_staging_banks(staging_banks)
@@ -73,20 +83,22 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
     if case == "serial_layer_control":
         return generate_serial(path, rank_staging=rank_staging, staging_banks=staging_banks,
             rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-            v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+            v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+            score_dram_spill=score_dram_spill,o_projection=o_projection,pv_bf16_output=pv_bf16_output)
     if case == "chain":
         result = attention.generate(path, horizon=16, case="chain", schedule="double", rank_staging=rank_staging, staging_banks=staging_banks, rank_descriptors=rank_descriptors,
-            qkv_fusion=qkv_fusion,whole_srf=pv_token_sharding)
+            qkv_fusion=qkv_fusion,whole_srf=pv_token_sharding,score_dram_spill=score_dram_spill)
     elif case in ("v", "pv"):
         result = value.generate(path, 16, case, rank_staging=rank_staging, staging_banks=staging_banks,
-                                v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,rank_descriptors=rank_descriptors)
+                                v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,rank_descriptors=rank_descriptors,
+                                o_projection=o_projection,pv_bf16_output=pv_bf16_output)
     else:
         result = ffn.generate(path, 16, case, local_ck=2, rank_staging=rank_staging, staging_banks=staging_banks)
     result["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
-                                         v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                                         v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,o_projection=o_projection)
     if "layout" in result:
         result["layout"]["buffers"] = unified_buffers(case, rank_staging=rank_staging, staging_banks=staging_banks,
-                                                     v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                                                     v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,o_projection=o_projection)
     result.setdefault("required_backend", {}).update(pim_unified_gemv=True,
         gemv_port_cycles=2, pim_horizon=16,
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
@@ -113,13 +125,14 @@ def generate(path, case, rank_staging=True, staging_banks=1, rank_descriptors=Fa
 
 
 def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=False, channel_independent_dispatch=False,
-                    v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False):
+                    v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False,
+                    score_dram_spill=False,o_projection=False,pv_bf16_output=False):
     """One controller lifetime across all modeled stages; no invented GPU wait."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     lines, segments, parts, boundary = [], [], [], 0
     staging_inputs, rank_batches, v_mapping = [], [], None
-    pv_mappings,qkv_mapping={},None
+    pv_mappings,qkv_mapping,o_mapping,score_mapping={},None,None,None
     expanded_counts = Counter()
     dq = {}
     with tempfile.TemporaryDirectory(prefix="serial-parts-", dir=path.parent) as scratch:
@@ -129,7 +142,8 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
             part_path = Path(scratch) / f"{case}.trace"
             manifest = generate(part_path, case, rank_staging=rank_staging, staging_banks=staging_banks,
                 rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-                v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
+                v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion,
+                score_dram_spill=score_dram_spill,o_projection=o_projection,pv_bf16_output=pv_bf16_output)
             expanded_counts.update(manifest["expanded_counts"])
             source = part_path.read_text(encoding="ascii").splitlines()
             skip = bool(lines)
@@ -176,6 +190,13 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
                 from pv_token_layout import shift_trace_lines
                 qkv_mapping=shift_trace_lines(manifest["qkv_mapping"],line_shift)
                 qkv_mapping["stage"]=case
+            if manifest.get("o_projection_mapping"):
+                from pv_token_layout import shift_trace_lines
+                o_mapping=shift_trace_lines(manifest["o_projection_mapping"],line_shift)
+                o_mapping["stage"]=case
+            if manifest.get("score_dram_mapping"):
+                score_mapping=deepcopy(manifest["score_dram_mapping"])
+                score_mapping["stage"]=case
             parts.append(dict(stage=case, start_marker=boundary,
                 end_marker=segments[-1]["end"], first_line=2+line_shift, last_line=len(lines)))
             if manifest.get("v_token_sharding"):
@@ -186,7 +207,7 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
                 parts[-1]["qkv_fusion"]=True
             boundary = segments[-1]["end"]
             dq[case] = manifest["expected_dq_bytes"]["total"]
-    path.write_text("\n".join(lines)+"\n", encoding="ascii")
+    path.write_text("\n".join(lines)+"\n", encoding="ascii", newline="\n")
     buffers = unified_buffers("combined_timing_chain", rank_staging=rank_staging, staging_banks=staging_banks,
         v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding,qkv_fusion=qkv_fusion)
     buffers.update(projection_accumulator_per_bank=1536 if qkv_fusion else 1024, value_accumulator_per_bank=512,
@@ -239,10 +260,29 @@ def generate_serial(path, rank_staging=True, staging_banks=1, rank_descriptors=F
     if qkv_mapping is not None:
         result["qkv_mapping"]=qkv_mapping
         result["required_backend"]["pim_qkv_fusion"]=True
+    if score_dram_spill:
+        result.update(score_dram_spill=True,score_dram_mapping=score_mapping)
+        result["required_backend"]["pim_score_dram_spill"]=True
+    if pv_bf16_output:
+        result["pv_bf16_output"]=True
+        result["required_backend"]["pim_pv_bf16_output"]=True
+    if o_projection:
+        result.update(o_projection=True,o_projection_mapping=o_mapping)
+        result["required_backend"]["pim_o_projection"]=True
+        result["buffers"].update(o_projection_accumulator_per_bank=2048,
+            o_projection_input_dram_bytes_per_rank=8192,o_projection_output_tiles=2)
+        result["buffers"]["input_rows_by_operator"]["O_projection"]=16
+        result["buffers"]["gemv_views_by_operator"]["O_projection"]=2
+        result["buffers"]["gemv_view_bytes_by_operator"]["O_projection"]=512
+        result["unknown_boundary_latency_us"].pop("GPU_PV_partial_sum",None)
+        result["unknown_boundary_latency_us"].pop("GPU_O_projection_norm_residual_FFN_input")
+        result["unknown_boundary_latency_us"].update(GPU_O_projection_partial_sum=None,
+            GPU_norm_residual_FFN_input=None)
     return result
 
 
-def layouts(rank_staging=True, staging_banks=1, v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False):
+def layouts(rank_staging=True, staging_banks=1, v_token_sharding=False,pv_token_sharding=False,qkv_fusion=False,
+            score_dram_spill=False,o_projection=False,pv_bf16_output=False):
     result = dict(attention=attention.layout_for(16,qkv_fusion=qkv_fusion), value=value.layout(16, v_token_sharding=v_token_sharding,pv_token_sharding=pv_token_sharding),
                   ffn=ffn.layout(16, rank_staging=rank_staging, staging_banks=staging_banks))
     for name, case in (("attention", "chain"), ("value", "v"), ("ffn", "combined_timing_chain")):
@@ -252,4 +292,13 @@ def layouts(rank_staging=True, staging_banks=1, v_token_sharding=False,pv_token_
             result[name]["input_staging"] = reservation(staging_banks)
         for stale in ("input_double_buffer_bytes_per_rank", "rank_input_layout"):
             result[name].pop(stale, None)
+    if score_dram_spill:
+        from score_dram_layout import contract
+        result["attention"]["score_dram"]=contract()
+    if pv_bf16_output:
+        result["value"]["pv_output_dtype"]="BF16"
+        result["value"]["pv_accumulator_dtype"]="FP32"
+    if o_projection:
+        from o_projection_layout import contract
+        result["o_projection"]=contract()
     return result

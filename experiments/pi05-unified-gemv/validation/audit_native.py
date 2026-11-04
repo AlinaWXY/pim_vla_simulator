@@ -328,6 +328,8 @@ def audit_slot_events(events, case, require_final_release=True, mac_context=None
                         rows, columns, kind = 16, 32, "X"
                     elif 160 <= row < 176:
                         rows, columns, kind = 16, 4, "X"
+                    elif 384 <= row < 400:
+                        rows, columns, kind = 16, 32, "X"
                     else:
                         raise AssertionError("Native MAC address outside independently defined H16 operators")
                     require(state["kind"] == kind, "Native operator consumes wrong input producer kind")
@@ -527,6 +529,10 @@ def audit_serial_continuity(manifest, result, simulation, native, events):
 def audit_run(directory):
     directory = Path(directory)
     manifest, native_result = read_json(directory / "manifest.json"), read_json(directory / "simulation/result.json")
+    if any(native_result["config"].get(k, False) for k in
+           ("pim_score_dram_spill", "pim_o_projection", "pim_pv_bf16_output")):
+        from audit_o_projection import audit_experiment
+        return audit_experiment(directory)
     case = manifest["case"]
     require(native_result["config"]["pim_ffn_dram"] is False,
             "GPU-fed experiment must disable the old local Z/nonlinear path")

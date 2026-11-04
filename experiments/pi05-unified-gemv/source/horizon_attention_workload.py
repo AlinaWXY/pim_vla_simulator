@@ -186,7 +186,7 @@ def q_exchange(w):
             source_ready="previous global completion barrier")
 
 
-def qk(w):
+def qk(w, score_dram_spill=False):
     # All H queries remain in their H*32B bank buffer through this single K scan.
     # Output tiles bound rank score storage; they do not repeat Q or K reads.
     for tile, start in enumerate(range(0, L.LOCAL_TOKENS, SCORE_TILE_TOKENS)):
@@ -208,13 +208,38 @@ def qk(w):
                 line_end=w.line_no, bytes=(w.line_no-first+1)*L.BURST_BYTES,
                 scope="complete rank scores, no cross-rank numerical reduction",
                 maximum_staged_bytes_per_rank=(stop-start) * L.QUERIES * 4))
-        w.phase(f"qk_tile_{tile}_export", export, kind="external_read",
-                token_slot_start=start, token_slot_stop=stop)
+        if score_dram_spill:
+            import score_dram_layout as S
+            def spill(tile=tile):
+                first = w.line_no + 1
+                w.ranks("PIM_SCORE_SPILL", S.descriptor_offset(tile))
+                w.local_writes.append(dict(phase=f"qk_tile_{tile}_spill",
+                    line_start=first, line_end=w.line_no, bytes=16*S.TILE_BYTES,
+                    bytes_per_rank=S.TILE_BYTES, external_bytes=0,
+                    source="complete rank score tile FP32", destination="score DRAM bank0/4",
+                    tile=tile, native_packets_per_rank=S.PACKETS_PER_TILE))
+            w.phase(f"qk_tile_{tile}_spill", spill, kind="local_write",
+                    token_slot_start=start, token_slot_stop=stop,
+                    bytes_per_rank=S.TILE_BYTES, output_dtype="FP32")
+        else:
+            w.phase(f"qk_tile_{tile}_export", export, kind="external_read",
+                    token_slot_start=start, token_slot_stop=stop)
+    if score_dram_spill:
+        def dram_export():
+            first = w.line_no+1
+            for tile in range(S.TILES):
+                for packet in range(S.PACKETS_PER_TILE):
+                    for channel in range(L.CHANNELS):
+                        w.emit("LD", L.physical_address(*S.packet_location(channel,tile,packet)))
+            w.exports.append(dict(phase="qk_scores_dram_export",line_start=first,line_end=w.line_no,
+                bytes=16*S.TILES*S.TILE_BYTES, bytes_per_rank=S.TILES*S.TILE_BYTES,
+                dtype="FP32",source="score DRAM bank0/4",scope="complete rank scores; all tiles spilled before export"))
+        w.phase("qk_scores_dram_export",dram_export,kind="external_read",output_dtype="FP32")
     w.phase("qk_gemv_release", lambda: w.ranks("PIM_GEMV_RELEASE", 0, 0),
             kind="gemv_release")
 
 
-def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False, qkv_fusion=False, whole_srf=False):
+def generate(path, case="chain", schedule="double", rank_staging=False, staging_banks=1, rank_descriptors=False, qkv_fusion=False, whole_srf=False, score_dram_spill=False):
     if case not in OPERATORS or schedule not in ("double", "serial"):
         raise ValueError((case, schedule))
     w = Writer(path, rank_descriptors=rank_descriptors)
@@ -225,7 +250,7 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
             rope(w, schedule)
         if case in ("chain", "qk"):
             q_exchange(w)
-            qk(w)
+            qk(w,score_dram_spill=score_dram_spill)
     finally:
         w.close()
     counts = dict(w.counts)
@@ -233,7 +258,7 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
     dq = dict(x_gpu_to_pim=(w.counts["ST"] if rank_staging else w.counts["PIM_WR_GB"]) * L.BURST_BYTES,
               q_pim_to_gpu=expanded["PIM_Q_EXPORT"] * L.BURST_BYTES,
               q_gpu_to_remote_buffer=expanded["PIM_Q_REMOTE"] * L.BURST_BYTES,
-              score_pim_to_gpu=w.counts["PIM_RD_BG"] * L.BURST_BYTES)
+              score_pim_to_gpu=(w.counts["PIM_RD_BG"]+w.counts["LD"]) * L.BURST_BYTES)
     dq["total"] = sum(dq.values())
     buffers = dict(L.manifest()["buffers"])
     # Native implementation uses two bounded output entries to allow the next
@@ -269,6 +294,11 @@ def generate(path, case="chain", schedule="double", rank_staging=False, staging_
                                         GPU_source_X_read=None),
                 numeric_compute=False,
                 numeric_scope="Trace validates ownership and timing dependencies, not bitwise model inference")
+    if score_dram_spill:
+        from score_dram_layout import contract
+        result.update(score_dram_spill=True,score_dram_mapping=contract())
+        result["required_backend"]["pim_score_dram_spill"]=True
+        result["expected_local_bytes"]["score_dram_write"]=w.counts["PIM_SCORE_SPILL"]*1024
     if qkv_fusion:
         from qkv_token_layout import mapping_contract
         from pv_token_layout import cache_contract, trace_ranges

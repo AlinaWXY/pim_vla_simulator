@@ -40,6 +40,9 @@ class MemoryConfig:
     pim_qkv_fusion: bool = False
     pim_whole_srf: bool = False
     v_cache_preinstalled: bool = False
+    pim_score_dram_spill: bool = False
+    pim_o_projection: bool = False
+    pim_pv_bf16_output: bool = False
     pim_rank_rope: bool = False
     pim_horizon: int = 16
     pim_ffn_dram: bool = False
@@ -50,7 +53,8 @@ class MemoryConfig:
     rank_reduce_cycles: int = 4
 
     def __post_init__(self):
-        for name in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
+        for name in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled",
+                     "pim_score_dram_spill", "pim_o_projection", "pim_pv_bf16_output"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError(f"{name} must be boolean")
         if self.pim_whole_srf and (not self.pim_unified_gemv or not self.pim_rank_staging):
@@ -61,6 +65,12 @@ class MemoryConfig:
             raise ValueError("QKV fusion requires token PV and rank RoPE")
         if self.v_cache_preinstalled and not self.pim_token_pv:
             raise ValueError("Preinstalled token V cache requires token PV")
+        if self.pim_score_dram_spill and (not self.pim_rank_rope or not self.pim_rank_controller):
+            raise ValueError("Score DRAM spill requires rank RoPE and rank controller")
+        if self.pim_pv_bf16_output and not self.pim_token_pv:
+            raise ValueError("BF16 PV output requires token PV")
+        if self.pim_o_projection and (not self.pim_pv_bf16_output or not self.pim_rank_staging or self.pim_staging_banks != 2):
+            raise ValueError("O projection requires BF16 PV output and two-bank rank staging")
         if type(self.pim_rank_descriptors) is not bool or type(self.channel_independent_dispatch) is not bool:
             raise ValueError("Rank descriptor/channel dispatch flags must be boolean")
         if self.pim_rank_descriptors and (not self.pim_rank_controller or not self.pim_unified_gemv):

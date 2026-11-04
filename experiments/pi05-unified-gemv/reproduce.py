@@ -45,7 +45,8 @@ def setup(backend):
 
 def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, staging_banks=1,
                rank_descriptors=False, channel_independent_dispatch=False, v_token_sharding=False,
-               pv_token_sharding=False, qkv_fusion=False):
+               pv_token_sharding=False, qkv_fusion=False, score_dram_spill=False,
+               o_projection=False, pv_bf16_output=False):
     from simulator.config import MemoryConfig
     chain = case in ("chain", "serial_layer_control")
     timings = dict(nCCDAB=8 if chain or (case == "v" and v_token_sharding) else 16, nLOCALWR=4)
@@ -60,6 +61,9 @@ def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, stag
         pim_qkv_fusion=bool(qkv_fusion and case in ("chain", "serial_layer_control")),
         pim_whole_srf=bool(pv_token_sharding),
         v_cache_preinstalled=bool(pv_token_sharding and case == "pv"),
+        pim_score_dram_spill=bool(score_dram_spill and chain),
+        pim_o_projection=bool(o_projection and case in ("pv", "serial_layer_control")),
+        pim_pv_bf16_output=bool(pv_bf16_output and case in ("pv", "serial_layer_control")),
         pim_rank_staging=rank_staging, pim_rank_controller=rank_staging,
         pim_staging_banks=staging_banks if rank_staging else 1,
         pim_rank_descriptors=bool(rank_descriptors and rank_staging),
@@ -71,7 +75,7 @@ def config_for(case, refresh=True, max_cycles=1_000_000, rank_staging=True, stag
 
 def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=False,
              channel_independent_dispatch=False, v_token_sharding=False, pv_token_sharding=False,
-             qkv_fusion=False):
+             qkv_fusion=False, score_dram_spill=False, o_projection=False, pv_bf16_output=False):
     import workload
     from simulator.backend import run_trace
     from audit_native import audit_run
@@ -79,11 +83,13 @@ def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=
     directory.mkdir()
     manifest = workload.generate(directory / "workload.trace", case, rank_staging=rank_staging, staging_banks=staging_banks,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion)
+        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion,
+        score_dram_spill=score_dram_spill, o_projection=o_projection, pv_bf16_output=pv_bf16_output)
     dump(directory / "manifest.json", manifest)
     config = config_for(case, rank_staging=rank_staging, staging_banks=staging_banks,
         rank_descriptors=rank_descriptors, channel_independent_dispatch=channel_independent_dispatch,
-        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion)
+        v_token_sharding=v_token_sharding, pv_token_sharding=pv_token_sharding, qkv_fusion=qkv_fusion,
+        score_dram_spill=score_dram_spill, o_projection=o_projection, pv_bf16_output=pv_bf16_output)
     native = run_trace(config, directory / "workload.trace", directory / "simulation")
     with (directory / "simulation/barriers.csv").open(newline="") as stream:
         markers = {int(r["marker"]): int(r["frontend_tick"]) for r in csv.DictReader(stream)}
@@ -95,6 +101,8 @@ def run_case(output, case, rank_staging=True, staging_banks=1, rank_descriptors=
     if dq != manifest["expected_dq_bytes"]["total"]:
         raise AssertionError((case, "external DQ differs", dq, manifest["expected_dq_bytes"]))
     summary = dict(case=case, horizon=16, fresh_native_run=True, unified_bank_gemv=True,
+        score_dram_spill=config.pim_score_dram_spill, o_projection=config.pim_o_projection,
+        pv_bf16_output=config.pim_pv_bf16_output,
         v_token_sharding=bool(v_token_sharding and (case in ("v", "serial_layer_control") or case == "chain" and qkv_fusion)),
         pv_token_sharding=bool(pv_token_sharding and (case in ("v", "pv", "serial_layer_control") or case == "chain" and qkv_fusion)),
         qkv_fusion=bool(qkv_fusion and case in ("chain", "serial_layer_control")),

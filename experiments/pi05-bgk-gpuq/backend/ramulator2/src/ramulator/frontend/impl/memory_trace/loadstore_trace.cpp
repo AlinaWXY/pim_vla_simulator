@@ -341,6 +341,9 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
           op == "PIM_STAGE_SEAL" ? Request::Type::PIM_STAGE_SEAL :
           op == "PIM_STAGE_LOAD" ? Request::Type::PIM_STAGE_LOAD :
           op == "PIM_STAGE_FRAGMENT" ? Request::Type::PIM_STAGE_FRAGMENT :
+          op == "PIM_SCORE_SPILL" ? Request::Type::PIM_SCORE_SPILL :
+          op == "PIM_PV_SPILL" ? Request::Type::PIM_PV_SPILL :
+          op == "PIM_O_REWIND" ? Request::Type::PIM_O_REWIND :
           op == "BARRIER" ? Barrier : op == "WAIT" ? Wait : -1;
       if (type == -1) throw std::runtime_error("LoadStoreTrace: unknown operation " + op);
       if (rank_batch && (type < Request::Type::PIM_SPILL || type > Request::Type::PIM_Q_REMOTE))

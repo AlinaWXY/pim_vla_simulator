@@ -50,6 +50,7 @@ void record_v_cache(const Request& req,const char* op,Clk_t ready,int bytes,int 
     <<(lane<0?0:8)<<','<<(lane<0?0:15)<<','<<(lane<0?0:4080)<<','<<(lane<0?0:61440)<<'\n';
 }
 int output_fragments(int base) const {
+  if(is_o_weight_base(base)) return 16;
   if(base==163840) return 31;
   if(base==100352) return 62;
   if(base==327680) return m_ffn_dram?64:256;
@@ -60,9 +61,11 @@ bool output_retired() const {
   if(m_output_macs!=m_output_expected_macs) return false;
   const bool qk=m_output_base==0 || m_output_base==393216;
   const bool local_v=m_token_pv && (m_output_base==131072 || m_output_base==393216);
+  const bool local_pv=m_o_projection && m_output_base==163840;
   if(qk && !output_all(m_output_qk_spills)) return false;
   if(local_v && !output_all(m_v_spills)) return false;
-  if(!qk && !local_v && m_output_export_done!=m_output_bytes*16/32) return false;
+  if(local_pv && !output_all(m_o_pv_spills)) return false;
+  if(!qk && !local_v && !local_pv && m_output_export_done!=output_export_packets()) return false;
   return true;
 }
 bool output_other_ready() {
@@ -71,9 +74,9 @@ bool output_other_ready() {
     // Every result packet may be issued while its final DQ completion is still
     // pending. Wait for that legal tail; missing packets remain an error.
     const bool local=m_output_base==0 || m_output_base==393216 ||
-      (m_token_pv && m_output_base==131072);
+      (m_token_pv && m_output_base==131072) || (m_o_projection && m_output_base==163840);
     if(!local && m_output_macs==m_output_expected_macs &&
-       m_output_exports==m_output_bytes*16/32 && m_output_export_done<m_output_exports) return false;
+       m_output_exports==output_export_packets() && m_output_export_done<m_output_exports) return false;
     throw std::runtime_error("Output owner change before complete result drain");
   }
   if(m_clk<m_output_ready) return false;
@@ -89,6 +92,7 @@ bool output_mac_ready(const Request& req) {
     m_output_base=base;m_output_columns=columns;m_output_bytes=bytes;
     m_output_macs=0;m_output_expected_macs=output_fragments(base)*columns;
     m_output_exports=m_output_export_done=0;m_output_ready=m_output_compute_ready=0;m_output_qk_spills.fill(0);
+    o_output_begin(base);
     if(m_token_pv && (base==131072 || base==393216)) {
       m_v_source_columns=columns;m_v_spills.fill(0);m_v_cache_ready=0;
     }
@@ -120,24 +124,27 @@ void output_qk_spill_issued(const Request& req,Clk_t ready) {
   m_output_qk_spills[rr_bank(req)-16]|=1<<(rr_column(req)-rr_local_queries());
   m_output_ready=std::max(m_output_ready,ready);
 }
-bool output_export_ready(const Request& req) const {
+bool output_export_ready(const Request& req) {
   if(!m_whole_srf) return true;
   if(m_output_base<0 || m_output_macs!=m_output_expected_macs)
     throw std::runtime_error("Result export requires complete output owner");
-  if(m_output_base==0 || m_output_base==393216 || (m_token_pv && m_output_base==131072))
+  if(m_output_base==0 || m_output_base==393216 || (m_token_pv && m_output_base==131072) ||
+     (m_o_projection && m_output_base==163840))
     throw std::runtime_error("Local projection output must use spill instead of GPU export");
-  if(gemv_offset(req)!=m_output_exports*32 || m_output_exports>=m_output_bytes*16/32)
+  if(gemv_offset(req)!=m_output_exports*32 || m_output_exports>=output_export_packets())
     throw std::runtime_error("Output export address/count mismatch");
-  return m_clk>=m_output_ready;
+  return m_clk>=m_output_ready && o_bf16_export_ready(req);
 }
 void output_export_issued(const Request& req) {
   if(!m_whole_srf) return;
+  o_bf16_export_issued(req);
   ++m_output_exports;
   record_v_cache(req,"RESULT_EXPORT",req.depart,32);
 }
 void output_complete(const Request& req) {
   if(!m_whole_srf || req.type_id!=Request::Type::PIM_RD_RES) return;
   if(++m_output_export_done>m_output_exports) throw std::runtime_error("Output completed before export issue");
+  if(m_output_base==802816 && m_output_export_done==output_export_packets()) m_o_completed=true;
 }
 void prepare_v_cache_spill(Request& req) {
   if(!m_token_pv) throw std::runtime_error("V cache spill requires pim_token_pv");

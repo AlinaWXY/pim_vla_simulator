@@ -107,6 +107,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "rank_descriptor_extension.inc"
 #include "whole_srf_extension.inc"
 #include "v_cache_extension.inc"
+#include "score_spill_extension.inc"
+#include "o_projection_extension.inc"
 
  public:
   void init() override {
@@ -193,6 +195,13 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_v_cache_preinstalled, bool, "v_cache_preinstalled").default_val(false);
     RAMULATOR_PARSE_PARAM(m_v_cache_path, std::string, "v_cache_events_path").default_val("");
     init_v_cache();
+    RAMULATOR_PARSE_PARAM(m_score_dram_spill, bool, "pim_score_dram_spill").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_score_spill_path, std::string, "score_spill_events_path").default_val("");
+    init_score_spill();
+    RAMULATOR_PARSE_PARAM(m_o_projection, bool, "pim_o_projection").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_pv_bf16_output, bool, "pim_pv_bf16_output").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_o_projection_path, std::string, "o_projection_events_path").default_val("");
+    init_o_projection();
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -211,6 +220,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     }
     setup_rank_descriptors();
     setup_v_cache();
+    setup_score_spill();
+    setup_o_projection();
     m_stats.add("num_pim_requests", s_pim_requests);
     m_stats.add("num_pim_completed", s_pim_completed);
     m_stats.add("pim_request_latency_cycles", s_pim_latency);
@@ -292,6 +303,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if ((m_rank_rope || m_ffn_dram || m_unified_gemv) && req.type_id >= Request::Type::PIM_MAC_AB && req.addr_vec[m_rank_level] != 1)
       throw std::runtime_error("rank0 is reserved for GPU: PIM requests must address physical rank1");
     if (req.type_id < Request::Type::PIM_MAC_AB) {
+      const int score_key=score_read_key(req);
+      if(!score_read_ready(score_key)) return false;
       const bool staging_write=m_rank_staging && req.type_id==Request::Type::Write && req.addr_vec[m_rank_level]==1 && stage_offset(req)>=256*2048 && stage_offset(req)<320*2048;
       if(staging_write) {
         for(const auto& pending:m_pim_buffer) if(pending.type_id==Request::Type::PIM_STAGE_BEGIN) return false;
@@ -313,7 +326,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         if (!can_overlap(pim, req)) return false;
       }
       auto callback = req.callback;
-      req.callback = [this, callback, staging_write](Request& done) {
+      req.callback = [this, callback, staging_write, score_key](Request& done) {
+        score_read_complete(done,score_key);
         if (done.type_id == Request::Type::Write) {
           m_normal_ready_at = std::max(m_normal_ready_at, m_clk + m_write_recovery);
           if(staging_write) {
@@ -327,6 +341,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       };
       if(staging_write) m_stage.writes.emplace(stage_logical_offset(req),-1);
       bool accepted = LPDDR5Controller::send(req);
+      if(accepted) score_read_accepted(req,score_key);
       if(staging_write && !accepted) m_stage.writes.erase(stage_logical_offset(req));
       req.callback = callback;
       return accepted;
@@ -335,6 +350,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (m_pim_buffer.size() >= m_pim_buffer.max_size) {
       return false;
     }
+    if (is_score_spill(req)) return send_score_spill(req);
+    if (is_o_command(req)) return send_o_command(req);
     if (is_stage(req)) return send_stage(req);
     if (is_gemv_release(req)) return send_gemv_release(req);
     if (m_unified_gemv && !m_rank_rope && (req.type_id==Request::Type::PIM_MAC_QK || req.type_id==Request::Type::PIM_RD_BG))
@@ -506,6 +523,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void finalize() override {
+    finish_score_spill();
+    finish_o_projection();
     if(m_whole_srf) {
       if(!output_retired() || m_clk<m_output_ready)
         throw std::runtime_error("Incomplete shared output at end of trace");
@@ -558,6 +577,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool can_bypass(const Request& later, const Request& earlier, bool preparing_row) const {
+    if(is_score_spill(later) || is_score_spill(earlier) || is_o_command(later) || is_o_command(earlier)) return false;
     if (is_stage(later) || is_stage(earlier)) return false;
     if (is_gemv_release(later) || is_gemv_release(earlier)) return false;
     if(is_v_cache_spill(later) || is_v_cache_spill(earlier))
@@ -683,11 +703,14 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
   bool issue_bgk(ReqBuffer::iterator it) {
     if (it->type_id == Request::Type::PIM_RD_Q) return issue_q_dram_read(it);
+    if(m_score_dram_spill && it->type_id==Request::Type::PIM_RD_BG)
+      throw std::runtime_error("Score DRAM mode requires local spill then ordinary reads");
     if (m_rank_rope && it->type_id == Request::Type::PIM_RD_BG && m_clk < m_rank_reduction_ready) return false;
     it->command = get_preq_command(it->final_command,it->addr_vec);
     // Payload issues through independent local ports; only ACT/PRE uses CA.
     if (it->command == m_localwr) return false;
     const bool actual_mac = is_bgk_mac(*it) && it->command == it->final_command;
+    if(actual_mac && !score_mac_ready()) return false;
     if (actual_mac && !output_other_ready()) return false;
     if (!bgk_targets_ready(*it,actual_mac) || !issue_internal_array_command(it)) return false;
     if (it->command != it->final_command) return true;
@@ -708,6 +731,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     if (m_rank_rope && actual_mac) {
       m_rank_reduction_ready = ready + m_rank_reduce_cycles;
       record_bgk(*it, m_rank_reduction_ready, m_rank_reduce_cycles, "PIM_RANK_REDUCE", ready, 16);
+      score_mac_issued(*it,m_rank_reduction_ready);
     }
     record_bgk(*it,ready,service);
     enqueue_bgk_done(it, m_rank_rope && actual_mac ? m_rank_reduction_ready : ready);
@@ -843,6 +867,14 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RankFineScope fine(m_rank_fine_context,m_rank_controller);
     for (auto it = m_pim_buffer.begin(); it != m_pim_buffer.end(); ++it) {
       if (is_local(*it) || (is_rank_rope(*it) && it->type_id == Request::Type::PIM_ROPE_EXEC)) continue;
+      if(is_score_spill(*it)) {
+        if(it==m_pim_buffer.begin()) return issue_score_spill(it);
+        continue;
+      }
+      if(is_o_command(*it)) {
+        if(it==m_pim_buffer.begin()) return issue_o_command(it);
+        continue;
+      }
       if(is_stage(*it)) {
         if(it==m_pim_buffer.begin()) return issue_stage(it);
         continue;

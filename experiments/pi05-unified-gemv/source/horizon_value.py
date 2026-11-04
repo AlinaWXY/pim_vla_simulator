@@ -148,12 +148,13 @@ class Writer:
 
 
 def generate(path, horizon, case, rank_staging=False, staging_banks=1, v_token_sharding=False,
-             pv_token_sharding=False, rank_descriptors=False):
+             pv_token_sharding=False, rank_descriptors=False,o_projection=False,pv_bf16_output=False):
     if pv_token_sharding:
         if not v_token_sharding:
             raise ValueError('PV token sharding requires token-sharded V')
         from pv_token_workload import generate as token_generate
-        return token_generate(path,horizon,case,rank_staging,staging_banks,rank_descriptors)
+        return token_generate(path,horizon,case,rank_staging,staging_banks,rank_descriptors,
+            o_projection=o_projection,pv_bf16_output=pv_bf16_output)
     if case not in ('v', 'pv'):
         raise ValueError(case)
     token_sharded = bool(v_token_sharding and case == 'v')

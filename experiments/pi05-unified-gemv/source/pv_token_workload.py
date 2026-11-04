@@ -38,23 +38,37 @@ def mapping_contract(manifest):
         result["projection_weights"]=dict(base_bytes=131072,end_bytes_exclusive=163840,
             bytes_per_bank=32768,copies_per_head=2,columns_per_fragment=16,fragment_count=64)
     else:
+        bf16=manifest.get("pv_bf16_output",False)
+        element_bytes=2 if bf16 else 4
+        dtype="BF16" if bf16 else "FP32"
         result.update(query_batches=1,query_rows=16,kv_fragments=31,columns_per_fragment=16,
             weight_offset_formula="163840+(fragment*16+feature_lane)*32",
-            export=dict(dtype="FP32",order="[query16][bank16][feature_lane16]",bytes_per_rank=16384,
-                packets_per_rank=512,elements_per_packet=8,packet_bytes=32,
-                element_offset_formula="((query*16+bank)*16+feature_lane)*4",
+            export=dict(dtype=dtype,accumulator_dtype="FP32",order="[query16][bank16][feature_lane16]",bytes_per_rank=4096*element_bytes,
+                packets_per_rank=128*element_bytes,elements_per_packet=32//element_bytes,packet_bytes=32,
+                element_offset_formula=f"((query*16+bank)*16+feature_lane)*{element_bytes}",
                 trace_line_formula="exports[0].line_start+(packet_offset_bytes//32)*16+channel",
                 trace_address_is_result_tag=True),
             gpu_reduction=dict(operation="sum",operands_per_element=2,logical_shape=[8,16,256],
                 operand_channels_formula="[2*head,2*head+1]",elements=32768,
-                operand_bytes=262144,output_bytes=131072,dtype="FP32",latency_us=None,
+                operand_bytes=65536*element_bytes,output_bytes=131072,dtype=dtype,
+                input_dtype=dtype,output_dtype="FP32",latency_us=None,
                 meaning="Each rank sums its 496 KV-token parity shard; GPU adds corresponding rank partial O values"))
+        if manifest.get("o_projection"):
+            result["export"].update(enabled=False,bytes_per_rank=0,packets_per_rank=0,
+                destination="local two-bank DRAM input of Wo",trace_line_formula=None)
+            result["gpu_reduction"].update(enabled=False,
+                meaning="PV rank partials remain local; reduction is deferred until after Wo")
     return result
 
 
-def generate(path,horizon,case,rank_staging=False,staging_banks=1,rank_descriptors=False):
+def generate(path,horizon,case,rank_staging=False,staging_banks=1,rank_descriptors=False,
+             o_projection=False,pv_bf16_output=False):
     if horizon != 16 or case not in ("v","pv"):
         raise ValueError((horizon,case))
+    if o_projection and (not rank_staging or staging_banks!=2 or not pv_bf16_output):
+        raise ValueError("O projection requires two-bank rank staging and BF16 PV output")
+    o_projection=bool(o_projection and case=="pv")
+    pv_bf16_output=bool(pv_bf16_output and case=="pv")
     from horizon_value import layout
     geometry=layout(horizon,v_token_sharding=True,pv_token_sharding=True)
     geometry["input_staging"]=reservation(staging_banks) if rank_staging else None
@@ -102,17 +116,22 @@ def generate(path,horizon,case,rank_staging=False,staging_banks=1,rank_descripto
             for view in range(views):
                 w.ranks("PIM_GEMV_RELEASE",0,view)
         w.phase(f"{case}_gemv_release",release,kind="gemv_release")
-        if case=="pv":
+        if o_projection:
+            from o_projection_workload import append
+            append(w)
+        elif case=="pv":
+            output_bytes=8192 if pv_bf16_output else 16384
+            output_dtype="BF16" if pv_bf16_output else "FP32"
             def export():
                 first=w.line_no+1
-                for offset in range(0,16384,32):
+                for offset in range(0,output_bytes,32):
                     w.ranks("PIM_RD_RES",offset)
                 w.exports.append(dict(phase="pv_result_export",line_start=first,line_end=w.line_no,
-                    bytes=262144,bytes_per_rank=16384,query_count=16,dtype="FP32",
-                    output_order="[query16][bank16][feature_lane16]",elements_per_packet=8,
+                    bytes=output_bytes*16,bytes_per_rank=output_bytes,query_count=16,dtype=output_dtype,
+                    output_order="[query16][bank16][feature_lane16]",elements_per_packet=16 if pv_bf16_output else 8,
                     payload_contract="pv_token_mapping.export",rank_partial=True))
                 w.fence()
-            w.phase("pv_result_export",export,kind="external_read",output_dtype="FP32",rank_partial=True)
+            w.phase("pv_result_export",export,kind="external_read",output_dtype=output_dtype,rank_partial=True)
     finally:
         w.close()
     dq=dict(pim_input_write=rows*fragments*16*32,pim_result_read=w.counts["PIM_RD_RES"]*32,
@@ -146,6 +165,21 @@ def generate(path,horizon,case,rank_staging=False,staging_banks=1,rank_descripto
         cache_precondition="Token-parity prefix resident; full cache preinstalled for standalone PV, local V spill required in serial",
         unknown_latency_us=dict(GPU_softmax=None,GPU_PV_partial_sum=None,GPU_source_DMA_arrival=None),
         numeric_compute=False,complete_ae_latency=False)
+    if pv_bf16_output:
+        result["pv_bf16_output"]=True
+        result["matrix"].update(input_dtype="BF16",weight_dtype="BF16",accumulator_dtype="FP32",output_dtype="BF16")
+        result["required_backend"]["pim_pv_bf16_output"]=True
+    if o_projection:
+        from o_projection_layout import contract
+        result.update(o_projection=True,o_projection_mapping=contract())
+        result["o_projection_mapping"]["trace_ranges"]=T.trace_ranges(result)
+        result["required_backend"]["pim_o_projection"]=True
+        result["buffers"]["o_projection_accumulator_per_bank"]=2048
+        result["expected_local_bytes"].update(pv_result_dram_write=131072,
+            o_projection_input_read=262144,o_projection_broadcast_destination=4194304)
+        result["unknown_latency_us"].pop("GPU_PV_partial_sum")
+        result["unknown_latency_us"]["GPU_O_projection_partial_sum"]=None
+        result["gpu_boundary"]="Post-softmax P availability and 16-way Wo-partial GPU sum remain unmeasured"
     result["pv_token_mapping"]=mapping_contract(result)
     if case=="v":
         result["v_token_mapping"]=dict(schema_version=2,enabled=True,logical_shape=[8,16,256],

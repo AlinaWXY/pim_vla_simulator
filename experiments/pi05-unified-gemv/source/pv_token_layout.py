@@ -70,39 +70,45 @@ def input_coordinates(channel, fragment, local_query, input_lane, query_rows):
         padding=local_kv >= LOCAL_VALID)
 
 
-def result_element(head, query, feature, parity, query_rows):
+def result_element(head, query, feature, parity, query_rows, dtype="FP32"):
     """A rank partial O packet, requiring the peer parity's GPU sum."""
     L.check(query, QUERIES, "PV query")
     if query_rows not in (8, 16):
         raise ValueError("PV query rows must be 8 or 16")
+    if dtype not in ("FP32","BF16"):
+        raise ValueError("PV result dtype must be FP32 or BF16")
     owner, lane = L.feature_owner(head, parity, feature)
     local_query = query % query_rows
     flat_bank = 4*owner[2]+owner[3]
-    offset = ((local_query*16+flat_bank)*16+lane)*4
+    element_bytes=4 if dtype=="FP32" else 2
+    offset = ((local_query*16+flat_bank)*16+lane)*element_bytes
     return dict(head=head, query=query, feature=feature, parity=parity,
         channel=owner[0], physical_rank=1, bank_group=owner[2], bank=owner[3],
         batch=query//query_rows, local_query=local_query, output_lane=lane,
         accumulator_index=local_query*16+lane, result_offset_bytes=offset,
         packet_offset_bytes=offset//32*32, byte_in_packet=offset%32,
-        trace_address=L.physical_address(owner[0],1,0,0,offset//32*32), dtype="FP32")
+        trace_address=L.physical_address(owner[0],1,0,0,offset//32*32), dtype=dtype)
 
 
-def result_packet(channel, batch, offset, query_rows):
+def result_packet(channel, batch, offset, query_rows, dtype="FP32"):
     L.check(channel, 16, "PV output channel")
     L.check(batch, QUERIES//query_rows, "PV output batch")
-    if offset%32 or not 0 <= offset < query_rows*256*4:
+    if dtype not in ("FP32","BF16"):
+        raise ValueError("PV result dtype must be FP32 or BF16")
+    element_bytes=4 if dtype=="FP32" else 2
+    if offset%32 or not 0 <= offset < query_rows*256*element_bytes:
         raise ValueError("PV result packet offset is outside the batch")
-    local_query, inside = divmod(offset, 16*16*4)
-    bank, byte = divmod(inside, 16*4)
+    local_query, inside = divmod(offset, 16*16*element_bytes)
+    bank, byte = divmod(inside, 16*element_bytes)
     return [result_element(channel//2, batch*query_rows+local_query,
-        L.feature_from_lane(bank,lane),channel%2,query_rows)
-        for lane in range(byte//4,byte//4+8)]
+        L.feature_from_lane(bank,lane),channel%2,query_rows,dtype)
+        for lane in range(byte//element_bytes,byte//element_bytes+32//element_bytes)]
 
 
-def reduction_element(head, query, feature, query_rows):
+def reduction_element(head, query, feature, query_rows, dtype="FP32"):
     return dict(head=head, query=query, feature=feature,
-        operands=[result_element(head,query,feature,p,query_rows) for p in (0,1)],
-        operation="sum", output_dtype="FP32", latency_us=None)
+        operands=[result_element(head,query,feature,p,query_rows,dtype) for p in (0,1)],
+        operation="sum", input_dtype=dtype, output_dtype="FP32", latency_us=None)
 
 
 def cache_contract(qkv_fusion=False):
