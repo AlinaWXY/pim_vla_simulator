@@ -1,0 +1,51 @@
+{
+  "status": "passed",
+  "source_hashes_verified": true,
+  "raw_hashes_verified": true,
+  "cache_probe_passed": true,
+  "all_model_kernels_single_pass": true,
+  "warm_kernel_signatures_match": true,
+  "kernel_totals_reconcile": true,
+  "html_links_resolve": true,
+  "plots": [
+    {
+      "path": "01_cold_families.png",
+      "width": 1895,
+      "height": 830
+    },
+    {
+      "path": "02_cold_linear.png",
+      "width": 1895,
+      "height": 995
+    },
+    {
+      "path": "03_cold_nonmatrix.png",
+      "width": 1895,
+      "height": 1339
+    },
+    {
+      "path": "04_cache_probe_and_repeats.png",
+      "width": 1891,
+      "height": 691
+    }
+  ],
+  "compressed_reports": [
+    {
+      "path": "pi05_h16_cold_model_20261105_01.ncu-rep.gz",
+      "uncompressed_bytes": 44499999,
+      "uncompressed_sha256": "19c31fe5597c63324354267be3b725f274f1c43e9db68990d49a4c3a351aaa61"
+    },
+    {
+      "path": "pi05_h16_cold_probe_all_20261105_01.ncu-rep.gz",
+      "uncompressed_bytes": 79470,
+      "uncompressed_sha256": "95eccd22ae033d9168da3ce0142dddad2fc629d08c54dc8838a4d4e2312d06d1"
+    },
+    {
+      "path": "pi05_h16_cold_probe_none_20261105_01.ncu-rep.gz",
+      "uncompressed_bytes": 79474,
+      "uncompressed_sha256": "3565cd7e2c84d2c68d6a1b25c7c6f5c4651b863eccb282482cc620b4a77d5e51"
+    }
+  ],
+  "live_browser_layout_verified": false,
+  "figure_visual_review": "Four static PNG figures visually inspected"
+}

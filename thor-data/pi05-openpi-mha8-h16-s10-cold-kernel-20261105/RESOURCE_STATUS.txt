@@ -1,0 +1,10 @@
+deep-space
+/fact_home/shiyuhuang
+fact-thor
+/fact_home/shiyuhuang
+2026-11-05T15:06:51+08:00
+pid, process_name
+utilization.gpu [%], temperature.gpu
+0 %, 40
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p1  936G  887G 1012M 100% /

@@ -1,0 +1,101 @@
+{
+  "status": "complete",
+  "arguments": {
+    "mode": "probe",
+    "cache_policy": "all",
+    "tag": "pi05_h16_cold_probe_all_20261105_01"
+  },
+  "host": "fact-thor",
+  "pid": 3973755,
+  "started_utc": "2026-11-05T06:58:34.635168+00:00",
+  "occupancy": [
+    {
+      "label": "before_import",
+      "monotonic_ns": 598462368373365,
+      "raw": "",
+      "others": [],
+      "free_disk_bytes": 1118601216
+    },
+    {
+      "label": "probe_0",
+      "monotonic_ns": 598464043917618,
+      "raw": "3973755, python\n",
+      "others": [],
+      "free_disk_bytes": 1118601216
+    },
+    {
+      "label": "probe_1",
+      "monotonic_ns": 598464690091559,
+      "raw": "3973755, python\n",
+      "others": [],
+      "free_disk_bytes": 1118564352
+    },
+    {
+      "label": "probe_2",
+      "monotonic_ns": 598465020424132,
+      "raw": "3973755, python\n",
+      "others": [],
+      "free_disk_bytes": 1118543872
+    },
+    {
+      "label": "probe_3",
+      "monotonic_ns": 598465349581380,
+      "raw": "3973755, python\n",
+      "others": [],
+      "free_disk_bytes": 1118523392
+    },
+    {
+      "label": "finished",
+      "monotonic_ns": 598465718907805,
+      "raw": "3973755, python\n",
+      "others": [],
+      "free_disk_bytes": 1118507008
+    }
+  ],
+  "operations": [],
+  "methodology": "NCU isolated kernel duration; cache policy applied by launcher; no wall-time latency claim",
+  "environment": {
+    "torch": "2.11.0+cu130",
+    "python": "/var/tmp/vla-venv/bin/python",
+    "ncu_version": "NVIDIA (R) Nsight Compute Command Line Profiler\nCopyright (c) 2018-2026 NVIDIA Corporation\nVersion 2026.1.1.0 (build 37634170) (public-release)\n",
+    "code_sha256": {
+      "capture.py": "7c3892d966eff52855adeeff5fbf3b7a05454365a98eaa0ce6d66636b6d05223",
+      "common.py": "602f1316c7a922c2aa307a5996e0377eacf3432b36bd01488c2b37dbcad4941c",
+      "warm_analysis.py": "f9325e4c8f4184eea8c1f12577b6b4f705eb02aec29d896c7b617518ca3b04a9",
+      "attribution.py": "131e361a07afd4bb1f05a18601092fda64f6169ccfc5138e068a32ed78f3207c",
+      "mha8.py": "078e5e3e9e8690969080bf5e321e2f666d1cf9b865e16f5e800690bde1e2dca6",
+      "launch.py": "b1ec127a4744ca19052509968a608eb4ba9c3ae894c68076aa6e65445a647e21",
+      "adarms_cache.py": "9f9921d012e6efa6267d33ffc2b5b968bdb88403058897bf4299c87fd02a70f0"
+    },
+    "cpu_threads": 1,
+    "interop_threads": 1,
+    "clock_control": "none",
+    "pipeline_boost_state": "stable (NCU default)",
+    "import_sass": false,
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ]
+  },
+  "probe": {
+    "input_bytes": 1048576,
+    "output_bytes": 1048576,
+    "l2_bytes": 33554432,
+    "repeats": 4,
+    "warmup": 50
+  },
+  "output_bitwise_equal": true,
+  "finished_utc": "2026-11-05T06:58:38.008878+00:00"
+}

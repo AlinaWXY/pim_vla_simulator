@@ -1,0 +1,18 @@
+deep-space
+/fact_home/shiyuhuang
+fact-thor
+/fact_home/shiyuhuang
+fact-thor
+/var/tmp/shiyuhuang-vla-baseline
+/var/tmp/vla-venv/bin/python
+/var/tmp/vla-venv/bin/python
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 3976958 (/usr/bin/python3.12)
+==PROF== Profiling "vectorized_elementwise_kernel" - 0: 0%....50%....100% - 3 passes
+==PROF== Profiling "vectorized_elementwise_kernel" - 1: 0%....50%....100% - 3 passes
+==PROF== Profiling "vectorized_elementwise_kernel" - 2: 0%....50%....100% - 3 passes
+==PROF== Profiling "vectorized_elementwise_kernel" - 3: 0%....50%....100% - 3 passes
+15:00:19 CAPTURE_COMPLETE probe
+==PROF== Disconnected from process 3976958
+==PROF== Report: /var/tmp/shiyuhuang-vla-baseline/runs/pi05_h16_cold_probe_none_20261105_01.ncu-rep
