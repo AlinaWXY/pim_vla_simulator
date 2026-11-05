@@ -1,5 +1,7 @@
 # Thor pi0.5 H16 MHA8: Cold-Kernel Timing
 
+中文简要说明：[算子耗时、memory input/output 边界与 E2E 使用方法](LATENCY_CN.md)。
+
 Fresh, separate cold-cache measurements on 2026-11-05. Existing normal-cache
 results are not replaced. This dataset measures **isolated kernel durations**,
 not model cold-start time, normal denoising-step elapsed time or PIM offload time.

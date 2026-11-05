@@ -4,8 +4,8 @@
   "branch": "thor-data/pi05-openpi-mha8-h16-s10-cold-kernel-20261105",
   "base_commit": "de6974fe0095098500191211c7bdaa231c895ab7",
   "scope": "Add only cold-kernel dataset; previous warm results and simulator sources unchanged",
-  "file_count": 52,
-  "total_bytes": 16926700,
+  "file_count": 53,
+  "total_bytes": 16932442,
   "compressed_reports": [
     {
       "path": "pi05_h16_cold_model_20261105_01.ncu-rep.gz",
@@ -30,14 +30,19 @@
       "sha256": "97e3f0080ae0273726e1db571a0023be17c8d5792633ac51f325218b58b3a129"
     },
     {
+      "path": "LATENCY_CN.md",
+      "bytes": 5638,
+      "sha256": "46fbb3c50a4309078bd63306e5366e71097b5ac80a165373de5c79cff9379b8f"
+    },
+    {
       "path": "PUBLICATION_CHECKS.json",
       "bytes": 1428,
       "sha256": "97e3f0080ae0273726e1db571a0023be17c8d5792633ac51f325218b58b3a129"
     },
     {
       "path": "README.md",
-      "bytes": 8845,
-      "sha256": "37a1e607701e41eaf08e6bea150276c3a51bdb0de9f2f0e7ee5de9f0694beeba"
+      "bytes": 8949,
+      "sha256": "195efe8cc028983a0f96a895bd0346e70489afd81c3b9253deb771f1f58d0829"
     },
     {
       "path": "RESOURCE_STATUS.txt",
