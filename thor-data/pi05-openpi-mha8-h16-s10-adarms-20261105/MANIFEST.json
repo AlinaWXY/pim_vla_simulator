@@ -1,0 +1,247 @@
+{
+  "experiment_date": "2026-11-05",
+  "repository": "AlinaWXY/pim_vla_simulator",
+  "branch": "thor-data/pi05-openpi-mha8-h16-s10-adarms-latency-20261105",
+  "base_commit": "f919e6c2d0c83f9a3860cf6969a5976b1a630370",
+  "base_branch": "main",
+  "scope": "Add only this Thor measurement data directory; simulator code unchanged",
+  "file_count": 47,
+  "total_bytes": 15675173,
+  "files": [
+    {
+      "path": "ATTENTION_BACKEND_AUDIT.md",
+      "bytes": 1573,
+      "sha256": "026db475dbb8149886744e58e15e777e76df29ab3b8624e4351bf6391995986f"
+    },
+    {
+      "path": "CHECKS.json",
+      "bytes": 851,
+      "sha256": "f4f59d0054ea1f5dfd909ecb3c1306aa589990011d58af95cea83d0ebac2e493"
+    },
+    {
+      "path": "PUBLICATION_CHECKS.json",
+      "bytes": 851,
+      "sha256": "f4f59d0054ea1f5dfd909ecb3c1306aa589990011d58af95cea83d0ebac2e493"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9739,
+      "sha256": "0f931f6d57642908a09c88efc74584ddd7fab3e8f92bdb9d4d03741e368c1a4f"
+    },
+    {
+      "path": "RESOURCE_STATUS.txt",
+      "bytes": 328,
+      "sha256": "21c70f736d0b51afc1de9d50c8e7683ae7666608c9e62a066d644106b69eda0e"
+    },
+    {
+      "path": "analysis/coarse.csv",
+      "bytes": 372,
+      "sha256": "9e5247bafd2b4b3145eb5cc33e044ddf4ccc99a8e5df5ae47b76cddfbbac0a54"
+    },
+    {
+      "path": "analysis/first_step_kernels.json",
+      "bytes": 608541,
+      "sha256": "19fbf54d1463f00cd667071a1ca656dd3c35779db99fdfea7a9dab5e7316360a"
+    },
+    {
+      "path": "analysis/operator_labels.json",
+      "bytes": 602127,
+      "sha256": "dd86ce7493bbc09d87843ffba211827461a12be908bb4613504b47715e3d7643"
+    },
+    {
+      "path": "analysis/operators.csv",
+      "bytes": 3036,
+      "sha256": "c9267c348c5a06f9258543debaac81009c44fbee87f023509a65131d25bc1437"
+    },
+    {
+      "path": "analysis/step_samples.json",
+      "bytes": 95446,
+      "sha256": "102e6a0c864801ef103cd42f0d580f7eda774086f8e5c171b083fd4caa180430"
+    },
+    {
+      "path": "analysis/steps.csv",
+      "bytes": 3011,
+      "sha256": "95a30dc339ba0c934839463cc65f5c806c105e40e5066a3985935593e0fa7598"
+    },
+    {
+      "path": "analysis/summary.json",
+      "bytes": 60323,
+      "sha256": "f84781d6afb79da1fffbf5abfb4c36426c656468f7d115bf459935afa6e4a2db"
+    },
+    {
+      "path": "code/adarms_cache.py",
+      "bytes": 8074,
+      "sha256": "9f9921d012e6efa6267d33ffc2b5b968bdb88403058897bf4299c87fd02a70f0"
+    },
+    {
+      "path": "code/analyze.py",
+      "bytes": 16363,
+      "sha256": "f9325e4c8f4184eea8c1f12577b6b4f705eb02aec29d896c7b617518ca3b04a9"
+    },
+    {
+      "path": "code/attribution.py",
+      "bytes": 13207,
+      "sha256": "131e361a07afd4bb1f05a18601092fda64f6169ccfc5138e068a32ed78f3207c"
+    },
+    {
+      "path": "code/capture.py",
+      "bytes": 15604,
+      "sha256": "14c5143b303f18b2ee4f17f92ec2bed9fa7171b54b989525cad026740bc7f84e"
+    },
+    {
+      "path": "code/common.py",
+      "bytes": 4333,
+      "sha256": "602f1316c7a922c2aa307a5996e0377eacf3432b36bd01488c2b37dbcad4941c"
+    },
+    {
+      "path": "code/mha8.py",
+      "bytes": 2799,
+      "sha256": "078e5e3e9e8690969080bf5e321e2f666d1cf9b865e16f5e800690bde1e2dca6"
+    },
+    {
+      "path": "code/render.py",
+      "bytes": 18937,
+      "sha256": "07088b581dcc9e62007ce1d13a4f4795879110c6c21ad65c8542275cf2170c13"
+    },
+    {
+      "path": "code/run.sh",
+      "bytes": 1344,
+      "sha256": "ff57383f6269aa224da0b03f408a4793b5cc5576374a2e39f88d9d80a248e608"
+    },
+    {
+      "path": "code/test_analysis.py",
+      "bytes": 1793,
+      "sha256": "ca5f1bfcada44dbd4abdac761922c3c1f15d28e7b4c306b1c15fbf100a069bd6"
+    },
+    {
+      "path": "code/verify.py",
+      "bytes": 3706,
+      "sha256": "ec182490e1acce088fa929c05c9dc958e38c449a00e32bb248bd9ca14cff9703"
+    },
+    {
+      "path": "figures/01_coarse.pdf",
+      "bytes": 25940,
+      "sha256": "a262dfa6f2bace17f4aea7648a720003bceeb74c88147cfcb868f87ee5778320"
+    },
+    {
+      "path": "figures/01_coarse.png",
+      "bytes": 68608,
+      "sha256": "25a21a69b52fc998575041b6d303add000fde1ebfa9e5f879e273868957901fb"
+    },
+    {
+      "path": "figures/01_coarse.svg",
+      "bytes": 7989,
+      "sha256": "8a7fb0c5c56bfd88e0e7317313b7513a2b570332d307978fbe65d7e863439eae"
+    },
+    {
+      "path": "figures/02_families.pdf",
+      "bytes": 29215,
+      "sha256": "0ae32fe781c08c836a7ad1d8c1018ca40421d15d01882c1c1b362567c2549224"
+    },
+    {
+      "path": "figures/02_families.png",
+      "bytes": 129720,
+      "sha256": "3a1bf0455acd8b1df8b746e5633673fbbfd45ecefa31b9de3d0ecbad7e0b34af"
+    },
+    {
+      "path": "figures/02_families.svg",
+      "bytes": 12974,
+      "sha256": "bc4df76db71ef3f9556ec0f761a52387c75804db1648e2a614114d5293c370ad"
+    },
+    {
+      "path": "figures/03_linear.pdf",
+      "bytes": 25672,
+      "sha256": "d94d685658a8079e8c0cf7ac05fd9c087a6f3f911f10b948336a687bf3cf05ae"
+    },
+    {
+      "path": "figures/03_linear.png",
+      "bytes": 147064,
+      "sha256": "6b1befa5b0ef0c01801c05ddaa1dd958d1210444c2ac0a86e9ba1f6cb81fea7d"
+    },
+    {
+      "path": "figures/03_linear.svg",
+      "bytes": 17325,
+      "sha256": "c49c20d9c938521cfdd30e4e7083a65255e1d28f6ba7938f23701e0e6fe14030"
+    },
+    {
+      "path": "figures/04_nonmatrix.pdf",
+      "bytes": 27274,
+      "sha256": "fea173e29f863d1eb0c4ccfcead93ccf8ddb64dca3c412c21d03e48350b45872"
+    },
+    {
+      "path": "figures/04_nonmatrix.png",
+      "bytes": 220755,
+      "sha256": "043239e90cbb1989927b4a2f28c5c40455a7c1f9b6bf520a5f953af2742d49ea"
+    },
+    {
+      "path": "figures/04_nonmatrix.svg",
+      "bytes": 21153,
+      "sha256": "bb74b0626233761c5d3a99658aabbcf8f87c05485a6b632c690ca6b9261a0a0e"
+    },
+    {
+      "path": "figures/05_method_audit.pdf",
+      "bytes": 26733,
+      "sha256": "6cd5b999cf5b9cc7dad7fc2362352d614810666398e41c642cf10a476a01eae6"
+    },
+    {
+      "path": "figures/05_method_audit.png",
+      "bytes": 130451,
+      "sha256": "0604ccc10e643c78c9f04d8efc7ae27619b6bbc130f2521a64c91d04f211d3a2"
+    },
+    {
+      "path": "figures/05_method_audit.svg",
+      "bytes": 27698,
+      "sha256": "ab6508bc3fecb8e6546af6dd97098607c4a1c81af151201f203c0ba49fc7d8ff"
+    },
+    {
+      "path": "figures/index.html",
+      "bytes": 12189,
+      "sha256": "67ace514447a954a16ec9679d2efb05ccc4f7b25f4d78a137d648e6461753c68"
+    },
+    {
+      "path": "raw/pi05_h16_latency_baseline_20261105_01/capture.json",
+      "bytes": 177436,
+      "sha256": "d5392e977016fd48764b36c4391277128674c0104d91b3d2007fb10278655c99"
+    },
+    {
+      "path": "raw/pi05_h16_latency_baseline_20261105_01/exit.json",
+      "bytes": 23,
+      "sha256": "c0c359bd44f6f8aacd20700abf844c9c05ee1c7140b17d270ef93d8bde6764df"
+    },
+    {
+      "path": "raw/pi05_h16_latency_baseline_20261105_01.log",
+      "bytes": 1223,
+      "sha256": "d273ae879526700bb8af3a0c31f9c33724eea01838a7e8fdf3c67f5aeb4ad7c6"
+    },
+    {
+      "path": "raw/pi05_h16_latency_trace_20261105_01/capture.json",
+      "bytes": 116355,
+      "sha256": "12f8e2b56fb53ff4dbaf4859301b2004dcbf6f8137fa1530e1ad2efa5c211e75"
+    },
+    {
+      "path": "raw/pi05_h16_latency_trace_20261105_01/exit.json",
+      "bytes": 23,
+      "sha256": "c0c359bd44f6f8aacd20700abf844c9c05ee1c7140b17d270ef93d8bde6764df"
+    },
+    {
+      "path": "raw/pi05_h16_latency_trace_20261105_01.log",
+      "bytes": 11468,
+      "sha256": "61d40efe625eca07bff97b0dbcbc5fc8ca7d0fa3fde5a37162949f3067ec88cd"
+    },
+    {
+      "path": "raw/pi05_h16_latency_trace_20261105_01.nsys-rep",
+      "bytes": 7224658,
+      "sha256": "8d4c1c92a686128d40850ab9caf0f84fdfa212e053d9963678eeb0c6cdf680f6"
+    },
+    {
+      "path": "raw/pi05_h16_latency_trace_20261105_01.sqlite.gz",
+      "bytes": 5734870,
+      "sha256": "ce35325b60022de68555e9a7d162a3eb3c9a8bbd1d4bba9b8c10a14581ffc5f5"
+    },
+    {
+      "path": "raw/pi_tokens.json",
+      "bytes": 5999,
+      "sha256": "1068738525557e21aee1dac5304c455d6caf1cba262a47912af76911807d90ed"
+    }
+  ]
+}

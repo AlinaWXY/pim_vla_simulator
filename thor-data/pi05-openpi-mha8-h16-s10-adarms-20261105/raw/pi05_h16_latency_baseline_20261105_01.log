@@ -1,0 +1,17 @@
+fact-thor
+/var/tmp/shiyuhuang-vla-baseline
+/var/tmp/vla-venv/bin/python
+/var/tmp/vla-venv/bin/python
+13:54:00 Load existing local NVMe checkpoint once using sequential readinto
+13:54:08 20 full requests warmup, natural cache state
+13:54:12 clean_before: 50
+13:54:25 {"clean_before": {"mean": 222.42235462, "p50": 219.09204599999998, "p95": 236.22949455, "minimum": 218.406671, "maximum": 242.259441, "stdev": 6.346849630378945}}
+13:54:25 phases_before: 50
+13:54:37 {"phases_before": {"mean": 223.85081034, "p50": 220.6455755, "p95": 237.22012504999998, "minimum": 218.75461, "maximum": 239.267242, "stdev": 6.2122880760995685}}
+13:54:37 step_control: 50
+13:54:49 {"step_control": {"mean": 222.97409904, "p50": 220.001633, "p95": 235.55088115, "minimum": 219.027425, "maximum": 238.771364, "stdev": 5.57242013268954}}
+13:54:49 phases_after: 50
+13:55:01 {"phases_after": {"mean": 224.2229684, "p50": 219.71576, "p95": 240.51632454999998, "minimum": 218.494489, "maximum": 255.661256, "stdev": 8.715532823525068}}
+13:55:01 clean_after: 50
+13:55:14 {"clean_after": {"mean": 225.35426002, "p50": 219.4837465, "p95": 235.1291684, "minimum": 218.49474, "maximum": 379.121716, "stdev": 22.7812902788381}}
+13:55:14 CAPTURE_COMPLETE

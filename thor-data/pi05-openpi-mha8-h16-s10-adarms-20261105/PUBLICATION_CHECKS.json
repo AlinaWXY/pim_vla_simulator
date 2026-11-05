@@ -1,0 +1,38 @@
+{
+  "status": "passed",
+  "configuration_verified": true,
+  "input_hashes_verified": true,
+  "capture_source_hashes_verified": true,
+  "all_percentages_reconcile": true,
+  "per_step_partition_reconciles": true,
+  "html_references_resolve": true,
+  "images": [
+    {
+      "file": "01_coarse.png",
+      "width": 1894,
+      "height": 542
+    },
+    {
+      "file": "02_families.png",
+      "width": 1895,
+      "height": 814
+    },
+    {
+      "file": "03_linear.png",
+      "width": 1895,
+      "height": 995
+    },
+    {
+      "file": "04_nonmatrix.png",
+      "width": 1895,
+      "height": 1408
+    },
+    {
+      "file": "05_method_audit.png",
+      "width": 2051,
+      "height": 736
+    }
+  ],
+  "live_browser_layout_verified": false,
+  "note": "Static PNG figures reviewed visually; HTML links/structure checked without a browser renderer."
+}

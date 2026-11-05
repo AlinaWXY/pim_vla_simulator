@@ -1,0 +1,11 @@
+deep-space
+/fact_home/shiyuhuang
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+fact-thor
+/fact_home/shiyuhuang
+2026-11-05T14:12:35+08:00
+pid, process_name
+utilization.gpu [%], temperature.gpu
+0 %, 39
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p1  936G  887G  1.1G 100% /
