@@ -1,0 +1,92 @@
+{
+  "native_rerun": false,
+  "source_sha256": {
+    "before/serial_layer_control/manifest.json": "82079fcd43809fb31090ae944ccdc117d741a4e4094ec81c3bd3212a9d348552",
+    "before/serial_layer_control/simulation/barriers.csv": "fc86388287d30df438fe3480ebde3a09c264153fd1411720580e1151f927840c",
+    "before/serial_layer_control/simulation/timeline.csv.ch0": "750394c3cfa2530ba269c19bcfbde05db5b4a53fc996cc6fc23a1ef59f651b89",
+    "before/serial_layer_control/simulation/rank_ca_events.csv.ch0": "2d20b4a8b4376773892dc82fbef6cf64dc8f5f85836634e9d4451a487a7a74c1",
+    "after/serial_layer_control/manifest.json": "7034b0a78697386956650f9133de71b7a8e7a6344efb44897339778541d2e427",
+    "after/serial_layer_control/simulation/barriers.csv": "6c8433b1580e4669ac2284374e5bb3a8e2955c6c6edeea48e07ce0e60f81ebf3",
+    "after/serial_layer_control/simulation/timeline.csv.ch0": "9ceab8568cb6b03170181b74b032aa29cc0fd9cf9588b8e1ac57da0282c73330",
+    "after/serial_layer_control/simulation/rank_ca_events.csv.ch0": "fffb8c955ce7d6cd8535eef786fa0957d1a79dec6d56c4ec4adca8da9281226a"
+  },
+  "metrics_sha256": "ff99c2fb71daae5778305224cf7e12721f6fdd12a0eb68d93b3cd448d3c0ac83",
+  "renderer_sha256": "b4eda0901fe819e15f012896750a75744b567819545a0d62a88f5e30adc51d1f",
+  "dq_long_windows_us": {
+    "before": [
+      [
+        1.2072353125,
+        33.7042453125
+      ],
+      [
+        38.189761312499996,
+        57.6354393125
+      ],
+      [
+        61.2842593125,
+        86.69843131249999
+      ],
+      [
+        90.55830131249999,
+        100.5564433125
+      ],
+      [
+        107.16840531249998,
+        147.75097531249997
+      ],
+      [
+        162.4860173125,
+        210.1673713125
+      ]
+    ],
+    "after": [
+      [
+        1.2072353125,
+        33.482877312499994
+      ],
+      [
+        37.947757312499995,
+        57.506933312499996
+      ],
+      [
+        61.115419312499995,
+        86.53240531249999
+      ],
+      [
+        90.3913373125,
+        100.39041731249999
+      ],
+      [
+        106.92921531249999,
+        147.5699413125
+      ],
+      [
+        162.2318193125,
+        209.86252131249998
+      ]
+    ]
+  },
+  "ca_zoom": {
+    "begin_us": 183.3,
+    "end_us": 187.8,
+    "long_gap_us": [
+      183.5816373125,
+      187.4790273125
+    ],
+    "command_counts": {
+      "before": {
+        "PIM_MAC_AB": 90,
+        "PIM_STAGE_FRAGMENT": 24,
+        "REFab": 4,
+        "PREab": 2
+      },
+      "after": {
+        "REFab": 4,
+        "PREab": 1
+      }
+    }
+  },
+  "plotted_channel": 0,
+  "channel_schedule_equal": true,
+  "original_metrics_verified": true
+}
