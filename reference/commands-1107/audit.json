@@ -1,0 +1,2789 @@
+{
+  "chain": {
+    "before": {
+      "status": "passed",
+      "case": "chain",
+      "trace_and_native_address_coverage": true,
+      "independent_trace_commands": 109408,
+      "native_data_commands_checked": 131840,
+      "array_open_row_checks": 986112,
+      "unified_gemv": {
+        "events_checked": 69456,
+        "operation_counts": {
+          "GEMV_MULTICAST": 8192,
+          "GEMV_MAC": 49152,
+          "GEMV_RELEASE": 80,
+          "GEMV_Q_LOCAL": 2048,
+          "GEMV_Q_REMOTE": 2048,
+          "GEMV_QK": 7936
+        },
+        "bank_generations_checked": 16640,
+        "physical_bank_releases": 1280,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 3024,
+        "ACT2_commands": 3024,
+        "paired_ACT2": 3024,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 3024
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 672,
+            "paired_ACT2": 672,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 672
+            }
+          },
+          "other_internal": {
+            "ACT1": 1824,
+            "paired_ACT2": 1824,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1824
+            }
+          },
+          "staging": {
+            "ACT1": 528,
+            "paired_ACT2": 528,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 528
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "new_local_write_precharge": {
+        "new_LOCALWR_commands": 15872,
+        "physical_precharge_checks": 1040,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 16,
+        "source_packets_checked": 8192,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 256,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 16,
+          "cross_generation_boundaries_checked": 0,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "rank_controller": {
+        "command_intervals_checked": 252448,
+        "rank_command_coverage": 166112,
+        "global_CA_resources": 16,
+        "rank_CA_resources": 32,
+        "transfer_broadcast_compute_share_rank_CA": true,
+        "no_CA_interval_overlap": true,
+        "coarse_fragment_descriptors_checked": null,
+        "additional_local_pseudo_commands": 15872
+      },
+      "native_external_DQ_bytes": 901120,
+      "native_command_counts": {
+        "ACT1": 3024,
+        "ACT2": 3024,
+        "WR": 8192,
+        "PREpb": 2320,
+        "LOCALRD": 18432,
+        "PREab": 1504,
+        "ACTAB": 1392,
+        "MACAB": 49152,
+        "REFab": 480,
+        "LOCALWR": 28160,
+        "RD": 17920,
+        "WRGB": 2048,
+        "MACQK": 7936
+      },
+      "numerical_compute": false,
+      "score_DRAM": {
+        "tiles_per_rank": 31,
+        "bytes_per_rank": 31744,
+        "one_live_score_tile": true,
+        "complete_MAC_and_rank_reduction_before_spill": true,
+        "final_read_after_all_tiles": true,
+        "write_recovery_checked": true
+      },
+      "shared_local_port_intervals_checked": 24064,
+      "channel_ingress": {
+        "requests_checked": 84448,
+        "channel_count": 16,
+        "capacity_per_channel": 32,
+        "queue_high_water_by_channel": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32
+        },
+        "no_channel_FIFO_reordering": true,
+        "one_dispatch_per_channel_per_CK": true,
+        "completion_fences_checked": 73,
+        "global_barriers_checked": 73,
+        "peer_export_dependencies_checked": 128,
+        "peer_wait_events": 0,
+        "all_accepted_requests_complete": true
+      },
+      "rank_descriptors": {
+        "parent_descriptors_checked": 1664,
+        "fine_children_checked": 26624,
+        "children_per_descriptor": 16,
+        "parent_waits_for_all_children": true,
+        "one_global_CA_per_descriptor": true,
+        "fine_bank_operations_preserved": true,
+        "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+      },
+      "qkv_fusion": {
+        "logical_input_elements": 131072,
+        "projection_MAC_commands": 49152,
+        "scalar_MACs": 100663296,
+        "weight_bytes_per_bank": 98304,
+        "output_bytes_per_bank": 1536,
+        "physical_output_capacity_bytes": 2048,
+        "complete_Q_K_V_feature_coverage": true,
+        "numerical_compute": false
+      },
+      "local_V_cache": {
+        "packets": 4096,
+        "local_read_bytes": 131072,
+        "local_write_bytes": 131072,
+        "gathered_FP32_bytes": 131072,
+        "cast_BF16_bytes": 65536,
+        "external_DQ_bytes": 0,
+        "preserved_prefix_lanes": 4,
+        "suffix_lanes": 8,
+        "zero_padding_lanes": 4,
+        "source_columns": 48,
+        "store_ready_by_channel": {
+          "0": 34588,
+          "1": 34588,
+          "2": 34588,
+          "3": 34588,
+          "4": 34588,
+          "5": 34588,
+          "6": 34588,
+          "7": 34588,
+          "8": 34588,
+          "9": 34588,
+          "10": 34588,
+          "11": 34588,
+          "12": 34588,
+          "13": 34588,
+          "14": 34588,
+          "15": 34588
+        },
+        "numerical_compute": false
+      },
+      "trace_sha256": "d9fe483ce2982f32a29f6a788c9509b0779749baffdcc71243f15a3c8e8db1df",
+      "native_sha256": {
+        "timeline.csv.ch0": "1f35ed8f92fad0a2ca5088012f17bfe85de37600831c1794e2c668a637f928f4",
+        "timeline.csv.ch1": "f1404d7360846d767286a2ff850d0ece295b197b284976ff85fafcf230b0f659",
+        "timeline.csv.ch2": "4ca36e26e476e97804644872582aa8368f310f7e8a7f59ce25911a59263ea1de",
+        "timeline.csv.ch3": "b9e22d4c32ab39e420910ca6f1210b573e4799f425f28f29680b5fbd32bb1a68",
+        "timeline.csv.ch4": "c0034df32e2de7726fbb4051b47d9610fa7f737dbdf427d1b79f86163c80dc51",
+        "timeline.csv.ch5": "d0212767b467870d22eb4b830ead56bccbeeeaca24c32ddbc54405251f735b1e",
+        "timeline.csv.ch6": "cda8994d71580b2e97a61016b157a3bfd0e1463fc882e8ba483df85d93fdb5a4",
+        "timeline.csv.ch7": "8169400bb3fe3f8f7b5bd83d5d434e8f18a47032a9cbfee3fe57a885c35b168d",
+        "timeline.csv.ch8": "6f4cb0e27d5252172dd0526534cf962de03df6b099d9094bac415eddef19092c",
+        "timeline.csv.ch9": "834dbee8a9e008983bab233f6430ef71e45505d3fc0aceeaae4b931c8e88910b",
+        "timeline.csv.ch10": "a3d3d8377e991536c94309145b0a59f25d10fdebca4464638ca65d7e08295f6f",
+        "timeline.csv.ch11": "a92c3b8c4850f2124c8ed014c150b922690a49ce3d44b37e6852a25cf6dd0a9f",
+        "timeline.csv.ch12": "191987d28770539a4f0779c21256e4ce67489d99902281aa47c9e6e31e00c69f",
+        "timeline.csv.ch13": "f0926d4ba8c17b42106c5738bfeddadb93aaff09e2004f594bc7b69215f0b647",
+        "timeline.csv.ch14": "014e89424e1996fc08d77f1455e2d91fe22c7b6542b1be56664827a638cf1543",
+        "timeline.csv.ch15": "862017ce93b3a1ace029db45456c3bd484b7585bd7a6ea2351dbc6ea70716920",
+        "unified_gemv.csv.ch0": "b4b630be03cda6866cfefc5e7bd29184eff89583ac4ab83d4845ea74747a9eb0",
+        "unified_gemv.csv.ch1": "babf5861f40acdef589428260c9797a2ff6f0296e2f12edfa5bf74d3a920dbef",
+        "unified_gemv.csv.ch2": "c6783653908229f386d875857eba7fe5351422b2b26338d08d35563cd53c41ff",
+        "unified_gemv.csv.ch3": "1855b98e36c7f47f3a1d9ea8744315e8d1284819ea71f0751030e447c814ac9f",
+        "unified_gemv.csv.ch4": "94476e74428ea74a5806683ddde4cb58606338223dd588ed37f7d9fcac3dea5d",
+        "unified_gemv.csv.ch5": "e1d2f1d3246e1705916cbcf082bcf2483236b98e62734c4c804440a49199171e",
+        "unified_gemv.csv.ch6": "de70bb759214aea9e57f5d85cb30cbaddb979f7bc2252bd67d605c799b9b0abf",
+        "unified_gemv.csv.ch7": "5d0abc1c35e35a4ada9c8b2458caa9198b23325ff05a9508084d2789b394d6e2",
+        "unified_gemv.csv.ch8": "6f12f226355ff1a4b48b262f7a362cb94a05e7f9dee071693e4d87d0f5baa5b5",
+        "unified_gemv.csv.ch9": "2ade6c23a9562fc8b2a930ecd8cc24e5de828c634a51a919a71d647d26fc9a3e",
+        "unified_gemv.csv.ch10": "0e9c7d4710501f17998aee51f360b4704ffa72ee196798f1e80efd15f9d5096c",
+        "unified_gemv.csv.ch11": "6ef155cb39ebed0cc5f474cedbf16bd7b1d5d6570bae18a4dfbac6360bf8a9c2",
+        "unified_gemv.csv.ch12": "1a82ea2671ea3c76317766a176163304e1708aa89ce608f78ab18d1b8e01f024",
+        "unified_gemv.csv.ch13": "9270242e30b877c55ac5878c36ec0c974a7748e711e7cff4c9e9d058fe8adaf4",
+        "unified_gemv.csv.ch14": "cc5a2d07fd6e7514d8cca259eeccb5b899e066301cb4a008b0de04fb221d48b5",
+        "unified_gemv.csv.ch15": "2f9861b8c79506e4037bc4870d8bb92d97b429587964a5770907669142f74cd9",
+        "staging_events.csv.ch0": "0ac8f4b0819f6d428fd366f1e3a66a9fe9bfdc6d47fba1a1aa6c6b5da164ba3e",
+        "staging_events.csv.ch1": "57997712b9c3caad7bc7fc6ce896ff1cbd8e1211b21195338f3303e75072c829",
+        "staging_events.csv.ch2": "a8f1e421788aad58671a6e3ecf665bcd976bac538ee540b816369f08dbab9ce5",
+        "staging_events.csv.ch3": "12e95421a561ab84ea738573217acccb87cee3112e9af5a333451d613d5b6262",
+        "staging_events.csv.ch4": "b39b57334b03387d67bd6e6c6d071cd98e91b4a46f48f00341ef2584ef11d6ca",
+        "staging_events.csv.ch5": "015ae57498815ee12e6e1e180b209b71bb7d32a7b4cfdb7a63c9294b25937b6a",
+        "staging_events.csv.ch6": "68aa8acf6d253cf361b2a571eb48c678a97b8f5331f3d3e28cb4327d78fff01d",
+        "staging_events.csv.ch7": "4080f2adee4fc649e6cbb3505d479de5b059fa0ed29f7981991ba47864b466a8",
+        "staging_events.csv.ch8": "a12d5100ae410988d0ab2f94c0033d782349ea1b36df50293e706140ee4d3d09",
+        "staging_events.csv.ch9": "04e46bc3b8609b44bd7fbe9fbdb0840eb2ea962cd7e49609358488eb00da7afd",
+        "staging_events.csv.ch10": "5bd645613f0ad08cd5bbb46d1c387d0874b53ff9f0a95a2c1fd92677de083f32",
+        "staging_events.csv.ch11": "20038a1ec336943df5b40f360e41fd33f54b02af64251b7594ba4da0d8bf1cde",
+        "staging_events.csv.ch12": "3053e6f63b9c365d04cc0630d14efcbe24d1fbdfaa0e7b300d52b6f5aeb30288",
+        "staging_events.csv.ch13": "e0fe2708accd4d3e26370a1569a43f29484f450375abe246105043aa3789b472",
+        "staging_events.csv.ch14": "83d196521ccd5f3f80c67868cc5f0b96b8b86e7281476dbf657a1c9143969d16",
+        "staging_events.csv.ch15": "0dd6c8d1d600e042272a7abc418a12b1b33c3e500691f5ff814f776cacc4b42a",
+        "rank_ca_events.csv.ch0": "812e89976ae5a898bf9ffd19fb3e97b1c7b9dcc5d624300e9d5aa91740f0faab",
+        "rank_ca_events.csv.ch1": "4ae496644a2bb37a339b31e63889ab79e4cf2bc239007b265d056bbda60bc904",
+        "rank_ca_events.csv.ch2": "d8c895d9d8c382806d6a18c739087d197bdbfb589151c0590dfe77d2588d4cba",
+        "rank_ca_events.csv.ch3": "0c06aea099e822a831a8b10e802b371f729f6cc197a89374b9e1e9c41d404262",
+        "rank_ca_events.csv.ch4": "04a20550c8b1c5edef488bf09b3e438b5f2328e1ef7292af5d6ec72333da3a59",
+        "rank_ca_events.csv.ch5": "c31e3889c1262814292bb4a0b0b58f899310ddaf938d94cedd733730fb0c1119",
+        "rank_ca_events.csv.ch6": "4d61b84457b05e63335de78b1817ac3b839a2014e440a31ca9d1d86881a7e308",
+        "rank_ca_events.csv.ch7": "4a0b4e3ab3c454eda2f67f70cc47afc717d8965022a821957fcef7c48cf20ca9",
+        "rank_ca_events.csv.ch8": "430473e17ba8209587cb9515a56d356994ea83edb5a27b00cbaa89a07bb99a3a",
+        "rank_ca_events.csv.ch9": "31a175995bcf9bbb0a8ecee8d83059092cf8acb6514c062ace2cc48f50f24fdb",
+        "rank_ca_events.csv.ch10": "542487828bf637ecc1e506dc2da16c3338d61926824c68d0cc2e429fb169564d",
+        "rank_ca_events.csv.ch11": "bf6cd5798cb29ac9533a59a0ef0917248f40e097e1fc104f86205f8d6378580b",
+        "rank_ca_events.csv.ch12": "d6eeb5ae643dbeb7577a91fd9c3d4f6fcdc4c07ea72c038e756dd888461a8c21",
+        "rank_ca_events.csv.ch13": "6ad995ce3ee6b6bd46380376296f6f3d66d6f6fea97c99c42d3d152c8c82f863",
+        "rank_ca_events.csv.ch14": "0d2b2681a48a79f11a60349203c0f25075a7e045418c836a7f770c688f2c84ff",
+        "rank_ca_events.csv.ch15": "102bb0a3e2219a0ba826633cd0bfa460e43e4e8bd3fa83fcbfea09500931bee9",
+        "bgk_events.csv.ch0": "906ae10b6f64d4ef4b47f23c220d0afc55c1164793520ce01c8ef6c696a1e86e",
+        "bgk_events.csv.ch1": "f23e42ee617a85c697ae3bb0dbf40ba7c6e40f4dc497047ebc03e2feac3fdc7a",
+        "bgk_events.csv.ch2": "1c12a962a26c01a1f8642b5260a8fedf7c05efb08145f4707b18686c1ab66452",
+        "bgk_events.csv.ch3": "bd67ec31e70efda8a4028c3584527e6a2995ca24e2b5cadc98db85092e472df7",
+        "bgk_events.csv.ch4": "1ad2b58f28d8dda18c9a647eb75c2cb67c03701704d14182f60a70b5cb6670c3",
+        "bgk_events.csv.ch5": "257e03fc251c72386984d738d01bbbb621372118d7380a5f0a084dab7aeed1cc",
+        "bgk_events.csv.ch6": "4aff9cac0b8dee639073e3a2278c77537b45db39959371e2f76a6f70c3617429",
+        "bgk_events.csv.ch7": "7b526c04c089e6db6d595fb7b550aedc485138c236a4a752da5a154f014a9f3d",
+        "bgk_events.csv.ch8": "fc253458282bfc92b3a256b284c94a7ca57b0146d6cf85980c7dca0c75c67485",
+        "bgk_events.csv.ch9": "10bf13aab16422ebf27f8bb1969174a38cf2d11adf1a17e00b2d30e779534314",
+        "bgk_events.csv.ch10": "26f33aeab6c364fa30805cc149ab81a4092d00eefd841018e7fb749293ac7eee",
+        "bgk_events.csv.ch11": "1c9cb27a19850aff336aa00c63a298e96f2f585b44b2a25e650be3cae339d181",
+        "bgk_events.csv.ch12": "c50761abfb3498c61ac3bbb8e098add1438b7df5e8f0f1ccf27b069f18edb9fd",
+        "bgk_events.csv.ch13": "0cc594eb8778996fb48259002f04a14c0a74f43d02dbdd5e2a66a7bd75314a9f",
+        "bgk_events.csv.ch14": "2ff34cec2af372e1f22e6f9bbf36b5350f2673ab7f8bb5a37e28eaa5a1bc6403",
+        "bgk_events.csv.ch15": "a0203e016dfb180eade8e35a6aaac7a094ff78c213d03ed35d36a3997694b7e8",
+        "v_cache.csv.ch0": "3dea40d7f6b6e1a645350d12b845e04395d3ee5c053b24c5edc2c66b05ade1f9",
+        "v_cache.csv.ch1": "81da9555cf542789d167e082b2d76118d4eb01a5a526f80b93427d0b0667838d",
+        "v_cache.csv.ch2": "25e61418bf59abd05906920fa1bd6c9cdf68b38a705e646ff928ab7067aa6766",
+        "v_cache.csv.ch3": "fd86c57e05a146368f20e898d208c975eeeaad7c34ace2aa90d1cc48bce25c0d",
+        "v_cache.csv.ch4": "2624d23a50787e01194c5ff2a65212f8cfa364991b1a7bd0129a82b877fe0dca",
+        "v_cache.csv.ch5": "cbc10892da91d7a098fb19cc24f14350736606beb76be816fa42aac7f343ada6",
+        "v_cache.csv.ch6": "2940ae2373515bf0f1cb4dd5d4832bf3ee77a9d4387bc9731298d3336190c798",
+        "v_cache.csv.ch7": "f1c9865799c2d44d6d8640b21f90e8526ea3613b1ed5da456cb88004deed86b7",
+        "v_cache.csv.ch8": "984e84746342800c2eedaaa79d1171419319b47b0926fd98f2d2161becf57012",
+        "v_cache.csv.ch9": "88af37059e68b37241da146da35c5bcc8f1cb2baa4f5d6212afa8e2cb27ab44f",
+        "v_cache.csv.ch10": "bde0bbfcc875f8ca73937e5905acfd61c6fee52d7b8d0680a7db1e351cfc3a33",
+        "v_cache.csv.ch11": "ed08594db074ef19e0e7488f540f13334551a2484f4da84aed4976656873af57",
+        "v_cache.csv.ch12": "6dcb3ded29db472e1b9df76cdbf108dc345e610c999051de99c457f3af8c2540",
+        "v_cache.csv.ch13": "e4da4add8f01a88e0e10e74d4918fb4af6cc576ba3dcd4b3a605a3989c2c764f",
+        "v_cache.csv.ch14": "c3264901c1309a02a2a3f250f6920e445002bdeec9566e80b03803802566d859",
+        "v_cache.csv.ch15": "013f1cd0d9f7f218f0f421e679028f3bd6efcac2bdaadddf287b6dad9430fbb1",
+        "score_spill.csv.ch0": "001dc5f7ff70ccb6e2cc5bec139a0b89d85988ace51023f2ae7768d1d0fc013b",
+        "score_spill.csv.ch1": "e8013204280e22b90c8859423b77dfa59eaf2612f5f931673f1ca9c3189fa752",
+        "score_spill.csv.ch2": "487ad417b60023cdcf8a081f7489a25d3869e1b2e320b69c4ee7a504bd286d78",
+        "score_spill.csv.ch3": "8c7da2203127f7fa65221bcccfc3f6f63ae6f3f55a03eab64c127331a9aec874",
+        "score_spill.csv.ch4": "807144ad404c40f2bade2a85699e02f75f53bcab571d0e72b45498670d5103b9",
+        "score_spill.csv.ch5": "df5093f75df53a93c4ecd4a33e54c437ab5575160c0908cf58adfd848b3dbb2f",
+        "score_spill.csv.ch6": "d5fa20204086f89d312753ca515fd9ac6dca6f209805031e82a17177d9fe1b9a",
+        "score_spill.csv.ch7": "38c60a61c99158cbf7fd8733495e58d6caac314edd65ae138a29dc4fb6a00eeb",
+        "score_spill.csv.ch8": "aa0b7e7724261afd9079bfd8004550b6f618362bdcbda36a206f662b326fb2d8",
+        "score_spill.csv.ch9": "29f2f86a6e51a1343dbf2f72880402f43d433ac290afb41ee4cbeeffb1acee61",
+        "score_spill.csv.ch10": "f3e2002f54796f7ada850e5c7a5458ba5fe9c039e2f6b45c29e205a9d4228886",
+        "score_spill.csv.ch11": "46062c5767e88accc6a96e70ce685c58e8cadb5aaf3ae8ea9558c1c7a3a3bcea",
+        "score_spill.csv.ch12": "a5591710bb3e382a1d94664a6283fe4607e20c61724e9d9401ca2ca4ed364445",
+        "score_spill.csv.ch13": "4377572a2227b3e9bfb1f469788565b38e8611f15c4ef1ccc597285d1635f977",
+        "score_spill.csv.ch14": "a7dc257500914d9da14539229fbe5ece0921dff9b0a8e56aa5867b5ae301c5da",
+        "score_spill.csv.ch15": "b943bbc06e4b7ce96501f4c04a00f18f78068a39e73dafc3ff52f04ec32b7b6e",
+        "rank_descriptors.csv.ch0": "8aed2ac79c8b4624adaffe76fe5678c9069d812514b9b4797a576d53e5919e08",
+        "rank_descriptors.csv.ch1": "4a039d4cb3bd540e58f3414f9d0a8575a2f8504ffd81e7cd1318748fca5ff5de",
+        "rank_descriptors.csv.ch2": "c59a19c5a53394555b272e04d569bc7ceb84885933fd6e6ff780553b84e8cbf1",
+        "rank_descriptors.csv.ch3": "2afe84a11bba807d7d317639c457690ca8fef5d9290a9f10a63d4f0605a91f4f",
+        "rank_descriptors.csv.ch4": "5861a70845c2db08178a6a00b528189c068cedb8af191e23a614deaf22424fe7",
+        "rank_descriptors.csv.ch5": "19162222febf616595cbc04544b35cb221330b151ab5c50bb22f7ac130297225",
+        "rank_descriptors.csv.ch6": "79c986690fa77184723c048467154b8cd27219706f6ff9303816e601f8c9c9d4",
+        "rank_descriptors.csv.ch7": "6409a57e1958808c5f5adf9148df3e254b3b7cb32305efc0c0ef4c1c00191663",
+        "rank_descriptors.csv.ch8": "5ba9a5224c6212802d2d3fd0ea95487ad639eace03703fd921e9c19121d104c4",
+        "rank_descriptors.csv.ch9": "fe5b38ea55987148cafbaa805622dea327c2bfa6f14c3ede885ddb7010b763c4",
+        "rank_descriptors.csv.ch10": "9cf009319ee1044db582ecc9cf15c0d7f863c5d9b812ddf447ebe89b84931d51",
+        "rank_descriptors.csv.ch11": "70db5d046dbc99897e21db90004b353948316fb7a4c7d61ad013be08e38b7717",
+        "rank_descriptors.csv.ch12": "ca9999bf4b42f402bf6461602bfb151a087badf7867b96969351c23fac677b2c",
+        "rank_descriptors.csv.ch13": "a1ff557c56b1c384ca26dcea48b1e2e7aab53c9a098a430f04df664b25e885e0",
+        "rank_descriptors.csv.ch14": "e454d2d2578ef15331481a7971a87cfa2a4cfc872459accaad2a8e54ff60ddbe",
+        "rank_descriptors.csv.ch15": "afc1c1ae6817e5247274237c51b45af58c603bf8d1ae087fb460cc0b106898ff"
+      }
+    },
+    "after": {
+      "status": "passed",
+      "data_commands_checked": 131840,
+      "descriptor_children_checked": 81216,
+      "descriptor_count": 48,
+      "descriptor_global_CA_CK": 1008,
+      "exact_data_address_multiset": true,
+      "exact_MAC_order": true,
+      "array_open_row_checks": 986112,
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 3008,
+        "ACT2_commands": 3008,
+        "paired_ACT2": 3008,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 3008
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 640,
+            "paired_ACT2": 640,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 640
+            }
+          },
+          "other_internal": {
+            "ACT1": 1856,
+            "paired_ACT2": 1856,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1856
+            }
+          },
+          "staging": {
+            "ACT1": 512,
+            "paired_ACT2": 512,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 512
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "shared_SRF": {
+        "events_checked": 69456,
+        "operation_counts": {
+          "GEMV_MULTICAST": 8192,
+          "GEMV_MAC": 49152,
+          "GEMV_RELEASE": 80,
+          "GEMV_Q_LOCAL": 2048,
+          "GEMV_Q_REMOTE": 2048,
+          "GEMV_QK": 7936
+        },
+        "bank_generations_checked": 16640,
+        "physical_bank_releases": 1280,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "local_write_recovery": {
+        "new_LOCALWR_commands": 15872,
+        "physical_precharge_checks": 1072,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 16,
+        "source_packets_checked": 8192,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 256,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 16,
+          "cross_generation_boundaries_checked": 0,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "packet_scratch": {
+        "packets_checked": 0,
+        "channels_checked": 0,
+        "scratch_bytes_per_rank": 64,
+        "local_write_service_before_reuse": true,
+        "external_DQ_completion_before_reuse": true
+      },
+      "storage_reuse": {
+        "generations_checked": 16,
+        "cross_generation_boundaries_checked": 0,
+        "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+      },
+      "score": {
+        "tiles_per_rank": 31,
+        "bytes_per_rank": 31744,
+        "one_live_score_tile": true,
+        "complete_MAC_and_rank_reduction_before_spill": true,
+        "final_read_after_all_tiles": true,
+        "write_recovery_checked": true
+      }
+    }
+  },
+  "pv": {
+    "before": {
+      "status": "passed",
+      "case": "pv",
+      "trace_and_native_address_coverage": true,
+      "independent_trace_commands": 53920,
+      "native_data_commands_checked": 68864,
+      "array_open_row_checks": 417280,
+      "unified_gemv": {
+        "events_checked": 40544,
+        "operation_counts": {
+          "GEMV_MULTICAST": 16128,
+          "GEMV_MAC": 24320,
+          "GEMV_RELEASE": 96
+        },
+        "bank_generations_checked": 16128,
+        "physical_bank_releases": 1536,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 1264,
+        "ACT2_commands": 1264,
+        "paired_ACT2": 1264,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 1264
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 128,
+            "paired_ACT2": 128,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 128
+            }
+          },
+          "other_internal": {
+            "ACT1": 96,
+            "paired_ACT2": 96,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 96
+            }
+          },
+          "staging": {
+            "ACT1": 1040,
+            "paired_ACT2": 1040,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1040
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "new_local_write_precharge": {
+        "new_LOCALWR_commands": 4096,
+        "physical_precharge_checks": 96,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 48,
+        "source_packets_checked": 16128,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 512,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 48,
+          "cross_generation_boundaries_checked": 32,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "rank_controller": {
+        "command_intervals_checked": 145072,
+        "rank_command_coverage": 90272,
+        "global_CA_resources": 16,
+        "rank_CA_resources": 32,
+        "transfer_broadcast_compute_share_rank_CA": true,
+        "no_CA_interval_overlap": true,
+        "coarse_fragment_descriptors_checked": null,
+        "additional_local_pseudo_commands": 45072
+      },
+      "native_external_DQ_bytes": 778240,
+      "native_command_counts": {
+        "ACT1": 1264,
+        "ACT2": 1264,
+        "WR": 7936,
+        "PREpb": 1104,
+        "LOCALRD": 16128,
+        "PREab": 688,
+        "ACTAB": 608,
+        "MACAB": 24320,
+        "REFab": 352,
+        "LOCALWR": 4096,
+        "RDRES": 16384
+      },
+      "numerical_compute": false,
+      "BF16_output": {
+        "local_PV_packets": 4096,
+        "BF16_export_packets": 16384,
+        "FP32_source_coverage": true,
+        "cast_and_transfer_service_checked": true,
+        "local_write_recovery_checked": true,
+        "output_DQ_before_rewind_checked": true,
+        "packet_scratch": {
+          "packets_checked": 20480,
+          "channels_checked": 16,
+          "scratch_bytes_per_rank": 64,
+          "local_write_service_before_reuse": true,
+          "external_DQ_completion_before_reuse": true
+        }
+      },
+      "shared_local_port_intervals_checked": 24576,
+      "channel_ingress": {
+        "requests_checked": 53920,
+        "channel_count": 16,
+        "capacity_per_channel": 32,
+        "queue_high_water_by_channel": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32
+        },
+        "no_channel_FIFO_reordering": true,
+        "one_dispatch_per_channel_per_CK": true,
+        "completion_fences_checked": 12,
+        "global_barriers_checked": 13,
+        "peer_export_dependencies_checked": 0,
+        "peer_wait_events": 0,
+        "all_accepted_requests_complete": true
+      },
+      "rank_descriptors": {
+        "parent_descriptors_checked": 0,
+        "fine_children_checked": 0,
+        "children_per_descriptor": 16,
+        "parent_waits_for_all_children": true,
+        "one_global_CA_per_descriptor": true,
+        "fine_bank_operations_preserved": true,
+        "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+      },
+      "trace_sha256": "18c50b116f1dfc2ca8327aabfee177b7939d9efc05f0d25682c91c0b6f164252",
+      "native_sha256": {
+        "timeline.csv.ch0": "1f02349f161f70063eb7b4c66c83c2f352538d0b0150ff0364695090fa24af30",
+        "timeline.csv.ch1": "b1edea3760e8ee1f9320004685d7c4a005057af23dc244046f7d6b60ae76a3c1",
+        "timeline.csv.ch2": "0e59189eae7eda3d484a76e87da63bdaf9b73b6a6c67b108104ab510c6ba3192",
+        "timeline.csv.ch3": "e09b80a4acd21494cc10e843a478514a410dd9dba9b16e29c50ddba77dff65a7",
+        "timeline.csv.ch4": "9027587388212146a601eb3ef2b651323ca239f0e89e54286503d5d50cb43961",
+        "timeline.csv.ch5": "cb48c1b39a0ec9a762e8240c5e07d60665429949ec220d38240fa76922173481",
+        "timeline.csv.ch6": "6d80f4060f1fb4fa63b406b68ce5a887713112f30a07dfca36bb0e0731211553",
+        "timeline.csv.ch7": "7c2c50465fedd366be57b1118f18b89e5f08f6e49092567dd96f2395ae0ee6b1",
+        "timeline.csv.ch8": "3454529f53b7fa9f224b03ce621e484e12e4589ff202dd54f258403a3fb31bf4",
+        "timeline.csv.ch9": "2caa72b9891fbdaf42ff252cfe9c9aecf4ac8d59c50db909d280951f4709e667",
+        "timeline.csv.ch10": "a39c9042597511112aae0ba9f7676cee7c41eee0aaac4ac3ff97ca5d08e21cff",
+        "timeline.csv.ch11": "03aa86fc08302607d240637ee1721a65141b89f24fd84748145f999329e70ac6",
+        "timeline.csv.ch12": "34e03eb75b163bdf91c14c0f13a33c3946e368d593782147a0b9003af293bf32",
+        "timeline.csv.ch13": "eae6f3c1f12c4e6f9114910f4397389f6907f3f8f88d7815f0af646f0a279fba",
+        "timeline.csv.ch14": "0771e6af96d87cbebf4e86f2fc42d10b3b80159a1b8f59093808136350b8c0b2",
+        "timeline.csv.ch15": "9dc2db446b948924b74bdbee4b456854c61a504869d20920c1d9058c18c3f740",
+        "unified_gemv.csv.ch0": "44817b39d907cb79eab29e4537a7bb540a52775ab2e7ebcd1e3a1583a301e052",
+        "unified_gemv.csv.ch1": "562adee556ff0d4f1d9b8c80e080745a3a1eeea868fd8d2825fe091423300a44",
+        "unified_gemv.csv.ch2": "de25e5e51494b40304178c4b7985297d0db4c264bae3ab78dd828f316133a6df",
+        "unified_gemv.csv.ch3": "aa18c6180ab1638c26dc27e12cb6b4df0f7671b2dc38d908ca78a58decf4dc63",
+        "unified_gemv.csv.ch4": "feed764bfb763bcb6f44b13b5fc436b25cb264026d134228b34732f2aadd5181",
+        "unified_gemv.csv.ch5": "931084e33fa92ff15ffdb546e3cdb9fb47ad2bd88dc1aad845ebd36b4fd62862",
+        "unified_gemv.csv.ch6": "b87b904f8bc7a0f17f52a7b018ecdab5be0f17d9e221d995120a75469d2d6920",
+        "unified_gemv.csv.ch7": "1fcdcaf3de97359c2971efd2fc7ace615bee8573a243c7b45bacf50d27c4aa30",
+        "unified_gemv.csv.ch8": "d5ccc43f2742b441ee3c39d7b16da6455eff245ec9344ff8d4e6618789d9d756",
+        "unified_gemv.csv.ch9": "77842ebbaacb2c9e9070dc0698a3acc473e415609243f45fa0a0bee0443cc58a",
+        "unified_gemv.csv.ch10": "b78894ccf121e122549b4b64eb83ce3e35d1f4133d8c23f69ed5eff47e2b5901",
+        "unified_gemv.csv.ch11": "7997cc308b725fff1913a43d06b71230da40d3e1f60ad6b67288c8471e921f18",
+        "unified_gemv.csv.ch12": "6fa862f65c1635b8e16391793e3a9d4105a01be0323eaab4180b94c0e20faafc",
+        "unified_gemv.csv.ch13": "10d5eea2e289be42bdc119419cd4fa9fc50e79665fc5d14f4d81eea3862156ee",
+        "unified_gemv.csv.ch14": "3e74fc8c80f3bc85890d131595bfcdc972c393906aa4924c815bc49f719436bc",
+        "unified_gemv.csv.ch15": "64a0a8d2176ab66bee29c375c37ee0cebfd9b46f95634ed42a23fe808c022835",
+        "staging_events.csv.ch0": "f9a3aeb74abce018472423905394405255d258028928890399b4c2c8ec72c547",
+        "staging_events.csv.ch1": "58a52650017d9dc70cb5415c293709dc32dd5fef1a4dd9fdc096e4e131f5ccf5",
+        "staging_events.csv.ch2": "571e513739b17e4f072cb6b6fb66abea7015c05b438cebf0de03416eea75bf43",
+        "staging_events.csv.ch3": "d7c9bbf876067b7edee17a54adc50d3aec769a56ca8456f6ebb440775ea85db6",
+        "staging_events.csv.ch4": "941667c4ea9f7dcf09e2498d5b1a336c4df42469a741e7beaaec9d6d451772ee",
+        "staging_events.csv.ch5": "7150f0ccd57238ab0ae297bfab69ecf7866814be2baa95338e40c9d577b4ef66",
+        "staging_events.csv.ch6": "2a5a4a4a6479cac1bfb78effbfa1c5b5c380ef6d07eb10e02380bbaa38bce4ff",
+        "staging_events.csv.ch7": "e7780259f79120dc7998c9234927abfdcc27225f56e38d6081d96942003badc0",
+        "staging_events.csv.ch8": "86ba3c4e3b81d85348a5378eefffd4aa639eab2028ab10e9413531ea50e88168",
+        "staging_events.csv.ch9": "53cb9565a2d749df006ac6f94b076ebc73679c2ad66a7a5621dc42c6fed68701",
+        "staging_events.csv.ch10": "93b19fce7b73f28bd4a77cc2c4404883a69b996cb0f264a10b020d1f7e54e21a",
+        "staging_events.csv.ch11": "9cbea540df5e0d1156edff56a4bdb4593c2ccc47900bd1d48971e7dc88b6c624",
+        "staging_events.csv.ch12": "d4c7d08dd7c062ef5be266ad24a5dafbd65c9aec2c684b4ddda6a56fb4b6fe3e",
+        "staging_events.csv.ch13": "236a300a3ac0959c67388618c66daa3d4e72548a4f0872d7b20ccfcb14f6e1d0",
+        "staging_events.csv.ch14": "7d814194aff47a301f0925a55c13870b43e202ec7c61938bed5931642d83a13f",
+        "staging_events.csv.ch15": "e2d961d1d9d21f421f4b7ee7925fc298dd21e9a0aacb418fbce130293476be0e",
+        "rank_ca_events.csv.ch0": "76541c94a0dd600f2d891d74eabf4ef5a997b934819088720311163a2922a658",
+        "rank_ca_events.csv.ch1": "c14a11d8c30eb86bf3465adec0c65aa97c5bdd2d07a142c8dee546ee7bbbbfbb",
+        "rank_ca_events.csv.ch2": "d290ac5b1d81543b6b93f258286f26e8c7c396dcf1a8ba225a85c0187ecdd618",
+        "rank_ca_events.csv.ch3": "6022d5888afaee2474e47899e3222f689bad6f526f34ce29f42f72a7a6e10580",
+        "rank_ca_events.csv.ch4": "d985be669eaec1b8fee63dde8ca3b90f571ec0b4cc0529fc77b6e1ef16c8a4fb",
+        "rank_ca_events.csv.ch5": "0b139c8679662a58b55d55e728b190d030072ba9ba842bfe56e36feae07289c2",
+        "rank_ca_events.csv.ch6": "4cffbb7963f402b8eca19ac5bb736eafab6aee2f5cc3dfcaa5eaebfb3b71e56d",
+        "rank_ca_events.csv.ch7": "2adb106f6693d4e93e2b6d9c54c04fc07b7028068696991a38ad13279d2404ab",
+        "rank_ca_events.csv.ch8": "6dedfdeebd113723814bfdd487afb5a601f03da2cf122608fab9aab694fc16fb",
+        "rank_ca_events.csv.ch9": "255ac7e78e8dcf9fe3c523013557aab1c9e05c4c8ec1bce03124fb3a8abbfe9e",
+        "rank_ca_events.csv.ch10": "424621cf9f9e8ffd78803f8d06d16cbc0e1eacd32b1b10e03522d25018e6284d",
+        "rank_ca_events.csv.ch11": "15f1c4f2287bc306c838f97cf61ab8b8a0e99c4c1b9c83a43f3ce4ed7954a0f4",
+        "rank_ca_events.csv.ch12": "9d664c0e175000ce1c33f8ad215a4b268ed1d7bd21a4832523278b2973153e20",
+        "rank_ca_events.csv.ch13": "2713e56e9a4f1d1fec191b092823a0f74cf9e6772bbc6d7eeac2ce4f78da795c",
+        "rank_ca_events.csv.ch14": "029e4423e281f9c2ab6b5d4024e9c5c4a9f3fb03699c6f662f7cd4c0b75ec49a",
+        "rank_ca_events.csv.ch15": "001ed49d78a2513febe7250a3f4c603c749f919f022377b3c702b86d172bf599",
+        "bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch3": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch4": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch5": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch6": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch7": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch8": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch9": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch10": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch11": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch12": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch13": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch14": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch15": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "v_cache.csv.ch0": "3413ef9cf176967e6cf9e3d86db34a6872351a76068f1083dfe553505489ca9b",
+        "v_cache.csv.ch1": "b3e7db2cca734de0e26d98b802e265ee115ce353af203f27440bad17fde4c9ec",
+        "v_cache.csv.ch2": "6c2ad1272e4c2be5378f553f8dc716a38498a6a9598f94b3811d017bd0308a68",
+        "v_cache.csv.ch3": "22c5806d15858372fd18be32187655f799c25a8f0981b15c257713e73225461b",
+        "v_cache.csv.ch4": "08d34f26fe884b3d542fc7325b1e293c703ae2ca8bbd54d7afac6ac4c86ac608",
+        "v_cache.csv.ch5": "86590e2acd58feecc5858d3acce48fc86f44ddf9282fa5a2ea46f3fe441c1e35",
+        "v_cache.csv.ch6": "341b0e20619477b7860ead901d10e8c551ece0b9edcb91425d7e77a526278560",
+        "v_cache.csv.ch7": "abbe7d2fcb5ca8090395bd84d9f2d9218c204d3d23d274a22663583519fbc7e7",
+        "v_cache.csv.ch8": "4b0f14351b768505afc788b7d7da41289652c7829f0ee448cb7c9410a240da80",
+        "v_cache.csv.ch9": "d59ebb46f496d6c0f7948ee930dc497f3cf8f8da287a0185698f14fc6e1f798e",
+        "v_cache.csv.ch10": "99f2d5f824f3d8cad920329f80cf384dc6f048af3f4434e0c118288808076ea1",
+        "v_cache.csv.ch11": "e731ea60d7352d2a9df701d77af49b6be6b8f13d02f5fc2f4e638d9f3555d879",
+        "v_cache.csv.ch12": "0f667df79bd2a70427b9d87884041a23bd256e0e6cf1108a94a6149ae939dad9",
+        "v_cache.csv.ch13": "6ae871634166d60d89e910d52bd802bafab25883a3f9f4b09a2f1a370c9f8f4d",
+        "v_cache.csv.ch14": "289a3b6e38a77f157c5802a57602266e8f50503844c6640aed41a7a43fcbdad2",
+        "v_cache.csv.ch15": "1e84ab98297697de21f5e14f43f71a49bf2d4be2a7ab12be0ded3d063fb3c51b",
+        "o_projection.csv.ch0": "1b68ffb81ab3aa00ce46a7baeabd7cd3958d3ced3dfd2be9e6fde6941e45c4bc",
+        "o_projection.csv.ch1": "9ba838d5f7c1cac70729afe9fb6a01d8c433fc84e575abefb080f6059630049f",
+        "o_projection.csv.ch2": "f8f6f2e93bd2b72d97d5d61e327bff09bf47ec8f1d72aae43d850646a76b07ca",
+        "o_projection.csv.ch3": "3deec71c0747b664e05b0334ddcea64ace75c1723b21f433a140faac0925350d",
+        "o_projection.csv.ch4": "52a5c7c121655ecaf87bb0c4c41674bd0b7b57efae5be7061c76d9ef6584abf8",
+        "o_projection.csv.ch5": "aa84175bd0d72d90ad236e01e7e13afe9389e03a5b82f351a36bc6a4970be636",
+        "o_projection.csv.ch6": "5844bb9ac49b2149048489318110415f7ffda2264f2defe33769b91947a7fbcc",
+        "o_projection.csv.ch7": "b33012fe098f4e14e953d0d0643e6c9e02e9cc7f124734636a1fa977fed8d4c1",
+        "o_projection.csv.ch8": "d965dc9feec93dfab7740f8172e5856f9d6b8dfe7502e232ca3cf7aa91d7e182",
+        "o_projection.csv.ch9": "c33d7291f370ebbf6b3a691e7ba5187e4b8cec23cb023fd06dd008e8c949289b",
+        "o_projection.csv.ch10": "0b9e7c14515fb7ab37d814078a3d82e26a6f74885c4584c99b60bc99461f7f99",
+        "o_projection.csv.ch11": "840935025dc3dc53efb70c25ac9a610c402d768969497755d7915d832e62bcf2",
+        "o_projection.csv.ch12": "29f61e1356c2014d4575047c9ab5d7b1cc85be2afea582c0640bea083383c146",
+        "o_projection.csv.ch13": "c8c93dcb351bd841860632d7db08d538c1fd124565fcd9434e1ef4eb7b339cbc",
+        "o_projection.csv.ch14": "3cf110a0d3178cf4aa0acb4974a688aaf610dde9f5be7f9ef4c115fb62c2fc50",
+        "o_projection.csv.ch15": "65ef3c7116845827cbbddc735061baf7ab67e97900b79198eab46a50c8ad4312",
+        "rank_descriptors.csv.ch0": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch1": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch2": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch3": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch4": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch5": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch6": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch7": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch8": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch9": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch10": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch11": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch12": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch13": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch14": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch15": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7"
+      }
+    },
+    "after": {
+      "status": "passed",
+      "data_commands_checked": 68864,
+      "descriptor_children_checked": 29536,
+      "descriptor_count": 32,
+      "descriptor_global_CA_CK": 672,
+      "exact_data_address_multiset": true,
+      "exact_MAC_order": true,
+      "array_open_row_checks": 417280,
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 1248,
+        "ACT2_commands": 1248,
+        "paired_ACT2": 1248,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 1248
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 128,
+            "paired_ACT2": 128,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 128
+            }
+          },
+          "other_internal": {
+            "ACT1": 96,
+            "paired_ACT2": 96,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 96
+            }
+          },
+          "staging": {
+            "ACT1": 1024,
+            "paired_ACT2": 1024,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1024
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "shared_SRF": {
+        "events_checked": 40544,
+        "operation_counts": {
+          "GEMV_MULTICAST": 16128,
+          "GEMV_MAC": 24320,
+          "GEMV_RELEASE": 96
+        },
+        "bank_generations_checked": 16128,
+        "physical_bank_releases": 1536,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "local_write_recovery": {
+        "new_LOCALWR_commands": 4096,
+        "physical_precharge_checks": 96,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 48,
+        "source_packets_checked": 16128,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 512,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 48,
+          "cross_generation_boundaries_checked": 32,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "packet_scratch": {
+        "packets_checked": 20480,
+        "channels_checked": 16,
+        "scratch_bytes_per_rank": 64,
+        "local_write_service_before_reuse": true,
+        "external_DQ_completion_before_reuse": true
+      },
+      "storage_reuse": {
+        "generations_checked": 48,
+        "cross_generation_boundaries_checked": 32,
+        "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+      },
+      "output": {
+        "local_PV_packets": 4096,
+        "BF16_export_packets": 16384,
+        "FP32_source_coverage": true,
+        "cast_and_transfer_service_checked": true,
+        "local_write_recovery_checked": true,
+        "output_DQ_before_rewind_checked": true,
+        "packet_scratch": {
+          "packets_checked": 20480,
+          "channels_checked": 16,
+          "scratch_bytes_per_rank": 64,
+          "local_write_service_before_reuse": true,
+          "external_DQ_completion_before_reuse": true
+        }
+      }
+    }
+  },
+  "gate_up_gpu": {
+    "before": {
+      "status": "passed",
+      "case": "gate_up_gpu",
+      "horizon": 16,
+      "trace_and_native_address_coverage": true,
+      "native_data_commands_checked": 81920,
+      "array_open_row_checks": 557056,
+      "independent_MAC_order_checks": 32768,
+      "external_DQ_to_bank_fill_checks": 0,
+      "unified_gemv": {
+        "events_checked": 49184,
+        "operation_counts": {
+          "GEMV_MULTICAST": 16384,
+          "GEMV_MAC": 32768,
+          "GEMV_RELEASE": 32
+        },
+        "bank_generations_checked": 16384,
+        "physical_bank_releases": 512,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "staging": {
+        "stages_checked": 16,
+        "staging_base_row": 256,
+        "external_input_bytes": 524288,
+        "internal_read_bytes": 524288,
+        "multicast_destination_bytes": 8388608,
+        "write_completion_checks": 16384,
+        "full_input_seal_checks": 16,
+        "source_read_to_precharge_checks": 2368,
+        "read_to_SRF_multicast_checks": 16384,
+        "source_fragment_to_MAC_weight_checks": 32768,
+        "external_input_bytes_unchanged": true,
+        "internal_read_and_broadcast_use_DQ": false,
+        "SRAM_bytes_per_bank": 1024,
+        "maximum_DRAM_staging_bytes_per_rank": 32768,
+        "reserved_DRAM_staging_bytes_per_rank": 131072,
+        "source_banks": [
+          0,
+          4
+        ],
+        "source_bank_groups": [
+          0,
+          1
+        ],
+        "staging_banks": 2,
+        "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+        "maximum_DRAM_staging_bytes_per_source_bank": 16384,
+        "source_last_reserved_row": 287,
+        "writer": {
+          "same_BG_spacing_checks": 16352,
+          "cross_BG_short_WR_pairs": 16128,
+          "minimum_cross_BG_WR_gap_ck": 2,
+          "issue_gap_histogram": [
+            {
+              "kind": "cross_BG",
+              "gap_ck": 2,
+              "count": 16128
+            },
+            {
+              "kind": "cross_BG",
+              "gap_ck": 4,
+              "count": 128
+            },
+            {
+              "kind": "cross_BG",
+              "gap_ck": 79,
+              "count": 112
+            }
+          ]
+        }
+      },
+      "input_batching": {
+        "input_batches_checked": 512,
+        "physical_input_capacity_bytes_per_bank": 1024,
+        "maximum_prefetched_input_bytes_per_bank": 1024,
+        "both_slots_ready_before_first_MAC": true,
+        "no_weight_row_switch_between_paired_fills": true,
+        "MAC_counts_and_reduction_order_preserved": true,
+        "row_command_counts": [
+          {
+            "channel": 0,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 1,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 2,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 3,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 4,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 5,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 6,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 7,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 8,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 9,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 10,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 11,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 12,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 13,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 14,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          },
+          {
+            "channel": 15,
+            "stage_generation": 1,
+            "input_batches": 32,
+            "source_ACT2": 64,
+            "weight_ACTAB": 42,
+            "refresh_commands": 11
+          }
+        ],
+        "first_two_batches_channel0": [
+          {
+            "channel": 0,
+            "stage_generation": 1,
+            "batch": 0,
+            "source_row": 256,
+            "input_begin_ck": 2710,
+            "last_input_issue_ck": 2872,
+            "both_slots_ready_ck": 2897,
+            "first_MAC_ck": 2923,
+            "last_MAC_complete_ck": 3947,
+            "input_bytes_per_bank": 1024,
+            "refresh_commands_during_load": 0,
+            "view_count": 2,
+            "view_bytes": 512,
+            "source_rows": [
+              256
+            ],
+            "source_banks": [
+              0,
+              4
+            ]
+          },
+          {
+            "channel": 0,
+            "stage_generation": 1,
+            "batch": 1,
+            "source_row": 256,
+            "input_begin_ck": 3979,
+            "last_input_issue_ck": 4141,
+            "both_slots_ready_ck": 4166,
+            "first_MAC_ck": 4416,
+            "last_MAC_complete_ck": 5440,
+            "input_bytes_per_bank": 1024,
+            "refresh_commands_during_load": 0,
+            "view_count": 2,
+            "view_bytes": 512,
+            "source_rows": [
+              256
+            ],
+            "source_banks": [
+              0,
+              4
+            ]
+          }
+        ],
+        "whole_SRF_bytes_per_bank": 1024,
+        "view_bytes_by_rows": {
+          "8": 256,
+          "16": 512
+        },
+        "full_batch_consumption_before_any_view_overwrite": true,
+        "all_views_ready_before_first_MAC": true
+      },
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 1280,
+        "ACT2_commands": 1280,
+        "paired_ACT2": 1280,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 1280
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 256,
+            "paired_ACT2": 256,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 256
+            }
+          },
+          "staging": {
+            "ACT1": 1024,
+            "paired_ACT2": 1024,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1024
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "rank_controller": {
+        "command_intervals_checked": 171776,
+        "rank_command_coverage": 103856,
+        "global_CA_resources": 16,
+        "rank_CA_resources": 32,
+        "transfer_broadcast_compute_share_rank_CA": true,
+        "no_CA_interval_overlap": true,
+        "coarse_fragment_descriptors_checked": 1024
+      },
+      "ffn_streams": {
+        "GU_GPU_input_bytes": 524288,
+        "GU_GPU_FP32_export_bytes": 524288,
+        "Down_GPU_BF16_input_bytes": 0,
+        "Down_GPU_FP32_output_bytes": 0,
+        "GPU_input_multicast_destination_bytes": 8388608,
+        "Z_local_read_bytes": 0,
+        "Z_local_write_bytes": 0,
+        "GPU_Z_DRAM_store_bytes": 0,
+        "separate_Z_staging_bytes": 0,
+        "direct_GPU_input": false,
+        "GPU_input_via_single_DRAM_bank": false,
+        "extra_internal_broadcast_cycles": 0,
+        "combined_GPU_export_before_Down_input": false,
+        "GPU_GeLU_multiply_cast_latency_us": null,
+        "Down_output_features_per_rank": 64,
+        "Down_outputs_are_complete": true,
+        "Down_cross_rank_reduction_required": false
+      },
+      "serial_continuity": null,
+      "native_external_DQ_bytes": 1048576,
+      "native_command_counts": {
+        "ACT1": 1280,
+        "ACT2": 1280,
+        "WR": 16384,
+        "PREpb": 1248,
+        "LOCALRD": 16384,
+        "PREab": 688,
+        "ACTAB": 672,
+        "MACAB": 32768,
+        "REFab": 384,
+        "RDRES": 16384
+      },
+      "trace_sha256": "9e89b94ba0d944c3fb4f66004b29727026f55f4d093305fcdf00e790e2d50558",
+      "native_sha256": {
+        "timeline.csv.ch0": "f1889b7ca74b35006801b8d338fef8c38b1fba92c31e1c96df2cd28729c9d2f5",
+        "timeline.csv.ch1": "a6e3cd505e7c9db32cb0317ab91c43ee9a515fc9a8bcc087cf37d18fcabeeeb8",
+        "timeline.csv.ch2": "18f22d4377792e5e4625664ef3816f1c0655bf11d0f5c3237bdb9259b2b0d908",
+        "timeline.csv.ch3": "795565817b8452a80292ac14d7b6428f350547eebb27180e8a7be1eb0c9c8f8f",
+        "timeline.csv.ch4": "ccd5363e045f36a80810d3c14670d8b593d28112f2b03004257c2a17909c07e5",
+        "timeline.csv.ch5": "8650875167e7e69c5ceb42b4beaef4f478bcf0d6c40043c7eea6119853cf5d31",
+        "timeline.csv.ch6": "6ed0e242be60634618666c29ca67e4a74858a55f422bfb2eaa8230c623ce388d",
+        "timeline.csv.ch7": "b3136d5518d2b4cc1e70c36e97aadbdafa77a7bcf8f0cfe6c6e8f87f6a062ab2",
+        "timeline.csv.ch8": "9c420b555fc2ddb719e189f3a15cfa590d2cd1d6dd30cbfb360829e4049c781e",
+        "timeline.csv.ch9": "d35eac7587045209d0c8a9b616669b48cfaacd65ec86845af86e249207da2a91",
+        "timeline.csv.ch10": "bce738104f84849ebfde50e46f835d4f9bd1e05bab20cb16ae0c6ac5f8c67bf7",
+        "timeline.csv.ch11": "c9a724fc4ecb31fe33c310a15b9092079586765963dcc9ace9d70ff847fc2a9f",
+        "timeline.csv.ch12": "2fc51f8738d89ce658d5bc1d85605fa2dadf65afc423c89266569abf7095cb5b",
+        "timeline.csv.ch13": "31a5359a6320d0f29a610a0a7b28a223cf1af47f3a205203684cac2f63d4448b",
+        "timeline.csv.ch14": "0beb74376389db5075ca567d0d667e38598c2e1dbe08d77079f593b77ac0075c",
+        "timeline.csv.ch15": "b4d46aa9344a9041560846eb2fdf797744dc00f0336c9799917ae6f65e70d372",
+        "unified_gemv.csv.ch0": "d84b3af3f033dba063665268e5fabcbcf9d5aa5ac22f5a678a6085dd601013a8",
+        "unified_gemv.csv.ch1": "e00881358e0ed9c861baaa5662577a955ff78f29fcd6dd529f3a3e80369a7a4f",
+        "unified_gemv.csv.ch2": "3db6748a08fe530214a3f913add0632c7597c8525c1787899a90e761df3baaa9",
+        "unified_gemv.csv.ch3": "2023684f0421c4447798aaf918d377aeeff52fa37de1a0eb1c79ec9224633b49",
+        "unified_gemv.csv.ch4": "6ac9951728a0654b2343d8846f347ba5fbf5ac69ba67cbe27e05aacf23347ecd",
+        "unified_gemv.csv.ch5": "29fdc54f10e7f3d47f052f65f7446742d9e95d28688afcacb1c8d56a2aabd69a",
+        "unified_gemv.csv.ch6": "96c49584b3de97f4979b1b6c421bc0cd9b268da3e99d3989b98e3b5b63b5d42f",
+        "unified_gemv.csv.ch7": "8fde0bbfb0ba9f8ae4ec3f68c0011c504fb800ce7e8791c26c3322a1049f545e",
+        "unified_gemv.csv.ch8": "6adca56d1427d748127d56523e4c1e9235593e5eecf71a59a09678ca0346fec5",
+        "unified_gemv.csv.ch9": "87a94bf4f73149c95b02ebddeb43ca71872f159fac718e7d5ea13685a2c65732",
+        "unified_gemv.csv.ch10": "ced7353cefcc52396270339c6de07ae72e37f54e8e66769ddc7202f9b173f03a",
+        "unified_gemv.csv.ch11": "7f83b917bae950c3c5d53db69283a53e052ea8eae7e2c4865860b0a28fd1a4eb",
+        "unified_gemv.csv.ch12": "06fa7703625ebf6d38fce3897727ca2ad011b63ef792567b31dffb066c976086",
+        "unified_gemv.csv.ch13": "c1dcb2dd27ef2da0ad6d4caf1203a40588fc618bdc480c138a365c05f84bce1e",
+        "unified_gemv.csv.ch14": "58c1719c0581d0b0dfe8fec1a00009daf1e39a24cbbeeccff9591e25585a8e6e",
+        "unified_gemv.csv.ch15": "4348340b8002c9e4e6810478ba045216cec44fcd304e1fe325650be57e4e834d",
+        "staging_events.csv.ch0": "b17e46cffee45d3468245d39da9e44c353b0b5cfc18bb05207123039f74765f5",
+        "staging_events.csv.ch1": "0f76db8377f57d2c796fede1d89b860521c7f2f6ae6a669ac719973cf165ba8a",
+        "staging_events.csv.ch2": "ccc4ebafb2ea0bad963d4ff5edecbf076db1ee480801810215c954f70df934c4",
+        "staging_events.csv.ch3": "2143489f827e5e565a282df6298f0318a6f18797de21e813e75fb953f0def7ac",
+        "staging_events.csv.ch4": "008397a754d5540f9b6ac8a0984afd7658e46f2059bcca216af12c8d3d713414",
+        "staging_events.csv.ch5": "2d77f4c54b7d63aebdea89f6e2dcf4d13cd09e4dca0460a67969e4aa9d5364f0",
+        "staging_events.csv.ch6": "22e396ed612764a9482eec814c200a66a6aea4e433a31ff46dc8b31d303b148c",
+        "staging_events.csv.ch7": "1038f73cda1f20c97a6fdfa18f757c9f3d9b735fa3bd8aae8380bbd8b5eb6b46",
+        "staging_events.csv.ch8": "b15135967940c4b705f98b8f7f4ede043fc5626751781986be7fce22dcadd0ca",
+        "staging_events.csv.ch9": "0ab7d4f34493290d790661244a26e83b97c17f2b9790b67ac86ebcd0f3396eaa",
+        "staging_events.csv.ch10": "e62e296c49e0a60c44667d0b4e941785359b6b314d0db41a5c6bad40cf3b8e12",
+        "staging_events.csv.ch11": "4795004f2029e2ef7a670f4fdffbe5b15821764e0efd68476c00c0850f92b516",
+        "staging_events.csv.ch12": "2ab6132ba828081ee0e354eaf95d17218f39abadbdee34919cf0614edfada6b9",
+        "staging_events.csv.ch13": "519de60ab74a67ee3d3b8ae945326c0d60668601e6d414701e045fc42c6ca070",
+        "staging_events.csv.ch14": "9bee517579e9b52549a4de41bbb95195e6b83567cfea6d8482cc6ea6648c9436",
+        "staging_events.csv.ch15": "82fe440068da356ee958ee2d5cf0c347e2c4e9a1efe7b84ccd7779016665dca2",
+        "rank_ca_events.csv.ch0": "50ad869f301599461a4769d9a7c94ea75480b2e1fa15421143edae2c1613d827",
+        "rank_ca_events.csv.ch1": "8331b595f7c57a688988c1b17547517f99618fe18f1f67b6d266452336db8455",
+        "rank_ca_events.csv.ch2": "6c3f94e1f872de12385df332b982b10a106489b0d179f7e1bc814b443a17bb67",
+        "rank_ca_events.csv.ch3": "5a5897f75e9f817210240dd5494dcb41cbf8431334afb0c8d090fd747aa04ab4",
+        "rank_ca_events.csv.ch4": "b7099c0e5a6258e3d2e18eec94549425ce8461979a83b5908fcede5a1000b8bb",
+        "rank_ca_events.csv.ch5": "6bc1bdcef44c1e1ba4ac59fee6b1fc584d7d55055200900420a85f6f191bd687",
+        "rank_ca_events.csv.ch6": "a4d0bd9952d9db4e0a2d77472d78c92c7f694d2ecbb7cef60086f504c7c66f11",
+        "rank_ca_events.csv.ch7": "96861d631d16a4785d8f16bba330441955935563a6d387d9d6b47239690560e6",
+        "rank_ca_events.csv.ch8": "80fd4ea1318900ab59162462435b7908b088493d0f63b065e339be884eef8417",
+        "rank_ca_events.csv.ch9": "d23af525a28d7e89d0b0aa078e05c201acfa4b8ab4c64a402e1d3fab34388185",
+        "rank_ca_events.csv.ch10": "667abf615d060c50783b57538dc02bbdfcdbf1358a0fbfeba3d7e9dd5aec3406",
+        "rank_ca_events.csv.ch11": "e47d0446a62f604235f1e1841098b6b40ab625874cc43a483eeae34fd6d5a23d",
+        "rank_ca_events.csv.ch12": "8a075d2c10d7874dd45a445b1ac9fe6a5bb0b8f835ee861355afe33d10aec73e",
+        "rank_ca_events.csv.ch13": "62d699519387deed939e7b0f8318ad8d5c307d57757cb7f7d4d04373350ee771",
+        "rank_ca_events.csv.ch14": "2d5e7ce395adcbab3f9c7c0f321ab5052a8f41f3d6b5a12e41957bc605b41ae4",
+        "rank_ca_events.csv.ch15": "9c1b352041873765b99a6da87d7e13c5ebe636ad3c66b144fc91e287cef19e9c",
+        "bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch3": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch4": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch5": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch6": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch7": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch8": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch9": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch10": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch11": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch12": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch13": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch14": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch15": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "frontend_dispatch.csv": "a9b146f1b341979953b281f437034df84093c114cc0daa913f279fec76e50dbb",
+        "channel_ingress.csv": "a689233dd59f1567e97d031d8a1a59d0270194fcdf5c86275375e303f2786f40",
+        "rank_descriptors.csv.ch0": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch1": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch2": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch3": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch4": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch5": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch6": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch7": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch8": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch9": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch10": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch11": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch12": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch13": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch14": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch15": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7"
+      },
+      "numerical_compute": false,
+      "unmeasured": "GPU/nonlinear arithmetic and GPU contention",
+      "channel_ingress": {
+        "requests_checked": 66624,
+        "channel_count": 16,
+        "capacity_per_channel": 32,
+        "queue_high_water_by_channel": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32
+        },
+        "no_channel_FIFO_reordering": true,
+        "one_dispatch_per_channel_per_CK": true,
+        "completion_fences_checked": 5,
+        "global_barriers_checked": 7,
+        "peer_export_dependencies_checked": 0,
+        "peer_wait_events": 0,
+        "all_accepted_requests_complete": true
+      },
+      "rank_descriptors": {
+        "parent_descriptors_checked": 0,
+        "fine_children_checked": 0,
+        "children_per_descriptor": 16,
+        "parent_waits_for_all_children": true,
+        "one_global_CA_per_descriptor": true,
+        "fine_bank_operations_preserved": true,
+        "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+      }
+    },
+    "after": {
+      "status": "passed",
+      "data_commands_checked": 81920,
+      "descriptor_children_checked": 33824,
+      "descriptor_count": 16,
+      "descriptor_global_CA_CK": 336,
+      "exact_data_address_multiset": true,
+      "exact_MAC_order": true,
+      "array_open_row_checks": 557056,
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 1280,
+        "ACT2_commands": 1280,
+        "paired_ACT2": 1280,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 1280
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 256,
+            "paired_ACT2": 256,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 256
+            }
+          },
+          "staging": {
+            "ACT1": 1024,
+            "paired_ACT2": 1024,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1024
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "shared_SRF": {
+        "events_checked": 49184,
+        "operation_counts": {
+          "GEMV_MULTICAST": 16384,
+          "GEMV_MAC": 32768,
+          "GEMV_RELEASE": 32
+        },
+        "bank_generations_checked": 16384,
+        "physical_bank_releases": 512,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "local_write_recovery": {
+        "new_LOCALWR_commands": 0,
+        "physical_precharge_checks": 0,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 16,
+        "source_packets_checked": 16384,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 512,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 16,
+          "cross_generation_boundaries_checked": 0,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "packet_scratch": {
+        "packets_checked": 0,
+        "channels_checked": 0,
+        "scratch_bytes_per_rank": 64,
+        "local_write_service_before_reuse": true,
+        "external_DQ_completion_before_reuse": true
+      },
+      "storage_reuse": {
+        "generations_checked": 16,
+        "cross_generation_boundaries_checked": 0,
+        "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+      }
+    }
+  },
+  "down_gpu_input": {
+    "before": {
+      "status": "passed",
+      "case": "down_gpu_input",
+      "horizon": 16,
+      "trace_and_native_address_coverage": true,
+      "native_data_commands_checked": 149504,
+      "array_open_row_checks": 393216,
+      "independent_MAC_order_checks": 16384,
+      "external_DQ_to_bank_fill_checks": 0,
+      "unified_gemv": {
+        "events_checked": 81952,
+        "operation_counts": {
+          "GEMV_MULTICAST": 65536,
+          "GEMV_MAC": 16384,
+          "GEMV_RELEASE": 32
+        },
+        "bank_generations_checked": 65536,
+        "physical_bank_releases": 512,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "staging": {
+        "stages_checked": 16,
+        "staging_base_row": 256,
+        "external_input_bytes": 2097152,
+        "internal_read_bytes": 2097152,
+        "multicast_destination_bytes": 33554432,
+        "write_completion_checks": 65536,
+        "full_input_seal_checks": 16,
+        "source_read_to_precharge_checks": 8400,
+        "read_to_SRF_multicast_checks": 65536,
+        "source_fragment_to_MAC_weight_checks": 16384,
+        "external_input_bytes_unchanged": true,
+        "internal_read_and_broadcast_use_DQ": false,
+        "SRAM_bytes_per_bank": 1024,
+        "maximum_DRAM_staging_bytes_per_rank": 131072,
+        "reserved_DRAM_staging_bytes_per_rank": 131072,
+        "source_banks": [
+          0,
+          4
+        ],
+        "source_bank_groups": [
+          0,
+          1
+        ],
+        "staging_banks": 2,
+        "reserved_DRAM_staging_bytes_per_source_bank": 65536,
+        "maximum_DRAM_staging_bytes_per_source_bank": 65536,
+        "source_last_reserved_row": 287,
+        "writer": {
+          "same_BG_spacing_checks": 65504,
+          "cross_BG_short_WR_pairs": 64480,
+          "minimum_cross_BG_WR_gap_ck": 2,
+          "issue_gap_histogram": [
+            {
+              "kind": "cross_BG",
+              "gap_ck": 2,
+              "count": 64480
+            },
+            {
+              "kind": "cross_BG",
+              "gap_ck": 4,
+              "count": 528
+            },
+            {
+              "kind": "cross_BG",
+              "gap_ck": 79,
+              "count": 480
+            },
+            {
+              "kind": "cross_BG",
+              "gap_ck": 308,
+              "count": 32
+            }
+          ]
+        }
+      },
+      "input_batching": {
+        "input_batches_checked": 2048,
+        "physical_input_capacity_bytes_per_bank": 1024,
+        "maximum_prefetched_input_bytes_per_bank": 1024,
+        "both_slots_ready_before_first_MAC": true,
+        "no_weight_row_switch_between_paired_fills": true,
+        "MAC_counts_and_reduction_order_preserved": true,
+        "row_command_counts": [
+          {
+            "channel": 0,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 1,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 2,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 3,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 4,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 5,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 6,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 7,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 8,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 9,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 10,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 11,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 12,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 13,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 14,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          },
+          {
+            "channel": 15,
+            "stage_generation": 1,
+            "input_batches": 128,
+            "source_ACT2": 260,
+            "weight_ACTAB": 131,
+            "refresh_commands": 12
+          }
+        ],
+        "first_two_batches_channel0": [
+          {
+            "channel": 0,
+            "stage_generation": 1,
+            "batch": 0,
+            "source_row": 256,
+            "input_begin_ck": 11287,
+            "last_input_issue_ck": 11449,
+            "both_slots_ready_ck": 11474,
+            "first_MAC_ck": 11500,
+            "last_MAC_complete_ck": 11628,
+            "input_bytes_per_bank": 1024,
+            "refresh_commands_during_load": 0,
+            "view_count": 2,
+            "view_bytes": 512,
+            "source_rows": [
+              256
+            ],
+            "source_banks": [
+              0,
+              4
+            ]
+          },
+          {
+            "channel": 0,
+            "stage_generation": 1,
+            "batch": 1,
+            "source_row": 256,
+            "input_begin_ck": 11660,
+            "last_input_issue_ck": 11822,
+            "both_slots_ready_ck": 11847,
+            "first_MAC_ck": 11873,
+            "last_MAC_complete_ck": 12001,
+            "input_bytes_per_bank": 1024,
+            "refresh_commands_during_load": 0,
+            "view_count": 2,
+            "view_bytes": 512,
+            "source_rows": [
+              256
+            ],
+            "source_banks": [
+              0,
+              4
+            ]
+          }
+        ],
+        "whole_SRF_bytes_per_bank": 1024,
+        "view_bytes_by_rows": {
+          "8": 256,
+          "16": 512
+        },
+        "full_batch_consumption_before_any_view_overwrite": true,
+        "all_views_ready_before_first_MAC": true
+      },
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 5216,
+        "ACT2_commands": 5216,
+        "paired_ACT2": 5216,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 5216
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 1056,
+            "paired_ACT2": 1056,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1056
+            }
+          },
+          "staging": {
+            "ACT1": 4160,
+            "paired_ACT2": 4160,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 4160
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "rank_controller": {
+        "command_intervals_checked": 327136,
+        "rank_command_coverage": 235264,
+        "global_CA_resources": 16,
+        "rank_CA_resources": 32,
+        "transfer_broadcast_compute_share_rank_CA": true,
+        "no_CA_interval_overlap": true,
+        "coarse_fragment_descriptors_checked": 4096
+      },
+      "ffn_streams": {
+        "GU_GPU_input_bytes": 0,
+        "GU_GPU_FP32_export_bytes": 0,
+        "Down_GPU_BF16_input_bytes": 2097152,
+        "Down_GPU_FP32_output_bytes": 65536,
+        "GPU_input_multicast_destination_bytes": 33554432,
+        "Z_local_read_bytes": 2097152,
+        "Z_local_write_bytes": 0,
+        "GPU_Z_DRAM_store_bytes": 2097152,
+        "separate_Z_staging_bytes": 131072,
+        "direct_GPU_input": false,
+        "GPU_input_via_single_DRAM_bank": false,
+        "extra_internal_broadcast_cycles": 0,
+        "combined_GPU_export_before_Down_input": false,
+        "GPU_GeLU_multiply_cast_latency_us": null,
+        "Down_output_features_per_rank": 64,
+        "Down_outputs_are_complete": true,
+        "Down_cross_rank_reduction_required": false
+      },
+      "serial_continuity": null,
+      "native_external_DQ_bytes": 2162688,
+      "native_command_counts": {
+        "ACT1": 5216,
+        "ACT2": 5216,
+        "WR": 65536,
+        "PREpb": 4976,
+        "REFab": 480,
+        "PREab": 2240,
+        "LOCALRD": 65536,
+        "ACTAB": 2096,
+        "MACAB": 16384,
+        "RDRES": 2048
+      },
+      "trace_sha256": "90052dab4631655269d682ecfbdca1ca0bdb47a14c7e5c1418fe2de909b63679",
+      "native_sha256": {
+        "timeline.csv.ch0": "2b89410061f3ba5750b77bb639f02026faddc444130ef6f00db10d781427222c",
+        "timeline.csv.ch1": "3f1a85f81046b965e05f22beeff170fbdf363bd62b2af9dfdc78e6d11399910c",
+        "timeline.csv.ch2": "e3ac295b6ff1cc30ad7f909822791066c15c80f1fda337a903fd0a6c6abe9659",
+        "timeline.csv.ch3": "0800097431a04fc8b63036c005e558fa901a46aa97637da77fc9348ff0cf0650",
+        "timeline.csv.ch4": "bf7e2210f892fa12ba4dfa9cc24827549fedacd5e133b531c70b04f225e1f6dd",
+        "timeline.csv.ch5": "1a245ef988b3de40d5d65f32b74ee55ce5b0d41d06010d7cb6c9856c59d7637a",
+        "timeline.csv.ch6": "cb8fe952487adb7e57ec9ba80713ac8c7de68739d71c52bc6f2c6d809d99405d",
+        "timeline.csv.ch7": "84216b8bcbbc666ff46f75a1241857f26a26781b312041be5cc1c94f104d40af",
+        "timeline.csv.ch8": "ce7f808264714287f708b69cd3e67a29ec552c237bd00584d201753e6c248cc2",
+        "timeline.csv.ch9": "0c588ef7feb66658b6b257476474e8a5057854987beb06cceaa7bbfd2bae4059",
+        "timeline.csv.ch10": "919a5ae19799c7fd46b1563ec2b1a216b66cacfa7940e416980abd1766bfb5bb",
+        "timeline.csv.ch11": "ba4aa90053e9a92f7aabe5e3ae1a3710017183ae565302e36d541a140fc9657a",
+        "timeline.csv.ch12": "61d0b41daebd609ac65e2ef39497dd56c8eca712867be3ceda7457baca376653",
+        "timeline.csv.ch13": "31e33e1f646ed2b658ba48490f2c973bed79704b997b4e294b58bdc1fa5fe77a",
+        "timeline.csv.ch14": "470aac46316e558daa56b07dfecaa6f5fbdc8460a1d2d1e59f46f23cb7899a3d",
+        "timeline.csv.ch15": "3926d8d7c5a5a62f2acca1eda73b29ed95883758470e4bc425a9799def682bec",
+        "unified_gemv.csv.ch0": "5363da97ee8aa1448a99a505cf67eb809a645d6aefa8c282ccc193753f75a352",
+        "unified_gemv.csv.ch1": "a580c3e9b0dd1e96eca08cefa966c3aafd2807c167983a1bcab427495ef5f4af",
+        "unified_gemv.csv.ch2": "9bdf796b7abb95716bb895bdf7b7fc295d9967704ab2e97d742bc1ebb86d6fee",
+        "unified_gemv.csv.ch3": "4d971e0ade8a5af3fd6faaae96d6ab53b2fb09a919bf81cdbefcaaa9a4c4fdbe",
+        "unified_gemv.csv.ch4": "1168395f362a6217401361b466735cfbc94aaf40be025ad4d34f95cde4cade3a",
+        "unified_gemv.csv.ch5": "cd5c5606f09a7bc031833a32611d116be673358057bda9840579740b6833aead",
+        "unified_gemv.csv.ch6": "551319f9086307591675dbb811f5d06e755fa148d03298e6e577a537b7e2bc7e",
+        "unified_gemv.csv.ch7": "51a493004e25d5afc95079123ba8c499513ef163a55e223ec8d87b268262c15e",
+        "unified_gemv.csv.ch8": "0b632e428c4a9e9b59ec6cfbae14e4a74c7b76976091d23253fa253086c726bb",
+        "unified_gemv.csv.ch9": "a74e7d6e34d86800f1d42c95f1e82caa8102d82a5ed640025da0d211b61c1c67",
+        "unified_gemv.csv.ch10": "cf7d0f28498105975e18567106b8334c1e7f0ff218b89c9ff011787e6ead420a",
+        "unified_gemv.csv.ch11": "7dbbb49075fc33f20074e2112aaf35632ad94bde7ef0a84a5d8df4c2565402c4",
+        "unified_gemv.csv.ch12": "003dd267f403a043a929436b5597cf371aa9b56257fbe4f182f4d1fbf4c91601",
+        "unified_gemv.csv.ch13": "b2e8e9f62a56727e2928409078fe5ff31f9c1b5a8d823ced16e03b5c502ad803",
+        "unified_gemv.csv.ch14": "5594253b224df6430a9194fca5aba213ba965e6e3231c2f3d6bec5a9f58850cf",
+        "unified_gemv.csv.ch15": "6a10e22051301dbdd5f9cc5a218c6951a1cc3c54ddbc21a0f43402766851da27",
+        "staging_events.csv.ch0": "7054fb1efb3f164e879dd7c45585f5b3b4eda7cbac3ad75fe974b7e8ad74119b",
+        "staging_events.csv.ch1": "1e2573c119f6de8767903d9f87f65e856ea60d5dffccf8e6cbf7040c9a042c2b",
+        "staging_events.csv.ch2": "1f81d5c0262efb16b0d91b6df52fc4a25426bdac4975cb8bc3e1cc86f4e3ec16",
+        "staging_events.csv.ch3": "73507484407b6a98ff37beb4625415c7c66edd9bdf034651cfc647c9707cc509",
+        "staging_events.csv.ch4": "cb4b47604272a36e9284a3e5ead0ed396cb443d48e4dd5601a890a2be91ec2a3",
+        "staging_events.csv.ch5": "dc927c8c8580ddbce55acfbbce60e272dc1a98e5278ef28baa199526ebe73a63",
+        "staging_events.csv.ch6": "994d3e70481b27fcf42b67ad5961baf619ace6d68b5e0bd741390726ff7e0769",
+        "staging_events.csv.ch7": "c71eb45b40bdf47941d235c349813c274b4cb3ac7de58eaa3bbc82c5ac643060",
+        "staging_events.csv.ch8": "612743e15a2c4d1b9ec7575e61cc7c04151b5a12ef233ae39957a79ca966d8da",
+        "staging_events.csv.ch9": "f570f27305f2a438c4c6f5edbadb5fc1acc64ac8ae47b37d747fcd1511326fd4",
+        "staging_events.csv.ch10": "0744673daf4159e353d8ff52352a56cdc0083fe5991fa04617455ea4d124f700",
+        "staging_events.csv.ch11": "ce3ac9008870840064a9ad8e65f78853ba59965224f4a27a991ceb027b0a382a",
+        "staging_events.csv.ch12": "7e1b0fbe1db6239a1ca46f146c5463056dacf3b6564c7aa1a4843957daadacee",
+        "staging_events.csv.ch13": "b57e6c085d3ac8390f4b2148a0ec7095cfcede6ee0eabea8f39f9a86ca6e505e",
+        "staging_events.csv.ch14": "0c2d5f4a5ebd18a485e7074edbae4c37ed68ceefced038de92f6b2e173c4580f",
+        "staging_events.csv.ch15": "b52712595244d439cd547de55599c18dcf810fde8758df1f003c75093c795573",
+        "rank_ca_events.csv.ch0": "70ad3ed6bee1b0a086d500bde558a97f866a17006ae3ef61290c16ef797c1a71",
+        "rank_ca_events.csv.ch1": "acf52dcd07aeca0462e6fef19c6e12392a01545fc2beb9c835d9268a57141be3",
+        "rank_ca_events.csv.ch2": "4f60aad5f29fb072148708427811094f8bd353ea31c219217f77e34e2adff6ff",
+        "rank_ca_events.csv.ch3": "de1891ea23be243671a3f97b8d93f7b1ac79d233579865143d2decba8176188a",
+        "rank_ca_events.csv.ch4": "2bdecf6de4ae67cd215605d61d04b845a129d3b18165df3f6b182d370bd2f056",
+        "rank_ca_events.csv.ch5": "ccb79a74016add213461c5a7e317a7a69f4c6aa9a10e49611d4850f6f28e1826",
+        "rank_ca_events.csv.ch6": "4c969eab274861709abf8bee147779a4bb650160589ccc69a7847440d7977d81",
+        "rank_ca_events.csv.ch7": "0ba472c1a483d37b8221e53544e852e8c13f00094e580963f7b34230c206f324",
+        "rank_ca_events.csv.ch8": "8b2b97df1c4d591c6c901e3bfcb249a56f327548583b1fe72c149f857ff51836",
+        "rank_ca_events.csv.ch9": "b385cf503e1f1dd2b2b52d4888e4764fcc54380efc9e9a07b4331bbd0d2ef55a",
+        "rank_ca_events.csv.ch10": "b1bc40dfbe1f3515e614c491ebafe3e5ce9fea95e37ae066c038202ae61920c5",
+        "rank_ca_events.csv.ch11": "e7b640f5dbc0ccd6089242154f0e6fcc6fb87967fd6cb4faf36dfb2a65451fd0",
+        "rank_ca_events.csv.ch12": "d793e20f3459df9d98f21a9cca8c9c48d770623399704cd7d9f81b13d3049ce2",
+        "rank_ca_events.csv.ch13": "e5714f3505cc607b0a6fd1820ef27c7b067e493e0f19feb0b482ea4aa8fddd0f",
+        "rank_ca_events.csv.ch14": "880f7fba088814663dcfd447fe1dde9a186346b9066ae2b5bce0d71e35e02779",
+        "rank_ca_events.csv.ch15": "35f3296f122083256660ef45b89cdffb29fa57e5c8fd0e0ef073db360a59f259",
+        "bgk_events.csv.ch0": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch1": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch2": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch3": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch4": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch5": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch6": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch7": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch8": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch9": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch10": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch11": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch12": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch13": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch14": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "bgk_events.csv.ch15": "08fb9ad4fa639cb2ed04a80f7e8ead94f60bbcb65d9e1a064387ca402e054b58",
+        "frontend_dispatch.csv": "0eb5b23d39a4cd89da0782ce51d417340a3245e4d46d850b615cdf20b92e8c7b",
+        "channel_ingress.csv": "572ef559dfbbaef558942b7ce49ba6e4009b9e9d6d25f013624d3bbf92afc4d6",
+        "rank_descriptors.csv.ch0": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch1": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch2": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch3": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch4": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch5": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch6": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch7": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch8": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch9": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch10": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch11": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch12": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch13": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch14": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7",
+        "rank_descriptors.csv.ch15": "f4f23066d107d1b22e9cc7b89a06af00808fdf5bc303fff5f523bb333b2073e7"
+      },
+      "numerical_compute": false,
+      "unmeasured": "GPU/nonlinear arithmetic and GPU contention",
+      "channel_ingress": {
+        "requests_checked": 88128,
+        "channel_count": 16,
+        "capacity_per_channel": 32,
+        "queue_high_water_by_channel": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32
+        },
+        "no_channel_FIFO_reordering": true,
+        "one_dispatch_per_channel_per_CK": true,
+        "completion_fences_checked": 5,
+        "global_barriers_checked": 7,
+        "peer_export_dependencies_checked": 0,
+        "peer_wait_events": 0,
+        "all_accepted_requests_complete": true
+      },
+      "rank_descriptors": {
+        "parent_descriptors_checked": 0,
+        "fine_children_checked": 0,
+        "children_per_descriptor": 16,
+        "parent_waits_for_all_children": true,
+        "one_global_CA_per_descriptor": true,
+        "fine_bank_operations_preserved": true,
+        "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 0
+      }
+    },
+    "after": {
+      "status": "passed",
+      "data_commands_checked": 149504,
+      "descriptor_children_checked": 20512,
+      "descriptor_count": 16,
+      "descriptor_global_CA_CK": 336,
+      "exact_data_address_multiset": true,
+      "exact_MAC_order": true,
+      "array_open_row_checks": 393216,
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 5152,
+        "ACT2_commands": 5152,
+        "paired_ACT2": 5152,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 5152
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 1056,
+            "paired_ACT2": 1056,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1056
+            }
+          },
+          "staging": {
+            "ACT1": 4096,
+            "paired_ACT2": 4096,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 4096
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "shared_SRF": {
+        "events_checked": 81952,
+        "operation_counts": {
+          "GEMV_MULTICAST": 65536,
+          "GEMV_MAC": 16384,
+          "GEMV_RELEASE": 32
+        },
+        "bank_generations_checked": 65536,
+        "physical_bank_releases": 512,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "local_write_recovery": {
+        "new_LOCALWR_commands": 0,
+        "physical_precharge_checks": 0,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 16,
+        "source_packets_checked": 65536,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 2048,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 16,
+          "cross_generation_boundaries_checked": 0,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "packet_scratch": {
+        "packets_checked": 0,
+        "channels_checked": 0,
+        "scratch_bytes_per_rank": 64,
+        "local_write_service_before_reuse": true,
+        "external_DQ_completion_before_reuse": true
+      },
+      "storage_reuse": {
+        "generations_checked": 16,
+        "cross_generation_boundaries_checked": 0,
+        "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+      }
+    }
+  },
+  "serial_layer_control": {
+    "before": {
+      "status": "passed",
+      "case": "serial_layer_control",
+      "trace_and_native_address_coverage": true,
+      "independent_trace_commands": 318080,
+      "native_data_commands_checked": 432128,
+      "array_open_row_checks": 2353664,
+      "unified_gemv": {
+        "events_checked": 241136,
+        "operation_counts": {
+          "GEMV_MULTICAST": 106240,
+          "GEMV_MAC": 122624,
+          "GEMV_RELEASE": 240,
+          "GEMV_Q_LOCAL": 2048,
+          "GEMV_Q_REMOTE": 2048,
+          "GEMV_QK": 7936
+        },
+        "bank_generations_checked": 114688,
+        "physical_bank_releases": 3840,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 10880,
+        "ACT2_commands": 10880,
+        "paired_ACT2": 10880,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 10880
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 2208,
+            "paired_ACT2": 2208,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 2208
+            }
+          },
+          "other_internal": {
+            "ACT1": 1920,
+            "paired_ACT2": 1920,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1920
+            }
+          },
+          "staging": {
+            "ACT1": 6752,
+            "paired_ACT2": 6752,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 6752
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "new_local_write_precharge": {
+        "new_LOCALWR_commands": 19968,
+        "physical_precharge_checks": 1136,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 96,
+        "source_packets_checked": 106240,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 3328,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 96,
+          "cross_generation_boundaries_checked": 80,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "rank_controller": {
+        "command_intervals_checked": 896944,
+        "rank_command_coverage": 595760,
+        "global_CA_resources": 16,
+        "rank_CA_resources": 32,
+        "transfer_broadcast_compute_share_rank_CA": true,
+        "no_CA_interval_overlap": true,
+        "coarse_fragment_descriptors_checked": null,
+        "additional_local_pseudo_commands": 60944
+      },
+      "native_external_DQ_bytes": 4890624,
+      "native_command_counts": {
+        "ACT1": 10880,
+        "ACT2": 10880,
+        "WR": 98048,
+        "PREpb": 9728,
+        "LOCALRD": 116480,
+        "PREab": 5120,
+        "ACTAB": 4752,
+        "MACAB": 122624,
+        "REFab": 1696,
+        "LOCALWR": 32256,
+        "RD": 17920,
+        "WRGB": 2048,
+        "MACQK": 7936,
+        "RDRES": 34816
+      },
+      "numerical_compute": false,
+      "score_DRAM": {
+        "tiles_per_rank": 31,
+        "bytes_per_rank": 31744,
+        "one_live_score_tile": true,
+        "complete_MAC_and_rank_reduction_before_spill": true,
+        "final_read_after_all_tiles": true,
+        "write_recovery_checked": true
+      },
+      "BF16_output": {
+        "local_PV_packets": 4096,
+        "BF16_export_packets": 16384,
+        "FP32_source_coverage": true,
+        "cast_and_transfer_service_checked": true,
+        "local_write_recovery_checked": true,
+        "output_DQ_before_rewind_checked": true,
+        "packet_scratch": {
+          "packets_checked": 20480,
+          "channels_checked": 16,
+          "scratch_bytes_per_rank": 64,
+          "local_write_service_before_reuse": true,
+          "external_DQ_completion_before_reuse": true
+        }
+      },
+      "shared_local_port_intervals_checked": 48640,
+      "channel_ingress": {
+        "requests_checked": 293120,
+        "channel_count": 16,
+        "capacity_per_channel": 32,
+        "queue_high_water_by_channel": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32
+        },
+        "no_channel_FIFO_reordering": true,
+        "one_dispatch_per_channel_per_CK": true,
+        "completion_fences_checked": 98,
+        "global_barriers_checked": 97,
+        "peer_export_dependencies_checked": 128,
+        "peer_wait_events": 0,
+        "all_accepted_requests_complete": true
+      },
+      "rank_descriptors": {
+        "parent_descriptors_checked": 1664,
+        "fine_children_checked": 26624,
+        "children_per_descriptor": 16,
+        "parent_waits_for_all_children": true,
+        "one_global_CA_per_descriptor": true,
+        "fine_bank_operations_preserved": true,
+        "Q_EXPORT_internal_RD_global_CA_exclusion_checks": 2048
+      },
+      "serial_continuity": {
+        "single_native_simulation": true,
+        "continuous_refresh_enabled": true,
+        "native_refresh_commands": 1696,
+        "refresh_observed_before_and_after_QKT": true,
+        "global_barriers_without_reset": true,
+        "excluded_producer_latencies_are_unknown": true,
+        "full_AE_end_to_end_latency_us": null,
+        "all_four_stages_share_physical_bank_slots": true,
+        "fused_QKV_avoids_repeated_V_projection": true
+      },
+      "qkv_fusion": {
+        "logical_input_elements": 131072,
+        "projection_MAC_commands": 49152,
+        "scalar_MACs": 100663296,
+        "weight_bytes_per_bank": 98304,
+        "output_bytes_per_bank": 1536,
+        "physical_output_capacity_bytes": 2048,
+        "complete_Q_K_V_feature_coverage": true,
+        "numerical_compute": false
+      },
+      "local_V_cache": {
+        "packets": 4096,
+        "local_read_bytes": 131072,
+        "local_write_bytes": 131072,
+        "gathered_FP32_bytes": 131072,
+        "cast_BF16_bytes": 65536,
+        "external_DQ_bytes": 0,
+        "preserved_prefix_lanes": 4,
+        "suffix_lanes": 8,
+        "zero_padding_lanes": 4,
+        "source_columns": 48,
+        "store_ready_by_channel": {
+          "0": 34588,
+          "1": 34588,
+          "2": 34588,
+          "3": 34588,
+          "4": 34588,
+          "5": 34588,
+          "6": 34588,
+          "7": 34588,
+          "8": 34588,
+          "9": 34588,
+          "10": 34588,
+          "11": 34588,
+          "12": 34588,
+          "13": 34588,
+          "14": 34588,
+          "15": 34588
+        },
+        "numerical_compute": false
+      },
+      "trace_sha256": "c456fedc6ddc7276be6f33d390474408f75bb438fec662b4406fe24c2d287303",
+      "native_sha256": {
+        "timeline.csv.ch0": "750394c3cfa2530ba269c19bcfbde05db5b4a53fc996cc6fc23a1ef59f651b89",
+        "timeline.csv.ch1": "1f511b1b416940e8ed875df7b57273a4713e1fec7865cb31701c8e71f42b7642",
+        "timeline.csv.ch2": "acb08e20612f265d2f64c6faffb46dc42335fd2a94b49d70c844e48850cbd65c",
+        "timeline.csv.ch3": "6da2556fb4934f5b2874c6b0e59e69356d26fd2a6f491aa6f8e6068981e99cff",
+        "timeline.csv.ch4": "06c184fe8495e94523b8e8b633649787d9804a555dbb9598b3b7e81280d0a52c",
+        "timeline.csv.ch5": "dc3b0b1b532cf03b25a4d72d98c2dd9ea4836956c39d9831833b02283b232edd",
+        "timeline.csv.ch6": "63ef8be98ae6966a75007dc9b222a2c075507691b33979975f409842b4a9c9f9",
+        "timeline.csv.ch7": "e5a22175bd065f828c50399d969e574dbe63b5a31ec2a2db8467c3f90be5e060",
+        "timeline.csv.ch8": "9759042a161c06e6ed3843241827928778e59fe17d5191d967cce630dc2f06b1",
+        "timeline.csv.ch9": "22feb055fbaed7e3a703864d2404e5206c0b6e1d398f241fee811c6d847402cf",
+        "timeline.csv.ch10": "e936f7367f965895f636bb4dd8551fd8a72f34da6862ad2c44be7bd37446b4ba",
+        "timeline.csv.ch11": "63d79c92a48450c890ee469fcf8bed0ae052373ef6cfdfa61f6067397160c140",
+        "timeline.csv.ch12": "24b5195adda0c6c4c1fee7c942c3f189ce61689b1b38677a0aff09507d5d84f9",
+        "timeline.csv.ch13": "214192d72b0640e6967ac3b9785ddc9cd5a4cd91150c35671723491270eb171c",
+        "timeline.csv.ch14": "4dae4a990510fcda6c7d2d5fa1b76217d6c280d3fcd3347b1099bf358e726ae1",
+        "timeline.csv.ch15": "da8ad4954caa00139ccb93a78c81c0281c79f59572215c2e46b66ae532464833",
+        "unified_gemv.csv.ch0": "f6a4c1c0163158d8370eef73418e62211e9026aaa2f47689e9d963307b9b7799",
+        "unified_gemv.csv.ch1": "18de61968e5b744f8b121fe8bed2c41afe372caf230ee3e6269616b12e6a02e7",
+        "unified_gemv.csv.ch2": "4eca8aaa0618603e9f9640e405bc5f2ec719937e64c1b98547228a001457329c",
+        "unified_gemv.csv.ch3": "d18600cebcbfd988ddbfcd3b8fbe1074cb45079b163c066e3f27a12f18f33ffa",
+        "unified_gemv.csv.ch4": "05364bb126448d9517107ccda3c0834180015f0a86c65d5815cf25819407b0c9",
+        "unified_gemv.csv.ch5": "94e425ed0f1820aefbe989386e4a00e2e0aade4e2689fa67b09cd1b56d98733f",
+        "unified_gemv.csv.ch6": "256a6af6e69792cffe58038b298c6d69c94e7293acbf1121fa99206769ed865e",
+        "unified_gemv.csv.ch7": "b58261d02d5b9cc4d3f2298cd2790bc4cd4a00a73b4dfd561113674af07e0a78",
+        "unified_gemv.csv.ch8": "c4305c010dd02c3a82e690e909a7efd16c727b9b17e8196e6062dc178a58f671",
+        "unified_gemv.csv.ch9": "9782751085ff61c709a7ba4a2e44ba6cbc85a780879da66fa3f67f89cb45d138",
+        "unified_gemv.csv.ch10": "e791799c1780489af03a42479c31740bfdfa15092b5003db0c8200aa58ea5be7",
+        "unified_gemv.csv.ch11": "f29cb361d1cc84d2f20a2d834c29b9fe66bd6dc0f73a4cfc8bf9d48d89117536",
+        "unified_gemv.csv.ch12": "8fb52cd8856c14462556867ef48dcdaa5b96d5c490324bac564a2788fbbc432e",
+        "unified_gemv.csv.ch13": "9d669c90db8b62f04f0f014c8752ce1744c9070441ef6702140e6ff97c62261a",
+        "unified_gemv.csv.ch14": "62c2c1a00a64cde0998c533496de0acc32f21bb7e40f4a9662c33e1970c99ee2",
+        "unified_gemv.csv.ch15": "08074be9a751597c42eecc238c6734d4e0a1b152762d130a2fe202c189a76efb",
+        "staging_events.csv.ch0": "c83d6cfd6bb1cbe9e04ed3b64602760d3aea40c4ab19d2f59463d0b01f72877a",
+        "staging_events.csv.ch1": "2b51c0a66e29924fbe041a807cf7961863224b6aa70cbab306c43bc479171cc2",
+        "staging_events.csv.ch2": "b7103cdbff09a84eb0ef04f3c7c12451b5dbb25978fb197ab52f2a6c706cacbd",
+        "staging_events.csv.ch3": "804daf633646958df60e41e4a82d7a685582c160677fa2d467012fce30c0b259",
+        "staging_events.csv.ch4": "336745fd62fe6aba2d478bdcc3cbaa2547ae956ff2d3ce575bdd355b287841fa",
+        "staging_events.csv.ch5": "27b9dbb1beecddc8c7e8b376e160641ecccae79fc611abee289aea05ffabc639",
+        "staging_events.csv.ch6": "a72f2450c137186bcf3e6d5d24eba13ba4016c009486c6a81d7fa7e2f3706a6f",
+        "staging_events.csv.ch7": "c828a5c0fc00a07e32123896b94d005347f7bc4f738fe15336c2b8f9a9a2e403",
+        "staging_events.csv.ch8": "1893375efe3d15034f2ea6cfacc2d6f711eee638a4af7e610890e5ab06cad153",
+        "staging_events.csv.ch9": "06cf1f60dc418d4aec6c31667de08f0789b26948de57a2046d3004b74842c01b",
+        "staging_events.csv.ch10": "a4eb3c1ad9ecc1e5dcad7a9d43ef936e4398de4bd2e4f0fc9d5e315227b793f5",
+        "staging_events.csv.ch11": "87d3f512406b849e24d5994359db17e7a775f6ce6f6972c88e69cc88d62fa079",
+        "staging_events.csv.ch12": "e69e4a5a85aec7f2ab160da9d206aa648795271ff0f67597051bd78fde786f5d",
+        "staging_events.csv.ch13": "1533cb786e3268251b8b159ec303ed83bcdd65fecc7cd7aa90e5ae360e8a0ef4",
+        "staging_events.csv.ch14": "682bf4a7d634cf0831c0dbd876073733bad3ebe31df6578873336605f4cf1f22",
+        "staging_events.csv.ch15": "0e88e2c7e88342766de32e4cdba649209e1fbc9f0c82993aab6878d4d7dfc433",
+        "rank_ca_events.csv.ch0": "2d20b4a8b4376773892dc82fbef6cf64dc8f5f85836634e9d4451a487a7a74c1",
+        "rank_ca_events.csv.ch1": "a7895bf240a73d9d73483e6036f0dfde90f2b5303cfb62fba75088e4d4174b18",
+        "rank_ca_events.csv.ch2": "62c379ff66bbc6b599aeca43fe644c76657b226b5d0336e6730969ee71bee709",
+        "rank_ca_events.csv.ch3": "ddda0babaf240ec30d235481aec156e79fd80a727b4a3a5e9cbf0aeae6de949a",
+        "rank_ca_events.csv.ch4": "4125b5a3b6e1efea2bdb268c5065df61e4a06a6895fe4502b98545980a4e6c21",
+        "rank_ca_events.csv.ch5": "d757f460f890ee8a252f089b55879fc20feca607b0e8934e8c1705076b4a4803",
+        "rank_ca_events.csv.ch6": "3eeb05f5dc9b11a0aa8665a65e32a79ba83c85ccecb702178e08faa326ee34b9",
+        "rank_ca_events.csv.ch7": "a2c28144fd678501374dfd4fa40252313270012e8bccfbd7974a76582554bc7c",
+        "rank_ca_events.csv.ch8": "3464752261397ff7ff933a075da2642193de4cc9d055d62c5205b8f0a68f3ab6",
+        "rank_ca_events.csv.ch9": "db67c7a09a39b666bf96536f2aedb2aae09eaab2bceb8b341d578f52b68700aa",
+        "rank_ca_events.csv.ch10": "79828ad66456f6e5c37a3130812e78db28499747c91b8e85c5cb2b17ed4bdf9f",
+        "rank_ca_events.csv.ch11": "97b03c113a9fb8bbf6223ecc5e5b5b02f4ea95813a3c00dfc91734be16a381f1",
+        "rank_ca_events.csv.ch12": "442e34dc819570d9d9ad9c8bda067c543493d0d4d0fa9f28bf436218a541772e",
+        "rank_ca_events.csv.ch13": "06ffa13ad1ac4dd6bb4aaa54e5926c2455e3d379480bbbdc6f68c9b3adb8c554",
+        "rank_ca_events.csv.ch14": "cf3d57ffac8c91060fd7e8abeab816316b8400f023a732dbedf1feba0d831598",
+        "rank_ca_events.csv.ch15": "735f14e319992361743808b888b3bfec9032093b41cfe52773cce2ed0ceecabf",
+        "bgk_events.csv.ch0": "ba1d47e6e1f8b4c5bdf881a7ea8d9a569ebff7950e8f1e3b2adbc9a0ccf18598",
+        "bgk_events.csv.ch1": "3cd3f90a20f4fae36cadd44373ccc84f4a6390a8b7c963795e80f94b4b97a361",
+        "bgk_events.csv.ch2": "62a7da5fd04a602de6714545315761c2c3a58fa465c2db35610b3712a9cde5d2",
+        "bgk_events.csv.ch3": "79b27b4dbb4bc8da16bd04977d88d87f81e0dbdecdc13dd5ed989b0b7c105dd7",
+        "bgk_events.csv.ch4": "d028a761c96429e9adbdf71e5e2073e4559ef7c3ccf7df6acddd561af2d437b0",
+        "bgk_events.csv.ch5": "757a2103c7f354f1079b56d951ad6aca8ecad544cb51376dce3a0438ffab125b",
+        "bgk_events.csv.ch6": "a6060302b1b4d613abbee38fbff66c5646cedfea1e353e304f6dc867c3da11f2",
+        "bgk_events.csv.ch7": "5100ae8046b2d5af300ccc326ea05a2047762315fe982a4939f7a6ee81967dad",
+        "bgk_events.csv.ch8": "a037c02374d8fd8942ccf8dd52307fa34d4881f39e03975e9bbc1dfbac2238e3",
+        "bgk_events.csv.ch9": "2ce18a6e123c6e729fe24ae8d80e850b82b086a2030b3ba668a392232eb4700f",
+        "bgk_events.csv.ch10": "cf5160c99d6e4aba86e11af37be4935b805704e9ee1b0f9d29484aa577c3b52b",
+        "bgk_events.csv.ch11": "0b29365498bff69ee89402127b24e9c05fa100707b1a8d19ad3c2dbfeecaffb1",
+        "bgk_events.csv.ch12": "7843b26e746ebbb40e34bcbbee710b313777984c0ca7e443dbbce2773103e965",
+        "bgk_events.csv.ch13": "e3b1022f7fcd77a76ba39ee5e862c0d1d4395311189fa5777e0c32447b041901",
+        "bgk_events.csv.ch14": "1faa4542ebe5a79c301d3cbbfce2e47fe9e7c6880b612ca75b72664b41aece5b",
+        "bgk_events.csv.ch15": "0b1a23d0bf87d4a9ea7a529cff27226e64641d577730756efc638146b763a327",
+        "v_cache.csv.ch0": "2e40d1cc25170800d30b03e38402a92f36ae3fc448669cabe60f961fca919042",
+        "v_cache.csv.ch1": "c785247c4d46a664fbafe62d9fdbc2043a6e4e3e19e73e52e8ff7f5e5910204f",
+        "v_cache.csv.ch2": "f197f14b9b0f48ea6f12ed57b10536d98b399eacb644e5c2268aabe6a74b2448",
+        "v_cache.csv.ch3": "bb81f4524f77c2439332731f6ce6d2f364780d4367374ee6f19168785122f96e",
+        "v_cache.csv.ch4": "e23308dce2ce8980e339518b28d4c354ddff39851866dc10b474b57074385705",
+        "v_cache.csv.ch5": "aeee08fa32b8dba4985daca2b644f3ac30fa9ccc19577d6d7b7543c4b01bfd4d",
+        "v_cache.csv.ch6": "716446f94508489205112a249287c6dc69f0b2ddec5bf3b6edb30762192c6a27",
+        "v_cache.csv.ch7": "a27dc39523fc065dac4fb0f85477903d74a6d7a0e3d2874b9d0084e947a66943",
+        "v_cache.csv.ch8": "661640a1eedef13ee57766a7f3c910e58c563dcfc45139a7885109b54f229a49",
+        "v_cache.csv.ch9": "8c9bb1902ec7562a39a285a7a3754e7e488646226efc2b968591ac02ac7b5b36",
+        "v_cache.csv.ch10": "336df8733a89519333b640f4ee28c896a39ed11bde2ea16ff6eef4931118706b",
+        "v_cache.csv.ch11": "1da24b975eccdf313cb27f11de8786789f5803d4137fb7d1ef8054cc6d82a87c",
+        "v_cache.csv.ch12": "1709d34ab95750d1c2276b0379fabe527d41ee7481eb22ca542d280b52f8a481",
+        "v_cache.csv.ch13": "86e51298325bf77cdc158bc624ed6d602a9f75aae25679a67a1990d27206996a",
+        "v_cache.csv.ch14": "e982df72e47230e6310105f82b9acbb5956063bc5e161b2758009b2353acb000",
+        "v_cache.csv.ch15": "efb75d757657babafa72faa2caec789f51236ea60ab911de2f9563a4957b172f",
+        "score_spill.csv.ch0": "001dc5f7ff70ccb6e2cc5bec139a0b89d85988ace51023f2ae7768d1d0fc013b",
+        "score_spill.csv.ch1": "e8013204280e22b90c8859423b77dfa59eaf2612f5f931673f1ca9c3189fa752",
+        "score_spill.csv.ch2": "487ad417b60023cdcf8a081f7489a25d3869e1b2e320b69c4ee7a504bd286d78",
+        "score_spill.csv.ch3": "8c7da2203127f7fa65221bcccfc3f6f63ae6f3f55a03eab64c127331a9aec874",
+        "score_spill.csv.ch4": "807144ad404c40f2bade2a85699e02f75f53bcab571d0e72b45498670d5103b9",
+        "score_spill.csv.ch5": "df5093f75df53a93c4ecd4a33e54c437ab5575160c0908cf58adfd848b3dbb2f",
+        "score_spill.csv.ch6": "d5fa20204086f89d312753ca515fd9ac6dca6f209805031e82a17177d9fe1b9a",
+        "score_spill.csv.ch7": "38c60a61c99158cbf7fd8733495e58d6caac314edd65ae138a29dc4fb6a00eeb",
+        "score_spill.csv.ch8": "aa0b7e7724261afd9079bfd8004550b6f618362bdcbda36a206f662b326fb2d8",
+        "score_spill.csv.ch9": "29f2f86a6e51a1343dbf2f72880402f43d433ac290afb41ee4cbeeffb1acee61",
+        "score_spill.csv.ch10": "f3e2002f54796f7ada850e5c7a5458ba5fe9c039e2f6b45c29e205a9d4228886",
+        "score_spill.csv.ch11": "46062c5767e88accc6a96e70ce685c58e8cadb5aaf3ae8ea9558c1c7a3a3bcea",
+        "score_spill.csv.ch12": "a5591710bb3e382a1d94664a6283fe4607e20c61724e9d9401ca2ca4ed364445",
+        "score_spill.csv.ch13": "4377572a2227b3e9bfb1f469788565b38e8611f15c4ef1ccc597285d1635f977",
+        "score_spill.csv.ch14": "a7dc257500914d9da14539229fbe5ece0921dff9b0a8e56aa5867b5ae301c5da",
+        "score_spill.csv.ch15": "b943bbc06e4b7ce96501f4c04a00f18f78068a39e73dafc3ff52f04ec32b7b6e",
+        "o_projection.csv.ch0": "0e1396dfad63e1512dd43ead1a69b026d277da3531d044ea06cdb5710304d457",
+        "o_projection.csv.ch1": "afa9a4ccbf22c6626fda3ed7bbbd5d54073c4dec86f36f3ba8d5d9c9e19f6c68",
+        "o_projection.csv.ch2": "0ba9ae41558762464356bb2d2e63b4617d58e5b4205036435c3092800aed2e6a",
+        "o_projection.csv.ch3": "500f09177d40e62b6a2f6ead84efacc78db3500d14800d89e2c731b12594c185",
+        "o_projection.csv.ch4": "1d59ce9d59593ea2643ba773e4c00d2238d2048d088b722043b54fdc76876274",
+        "o_projection.csv.ch5": "00cb64a3fd59ad5fd7e1b44e84876385724781fb118658cdce45646bc56d93b4",
+        "o_projection.csv.ch6": "18ee4195e91bc532971f4dd7dfc698a5bf53e652beedf1de978ed3070b424136",
+        "o_projection.csv.ch7": "2258519f56774fa194f79c9e661259d7de43df155fe31938d1a3c119ecfb5c82",
+        "o_projection.csv.ch8": "40eb4b6f254ae3c3eafdaa967a00030217d07fb996ea230cf228e62320226078",
+        "o_projection.csv.ch9": "a91c3e68c88409723acfd2371665efd5bc0c5c9831d09495a867da535769ee9a",
+        "o_projection.csv.ch10": "bc3097b987bb447e7f15bbf4060943fc8fbe99ca1e55f225753e9e900d952a16",
+        "o_projection.csv.ch11": "5b0070d4dbb683cde3096712154304f73ef02a100bb0fa311640ff489410479a",
+        "o_projection.csv.ch12": "1d77857f3c24e4414d8a44cf70fbc6a5a03f406501f7fce222e30b8a9d9c91fa",
+        "o_projection.csv.ch13": "fad71cefebf7705723472134a5aa971513871ebf40e9988817ef522df7578d03",
+        "o_projection.csv.ch14": "f8cb9b92d8dd7846ba9d24d671f7e336965d2ef769fec2c1e2f16b9c4db407a6",
+        "o_projection.csv.ch15": "ef79d1320cbe6f18ca17b8c8491ce0d2e641e1a370d6d02d3fd227409632f7fa",
+        "rank_descriptors.csv.ch0": "8aed2ac79c8b4624adaffe76fe5678c9069d812514b9b4797a576d53e5919e08",
+        "rank_descriptors.csv.ch1": "4a039d4cb3bd540e58f3414f9d0a8575a2f8504ffd81e7cd1318748fca5ff5de",
+        "rank_descriptors.csv.ch2": "c59a19c5a53394555b272e04d569bc7ceb84885933fd6e6ff780553b84e8cbf1",
+        "rank_descriptors.csv.ch3": "2afe84a11bba807d7d317639c457690ca8fef5d9290a9f10a63d4f0605a91f4f",
+        "rank_descriptors.csv.ch4": "5861a70845c2db08178a6a00b528189c068cedb8af191e23a614deaf22424fe7",
+        "rank_descriptors.csv.ch5": "19162222febf616595cbc04544b35cb221330b151ab5c50bb22f7ac130297225",
+        "rank_descriptors.csv.ch6": "79c986690fa77184723c048467154b8cd27219706f6ff9303816e601f8c9c9d4",
+        "rank_descriptors.csv.ch7": "6409a57e1958808c5f5adf9148df3e254b3b7cb32305efc0c0ef4c1c00191663",
+        "rank_descriptors.csv.ch8": "5ba9a5224c6212802d2d3fd0ea95487ad639eace03703fd921e9c19121d104c4",
+        "rank_descriptors.csv.ch9": "fe5b38ea55987148cafbaa805622dea327c2bfa6f14c3ede885ddb7010b763c4",
+        "rank_descriptors.csv.ch10": "9cf009319ee1044db582ecc9cf15c0d7f863c5d9b812ddf447ebe89b84931d51",
+        "rank_descriptors.csv.ch11": "70db5d046dbc99897e21db90004b353948316fb7a4c7d61ad013be08e38b7717",
+        "rank_descriptors.csv.ch12": "ca9999bf4b42f402bf6461602bfb151a087badf7867b96969351c23fac677b2c",
+        "rank_descriptors.csv.ch13": "a1ff557c56b1c384ca26dcea48b1e2e7aab53c9a098a430f04df664b25e885e0",
+        "rank_descriptors.csv.ch14": "e454d2d2578ef15331481a7971a87cfa2a4cfc872459accaad2a8e54ff60ddbe",
+        "rank_descriptors.csv.ch15": "afc1c1ae6817e5247274237c51b45af58c603bf8d1ae087fb460cc0b106898ff"
+      }
+    },
+    "after": {
+      "status": "passed",
+      "data_commands_checked": 432128,
+      "descriptor_children_checked": 165088,
+      "descriptor_count": 112,
+      "descriptor_global_CA_CK": 2352,
+      "exact_data_address_multiset": true,
+      "exact_MAC_order": true,
+      "array_open_row_checks": 2353664,
+      "split_activation": {
+        "status": "passed",
+        "nAAD_ck": 8,
+        "protocol_scope": "channel; ACT1/ACT2 owner keyed by channel/rank/BG/bank",
+        "ACT1_commands": 10800,
+        "ACT2_commands": 10800,
+        "paired_ACT2": 10800,
+        "cancelled_ACT1": 0,
+        "pending_ACT2_at_end": 0,
+        "minimum_gap_ck": 1,
+        "maximum_gap_ck": 1,
+        "gap_histogram_ck": {
+          "1": 10800
+        },
+        "maximum_pending_by_channel": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1
+        },
+        "classifications": {
+          "ordinary": {
+            "ACT1": 2112,
+            "paired_ACT2": 2112,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 2112
+            }
+          },
+          "other_internal": {
+            "ACT1": 1952,
+            "paired_ACT2": 1952,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 1952
+            }
+          },
+          "staging": {
+            "ACT1": 6736,
+            "paired_ACT2": 6736,
+            "late_ACT2": 0,
+            "cancelled": 0,
+            "pending_at_end": 0,
+            "gap_histogram_ck": {
+              "1": 6736
+            }
+          }
+        },
+        "violation_count": 0,
+        "violations": {},
+        "violations_by_kind": {},
+        "examples": [],
+        "classification": "native request type; optional sealed-stage windows; unclassified source region otherwise"
+      },
+      "shared_SRF": {
+        "events_checked": 241136,
+        "operation_counts": {
+          "GEMV_MULTICAST": 106240,
+          "GEMV_MAC": 122624,
+          "GEMV_RELEASE": 240,
+          "GEMV_Q_LOCAL": 2048,
+          "GEMV_Q_REMOTE": 2048,
+          "GEMV_QK": 7936
+        },
+        "bank_generations_checked": 114688,
+        "physical_bank_releases": 3840,
+        "maximum_destination_fanout": 16,
+        "input_bytes_per_bank": 1024,
+        "rank_full_input_SRAM_bytes": 0,
+        "independent_mask_reconstruction": true
+      },
+      "local_write_recovery": {
+        "new_LOCALWR_commands": 19968,
+        "physical_precharge_checks": 1168,
+        "minimum_write_to_precharge_ck": 41,
+        "scope": "score DRAM and two-bank PV-result staging only"
+      },
+      "staging": {
+        "generations": 96,
+        "source_packets_checked": 106240,
+        "two_bank_source_coverage": true,
+        "local_producer_recovery_before_consumption": true,
+        "whole_srf_lifetime": true,
+        "whole_SRF_batches_checked": 3328,
+        "source_to_MAC_identity": true,
+        "DRAM_storage_reuse": {
+          "generations_checked": 96,
+          "cross_generation_boundaries_checked": 80,
+          "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+        }
+      },
+      "packet_scratch": {
+        "packets_checked": 20480,
+        "channels_checked": 16,
+        "scratch_bytes_per_rank": 64,
+        "local_write_service_before_reuse": true,
+        "external_DQ_completion_before_reuse": true
+      },
+      "storage_reuse": {
+        "generations_checked": 96,
+        "cross_generation_boundaries_checked": 80,
+        "prior_DRAM_read_and_broadcast_completion_before_reuse": true
+      },
+      "score": {
+        "tiles_per_rank": 31,
+        "bytes_per_rank": 31744,
+        "one_live_score_tile": true,
+        "complete_MAC_and_rank_reduction_before_spill": true,
+        "final_read_after_all_tiles": true,
+        "write_recovery_checked": true
+      },
+      "output": {
+        "local_PV_packets": 4096,
+        "BF16_export_packets": 16384,
+        "FP32_source_coverage": true,
+        "cast_and_transfer_service_checked": true,
+        "local_write_recovery_checked": true,
+        "output_DQ_before_rewind_checked": true,
+        "packet_scratch": {
+          "packets_checked": 20480,
+          "channels_checked": 16,
+          "scratch_bytes_per_rank": 64,
+          "local_write_service_before_reuse": true,
+          "external_DQ_completion_before_reuse": true
+        }
+      }
+    }
+  }
+}

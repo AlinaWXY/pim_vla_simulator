@@ -2,6 +2,8 @@
 #define RAMULATOR_BASE_REQUEST_H
 
 #include <cstdint>
+#include <array>
+#include "ramulator/base/pim_descriptor.h"
 #include <functional>
 #include <string>
 #include <utility>
@@ -20,7 +22,7 @@ struct Request {
   // Universal built-in external request types — always Read = 0, Write = 1.
   // Additional non-negative ids may exist as metadata for future extensions.
   struct Type {
-    enum : int { Read = 0, Write = 1, PIM_MAC_AB = 2, PIM_WR_GB = 3, PIM_RD_RES = 4, PIM_MAC_HB = 5, PIM_LOCAL_GB = 6, PIM_WR_BG = 7, PIM_WR_Q = 8, PIM_MAC_K = 9, PIM_MAC_QK = 10, PIM_RD_BG = 11, PIM_LOCAL_WR = 12, PIM_RD_Q = 13, PIM_SPILL = 14, PIM_ROPE_COEF = 15, PIM_ROPE_LOAD = 16, PIM_ROPE_EXEC = 17, PIM_ROPE_STORE = 18, PIM_Q_EXPORT = 19, PIM_Q_REMOTE = 20, PIM_Z_STORE = 21, PIM_Z_LOAD = 22, PIM_GEMV_RELEASE = 23, PIM_STAGE_BEGIN = 24, PIM_STAGE_SEAL = 25, PIM_STAGE_LOAD = 26, PIM_STAGE_FRAGMENT = 27, PIM_SCORE_SPILL = 28, PIM_PV_SPILL = 29, PIM_O_REWIND = 30 };
+    enum : int { Read = 0, Write = 1, PIM_MAC_AB = 2, PIM_WR_GB = 3, PIM_RD_RES = 4, PIM_MAC_HB = 5, PIM_LOCAL_GB = 6, PIM_WR_BG = 7, PIM_WR_Q = 8, PIM_MAC_K = 9, PIM_MAC_QK = 10, PIM_RD_BG = 11, PIM_LOCAL_WR = 12, PIM_RD_Q = 13, PIM_SPILL = 14, PIM_ROPE_COEF = 15, PIM_ROPE_LOAD = 16, PIM_ROPE_EXEC = 17, PIM_ROPE_STORE = 18, PIM_Q_EXPORT = 19, PIM_Q_REMOTE = 20, PIM_Z_STORE = 21, PIM_Z_LOAD = 22, PIM_GEMV_RELEASE = 23, PIM_STAGE_BEGIN = 24, PIM_STAGE_SEAL = 25, PIM_STAGE_LOAD = 26, PIM_STAGE_FRAGMENT = 27, PIM_SCORE_SPILL = 28, PIM_PV_SPILL = 29, PIM_O_REWIND = 30, PIM_MAC_RUN = 31, PIM_ROPE_RUN = 32 };
   };
 
   int type_id = -1;        // Request type. -1 is the convention for internal maintenance/direct-command requests.
@@ -29,6 +31,9 @@ struct Request {
   int channel_count = 1;   // Channel mapper geometry for rank descriptor address expansion.
   bool pim_rank_micro = false; // Internal child: retains rank CA scope through ordinary RD scheduling.
   bool pim_rank_batch = false; // One rank descriptor expands into the original 16 bank requests.
+  std::array<uint32_t,8> pim_descriptor{};
+  uint16_t pim_descriptor_crc=0;
+  uint64_t pim_run_id=0;
   int pim_buffer = -1;     // Optional ping-pong input SRAM slot, 0/1; -1 = legacy trace.
   uint64_t pim_bank_mask = 0; // New bank-local input/result destinations.
   int pim_rank_mask = 0;   // Controller-resolved PIM targets; input broadcasts may select all ranks.

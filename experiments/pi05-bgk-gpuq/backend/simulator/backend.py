@@ -76,6 +76,8 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_staging_banks": config.pim_staging_banks,
                     "pim_rank_controller": config.pim_rank_controller,
                     "pim_rank_descriptors": config.pim_rank_descriptors,
+                    "pim_coarse_commands": config.pim_coarse_commands,
+                    "pim_coarse_events_path": str(output / f"coarse_runs.csv.ch{channel}") if config.pim_coarse_commands else "",
                     "rank_descriptor_events_path": str(output / f"rank_descriptors.csv.ch{channel}") if config.pim_rank_descriptors else "",
                     "rank_ca_events_path": str(output / f"rank_ca_events.csv.ch{channel}") if config.pim_rank_controller else "",
                     "staging_events_path": str(output / f"staging_events.csv.ch{channel}") if config.pim_rank_staging else "",
@@ -567,5 +569,27 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
     for field in ("pim_token_pv", "pim_qkv_fusion", "pim_whole_srf", "v_cache_preinstalled"):
         if not getattr(config, field):
             result["config"].pop(field, None)
+    if config.pim_coarse_commands:
+        staged_reads=0
+        for channel in range(config.channels):
+            with (output/f"staging_events.csv.ch{channel}").open() as stream:
+                staged_reads+=sum(row["operation"]=="LOCALRD" for row in csv.DictReader(stream))
+        result["schema_version"]=19
+        result["coarse_command_model"]=dict(descriptor_bits=256,header_bits=14,crc_bits=16,padding_bits=8,
+            ca_bits_per_ck=14,ca_cycles_per_run=21,decode_cycles=1,
+            mac_run_count=requests["mac_run"],rope_run_count=requests["rope_run"],
+            fixed_current_layout=True,internal_request_fifo_entries=32,
+            global_commands="MAC_RUN, ROPE_RUN, direct external reads/writes and DRAM maintenance",
+            rank_commands="MAC, LOCALRD, LOCALWR, ACT/PRE and maintenance",
+            timing_adapter="MACAB/MACQK names in native timeline retain their existing weight-fetch/reduction timing classes; rank CA names both MAC",
+            local_controls="SRF multicast, gather, cast, reduce, buffer release, RoPE execute: no CA; actual resource service retained",
+            producer_metadata="STAGE_BEGIN/SEAL and trace barriers validate producers and dependencies; no transmitted command",
+            result_policy="Current fixed layout: QKV and PV local spill, QKT score DRAM spill, O/FFN direct result reads")
+        result["traffic_bytes"].update(gpu_input_staging_write=requests["writes"]*32,
+            input_staging_array_read=staged_reads*32,input_srf_multicast_source=staged_reads*32,
+            input_srf_multicast_destination=staged_reads*32*16)
+        result["rank_controller_model"]["shared_rank_commands"]=["array ACT/PRE/LOCALRD/LOCALWR", "MAC", "external RD/WR/RDRES/WRGB"]
+        result["unified_gemv_model"]["port_sharing"]="Array/MAC share rank CA; multicast/gather/cast retain data-port service without pseudo CA"
+        result["pim_model"]["transfer_scheduling"]="Two-bank staging; descriptor-generated local loads and MAC; multicast is a local data-path action"
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

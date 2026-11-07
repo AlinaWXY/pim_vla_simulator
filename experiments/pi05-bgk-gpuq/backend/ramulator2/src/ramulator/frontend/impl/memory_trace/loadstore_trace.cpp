@@ -22,6 +22,8 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
     int type_id; Addr_t addr; int pim_buffer; int stage_bytes=0, stage_rows=0;
     bool rank_batch=false;
     size_t peer_source=std::numeric_limits<size_t>::max();
+    std::array<uint32_t,8> descriptor{};
+    uint16_t descriptor_crc=0;
   };
   std::vector<Trace> m_trace;
   size_t m_curr_trace_idx = 0;
@@ -135,6 +137,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       req.pim_stage_bytes = t.stage_bytes;
       req.pim_stage_rows = t.stage_rows;
       req.pim_rank_batch = t.rank_batch;
+      req.pim_descriptor=t.descriptor; req.pim_descriptor_crc=t.descriptor_crc;
       req.size_bytes = m_memory_system->get_tx_bytes();
       req.callback = [this, index, channel](Request& completed) {
         ++m_completed;
@@ -270,6 +273,7 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       req.ingress_id = static_cast<int>(m_curr_trace_idx);
       req.pim_stage_bytes = t.stage_bytes; req.pim_stage_rows = t.stage_rows;
       req.pim_rank_batch = t.rank_batch;
+      req.pim_descriptor=t.descriptor; req.pim_descriptor_crc=t.descriptor_crc;
       req.size_bytes = m_memory_system->get_tx_bytes();
       if (m_wait_for_completion) {
         req.callback = [this](Request& completed) {
@@ -307,6 +311,24 @@ class LoadStoreTrace : public IFrontEnd, public Implementation {
       std::string op, value, buffer, extra, overflow;
       if (!(fields >> op >> value)) {
         throw std::runtime_error(fmt::format("Trace line {}: expected OP ADDRESS [BUFFER]", line_num));
+      }
+      if(op=="MAC_RUN" || op=="ROPE_RUN") {
+        if(!m_wait_for_completion) throw std::runtime_error("RUN requires completion tracking");
+        size_t used=0; const Addr_t addr=std::stoll(value,&used,0);
+        if(used!=value.size() || addr<0 || addr%32) throw std::runtime_error("Invalid RUN address");
+        Trace t{op=="MAC_RUN"?Request::Type::PIM_MAC_RUN:Request::Type::PIM_ROPE_RUN,addr,-1};
+        for(auto& word:t.descriptor) {
+          std::string token; if(!(fields>>token)) throw std::runtime_error("Truncated RUN descriptor");
+          const auto val=std::stoull(token,&used,16);
+          if(used!=token.size() || val>0xffffffffULL) throw std::runtime_error("Invalid descriptor word");
+          word=uint32_t(val);
+        }
+        std::string token; if(!(fields>>token)) throw std::runtime_error("Missing RUN CRC");
+        const auto crc=std::stoull(token,&used,16);
+        if(used!=token.size() || crc>65535 || fields>>overflow) throw std::runtime_error("Invalid RUN CRC/length");
+        t.descriptor_crc=uint16_t(crc); PIMDescriptor decoded;decoded.decode(t.descriptor,t.descriptor_crc);
+        if(decoded.opcode!=(op=="MAC_RUN"?1:2)) throw std::runtime_error("RUN mnemonic/opcode mismatch");
+        m_trace.push_back(t);continue;
       }
       fields >> buffer;
       fields >> extra;

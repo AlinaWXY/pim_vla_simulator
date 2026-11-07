@@ -1,4 +1,8 @@
-# xinyao_1104_O_Projection：QKT score 暂存与 PIM O projection
+# xinyao_1107：MAC_RUN / ROPE_RUN 粗细命令
+
+新版本在原有 layout、本地 RoPE、QKT score 集中导出和 PIM O projection 上调整命令接口。计算统一为每 rank 每算子一条256-bit描述符，QKᵀ和O各一条；输入、结果和跨rank搬运保留直接DQ读写。字段、CA周期、执行语义和复现命令见[粗细命令说明](experiments/pi05-unified-gemv/COMMANDS.zh-CN.md)，原生前后对比与图见[本次报告](reference/commands-1107/REPORT.zh-CN.md)。
+
+以下保留调整前的历史实验记录。
 
 ## 四条历史数据流比较（仅分析已有记录）
 

@@ -69,6 +69,7 @@ bool rank_ca_available(int rank,Clk_t clock) const {
   return std::all_of(m_rank_ca_ready.begin(),m_rank_ca_ready.end(),[&](Clk_t ready){return clock>=ready;});
 }
 bool rank_pseudo(const char* command,int rank=1) {
+  if(m_coarse_commands) return true; // Local control signals; data-port/PE service remains charged by each caller.
   if(!m_rank_controller) return true;
   if(!rank_ca_available(rank,m_clk)) return false;
   m_rank_ca_ready[rank]=m_clk+1;
@@ -92,7 +93,8 @@ void init_rank_staging() {
     if(!rank_ca_available(rank,clock) || (!m_rank_fine_context && clock<m_global_ca_ready))
       throw std::runtime_error("rank/global command bus collision");
     const int cycles=std::max(1,m_device.m_spec->command_cycles[command]);
-    const auto& name=m_device.m_spec->command_names[command];
+    const auto& native_name=m_device.m_spec->command_names[command];
+    const std::string name=m_coarse_commands && (native_name=="MACAB" || native_name=="MACQK")?"MAC":native_name;
     for(int r=0;r<static_cast<int>(m_rank_ca_ready.size());++r) if(rank<0 || rank==r) {
       m_rank_ca_ready[r]=clock+cycles;
       record_ca(clock,clock+cycles,r,name,"rank");

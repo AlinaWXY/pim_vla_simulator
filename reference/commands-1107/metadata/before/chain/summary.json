@@ -1,0 +1,10 @@
+{
+  "mode": "before",
+  "case": "chain",
+  "latency_us": 60.061078,
+  "memory_cycles": 64031,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 901120,
+  "trace_sha256": "d9fe483ce2982f32a29f6a788c9509b0779749baffdcc71243f15a3c8e8db1df",
+  "numerical_compute": false
+}

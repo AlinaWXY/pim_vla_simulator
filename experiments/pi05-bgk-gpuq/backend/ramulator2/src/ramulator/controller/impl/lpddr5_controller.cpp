@@ -109,6 +109,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
 #include "v_cache_extension.inc"
 #include "score_spill_extension.inc"
 #include "o_projection_extension.inc"
+#include "coarse_run_extension.inc"
 
  public:
   void init() override {
@@ -202,6 +203,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_pv_bf16_output, bool, "pim_pv_bf16_output").default_val(false);
     RAMULATOR_PARSE_PARAM(m_o_projection_path, std::string, "o_projection_events_path").default_val("");
     init_o_projection();
+    RAMULATOR_PARSE_PARAM(m_coarse_commands, bool, "pim_coarse_commands").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_run_path, std::string, "pim_coarse_events_path").default_val("");
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -222,6 +225,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     setup_v_cache();
     setup_score_spill();
     setup_o_projection();
+    setup_coarse();
     m_stats.add("num_pim_requests", s_pim_requests);
     m_stats.add("num_pim_completed", s_pim_completed);
     m_stats.add("pim_request_latency_cycles", s_pim_latency);
@@ -271,6 +275,17 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool send(Request& req) override {
+    if(is_run(req) && !m_coarse_commands) throw std::runtime_error("RUN requires coarse command mode");
+    if(m_coarse_commands) {
+      if(is_run(req)) return send_run(req);
+      if(req.type_id==Request::Type::PIM_RD_RES || req.type_id==Request::Type::PIM_RD_BG)
+        return coarse_result_send(req);
+      if(req.pim_rank_batch || (req.type_id>=Request::Type::PIM_MAC_AB &&
+          req.type_id!=Request::Type::PIM_Q_EXPORT && req.type_id!=Request::Type::PIM_Q_REMOTE &&
+          req.type_id!=Request::Type::PIM_STAGE_BEGIN && req.type_id!=Request::Type::PIM_STAGE_SEAL))
+        throw std::runtime_error("Fine compute/local requests cannot cross the coarse command interface");
+      return send_impl(req);
+    }
     const bool coarse=m_rank_controller && req.type_id>=Request::Type::PIM_MAC_AB;
     if(coarse && m_clk<m_global_ca_ready) return false;
     const bool accepted=send_impl(req);
@@ -481,6 +496,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
          (!m_pim_pending.empty() && m_pim_pending.front().type_id == Request::Type::PIM_MAC_HB))) {
       LPDDR5Controller::tick();
       complete_pim();
+      pump_coarse();
       return;
     }
     if (!m_internal_act2_pending &&
@@ -489,11 +505,13 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         (!m_pim_buffer.size() && m_pim_pending.empty()))) {
       LPDDR5Controller::tick();
       complete_pim();
+      pump_coarse();
       issue_local_ready();
       return;
     }
     tick_prologue();
     complete_pim();
+    pump_coarse();
     issue_local_ready();
     m_refresh->tick();
     m_rowpolicy->pre_schedule();
@@ -523,6 +541,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   void finalize() override {
+    if(m_run.active) throw std::runtime_error("Incomplete RUN at end of trace");
     finish_score_spill();
     finish_o_projection();
     if(m_whole_srf) {
@@ -864,8 +883,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
   }
 
   bool issue_pim_ready() {
-    RankFineScope fine(m_rank_fine_context,m_rank_controller);
     for (auto it = m_pim_buffer.begin(); it != m_pim_buffer.end(); ++it) {
+      RankFineScope fine(m_rank_fine_context,m_rank_controller && (!m_coarse_commands || it->pim_rank_micro));
       if (is_local(*it) || (is_rank_rope(*it) && it->type_id == Request::Type::PIM_ROPE_EXEC)) continue;
       if(is_score_spill(*it)) {
         if(it==m_pim_buffer.begin()) return issue_score_spill(it);

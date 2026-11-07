@@ -1,0 +1,10 @@
+{
+  "mode": "after",
+  "case": "pv",
+  "latency_us": 44.398354,
+  "memory_cycles": 47333,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 778240,
+  "trace_sha256": "1b701bf58389e9bd5125f36b62ceae80c194e93dbcf1c89b1a5d33f878670024",
+  "numerical_compute": false
+}

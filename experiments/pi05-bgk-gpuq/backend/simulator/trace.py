@@ -1,6 +1,7 @@
 """Byte-address traces for ordinary memory and coarse bank-parallel PIM requests."""
 
 import hashlib
+from .coarse import parse as parse_coarse
 from pathlib import Path
 
 RANK_BATCH_OPS = {f"PIM_RANK_{name}": f"PIM_{name}" for name in
@@ -14,6 +15,7 @@ def inspect_trace(
     new_ops = ("PIM_SPILL", "PIM_ROPE_COEF", "PIM_ROPE_LOAD", "PIM_ROPE_EXEC", "PIM_ROPE_STORE", "PIM_Q_EXPORT", "PIM_Q_REMOTE", "PIM_Z_STORE", "PIM_Z_LOAD", "PIM_GEMV_RELEASE", "PIM_STAGE_BEGIN", "PIM_STAGE_SEAL", "PIM_STAGE_LOAD", "PIM_STAGE_FRAGMENT", "PIM_SCORE_SPILL", "PIM_PV_SPILL", "PIM_O_REWIND")
     counts.update(dict.fromkeys(new_ops, 0))
     counts.update(dict.fromkeys(RANK_BATCH_OPS, 0))
+    counts.update(MAC_RUN=0, ROPE_RUN=0)
     controls = {"BARRIER": 0, "WAIT": 0}
     wait_cycles = 0
     staged_input_bytes = 0
@@ -24,6 +26,13 @@ def inspect_trace(
         for number, raw in enumerate(stream, 1):
             digest.update(raw)
             fields = raw.split()
+            if fields and fields[0] in (b"MAC_RUN", b"ROPE_RUN"):
+                parse_coarse([x.decode("ascii") for x in fields])
+                address=int(fields[1],0)
+                if not pim or address<0 or address+transaction_bytes>capacity_bytes or address%transaction_bytes:
+                    raise ValueError(f"Trace line {number}: invalid RUN target")
+                counts[fields[0].decode()] += 1
+                continue
             if len(fields) not in (2, 3, 4):
                 raise ValueError(
                     f"Trace line {number}: expected OP ADDRESS [BUFFER] or STAGE_BEGIN ADDRESS BYTES ROWS"
@@ -89,6 +98,7 @@ def inspect_trace(
         logical_counts[child] += 16*counts[descriptor]
     descriptor_count = sum(counts[name] for name in RANK_BATCH_OPS)
     return dict(
+        mac_run=counts["MAC_RUN"], rope_run=counts["ROPE_RUN"],
         **{name.lower(): logical_counts[name] for name in new_ops if logical_counts[name]},
         **{name.lower(): counts[name] for name in RANK_BATCH_OPS if counts[name]},
         **({"rank_descriptor_requests": descriptor_count, "rank_descriptor_child_requests": 16*descriptor_count} if descriptor_count else {}),

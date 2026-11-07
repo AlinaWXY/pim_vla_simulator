@@ -33,6 +33,7 @@ class MemoryConfig:
     pim_staging_banks: int = 1
     pim_rank_controller: bool = False
     pim_rank_descriptors: bool = False
+    pim_coarse_commands: bool = False
     channel_independent_dispatch: bool = False
     channel_queue_capacity: int = 32
     gemv_port_cycles: int = 2
@@ -71,6 +72,9 @@ class MemoryConfig:
             raise ValueError("BF16 PV output requires token PV")
         if self.pim_o_projection and (not self.pim_pv_bf16_output or not self.pim_rank_staging or self.pim_staging_banks != 2):
             raise ValueError("O projection requires BF16 PV output and two-bank rank staging")
+        if type(self.pim_coarse_commands) is not bool or (self.pim_coarse_commands and
+                (not self.pim_rank_controller or not self.pim_whole_srf or self.pim_staging_banks != 2 or self.pim_rank_descriptors)):
+            raise ValueError("Coarse mode requires two-bank whole-SRF rank controller without legacy rank descriptors")
         if type(self.pim_rank_descriptors) is not bool or type(self.channel_independent_dispatch) is not bool:
             raise ValueError("Rank descriptor/channel dispatch flags must be boolean")
         if self.pim_rank_descriptors and (not self.pim_rank_controller or not self.pim_unified_gemv):

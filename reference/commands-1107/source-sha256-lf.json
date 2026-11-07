@@ -1,0 +1,22 @@
+{
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/base/pim_descriptor.h": "41da3cd8b3fa6f46b5773f37449b3f6fbc77ea1c66655fa2432eeafb81e27ecf",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/coarse_run_extension.inc": "02fd53aec22ac9802dc5f7a4a86af369a542d5685ade7da85f3e09bb785c2412",
+  "experiments/pi05-bgk-gpuq/backend/simulator/coarse.py": "ee1427c6d3fff834a7ddb06fcf4b663fdc4142a9075a3c89f9cceae81e70c6c6",
+  "experiments/pi05-unified-gemv/COMMANDS.zh-CN.md": "af46629caa361f69b8a5e6911a6a71f73a510e845525bea6dd2d2d3c04ebaab6",
+  "experiments/pi05-unified-gemv/commands.sbatch": "5c4d83746e252b00612e3666710baf72746f32f752a937eb52a5307f16872ff6",
+  "experiments/pi05-unified-gemv/compare_commands.py": "0c20756c7016c13dfe08e2cb53f76e55ca52da725bb75469d41fedc0038008a2",
+  "experiments/pi05-unified-gemv/reproduce_commands.py": "82ad3fa67e3acfbc9524b2ab1af3b3d7014537d58153d24c3c324628e6868c21",
+  "experiments/pi05-unified-gemv/source/coarse_workload.py": "f94e6d6c8eb47b3b4fe99eefe6180990acbb702e22e6b6d167b81be769f8e7ac",
+  "experiments/pi05-unified-gemv/validation/audit_commands.py": "b64f4eb1cf379159c9bb4d572975f56d16f5830f3bb288dd8d1e70d365ce505b",
+  "experiments/pi05-unified-gemv/validation/test_descriptors.py": "b264a5fee3f4e2c4ba312532e7688c799ce7db529121f7d813d3f6c2f62b504f",
+  "README.md": "65f5177ab1910bc16b7cd79fcdd21583fce91afb6f7bff090998302da1cfd22f",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5.py": "8fc461a0820c763d13e4919852002dea05843eeef197d6d2388d9de3d5dd3151",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": "47d78a1d7302772456fbc45717885229e2386b5d566826c52956354d42396812",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/base/request.h": "98717ec1953bb7063937800be875e99703391aac43841a58fcece3de3f7dea92",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp": "0d7dfd265c32f4a42ffd62fe2fc66cf7cf6ad725c8c590082e84509d581ce2c5",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc": "f6e434ac2a0d8b95455182a1fef806e00ab40065705e82a5ae84c42da81b352a",
+  "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/frontend/impl/memory_trace/loadstore_trace.cpp": "c9bf118379457698b338fddf915fa5b76fb7744167748050d8cafe3bf35eeb73",
+  "experiments/pi05-bgk-gpuq/backend/simulator/backend.py": "96d19f5a1a6d9987c65c132d05c9dba3e82b3c9b40e0a629b5df8f45710c1b4d",
+  "experiments/pi05-bgk-gpuq/backend/simulator/config.py": "9e70bf7b0b6a3b2dd4c8f450c71e806ece2b9835a4c46e9754f3d5d1838033c6",
+  "experiments/pi05-bgk-gpuq/backend/simulator/trace.py": "843729b833c8c3344d7cb2e3b6c603dbd4a11643af5fa3328d19ecd5f2fbcae7"
+}

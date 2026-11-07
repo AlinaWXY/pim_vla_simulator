@@ -1,0 +1,10 @@
+{
+  "mode": "before",
+  "case": "down_gpu_input",
+  "latency_us": 58.691598,
+  "memory_cycles": 62571,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 2162688,
+  "trace_sha256": "90052dab4631655269d682ecfbdca1ca0bdb47a14c7e5c1418fe2de909b63679",
+  "numerical_compute": false
+}

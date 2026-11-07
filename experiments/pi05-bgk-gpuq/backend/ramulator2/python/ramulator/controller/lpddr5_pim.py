@@ -53,6 +53,8 @@ class LPDDR5PIM(Component):
     pim_o_projection = Param(bool, default=False)
     pim_pv_bf16_output = Param(bool, default=False)
     o_projection_events_path = Param(str, default='')
+    pim_coarse_commands = Param(bool, default=False)
+    pim_coarse_events_path = Param(str, default='')
     scheduler = Child("scheduler")
     refresh_manager = Child("refresh_manager")
     row_policy = Child("row_policy")

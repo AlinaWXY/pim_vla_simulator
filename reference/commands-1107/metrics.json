@@ -1,0 +1,362 @@
+{
+  "before/chain": {
+    "dq": {
+      "busy_us": 3.30176,
+      "idle_us": 56.75931799999999,
+      "utilization_pct": 5.497337227280536,
+      "longest_idle_us": 32.497009999999996,
+      "all_channels_idle_total_us": 56.75931799999999,
+      "all_channels_longest_idle_us": 32.497009999999996
+    },
+    "global_ca": {
+      "busy_us": 5.0614479999999995,
+      "idle_us": 54.999629999999996,
+      "utilization_pct": 8.427168090456185,
+      "longest_idle_us": 0.8714019999999999,
+      "all_channels_idle_total_us": 54.999629999999996,
+      "all_channels_longest_idle_us": 0.8714019999999999
+    },
+    "rank1_ca": {
+      "busy_us": 10.736348,
+      "idle_us": 49.324729999999995,
+      "utilization_pct": 17.875716449844607,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 49.324729999999995,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 7.054697999999999,
+      "idle_us": 53.00637999999999,
+      "utilization_pct": 11.745873092720714,
+      "longest_idle_us": 0.47181399999999996,
+      "all_channels_idle_total_us": 53.00637999999999,
+      "all_channels_longest_idle_us": 0.47181399999999996
+    },
+    "latency_us": 60.061077999999995,
+    "external_DQ_bytes": 901120
+  },
+  "after/chain": {
+    "dq": {
+      "busy_us": 3.30176,
+      "idle_us": 56.590478,
+      "utilization_pct": 5.512834567978575,
+      "longest_idle_us": 32.275642,
+      "all_channels_idle_total_us": 56.590478,
+      "all_channels_longest_idle_us": 32.275642
+    },
+    "global_ca": {
+      "busy_us": 1.8478599999999998,
+      "idle_us": 58.044377999999995,
+      "utilization_pct": 3.0853079826471004,
+      "longest_idle_us": 3.88332,
+      "all_channels_idle_total_us": 58.044377999999995,
+      "all_channels_longest_idle_us": 3.88332
+    },
+    "rank1_ca": {
+      "busy_us": 8.487024,
+      "idle_us": 51.405213999999994,
+      "utilization_pct": 14.170490673599474,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 51.405213999999994,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 3.7163559999999998,
+      "idle_us": 56.175881999999994,
+      "utilization_pct": 6.205071181344066,
+      "longest_idle_us": 3.88332,
+      "all_channels_idle_total_us": 56.175881999999994,
+      "all_channels_longest_idle_us": 3.88332
+    },
+    "latency_us": 59.89223799999999,
+    "external_DQ_bytes": 901120
+  },
+  "before/pv": {
+    "dq": {
+      "busy_us": 2.85152,
+      "idle_us": 41.49805799999999,
+      "utilization_pct": 6.429644043061695,
+      "longest_idle_us": 25.172168,
+      "all_channels_idle_total_us": 41.49805799999999,
+      "all_channels_longest_idle_us": 25.172168
+    },
+    "global_ca": {
+      "busy_us": 3.2126499999999996,
+      "idle_us": 41.136928,
+      "utilization_pct": 7.243924620883653,
+      "longest_idle_us": 0.613452,
+      "all_channels_idle_total_us": 41.136928,
+      "all_channels_longest_idle_us": 0.613452
+    },
+    "rank1_ca": {
+      "busy_us": 7.959867999999999,
+      "idle_us": 36.389709999999994,
+      "utilization_pct": 17.948012943888667,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 36.389709999999994,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 4.71345,
+      "idle_us": 39.636128,
+      "utilization_pct": 10.62794780144244,
+      "longest_idle_us": 0.613452,
+      "all_channels_idle_total_us": 39.636128,
+      "all_channels_longest_idle_us": 0.613452
+    },
+    "latency_us": 44.349577999999994,
+    "external_DQ_bytes": 778240
+  },
+  "after/pv": {
+    "dq": {
+      "busy_us": 2.85152,
+      "idle_us": 41.546834,
+      "utilization_pct": 6.422580440707329,
+      "longest_idle_us": 25.214377999999996,
+      "all_channels_idle_total_us": 41.546834,
+      "all_channels_longest_idle_us": 25.214377999999996
+    },
+    "global_ca": {
+      "busy_us": 1.516746,
+      "idle_us": 42.881608,
+      "utilization_pct": 3.416221240994655,
+      "longest_idle_us": 3.8823819999999998,
+      "all_channels_idle_total_us": 42.881608,
+      "all_channels_longest_idle_us": 3.8823819999999998
+    },
+    "rank1_ca": {
+      "busy_us": 4.372955999999999,
+      "idle_us": 40.025397999999996,
+      "utilization_pct": 9.8493651363742,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 40.025397999999996,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 2.9640799999999996,
+      "idle_us": 41.434273999999995,
+      "utilization_pct": 6.676103352840513,
+      "longest_idle_us": 3.8823819999999998,
+      "all_channels_idle_total_us": 41.434273999999995,
+      "all_channels_longest_idle_us": 3.8823819999999998
+    },
+    "latency_us": 44.398354,
+    "external_DQ_bytes": 778240
+  },
+  "before/gate_up_gpu": {
+    "dq": {
+      "busy_us": 3.8420479999999997,
+      "idle_us": 43.285886,
+      "utilization_pct": 8.152379435941326,
+      "longest_idle_us": 40.799248,
+      "all_channels_idle_total_us": 43.285886,
+      "all_channels_longest_idle_us": 40.799248
+    },
+    "global_ca": {
+      "busy_us": 3.98181,
+      "idle_us": 43.14612399999999,
+      "utilization_pct": 8.448938160539777,
+      "longest_idle_us": 0.44273599999999996,
+      "all_channels_idle_total_us": 43.14612399999999,
+      "all_channels_longest_idle_us": 0.44273599999999996
+    },
+    "rank1_ca": {
+      "busy_us": 6.1166979999999995,
+      "idle_us": 41.011236,
+      "utilization_pct": 12.978922436956392,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 41.011236,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 5.967555999999999,
+      "idle_us": 41.160377999999994,
+      "utilization_pct": 12.662460442250662,
+      "longest_idle_us": 0.44273599999999996,
+      "all_channels_idle_total_us": 41.160377999999994,
+      "all_channels_longest_idle_us": 0.44273599999999996
+    },
+    "latency_us": 47.127933999999996,
+    "external_DQ_bytes": 1048576
+  },
+  "after/gate_up_gpu": {
+    "dq": {
+      "busy_us": 3.8420479999999997,
+      "idle_us": 43.297141999999994,
+      "utilization_pct": 8.15043279275694,
+      "longest_idle_us": 40.813317999999995,
+      "all_channels_idle_total_us": 43.297141999999994,
+      "all_channels_longest_idle_us": 40.813317999999995
+    },
+    "global_ca": {
+      "busy_us": 2.017638,
+      "idle_us": 45.121551999999994,
+      "utilization_pct": 4.28017112725102,
+      "longest_idle_us": 3.8823819999999998,
+      "all_channels_idle_total_us": 45.121551999999994,
+      "all_channels_longest_idle_us": 3.8823819999999998
+    },
+    "rank1_ca": {
+      "busy_us": 5.156186,
+      "idle_us": 41.983003999999994,
+      "utilization_pct": 10.938215102974828,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 41.983003999999994,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 3.9827479999999995,
+      "idle_us": 43.156442,
+      "utilization_pct": 8.448910556163566,
+      "longest_idle_us": 3.8823819999999998,
+      "all_channels_idle_total_us": 43.156442,
+      "all_channels_longest_idle_us": 3.8823819999999998
+    },
+    "latency_us": 47.13919,
+    "external_DQ_bytes": 1048576
+  },
+  "before/down_gpu_input": {
+    "dq": {
+      "busy_us": 7.924224,
+      "idle_us": 50.767374,
+      "utilization_pct": 13.501462338783142,
+      "longest_idle_us": 47.680415999999994,
+      "all_channels_idle_total_us": 50.767374,
+      "all_channels_longest_idle_us": 47.680415999999994
+    },
+    "global_ca": {
+      "busy_us": 5.385996,
+      "idle_us": 53.30560199999999,
+      "utilization_pct": 9.176775183391667,
+      "longest_idle_us": 1.093708,
+      "all_channels_idle_total_us": 53.30560199999999,
+      "all_channels_longest_idle_us": 1.093708
+    },
+    "rank1_ca": {
+      "busy_us": 13.901159999999999,
+      "idle_us": 44.790437999999995,
+      "utilization_pct": 23.685093733518723,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 44.790437999999995,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 9.552591999999999,
+      "idle_us": 49.139005999999995,
+      "utilization_pct": 16.27591056559748,
+      "longest_idle_us": 1.093708,
+      "all_channels_idle_total_us": 49.139005999999995,
+      "all_channels_longest_idle_us": 1.093708
+    },
+    "latency_us": 58.69159799999999,
+    "external_DQ_bytes": 2162688
+  },
+  "after/down_gpu_input": {
+    "dq": {
+      "busy_us": 7.924224,
+      "idle_us": 50.72235,
+      "utilization_pct": 13.511827647425747,
+      "longest_idle_us": 47.634454,
+      "all_channels_idle_total_us": 50.72235,
+      "all_channels_longest_idle_us": 47.634454
+    },
+    "global_ca": {
+      "busy_us": 4.204116,
+      "idle_us": 54.442457999999995,
+      "utilization_pct": 7.168561969195336,
+      "longest_idle_us": 3.8823819999999998,
+      "all_channels_idle_total_us": 54.442457999999995,
+      "all_channels_longest_idle_us": 3.8823819999999998
+    },
+    "rank1_ca": {
+      "busy_us": 10.064739999999999,
+      "idle_us": 48.58183399999999,
+      "utilization_pct": 17.161684500103963,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 48.58183399999999,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 8.351014,
+      "idle_us": 50.295559999999995,
+      "utilization_pct": 14.239559841978153,
+      "longest_idle_us": 3.8823819999999998,
+      "all_channels_idle_total_us": 50.295559999999995,
+      "all_channels_longest_idle_us": 3.8823819999999998
+    },
+    "latency_us": 58.646573999999994,
+    "external_DQ_bytes": 2162688
+  },
+  "before/serial_layer_control": {
+    "dq": {
+      "busy_us": 17.919552,
+      "idle_us": 192.727108,
+      "utilization_pct": 8.506924344302444,
+      "longest_idle_us": 47.681354,
+      "all_channels_idle_total_us": 192.727108,
+      "all_channels_longest_idle_us": 47.681354
+    },
+    "global_ca": {
+      "busy_us": 17.656912,
+      "idle_us": 192.989748,
+      "utilization_pct": 8.382241617313086,
+      "longest_idle_us": 1.093708,
+      "all_channels_idle_total_us": 192.989748,
+      "all_channels_longest_idle_us": 1.093708
+    },
+    "rank1_ca": {
+      "busy_us": 38.728144,
+      "idle_us": 171.91851599999998,
+      "utilization_pct": 18.38535868548782,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 171.91851599999998,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 27.315497999999998,
+      "idle_us": 183.33116199999998,
+      "utilization_pct": 12.967448902346707,
+      "longest_idle_us": 1.093708,
+      "all_channels_idle_total_us": 183.33116199999998,
+      "all_channels_longest_idle_us": 1.093708
+    },
+    "latency_us": 210.64665999999997,
+    "external_DQ_bytes": 4890624
+  },
+  "after/serial_layer_control": {
+    "dq": {
+      "busy_us": 17.919552,
+      "idle_us": 192.42225799999997,
+      "utilization_pct": 8.519253495061205,
+      "longest_idle_us": 47.630702,
+      "all_channels_idle_total_us": 192.42225799999997,
+      "all_channels_longest_idle_us": 47.630702
+    },
+    "global_ca": {
+      "busy_us": 9.587297999999999,
+      "idle_us": 200.75451199999998,
+      "utilization_pct": 4.55796115855426,
+      "longest_idle_us": 3.8973899999999997,
+      "all_channels_idle_total_us": 200.75451199999998,
+      "all_channels_longest_idle_us": 3.8973899999999997
+    },
+    "rank1_ca": {
+      "busy_us": 28.07434,
+      "idle_us": 182.26746999999997,
+      "utilization_pct": 13.347008851925349,
+      "longest_idle_us": 0.20823599999999998,
+      "all_channels_idle_total_us": 182.26746999999997,
+      "all_channels_longest_idle_us": 0.20823599999999998
+    },
+    "dq_global_ca": {
+      "busy_us": 19.020764,
+      "idle_us": 191.321046,
+      "utilization_pct": 9.042788022029477,
+      "longest_idle_us": 3.8973899999999997,
+      "all_channels_idle_total_us": 191.321046,
+      "all_channels_longest_idle_us": 3.8973899999999997
+    },
+    "latency_us": 210.34180999999998,
+    "external_DQ_bytes": 4890624
+  }
+}
