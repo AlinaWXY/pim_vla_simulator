@@ -11,7 +11,7 @@
     "after/serial_layer_control/simulation/rank_ca_events.csv.ch0": "fffb8c955ce7d6cd8535eef786fa0957d1a79dec6d56c4ec4adca8da9281226a"
   },
   "metrics_sha256": "ff99c2fb71daae5778305224cf7e12721f6fdd12a0eb68d93b3cd448d3c0ac83",
-  "renderer_sha256": "b4eda0901fe819e15f012896750a75744b567819545a0d62a88f5e30adc51d1f",
+  "renderer_sha256": "17af0042d7a9e38439ee1604681d6d17e7882b0134549fe56d01341e15ec36ad",
   "dq_long_windows_us": {
     "before": [
       [

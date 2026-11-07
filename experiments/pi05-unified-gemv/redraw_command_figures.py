@@ -71,7 +71,12 @@ def style(font):
 
 
 def save(fig,out,name):
-    for suffix in ('png','svg'):fig.savefig(out/f'{name}.{suffix}',dpi=160)
+    for suffix in ('png','svg'):
+        path=out/f'{name}.{suffix}';fig.savefig(path,dpi=160)
+        if suffix=='svg':
+            # Matplotlib leaves spaces at path-line ends; newline separation
+            # preserves SVG coordinates while keeping generated diffs clean.
+            path.write_text('\n'.join(line.rstrip() for line in path.read_text(encoding='utf-8').splitlines())+'\n',encoding='utf-8',newline='\n')
     plt.close(fig)
 
 
