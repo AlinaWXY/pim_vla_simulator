@@ -2,6 +2,6 @@
   "note": "lpddr5_pim.py is emitted by the native build codegen; copied verbatim from the successfully tested server checkout.",
   "sha256": {
     "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5.py": "845876c22fa105127e0b965cdc70a6d16a28580a0a4bc12c8407d934c73ed13b",
-    "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": "47d78a1d7302772456fbc45717885229e2386b5d566826c52956354d42396812"
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/controller/lpddr5_pim.py": "2ac3ab999be2c05785069868e69a4843e168e725b3cb75f03a08012ce69f5a64"
   }
 }
