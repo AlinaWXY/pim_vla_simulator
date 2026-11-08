@@ -1,10 +1,12 @@
 # xinyao_1108：允许 kernel 跨窗口推进的参数化请求仲裁
 
-日期：2026-11-08。用户指定取消整kernel装入单窗口的限制，并接受明确假设下的参数化访存敏感性分析。最终运行job **1971324**；复用native job1971246及已有GPU/VLM测量，没有重测纯GPU或VLM baseline。本报告保留请求级重放的探索性结果；最终并行Evaluation仍需校准。原始DQ流量与native时间线不变。
+日期：2026-11-08。取消整kernel装入单窗口的限制后，曾进行了参数化请求重放。最终运行job **1971324**；复用native job1971246及已有GPU/VLM测量，没有重测纯GPU或VLM baseline。本报告保留请求级重放的探索性结果；最终并行Evaluation仍需校准。原始DQ流量与native时间线不变。
 
 **c–g是条件性模型估计，不是采集到的真实GPU访存trace或硬件端到端测量。扫描范围也不是置信区间或真实性能上下界。** 原有Nsys记录只有kernel顺序和时长；cold AE NCU记录没有DRAM请求量；既有Thor探测未暴露DRAM读写计数器。没有将L2流量冒充DRAM流量。
 
-**审查更新：本表仅为探索性参数分析，暂不作为最终Evaluation主表。** ρ=0.30、32个在途请求和80/20读写比都不是Pi-0.5测量值。当前e的channel0共享CA忙时18.484228µs/158.746182µs=11.644%，g为9.587298µs/210.341810µs=4.558%；e并未被建模为算子执行期间外部CA持续独占。e的每条外部细命令一般计1CK，部分底层操作由rank控制器在私有CA上执行。必须按实际接口核对所有外部命令及发送频率，不能将细粒度直接等同于100%外部CA占用。
+**再次审查：停止使用ρ、在途数、读写比的合成假设推断性能；以下c–g数值仅为旧模型归档，不再用于Evaluation或比较e/g。** 新的[逐线性算子CA审计](../linear-ca-audit/REPORT.zh-CN.md)显示，QKV/Gate-Up/Down计算期间共享CA从11.99%/7.88%/15.79%降到约0.07%，典型空隙从数个CK变为微秒级长窗口。旧重放还缺少目标rank CA/bank时序及kernel内部访存依赖。下面的整层平均值不能用于说明GPU不受阻塞。
+
+**前次审查记录：** ρ=0.30、32个在途请求和80/20读写比都不是Pi-0.5测量值。当前e的channel0共享CA忙时18.484228µs/158.746182µs=11.644%，g为9.587298µs/210.341810µs=4.558%；e并未被建模为算子执行期间外部CA持续独占。e的每条外部细命令一般计1CK，部分底层操作由rank控制器在私有CA上执行。必须按实际接口核对所有外部命令及发送频率，不能将细粒度直接等同于100%外部CA占用。
 
 当前kernel模型没有内部数据到达后才能继续计算的依赖。中间配置的e/g结果恰好等于共同GPU串行服务时间145.737056ms分别加0.214865/0.152260ms额外访存延迟，说明两者PIM时间在这套模型中几乎完全被隐藏。这个现象不能证明真实硬件中e/g等效。参数扫描及资源冲突测试通过，也不等于这些建模假设被实测验证。
 
@@ -95,4 +97,4 @@ sbatch experiments/pi05-unified-gemv/request-model.sbatch
 python experiments/pi05-unified-gemv/publish_request_model.py --reference reference/evaluation-1108
 ```
 
-服务器工作树：`/fact_data/xinyaowang/pim_vla_xinyao_1108_20261108`。共享库在`results/request-model/librequest_replay.so`；其哈希、源码/输入哈希在[summary.json](summary.json)。[a–g主表](evaluation-a-g.csv)、[70组全精度数据](sensitivity.csv)、[范围及对应参数](sensitivity-range.csv)、[测试](tests.log)。
+服务器工作树：`/fact_data/xinyaowang/pim_vla_xinyao_1108_20261108`。共享库在`results/request-model/librequest_replay.so`；其哈希、源码/输入哈希在[summary.json](summary.json)。[旧模型a–g归档](evaluation-a-g.csv)、[70组全精度数据](sensitivity.csv)、[范围及对应参数](sensitivity-range.csv)、[测试](tests.log)。

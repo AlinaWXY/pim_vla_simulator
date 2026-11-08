@@ -1,0 +1,13 @@
+{
+  "server_local_measurements_identical": true,
+  "measurement_count": 1760,
+  "native_rerun": false,
+  "synthetic_gpu_requests": false,
+  "metadata_files_checked": 6,
+  "raw_files_sha256_checked": 70,
+  "bus_totals_checked": 64,
+  "all_16_channels_match": true,
+  "mac_counts_match": true,
+  "csv_sha256": "c742a5b69cb38227b4336cef110d7ef019aa8528eede575953f7a4485fbcacea",
+  "server_csv_sha256": "c742a5b69cb38227b4336cef110d7ef019aa8528eede575953f7a4485fbcacea"
+}
