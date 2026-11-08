@@ -1,0 +1,52 @@
+deep-space
+/fact_home/shiyuhuang
+fact-thor
+/fact_home/shiyuhuang
+fact-thor
+/var/tmp/shiyuhuang-vla-baseline
+/var/tmp/vla-venv/bin/python
+/var/tmp/vla-venv/bin/python
+18:08:46 Prepare 256 MiB cache-eviction buffer
+18:08:51 Read existing checkpoint once via sequential readinto
+18:09:01 20 complete native model warmups
+18:09:19 Validate and measure 386 complete segments
+18:09:20 SEGMENT 1/386 native_blocks/action_in/step
+18:09:20 SEGMENT 11/386 native_blocks/sv/0
+18:09:21 SEGMENT 21/386 handoff_composites/post_ffn_residual_nextnorm/0
+18:09:22 SEGMENT 31/386 native_blocks/scale_mask_softmax_cast/1
+18:09:22 SEGMENT 41/386 handoff_composites/post_attention_residual_norm/1
+18:09:23 SEGMENT 51/386 native_blocks/qkt/2
+18:09:24 SEGMENT 61/386 native_blocks/residual_ffn/2
+18:09:24 SEGMENT 71/386 native_blocks/kv_concat_pair/3
+18:09:25 SEGMENT 81/386 native_blocks/ffn_down/3
+18:09:26 SEGMENT 91/386 native_blocks/rope_qk/4
+18:09:27 SEGMENT 101/386 native_blocks/gelu_multiply/4
+18:09:27 SEGMENT 111/386 native_blocks/qkv_projection/5
+18:09:28 SEGMENT 121/386 native_blocks/ffn_gate_up/5
+18:09:29 SEGMENT 131/386 native_blocks/norm_input/6
+18:09:29 SEGMENT 141/386 native_blocks/norm_ffn/6
+18:09:30 SEGMENT 151/386 pim_interface_candidates/pim_scale_mask_softmax_bf16/6
+18:09:31 SEGMENT 161/386 native_blocks/residual_attention/7
+18:09:32 SEGMENT 171/386 pim_interface_candidates/pim_rope_fp32_bf16/7
+18:09:32 SEGMENT 181/386 native_blocks/o_projection/8
+18:09:33 SEGMENT 191/386 pim_interface_candidates/pim_gelu_multiply_bf16/8
+18:09:34 SEGMENT 201/386 native_blocks/sv_output_pack/9
+18:09:34 SEGMENT 211/386 handoff_composites/sv_pack_o_residual_norm/9
+18:09:35 SEGMENT 221/386 native_blocks/sv/10
+18:09:36 SEGMENT 231/386 handoff_composites/post_ffn_residual_nextnorm/10
+18:09:37 SEGMENT 241/386 native_blocks/scale_mask_softmax_cast/11
+18:09:37 SEGMENT 251/386 handoff_composites/post_attention_residual_norm/11
+18:09:38 SEGMENT 261/386 native_blocks/qkt/12
+18:09:39 SEGMENT 271/386 native_blocks/residual_ffn/12
+18:09:39 SEGMENT 281/386 native_blocks/kv_concat_pair/13
+18:09:40 SEGMENT 291/386 native_blocks/ffn_down/13
+18:09:41 SEGMENT 301/386 native_blocks/rope_qk/14
+18:09:42 SEGMENT 311/386 native_blocks/gelu_multiply/14
+18:09:42 SEGMENT 321/386 native_blocks/qkv_projection/15
+18:09:43 SEGMENT 331/386 native_blocks/ffn_gate_up/15
+18:09:44 SEGMENT 341/386 native_blocks/norm_input/16
+18:09:45 SEGMENT 351/386 native_blocks/norm_ffn/16
+18:09:45 SEGMENT 361/386 pim_interface_candidates/pim_scale_mask_softmax_bf16/16
+18:09:46 SEGMENT 371/386 native_blocks/residual_attention/17
+18:09:47 SEGMENT 381/386 pim_interface_candidates/pim_rope_fp32_bf16/17
+18:10:03 CAPTURE_COMPLETE measure

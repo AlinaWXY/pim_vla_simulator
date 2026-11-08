@@ -1,0 +1,43 @@
+{
+  "status": "passed",
+  "cases": 458,
+  "timed_runs": 36640,
+  "all_outputs_tensor_exact": true,
+  "no_internal_evictions": true,
+  "cache_probe_passed": true,
+  "source_and_raw_hashes_verified": true,
+  "matches_nov5_actions": true,
+  "nov5_reference_sha256": "d5392e977016fd48764b36c4391277128674c0104d91b3d2007fb10278655c99",
+  "initialization_failure_excluded": true,
+  "aggregates_reproduced": true,
+  "html_links_resolve": true,
+  "images": [
+    {
+      "path": "01_rope_and_cache_scope.png",
+      "width": 2054,
+      "height": 720
+    },
+    {
+      "path": "02_native_blocks.png",
+      "width": 2055,
+      "height": 1683
+    },
+    {
+      "path": "03_composite_boundaries.png",
+      "width": 2176,
+      "height": 710
+    },
+    {
+      "path": "04_fp32_interface_candidates.png",
+      "width": 2084,
+      "height": 989
+    },
+    {
+      "path": "05_normal_model_control.png",
+      "width": 1894,
+      "height": 528
+    }
+  ],
+  "live_browser_layout_verified": false,
+  "figure_visual_review": "Five static PNG figures visually inspected"
+}

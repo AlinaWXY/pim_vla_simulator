@@ -1,0 +1,2001 @@
+{
+  "client_date": "2026-11-08",
+  "configuration": {
+    "model": "OpenPI pi0.5",
+    "H": 16,
+    "steps": 10,
+    "batch": 1,
+    "q_heads": 8,
+    "kv_heads": 8,
+    "head_dim": 256,
+    "adarms_cache": true,
+    "selected_step": 4,
+    "synthetic_inputs": true,
+    "precision": "selective BF16/FP32",
+    "physical_mha_scope": "VLM and AE",
+    "cameras": 3,
+    "prefix_tokens": 968
+  },
+  "dimensions": {
+    "vlm": {
+      "layers": 18,
+      "D": 2048,
+      "F": 16384,
+      "q_heads": 8,
+      "kv_heads": 8,
+      "head_dim": 256,
+      "attention": "eager"
+    },
+    "ae": {
+      "layers": 18,
+      "D": 1024,
+      "F": 4096,
+      "q_heads": 8,
+      "kv_heads": 8,
+      "head_dim": 256,
+      "attention": "eager"
+    }
+  },
+  "environment": {
+    "python": "/var/tmp/vla-venv/bin/python",
+    "torch": "2.11.0+cu130",
+    "threads": 1,
+    "interop_threads": 1,
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "profiler": false,
+    "clock_change": false,
+    "graph_events": "enable_timing=True, external=True, captured INSIDE the segment graph",
+    "graph_compile": false,
+    "segment_fusion": false
+  },
+  "cache_probe": {
+    "input_bytes": 1048576,
+    "eviction_bytes": 268435456,
+    "l2_bytes": 33554432,
+    "flush_load_cache_modifier": ".ca",
+    "samples": [
+      {
+        "repeat": 0,
+        "reused": {
+          "time_enabled_ns": 3988288,
+          "time_running_ns": 3988288,
+          "values": {
+            "local_dram_byte_rd": 224,
+            "local_dram_byte_wr": 960
+          },
+          "window_enabled_ns": 30362,
+          "window_running_ns": 30362,
+          "running_fraction": 1.0
+        },
+        "entry_once": {
+          "time_enabled_ns": 4034010,
+          "time_running_ns": 4034010,
+          "values": {
+            "local_dram_byte_rd": 1053760,
+            "local_dram_byte_wr": 2240
+          },
+          "window_enabled_ns": 45722,
+          "window_running_ns": 45722,
+          "running_fraction": 1.0
+        },
+        "per_kernel": [
+          {
+            "time_enabled_ns": 4085510,
+            "time_running_ns": 4085510,
+            "values": {
+              "local_dram_byte_rd": 1052320,
+              "local_dram_byte_wr": 1824
+            },
+            "window_enabled_ns": 51500,
+            "window_running_ns": 51500,
+            "running_fraction": 1.0
+          },
+          {
+            "time_enabled_ns": 4135436,
+            "time_running_ns": 4135436,
+            "values": {
+              "local_dram_byte_rd": 1052352,
+              "local_dram_byte_wr": 2720
+            },
+            "window_enabled_ns": 49926,
+            "window_running_ns": 49926,
+            "running_fraction": 1.0
+          }
+        ]
+      },
+      {
+        "repeat": 1,
+        "reused": {
+          "time_enabled_ns": 4164214,
+          "time_running_ns": 4164214,
+          "values": {
+            "local_dram_byte_rd": 288,
+            "local_dram_byte_wr": 960
+          },
+          "window_enabled_ns": 28778,
+          "window_running_ns": 28778,
+          "running_fraction": 1.0
+        },
+        "entry_once": {
+          "time_enabled_ns": 4207917,
+          "time_running_ns": 4207917,
+          "values": {
+            "local_dram_byte_rd": 1053824,
+            "local_dram_byte_wr": 2176
+          },
+          "window_enabled_ns": 43703,
+          "window_running_ns": 43703,
+          "running_fraction": 1.0
+        },
+        "per_kernel": [
+          {
+            "time_enabled_ns": 4254492,
+            "time_running_ns": 4254492,
+            "values": {
+              "local_dram_byte_rd": 1052384,
+              "local_dram_byte_wr": 1760
+            },
+            "window_enabled_ns": 46575,
+            "window_running_ns": 46575,
+            "running_fraction": 1.0
+          },
+          {
+            "time_enabled_ns": 4299353,
+            "time_running_ns": 4299353,
+            "values": {
+              "local_dram_byte_rd": 1052448,
+              "local_dram_byte_wr": 2304
+            },
+            "window_enabled_ns": 44861,
+            "window_running_ns": 44861,
+            "running_fraction": 1.0
+          }
+        ]
+      },
+      {
+        "repeat": 2,
+        "reused": {
+          "time_enabled_ns": 4328455,
+          "time_running_ns": 4328455,
+          "values": {
+            "local_dram_byte_rd": 224,
+            "local_dram_byte_wr": 1024
+          },
+          "window_enabled_ns": 29102,
+          "window_running_ns": 29102,
+          "running_fraction": 1.0
+        },
+        "entry_once": {
+          "time_enabled_ns": 4372854,
+          "time_running_ns": 4372854,
+          "values": {
+            "local_dram_byte_rd": 1053920,
+            "local_dram_byte_wr": 2304
+          },
+          "window_enabled_ns": 44399,
+          "window_running_ns": 44399,
+          "running_fraction": 1.0
+        },
+        "per_kernel": [
+          {
+            "time_enabled_ns": 4421622,
+            "time_running_ns": 4421622,
+            "values": {
+              "local_dram_byte_rd": 1052384,
+              "local_dram_byte_wr": 1760
+            },
+            "window_enabled_ns": 48768,
+            "window_running_ns": 48768,
+            "running_fraction": 1.0
+          },
+          {
+            "time_enabled_ns": 4465576,
+            "time_running_ns": 4465576,
+            "values": {
+              "local_dram_byte_rd": 1052448,
+              "local_dram_byte_wr": 2432
+            },
+            "window_enabled_ns": 43954,
+            "window_running_ns": 43954,
+            "running_fraction": 1.0
+          }
+        ]
+      },
+      {
+        "repeat": 3,
+        "reused": {
+          "time_enabled_ns": 4491900,
+          "time_running_ns": 4491900,
+          "values": {
+            "local_dram_byte_rd": 224,
+            "local_dram_byte_wr": 960
+          },
+          "window_enabled_ns": 26324,
+          "window_running_ns": 26324,
+          "running_fraction": 1.0
+        },
+        "entry_once": {
+          "time_enabled_ns": 4535483,
+          "time_running_ns": 4535483,
+          "values": {
+            "local_dram_byte_rd": 1053824,
+            "local_dram_byte_wr": 1920
+          },
+          "window_enabled_ns": 43583,
+          "window_running_ns": 43583,
+          "running_fraction": 1.0
+        },
+        "per_kernel": [
+          {
+            "time_enabled_ns": 4583455,
+            "time_running_ns": 4583455,
+            "values": {
+              "local_dram_byte_rd": 1063520,
+              "local_dram_byte_wr": 2720
+            },
+            "window_enabled_ns": 47972,
+            "window_running_ns": 47972,
+            "running_fraction": 1.0
+          },
+          {
+            "time_enabled_ns": 4627409,
+            "time_running_ns": 4627409,
+            "values": {
+              "local_dram_byte_rd": 1061920,
+              "local_dram_byte_wr": 26720
+            },
+            "window_enabled_ns": 43954,
+            "window_running_ns": 43954,
+            "running_fraction": 1.0
+          }
+        ]
+      },
+      {
+        "repeat": 4,
+        "reused": {
+          "time_enabled_ns": 4655567,
+          "time_running_ns": 4655567,
+          "values": {
+            "local_dram_byte_rd": 4608,
+            "local_dram_byte_wr": 3360
+          },
+          "window_enabled_ns": 28158,
+          "window_running_ns": 28158,
+          "running_fraction": 1.0
+        },
+        "entry_once": {
+          "time_enabled_ns": 4699983,
+          "time_running_ns": 4699983,
+          "values": {
+            "local_dram_byte_rd": 1066784,
+            "local_dram_byte_wr": 2784
+          },
+          "window_enabled_ns": 44416,
+          "window_running_ns": 44416,
+          "running_fraction": 1.0
+        },
+        "per_kernel": [
+          {
+            "time_enabled_ns": 4748807,
+            "time_running_ns": 4748807,
+            "values": {
+              "local_dram_byte_rd": 1065216,
+              "local_dram_byte_wr": 18688
+            },
+            "window_enabled_ns": 48824,
+            "window_running_ns": 48824,
+            "running_fraction": 1.0
+          },
+          {
+            "time_enabled_ns": 4791621,
+            "time_running_ns": 4791621,
+            "values": {
+              "local_dram_byte_rd": 1053024,
+              "local_dram_byte_wr": 2368
+            },
+            "window_enabled_ns": 42814,
+            "window_running_ns": 42814,
+            "running_fraction": 1.0
+          }
+        ]
+      }
+    ],
+    "scope": "System-wide non-CPU UCF DRAM; qualification only, not timing runs",
+    "calibration": [
+      {
+        "ratio": 1.001783847808838,
+        "pmu": {
+          "time_enabled_ns": 1383334,
+          "time_running_ns": 1383334,
+          "values": {
+            "local_dram_byte_rd": 268914304,
+            "local_dram_byte_wr": 2288224
+          },
+          "window_enabled_ns": 1383334,
+          "window_running_ns": 1383334,
+          "running_fraction": 1.0
+        }
+      },
+      {
+        "ratio": 1.001554012298584,
+        "pmu": {
+          "time_enabled_ns": 2678075,
+          "time_running_ns": 2678075,
+          "values": {
+            "local_dram_byte_rd": 268852608,
+            "local_dram_byte_wr": 78304
+          },
+          "window_enabled_ns": 1294741,
+          "window_running_ns": 1294741,
+          "running_fraction": 1.0
+        }
+      },
+      {
+        "ratio": 1.001539707183838,
+        "pmu": {
+          "time_enabled_ns": 3957926,
+          "time_running_ns": 3957926,
+          "values": {
+            "local_dram_byte_rd": 268848768,
+            "local_dram_byte_wr": 75776
+          },
+          "window_enabled_ns": 1279851,
+          "window_running_ns": 1279851,
+          "running_fraction": 1.0
+        }
+      }
+    ],
+    "median_read_bytes": {
+      "reused": 224,
+      "entry_once": 1053824,
+      "per_kernel": 2104832
+    },
+    "passed": true,
+    "note": "Empirical streaming eviction proxy, not architectural invalidation or measured physical PIM handoff."
+  },
+  "empty_graph_event_ms": {
+    "n": 20,
+    "mean": 0.001424000004772097,
+    "p50": 0.0013279999839141965,
+    "p95": 0.002177600038703531,
+    "minimum": 0.0010560000082477927,
+    "maximum": 0.002208000048995018
+  },
+  "coarse": {
+    "clean_wall_ms": {
+      "n": 60,
+      "mean": 226.12681983333334,
+      "p50": 224.134475,
+      "p95": 240.43267745,
+      "minimum": 215.946006,
+      "maximum": 245.267312
+    },
+    "phase_total_ms": {
+      "n": 60,
+      "mean": 223.75737737019855,
+      "p50": 221.3422393798828,
+      "p95": 236.0767333984375,
+      "minimum": 216.39698791503906,
+      "maximum": 237.34669494628906
+    },
+    "phase_ms": {
+      "vit": {
+        "n": 60,
+        "mean": 25.775815534591676,
+        "p50": 25.69065570831299,
+        "p95": 26.313179302215577,
+        "minimum": 25.340768814086914,
+        "maximum": 26.682015419006348
+      },
+      "vlm": {
+        "n": 60,
+        "mean": 78.44415334065755,
+        "p50": 77.90430450439453,
+        "p95": 80.96651878356934,
+        "minimum": 77.49785614013672,
+        "maximum": 81.297119140625
+      },
+      "ae": {
+        "n": 60,
+        "mean": 118.68914858500163,
+        "p50": 117.20536041259766,
+        "p95": 128.50468215942382,
+        "minimum": 112.20694732666016,
+        "maximum": 129.98544311523438
+      },
+      "other": {
+        "n": 60,
+        "mean": 0.8482599099477132,
+        "p50": 0.7976970672607422,
+        "p95": 1.0262128353118896,
+        "minimum": 0.6696386337280273,
+        "maximum": 1.078460693359375
+      }
+    },
+    "clean_p50_drift_pct": 2.2838722344460827,
+    "phase_share_pct": {
+      "vit": 11.519537741071444,
+      "vlm": 35.05768357790256,
+      "ae": 53.04368060617492,
+      "other": 0.37909807485109087
+    }
+  },
+  "aggregates": [
+    {
+      "suite": "handoff_composites",
+      "family": "post_attention_residual_norm",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "handoff_composites/post_attention_residual_norm/0",
+        "handoff_composites/post_attention_residual_norm/1",
+        "handoff_composites/post_attention_residual_norm/2",
+        "handoff_composites/post_attention_residual_norm/3",
+        "handoff_composites/post_attention_residual_norm/4",
+        "handoff_composites/post_attention_residual_norm/5",
+        "handoff_composites/post_attention_residual_norm/6",
+        "handoff_composites/post_attention_residual_norm/7",
+        "handoff_composites/post_attention_residual_norm/8",
+        "handoff_composites/post_attention_residual_norm/9",
+        "handoff_composites/post_attention_residual_norm/10",
+        "handoff_composites/post_attention_residual_norm/11",
+        "handoff_composites/post_attention_residual_norm/12",
+        "handoff_composites/post_attention_residual_norm/13",
+        "handoff_composites/post_attention_residual_norm/14",
+        "handoff_composites/post_attention_residual_norm/15",
+        "handoff_composites/post_attention_residual_norm/16",
+        "handoff_composites/post_attention_residual_norm/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.9506127994507552,
+        "mean_occurrence_us": 108.36737774726417,
+        "minimum_layer_mean_us": 105.25440014898777,
+        "maximum_layer_mean_us": 115.77440053224564
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.6465552009642126,
+        "mean_occurrence_us": 147.0308444980118,
+        "minimum_layer_mean_us": 133.00800062716007,
+        "maximum_layer_mean_us": 188.19199800491333
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.4352735995315015,
+        "mean_occurrence_us": 24.181866640638972,
+        "minimum_layer_mean_us": 23.449600022286177,
+        "maximum_layer_mean_us": 26.75839951261878
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.5453199997544289,
+        "mean_occurrence_us": 30.295555541912716,
+        "minimum_layer_mean_us": 29.32640016078949,
+        "maximum_layer_mean_us": 31.21599992737174
+      }
+    },
+    {
+      "suite": "handoff_composites",
+      "family": "post_ffn_residual_nextnorm",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "handoff_composites/post_ffn_residual_nextnorm/0",
+        "handoff_composites/post_ffn_residual_nextnorm/1",
+        "handoff_composites/post_ffn_residual_nextnorm/2",
+        "handoff_composites/post_ffn_residual_nextnorm/3",
+        "handoff_composites/post_ffn_residual_nextnorm/4",
+        "handoff_composites/post_ffn_residual_nextnorm/5",
+        "handoff_composites/post_ffn_residual_nextnorm/6",
+        "handoff_composites/post_ffn_residual_nextnorm/7",
+        "handoff_composites/post_ffn_residual_nextnorm/8",
+        "handoff_composites/post_ffn_residual_nextnorm/9",
+        "handoff_composites/post_ffn_residual_nextnorm/10",
+        "handoff_composites/post_ffn_residual_nextnorm/11",
+        "handoff_composites/post_ffn_residual_nextnorm/12",
+        "handoff_composites/post_ffn_residual_nextnorm/13",
+        "handoff_composites/post_ffn_residual_nextnorm/14",
+        "handoff_composites/post_ffn_residual_nextnorm/15",
+        "handoff_composites/post_ffn_residual_nextnorm/16",
+        "handoff_composites/post_ffn_residual_nextnorm/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.9396432004868984,
+        "mean_occurrence_us": 107.75795558260546,
+        "minimum_layer_mean_us": 105.80160021781921,
+        "maximum_layer_mean_us": 111.8319995701313
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.5922048039734364,
+        "mean_occurrence_us": 144.01137799852424,
+        "minimum_layer_mean_us": 133.4624007344246,
+        "maximum_layer_mean_us": 169.83999907970428
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.43091840045526625,
+        "mean_occurrence_us": 23.93991113640368,
+        "minimum_layer_mean_us": 23.297599982470274,
+        "maximum_layer_mean_us": 24.654400069266558
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.5489328010939062,
+        "mean_occurrence_us": 30.49626672743923,
+        "minimum_layer_mean_us": 29.542400129139423,
+        "maximum_layer_mean_us": 31.36640004813671
+      }
+    },
+    {
+      "suite": "handoff_composites",
+      "family": "sv_pack_o_residual_norm",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "handoff_composites/sv_pack_o_residual_norm/0",
+        "handoff_composites/sv_pack_o_residual_norm/1",
+        "handoff_composites/sv_pack_o_residual_norm/2",
+        "handoff_composites/sv_pack_o_residual_norm/3",
+        "handoff_composites/sv_pack_o_residual_norm/4",
+        "handoff_composites/sv_pack_o_residual_norm/5",
+        "handoff_composites/sv_pack_o_residual_norm/6",
+        "handoff_composites/sv_pack_o_residual_norm/7",
+        "handoff_composites/sv_pack_o_residual_norm/8",
+        "handoff_composites/sv_pack_o_residual_norm/9",
+        "handoff_composites/sv_pack_o_residual_norm/10",
+        "handoff_composites/sv_pack_o_residual_norm/11",
+        "handoff_composites/sv_pack_o_residual_norm/12",
+        "handoff_composites/sv_pack_o_residual_norm/13",
+        "handoff_composites/sv_pack_o_residual_norm/14",
+        "handoff_composites/sv_pack_o_residual_norm/15",
+        "handoff_composites/sv_pack_o_residual_norm/16",
+        "handoff_composites/sv_pack_o_residual_norm/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 2.842126404494047,
+        "mean_occurrence_us": 157.89591136078042,
+        "minimum_layer_mean_us": 152.86400094628334,
+        "maximum_layer_mean_us": 172.89599999785423
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 3.8296080008149147,
+        "mean_occurrence_us": 212.75600004527303,
+        "minimum_layer_mean_us": 196.48639932274818,
+        "maximum_layer_mean_us": 258.0767974257469
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.5616112013347447,
+        "mean_occurrence_us": 31.200622296374707,
+        "minimum_layer_mean_us": 30.560000240802765,
+        "maximum_layer_mean_us": 31.905600242316723
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.9645599987357855,
+        "mean_occurrence_us": 53.58666659643253,
+        "minimum_layer_mean_us": 52.24799998104572,
+        "maximum_layer_mean_us": 55.44640049338341
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "action_embedding_prepare",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/action_embedding_prepare/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.025975999794900416,
+        "mean_occurrence_us": 25.975999794900417,
+        "minimum_layer_mean_us": 25.975999794900417,
+        "maximum_layer_mean_us": 25.975999794900417
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.03628000039607286,
+        "mean_occurrence_us": 36.280000396072865,
+        "minimum_layer_mean_us": 36.280000396072865,
+        "maximum_layer_mean_us": 36.280000396072865
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.005675200000405311,
+        "mean_occurrence_us": 5.675200000405312,
+        "minimum_layer_mean_us": 5.675200000405312,
+        "maximum_layer_mean_us": 5.675200000405312
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.008164800005033612,
+        "mean_occurrence_us": 8.164800005033612,
+        "minimum_layer_mean_us": 8.164800005033612,
+        "maximum_layer_mean_us": 8.164800005033612
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "action_in",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/action_in/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.02218559980392456,
+        "mean_occurrence_us": 22.18559980392456,
+        "minimum_layer_mean_us": 22.18559980392456,
+        "maximum_layer_mean_us": 22.18559980392456
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.03167999982833862,
+        "mean_occurrence_us": 31.67999982833862,
+        "minimum_layer_mean_us": 31.67999982833862,
+        "maximum_layer_mean_us": 31.67999982833862
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.006340799969621003,
+        "mean_occurrence_us": 6.340799969621003,
+        "minimum_layer_mean_us": 6.340799969621003,
+        "maximum_layer_mean_us": 6.340799969621003
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.008366400003433227,
+        "mean_occurrence_us": 8.366400003433228,
+        "minimum_layer_mean_us": 8.366400003433228,
+        "maximum_layer_mean_us": 8.366400003433228
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "action_out",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/action_out/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.029390399996191263,
+        "mean_occurrence_us": 29.390399996191263,
+        "minimum_layer_mean_us": 29.390399996191263,
+        "maximum_layer_mean_us": 29.390399996191263
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.04230719972401857,
+        "mean_occurrence_us": 42.307199724018574,
+        "minimum_layer_mean_us": 42.307199724018574,
+        "maximum_layer_mean_us": 42.307199724018574
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.008814399968832732,
+        "mean_occurrence_us": 8.814399968832731,
+        "minimum_layer_mean_us": 8.814399968832731,
+        "maximum_layer_mean_us": 8.814399968832731
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.011484799953177572,
+        "mean_occurrence_us": 11.484799953177571,
+        "minimum_layer_mean_us": 11.484799953177571,
+        "maximum_layer_mean_us": 11.484799953177571
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "action_output_cast",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/action_output_cast/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.015590400015935302,
+        "mean_occurrence_us": 15.590400015935302,
+        "minimum_layer_mean_us": 15.590400015935302,
+        "maximum_layer_mean_us": 15.590400015935302
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.020576000027358533,
+        "mean_occurrence_us": 20.576000027358532,
+        "minimum_layer_mean_us": 20.576000027358532,
+        "maximum_layer_mean_us": 20.576000027358532
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.005960000003688038,
+        "mean_occurrence_us": 5.960000003688037,
+        "minimum_layer_mean_us": 5.960000003688037,
+        "maximum_layer_mean_us": 5.960000003688037
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.00786399997305125,
+        "mean_occurrence_us": 7.863999973051251,
+        "minimum_layer_mean_us": 7.863999973051251,
+        "maximum_layer_mean_us": 7.863999973051251
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "euler_update",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/euler_update/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.01847519990988076,
+        "mean_occurrence_us": 18.475199909880757,
+        "minimum_layer_mean_us": 18.475199909880757,
+        "maximum_layer_mean_us": 18.475199909880757
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.025646399799734355,
+        "mean_occurrence_us": 25.646399799734354,
+        "minimum_layer_mean_us": 25.646399799734354,
+        "maximum_layer_mean_us": 25.646399799734354
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.005449600028805434,
+        "mean_occurrence_us": 5.449600028805435,
+        "minimum_layer_mean_us": 5.449600028805435,
+        "maximum_layer_mean_us": 5.449600028805435
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.007686399994418025,
+        "mean_occurrence_us": 7.686399994418025,
+        "minimum_layer_mean_us": 7.686399994418025,
+        "maximum_layer_mean_us": 7.686399994418025
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "ffn_down",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/ffn_down/0",
+        "native_blocks/ffn_down/1",
+        "native_blocks/ffn_down/2",
+        "native_blocks/ffn_down/3",
+        "native_blocks/ffn_down/4",
+        "native_blocks/ffn_down/5",
+        "native_blocks/ffn_down/6",
+        "native_blocks/ffn_down/7",
+        "native_blocks/ffn_down/8",
+        "native_blocks/ffn_down/9",
+        "native_blocks/ffn_down/10",
+        "native_blocks/ffn_down/11",
+        "native_blocks/ffn_down/12",
+        "native_blocks/ffn_down/13",
+        "native_blocks/ffn_down/14",
+        "native_blocks/ffn_down/15",
+        "native_blocks/ffn_down/16",
+        "native_blocks/ffn_down/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.5421776003204286,
+        "mean_occurrence_us": 30.120977795579368,
+        "minimum_layer_mean_us": 29.217599984258413,
+        "maximum_layer_mean_us": 33.02719993516803
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 1.1387423994019628,
+        "mean_occurrence_us": 63.26346663344237,
+        "minimum_layer_mean_us": 59.75840054452419,
+        "maximum_layer_mean_us": 70.67039981484413
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.26261599995195867,
+        "mean_occurrence_us": 14.589777775108814,
+        "minimum_layer_mean_us": 13.731200015172362,
+        "maximum_layer_mean_us": 16.00799998268485
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.7450416024774313,
+        "mean_occurrence_us": 41.391200137635074,
+        "minimum_layer_mean_us": 39.59040008485317,
+        "maximum_layer_mean_us": 44.718400202691555
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "ffn_gate_up",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/ffn_gate_up/0",
+        "native_blocks/ffn_gate_up/1",
+        "native_blocks/ffn_gate_up/2",
+        "native_blocks/ffn_gate_up/3",
+        "native_blocks/ffn_gate_up/4",
+        "native_blocks/ffn_gate_up/5",
+        "native_blocks/ffn_gate_up/6",
+        "native_blocks/ffn_gate_up/7",
+        "native_blocks/ffn_gate_up/8",
+        "native_blocks/ffn_gate_up/9",
+        "native_blocks/ffn_gate_up/10",
+        "native_blocks/ffn_gate_up/11",
+        "native_blocks/ffn_gate_up/12",
+        "native_blocks/ffn_gate_up/13",
+        "native_blocks/ffn_gate_up/14",
+        "native_blocks/ffn_gate_up/15",
+        "native_blocks/ffn_gate_up/16",
+        "native_blocks/ffn_gate_up/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.7715376015752554,
+        "mean_occurrence_us": 42.86320008751419,
+        "minimum_layer_mean_us": 40.15679992735386,
+        "maximum_layer_mean_us": 45.380800031125546
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 1.7661360006779432,
+        "mean_occurrence_us": 98.11866670433018,
+        "minimum_layer_mean_us": 93.12639981508255,
+        "maximum_layer_mean_us": 112.00319975614548
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.45871360059827565,
+        "mean_occurrence_us": 25.484088922126425,
+        "minimum_layer_mean_us": 24.080000072717667,
+        "maximum_layer_mean_us": 27.0672001875937
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 1.3533776003867388,
+        "mean_occurrence_us": 75.18764446592994,
+        "minimum_layer_mean_us": 73.63039925694466,
+        "maximum_layer_mean_us": 77.2256001830101
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "gelu_multiply",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/gelu_multiply/0",
+        "native_blocks/gelu_multiply/1",
+        "native_blocks/gelu_multiply/2",
+        "native_blocks/gelu_multiply/3",
+        "native_blocks/gelu_multiply/4",
+        "native_blocks/gelu_multiply/5",
+        "native_blocks/gelu_multiply/6",
+        "native_blocks/gelu_multiply/7",
+        "native_blocks/gelu_multiply/8",
+        "native_blocks/gelu_multiply/9",
+        "native_blocks/gelu_multiply/10",
+        "native_blocks/gelu_multiply/11",
+        "native_blocks/gelu_multiply/12",
+        "native_blocks/gelu_multiply/13",
+        "native_blocks/gelu_multiply/14",
+        "native_blocks/gelu_multiply/15",
+        "native_blocks/gelu_multiply/16",
+        "native_blocks/gelu_multiply/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.3665759987663478,
+        "mean_occurrence_us": 20.365333264797098,
+        "minimum_layer_mean_us": 19.558399822562933,
+        "maximum_layer_mean_us": 21.7119999229908
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.4754528015851974,
+        "mean_occurrence_us": 26.41404453251097,
+        "minimum_layer_mean_us": 23.891199845820665,
+        "maximum_layer_mean_us": 34.32640032842755
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.10704479985870421,
+        "mean_occurrence_us": 5.946933325483567,
+        "minimum_layer_mean_us": 5.510399979539216,
+        "maximum_layer_mean_us": 6.79839993827045
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.15391039960086345,
+        "mean_occurrence_us": 8.550577755603527,
+        "minimum_layer_mean_us": 7.950399932451547,
+        "maximum_layer_mean_us": 9.646400064229965
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "kv_concat_pair",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/kv_concat_pair/0",
+        "native_blocks/kv_concat_pair/1",
+        "native_blocks/kv_concat_pair/2",
+        "native_blocks/kv_concat_pair/3",
+        "native_blocks/kv_concat_pair/4",
+        "native_blocks/kv_concat_pair/5",
+        "native_blocks/kv_concat_pair/6",
+        "native_blocks/kv_concat_pair/7",
+        "native_blocks/kv_concat_pair/8",
+        "native_blocks/kv_concat_pair/9",
+        "native_blocks/kv_concat_pair/10",
+        "native_blocks/kv_concat_pair/11",
+        "native_blocks/kv_concat_pair/12",
+        "native_blocks/kv_concat_pair/13",
+        "native_blocks/kv_concat_pair/14",
+        "native_blocks/kv_concat_pair/15",
+        "native_blocks/kv_concat_pair/16",
+        "native_blocks/kv_concat_pair/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 3.6193423971533774,
+        "mean_occurrence_us": 201.0745776196321,
+        "minimum_layer_mean_us": 199.6799997985363,
+        "maximum_layer_mean_us": 202.5983989238739
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 4.271171197295189,
+        "mean_occurrence_us": 237.28728873862158,
+        "minimum_layer_mean_us": 233.86880159378052,
+        "maximum_layer_mean_us": 243.44000071287155
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 3.460324811190367,
+        "mean_occurrence_us": 192.24026728835372,
+        "minimum_layer_mean_us": 191.71040058135986,
+        "maximum_layer_mean_us": 193.34879964590073
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 4.061495996266603,
+        "mean_occurrence_us": 225.63866645925577,
+        "minimum_layer_mean_us": 224.58560019731522,
+        "maximum_layer_mean_us": 227.53440141677856
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "mask_position_setup",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/mask_position_setup/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.12850879803299903,
+        "mean_occurrence_us": 128.50879803299904,
+        "minimum_layer_mean_us": 128.50879803299904,
+        "maximum_layer_mean_us": 128.50879803299904
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.1621759995818138,
+        "mean_occurrence_us": 162.1759995818138,
+        "minimum_layer_mean_us": 162.1759995818138,
+        "maximum_layer_mean_us": 162.1759995818138
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.026180800050497055,
+        "mean_occurrence_us": 26.180800050497055,
+        "minimum_layer_mean_us": 26.180800050497055,
+        "maximum_layer_mean_us": 26.180800050497055
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.03424159977585077,
+        "mean_occurrence_us": 34.24159977585077,
+        "minimum_layer_mean_us": 34.24159977585077,
+        "maximum_layer_mean_us": 34.24159977585077
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "norm_ffn",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/norm_ffn/0",
+        "native_blocks/norm_ffn/1",
+        "native_blocks/norm_ffn/2",
+        "native_blocks/norm_ffn/3",
+        "native_blocks/norm_ffn/4",
+        "native_blocks/norm_ffn/5",
+        "native_blocks/norm_ffn/6",
+        "native_blocks/norm_ffn/7",
+        "native_blocks/norm_ffn/8",
+        "native_blocks/norm_ffn/9",
+        "native_blocks/norm_ffn/10",
+        "native_blocks/norm_ffn/11",
+        "native_blocks/norm_ffn/12",
+        "native_blocks/norm_ffn/13",
+        "native_blocks/norm_ffn/14",
+        "native_blocks/norm_ffn/15",
+        "native_blocks/norm_ffn/16",
+        "native_blocks/norm_ffn/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.7024287976324557,
+        "mean_occurrence_us": 94.57937764624755,
+        "minimum_layer_mean_us": 92.13920012116432,
+        "maximum_layer_mean_us": 100.76639987528324
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.325539201684296,
+        "mean_occurrence_us": 129.19662231579423,
+        "minimum_layer_mean_us": 116.24799948185682,
+        "maximum_layer_mean_us": 162.08159923553467
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.37328159958124163,
+        "mean_occurrence_us": 20.73786664340231,
+        "minimum_layer_mean_us": 20.2976000495255,
+        "maximum_layer_mean_us": 21.305600181221962
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.4848816007375717,
+        "mean_occurrence_us": 26.937866707642872,
+        "minimum_layer_mean_us": 25.56000016629696,
+        "maximum_layer_mean_us": 29.295999836176634
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "norm_final",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/norm_final/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.11819199733436107,
+        "mean_occurrence_us": 118.19199733436108,
+        "minimum_layer_mean_us": 118.19199733436108,
+        "maximum_layer_mean_us": 118.19199733436108
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.15072159916162492,
+        "mean_occurrence_us": 150.7215991616249,
+        "minimum_layer_mean_us": 150.7215991616249,
+        "maximum_layer_mean_us": 150.7215991616249
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.02043839991092682,
+        "mean_occurrence_us": 20.43839991092682,
+        "minimum_layer_mean_us": 20.43839991092682,
+        "maximum_layer_mean_us": 20.43839991092682
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.02623839983716607,
+        "mean_occurrence_us": 26.23839983716607,
+        "minimum_layer_mean_us": 26.23839983716607,
+        "maximum_layer_mean_us": 26.23839983716607
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "norm_input",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/norm_input/0",
+        "native_blocks/norm_input/1",
+        "native_blocks/norm_input/2",
+        "native_blocks/norm_input/3",
+        "native_blocks/norm_input/4",
+        "native_blocks/norm_input/5",
+        "native_blocks/norm_input/6",
+        "native_blocks/norm_input/7",
+        "native_blocks/norm_input/8",
+        "native_blocks/norm_input/9",
+        "native_blocks/norm_input/10",
+        "native_blocks/norm_input/11",
+        "native_blocks/norm_input/12",
+        "native_blocks/norm_input/13",
+        "native_blocks/norm_input/14",
+        "native_blocks/norm_input/15",
+        "native_blocks/norm_input/16",
+        "native_blocks/norm_input/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.693121598288417,
+        "mean_occurrence_us": 94.06231101602316,
+        "minimum_layer_mean_us": 91.59200005233288,
+        "maximum_layer_mean_us": 98.96319955587387
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.3177248030900954,
+        "mean_occurrence_us": 128.76248906056088,
+        "minimum_layer_mean_us": 117.2400001436472,
+        "maximum_layer_mean_us": 171.30399867892265
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.37321599991992116,
+        "mean_occurrence_us": 20.734222217773397,
+        "minimum_layer_mean_us": 20.220800302922726,
+        "maximum_layer_mean_us": 21.598400082439184
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.48068160088732836,
+        "mean_occurrence_us": 26.704533382629354,
+        "minimum_layer_mean_us": 26.05119999498129,
+        "maximum_layer_mean_us": 27.69760014489293
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "o_projection",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/o_projection/0",
+        "native_blocks/o_projection/1",
+        "native_blocks/o_projection/2",
+        "native_blocks/o_projection/3",
+        "native_blocks/o_projection/4",
+        "native_blocks/o_projection/5",
+        "native_blocks/o_projection/6",
+        "native_blocks/o_projection/7",
+        "native_blocks/o_projection/8",
+        "native_blocks/o_projection/9",
+        "native_blocks/o_projection/10",
+        "native_blocks/o_projection/11",
+        "native_blocks/o_projection/12",
+        "native_blocks/o_projection/13",
+        "native_blocks/o_projection/14",
+        "native_blocks/o_projection/15",
+        "native_blocks/o_projection/16",
+        "native_blocks/o_projection/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.4488224004395306,
+        "mean_occurrence_us": 24.934577802196145,
+        "minimum_layer_mean_us": 24.065599963068962,
+        "maximum_layer_mean_us": 28.516800329089165
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.850088001973927,
+        "mean_occurrence_us": 47.22711122077372,
+        "minimum_layer_mean_us": 40.98400007933378,
+        "maximum_layer_mean_us": 66.97440054267645
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.14958560019731523,
+        "mean_occurrence_us": 8.310311122073069,
+        "minimum_layer_mean_us": 7.665600022301078,
+        "maximum_layer_mean_us": 9.014400094747543
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.40625920025631784,
+        "mean_occurrence_us": 22.569955569795436,
+        "minimum_layer_mean_us": 21.652800124138594,
+        "maximum_layer_mean_us": 23.488000128418207
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "qkt",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/qkt/0",
+        "native_blocks/qkt/1",
+        "native_blocks/qkt/2",
+        "native_blocks/qkt/3",
+        "native_blocks/qkt/4",
+        "native_blocks/qkt/5",
+        "native_blocks/qkt/6",
+        "native_blocks/qkt/7",
+        "native_blocks/qkt/8",
+        "native_blocks/qkt/9",
+        "native_blocks/qkt/10",
+        "native_blocks/qkt/11",
+        "native_blocks/qkt/12",
+        "native_blocks/qkt/13",
+        "native_blocks/qkt/14",
+        "native_blocks/qkt/15",
+        "native_blocks/qkt/16",
+        "native_blocks/qkt/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.4719919992610812,
+        "mean_occurrence_us": 26.221777736726732,
+        "minimum_layer_mean_us": 25.20480016246438,
+        "maximum_layer_mean_us": 27.456000167876482
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.801379201002419,
+        "mean_occurrence_us": 44.52106672235661,
+        "minimum_layer_mean_us": 41.771199740469456,
+        "maximum_layer_mean_us": 54.90400083363056
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.16559359959792347,
+        "mean_occurrence_us": 9.199644422106857,
+        "minimum_layer_mean_us": 8.291199919767678,
+        "maximum_layer_mean_us": 10.969600081443787
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.39584319945424795,
+        "mean_occurrence_us": 21.99128885856933,
+        "minimum_layer_mean_us": 21.06240028515458,
+        "maximum_layer_mean_us": 22.80159993097186
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "qkv_projection",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/qkv_projection/0",
+        "native_blocks/qkv_projection/1",
+        "native_blocks/qkv_projection/2",
+        "native_blocks/qkv_projection/3",
+        "native_blocks/qkv_projection/4",
+        "native_blocks/qkv_projection/5",
+        "native_blocks/qkv_projection/6",
+        "native_blocks/qkv_projection/7",
+        "native_blocks/qkv_projection/8",
+        "native_blocks/qkv_projection/9",
+        "native_blocks/qkv_projection/10",
+        "native_blocks/qkv_projection/11",
+        "native_blocks/qkv_projection/12",
+        "native_blocks/qkv_projection/13",
+        "native_blocks/qkv_projection/14",
+        "native_blocks/qkv_projection/15",
+        "native_blocks/qkv_projection/16",
+        "native_blocks/qkv_projection/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.9033775985240936,
+        "mean_occurrence_us": 50.187644362449646,
+        "minimum_layer_mean_us": 48.172799684107304,
+        "maximum_layer_mean_us": 54.58879955112934
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 1.5269648049026727,
+        "mean_occurrence_us": 84.83137805014849,
+        "minimum_layer_mean_us": 78.2223992049694,
+        "maximum_layer_mean_us": 108.05920027196407
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.31707840161398054,
+        "mean_occurrence_us": 17.61546675633225,
+        "minimum_layer_mean_us": 16.79360019043088,
+        "maximum_layer_mean_us": 18.940800055861473
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 1.0339568004012107,
+        "mean_occurrence_us": 57.44204446673393,
+        "minimum_layer_mean_us": 55.89279979467392,
+        "maximum_layer_mean_us": 59.90880038589239
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "residual_attention",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/residual_attention/0",
+        "native_blocks/residual_attention/1",
+        "native_blocks/residual_attention/2",
+        "native_blocks/residual_attention/3",
+        "native_blocks/residual_attention/4",
+        "native_blocks/residual_attention/5",
+        "native_blocks/residual_attention/6",
+        "native_blocks/residual_attention/7",
+        "native_blocks/residual_attention/8",
+        "native_blocks/residual_attention/9",
+        "native_blocks/residual_attention/10",
+        "native_blocks/residual_attention/11",
+        "native_blocks/residual_attention/12",
+        "native_blocks/residual_attention/13",
+        "native_blocks/residual_attention/14",
+        "native_blocks/residual_attention/15",
+        "native_blocks/residual_attention/16",
+        "native_blocks/residual_attention/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.34919680007733406,
+        "mean_occurrence_us": 19.39982222651856,
+        "minimum_layer_mean_us": 18.409600155428052,
+        "maximum_layer_mean_us": 20.78399984166026
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.46542240083217623,
+        "mean_occurrence_us": 25.85680004623201,
+        "minimum_layer_mean_us": 23.044800106436014,
+        "maximum_layer_mean_us": 37.05760035663843
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.11317280041985214,
+        "mean_occurrence_us": 6.287377801102897,
+        "minimum_layer_mean_us": 5.774400010704994,
+        "maximum_layer_mean_us": 7.331199990585446
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.17823039996437728,
+        "mean_occurrence_us": 9.90168888690985,
+        "minimum_layer_mean_us": 9.123199945315719,
+        "maximum_layer_mean_us": 11.055999994277954
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "residual_ffn",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/residual_ffn/0",
+        "native_blocks/residual_ffn/1",
+        "native_blocks/residual_ffn/2",
+        "native_blocks/residual_ffn/3",
+        "native_blocks/residual_ffn/4",
+        "native_blocks/residual_ffn/5",
+        "native_blocks/residual_ffn/6",
+        "native_blocks/residual_ffn/7",
+        "native_blocks/residual_ffn/8",
+        "native_blocks/residual_ffn/9",
+        "native_blocks/residual_ffn/10",
+        "native_blocks/residual_ffn/11",
+        "native_blocks/residual_ffn/12",
+        "native_blocks/residual_ffn/13",
+        "native_blocks/residual_ffn/14",
+        "native_blocks/residual_ffn/15",
+        "native_blocks/residual_ffn/16",
+        "native_blocks/residual_ffn/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.3488031996879727,
+        "mean_occurrence_us": 19.377955538220704,
+        "minimum_layer_mean_us": 18.687999853864312,
+        "maximum_layer_mean_us": 20.508800074458122
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.45810240004211666,
+        "mean_occurrence_us": 25.450133335673144,
+        "minimum_layer_mean_us": 23.115200083702803,
+        "maximum_layer_mean_us": 31.76160017028451
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.11392160004470497,
+        "mean_occurrence_us": 6.328977780261387,
+        "minimum_layer_mean_us": 5.744000035338104,
+        "maximum_layer_mean_us": 7.25919995456934
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.17868800000287594,
+        "mean_occurrence_us": 9.927111111270884,
+        "minimum_layer_mean_us": 9.08800014294684,
+        "maximum_layer_mean_us": 10.684799961745739
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "rope_generation",
+      "occurrences_per_step": 1,
+      "case_ids": [
+        "native_blocks/rope_generation/step"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.11414879970252514,
+        "mean_occurrence_us": 114.14879970252514,
+        "minimum_layer_mean_us": 114.14879970252514,
+        "maximum_layer_mean_us": 114.14879970252514
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.17109920158982278,
+        "mean_occurrence_us": 171.09920158982277,
+        "minimum_layer_mean_us": 171.09920158982277,
+        "maximum_layer_mean_us": 171.09920158982277
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.015983999939635396,
+        "mean_occurrence_us": 15.983999939635396,
+        "minimum_layer_mean_us": 15.983999939635396,
+        "maximum_layer_mean_us": 15.983999939635396
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.022523200139403343,
+        "mean_occurrence_us": 22.523200139403343,
+        "minimum_layer_mean_us": 22.523200139403343,
+        "maximum_layer_mean_us": 22.523200139403343
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "rope_qk",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/rope_qk/0",
+        "native_blocks/rope_qk/1",
+        "native_blocks/rope_qk/2",
+        "native_blocks/rope_qk/3",
+        "native_blocks/rope_qk/4",
+        "native_blocks/rope_qk/5",
+        "native_blocks/rope_qk/6",
+        "native_blocks/rope_qk/7",
+        "native_blocks/rope_qk/8",
+        "native_blocks/rope_qk/9",
+        "native_blocks/rope_qk/10",
+        "native_blocks/rope_qk/11",
+        "native_blocks/rope_qk/12",
+        "native_blocks/rope_qk/13",
+        "native_blocks/rope_qk/14",
+        "native_blocks/rope_qk/15",
+        "native_blocks/rope_qk/16",
+        "native_blocks/rope_qk/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.4296399991959334,
+        "mean_occurrence_us": 79.42444439977407,
+        "minimum_layer_mean_us": 77.93599925935268,
+        "maximum_layer_mean_us": 81.83999955654144
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 1.7894672010093928,
+        "mean_occurrence_us": 99.41484450052182,
+        "minimum_layer_mean_us": 92.8528007119894,
+        "maximum_layer_mean_us": 124.9055989086628
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.5082063995301723,
+        "mean_occurrence_us": 28.233688862787353,
+        "minimum_layer_mean_us": 27.679999824613333,
+        "maximum_layer_mean_us": 28.76479970291257
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.6159439992159605,
+        "mean_occurrence_us": 34.219111067553364,
+        "minimum_layer_mean_us": 33.05760007351637,
+        "maximum_layer_mean_us": 35.895999893546104
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "scale_mask_softmax_cast",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/scale_mask_softmax_cast/0",
+        "native_blocks/scale_mask_softmax_cast/1",
+        "native_blocks/scale_mask_softmax_cast/2",
+        "native_blocks/scale_mask_softmax_cast/3",
+        "native_blocks/scale_mask_softmax_cast/4",
+        "native_blocks/scale_mask_softmax_cast/5",
+        "native_blocks/scale_mask_softmax_cast/6",
+        "native_blocks/scale_mask_softmax_cast/7",
+        "native_blocks/scale_mask_softmax_cast/8",
+        "native_blocks/scale_mask_softmax_cast/9",
+        "native_blocks/scale_mask_softmax_cast/10",
+        "native_blocks/scale_mask_softmax_cast/11",
+        "native_blocks/scale_mask_softmax_cast/12",
+        "native_blocks/scale_mask_softmax_cast/13",
+        "native_blocks/scale_mask_softmax_cast/14",
+        "native_blocks/scale_mask_softmax_cast/15",
+        "native_blocks/scale_mask_softmax_cast/16",
+        "native_blocks/scale_mask_softmax_cast/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.695115200150758,
+        "mean_occurrence_us": 38.61751111948656,
+        "minimum_layer_mean_us": 37.54719998687506,
+        "maximum_layer_mean_us": 40.95040000975132
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.9844863990321755,
+        "mean_occurrence_us": 54.69368883512087,
+        "minimum_layer_mean_us": 49.6239997446537,
+        "maximum_layer_mean_us": 67.80959963798523
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.3017232018057257,
+        "mean_occurrence_us": 16.762400100318093,
+        "minimum_layer_mean_us": 16.340800328180194,
+        "maximum_layer_mean_us": 17.408000025898218
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.35305759981274604,
+        "mean_occurrence_us": 19.614311100708115,
+        "minimum_layer_mean_us": 19.088000152260065,
+        "maximum_layer_mean_us": 20.606399700045586
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "sv",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/sv/0",
+        "native_blocks/sv/1",
+        "native_blocks/sv/2",
+        "native_blocks/sv/3",
+        "native_blocks/sv/4",
+        "native_blocks/sv/5",
+        "native_blocks/sv/6",
+        "native_blocks/sv/7",
+        "native_blocks/sv/8",
+        "native_blocks/sv/9",
+        "native_blocks/sv/10",
+        "native_blocks/sv/11",
+        "native_blocks/sv/12",
+        "native_blocks/sv/13",
+        "native_blocks/sv/14",
+        "native_blocks/sv/15",
+        "native_blocks/sv/16",
+        "native_blocks/sv/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.4401200002990663,
+        "mean_occurrence_us": 24.45111112772591,
+        "minimum_layer_mean_us": 23.29920008778572,
+        "maximum_layer_mean_us": 26.665600202977657
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.8138399995863438,
+        "mean_occurrence_us": 45.21333331035243,
+        "minimum_layer_mean_us": 39.783999882638454,
+        "maximum_layer_mean_us": 55.66080007702112
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.14938879979308695,
+        "mean_occurrence_us": 8.299377766282609,
+        "minimum_layer_mean_us": 7.6512000523507595,
+        "maximum_layer_mean_us": 9.216000069864094
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.41142560066655276,
+        "mean_occurrence_us": 22.856977814808488,
+        "minimum_layer_mean_us": 21.65280021727085,
+        "maximum_layer_mean_us": 24.0943999029696
+      }
+    },
+    {
+      "suite": "native_blocks",
+      "family": "sv_output_pack",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "native_blocks/sv_output_pack/0",
+        "native_blocks/sv_output_pack/1",
+        "native_blocks/sv_output_pack/2",
+        "native_blocks/sv_output_pack/3",
+        "native_blocks/sv_output_pack/4",
+        "native_blocks/sv_output_pack/5",
+        "native_blocks/sv_output_pack/6",
+        "native_blocks/sv_output_pack/7",
+        "native_blocks/sv_output_pack/8",
+        "native_blocks/sv_output_pack/9",
+        "native_blocks/sv_output_pack/10",
+        "native_blocks/sv_output_pack/11",
+        "native_blocks/sv_output_pack/12",
+        "native_blocks/sv_output_pack/13",
+        "native_blocks/sv_output_pack/14",
+        "native_blocks/sv_output_pack/15",
+        "native_blocks/sv_output_pack/16",
+        "native_blocks/sv_output_pack/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.31260159984230995,
+        "mean_occurrence_us": 17.366755546794995,
+        "minimum_layer_mean_us": 16.457599867135286,
+        "maximum_layer_mean_us": 18.748799990862608
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.436212799930945,
+        "mean_occurrence_us": 24.234044440608056,
+        "minimum_layer_mean_us": 21.668799966573715,
+        "maximum_layer_mean_us": 39.222400076687336
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.10206239991821349,
+        "mean_occurrence_us": 5.670133328789638,
+        "minimum_layer_mean_us": 5.279999994672835,
+        "maximum_layer_mean_us": 7.055999943986535
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.14810080027673395,
+        "mean_occurrence_us": 8.22782223759633,
+        "minimum_layer_mean_us": 7.327999966219068,
+        "maximum_layer_mean_us": 9.711999935097992
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_down_fp32_cast_resnorm",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/0",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/1",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/2",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/3",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/4",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/5",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/6",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/7",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/8",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/9",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/10",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/11",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/12",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/13",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/14",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/15",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/16",
+        "pim_interface_candidates/pim_down_fp32_cast_resnorm/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 2.0395168006420135,
+        "mean_occurrence_us": 113.3064889245563,
+        "minimum_layer_mean_us": 111.29919961094856,
+        "maximum_layer_mean_us": 118.61759908497334
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.6576831974089146,
+        "mean_occurrence_us": 147.64906652271748,
+        "minimum_layer_mean_us": 138.59840035438538,
+        "maximum_layer_mean_us": 163.31680044531822
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.4417632014490664,
+        "mean_occurrence_us": 24.54240008050369,
+        "minimum_layer_mean_us": 23.70239980518818,
+        "maximum_layer_mean_us": 25.600000098347664
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.5749792001210153,
+        "mean_occurrence_us": 31.94328889561196,
+        "minimum_layer_mean_us": 30.724799912422895,
+        "maximum_layer_mean_us": 33.02560010924935
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_gelu_multiply_bf16",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_gelu_multiply_bf16/0",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/1",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/2",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/3",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/4",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/5",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/6",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/7",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/8",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/9",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/10",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/11",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/12",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/13",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/14",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/15",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/16",
+        "pim_interface_candidates/pim_gelu_multiply_bf16/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.5065567987039685,
+        "mean_occurrence_us": 28.142044372442697,
+        "minimum_layer_mean_us": 27.32959995046258,
+        "maximum_layer_mean_us": 30.073599703609943
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 0.6744112020358444,
+        "mean_occurrence_us": 37.467289001991354,
+        "minimum_layer_mean_us": 35.15999997034669,
+        "maximum_layer_mean_us": 43.64480022341013
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.14393760024104268,
+        "mean_occurrence_us": 7.996533346724593,
+        "minimum_layer_mean_us": 7.289600046351552,
+        "maximum_layer_mean_us": 8.928000065498054
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.20078399986959994,
+        "mean_occurrence_us": 11.154666659422219,
+        "minimum_layer_mean_us": 10.376000078395009,
+        "maximum_layer_mean_us": 12.323200050741434
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_o_fp32_cast_resnorm",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/0",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/1",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/2",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/3",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/4",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/5",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/6",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/7",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/8",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/9",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/10",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/11",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/12",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/13",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/14",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/15",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/16",
+        "pim_interface_candidates/pim_o_fp32_cast_resnorm/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 2.0654975973069667,
+        "mean_occurrence_us": 114.74986651705372,
+        "minimum_layer_mean_us": 111.55519932508469,
+        "maximum_layer_mean_us": 133.7439987808466
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.6791216000914573,
+        "mean_occurrence_us": 148.84008889396986,
+        "minimum_layer_mean_us": 141.1983996629715,
+        "maximum_layer_mean_us": 178.49760055541992
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.4460656000301242,
+        "mean_occurrence_us": 24.781422223895788,
+        "minimum_layer_mean_us": 23.966400045901537,
+        "maximum_layer_mean_us": 25.81919999793172
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.5708512016572058,
+        "mean_occurrence_us": 31.713955647622548,
+        "minimum_layer_mean_us": 30.931200087070465,
+        "maximum_layer_mean_us": 32.97599982470274
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_pv_sum_cast_pack_o_resnorm",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/0",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/1",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/2",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/3",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/4",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/5",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/6",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/7",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/8",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/9",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/10",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/11",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/12",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/13",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/14",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/15",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/16",
+        "pim_interface_candidates/pim_pv_sum_cast_pack_o_resnorm/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 3.025553600490093,
+        "mean_occurrence_us": 168.08631113833852,
+        "minimum_layer_mean_us": 163.79200145602226,
+        "maximum_layer_mean_us": 180.03519922494888
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 4.079577610641718,
+        "mean_occurrence_us": 226.64320059120655,
+        "minimum_layer_mean_us": 206.81279823184013,
+        "maximum_layer_mean_us": 275.81600323319435
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.5942831946536898,
+        "mean_occurrence_us": 33.0157330363161,
+        "minimum_layer_mean_us": 32.51679930835962,
+        "maximum_layer_mean_us": 33.68479963392019
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.998127999715507,
+        "mean_occurrence_us": 55.45155553975039,
+        "minimum_layer_mean_us": 54.33439984917641,
+        "maximum_layer_mean_us": 56.864000111818314
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_rope_fp32_bf16",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_rope_fp32_bf16/0",
+        "pim_interface_candidates/pim_rope_fp32_bf16/1",
+        "pim_interface_candidates/pim_rope_fp32_bf16/2",
+        "pim_interface_candidates/pim_rope_fp32_bf16/3",
+        "pim_interface_candidates/pim_rope_fp32_bf16/4",
+        "pim_interface_candidates/pim_rope_fp32_bf16/5",
+        "pim_interface_candidates/pim_rope_fp32_bf16/6",
+        "pim_interface_candidates/pim_rope_fp32_bf16/7",
+        "pim_interface_candidates/pim_rope_fp32_bf16/8",
+        "pim_interface_candidates/pim_rope_fp32_bf16/9",
+        "pim_interface_candidates/pim_rope_fp32_bf16/10",
+        "pim_interface_candidates/pim_rope_fp32_bf16/11",
+        "pim_interface_candidates/pim_rope_fp32_bf16/12",
+        "pim_interface_candidates/pim_rope_fp32_bf16/13",
+        "pim_interface_candidates/pim_rope_fp32_bf16/14",
+        "pim_interface_candidates/pim_rope_fp32_bf16/15",
+        "pim_interface_candidates/pim_rope_fp32_bf16/16",
+        "pim_interface_candidates/pim_rope_fp32_bf16/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.7206512022763492,
+        "mean_occurrence_us": 95.59173345979717,
+        "minimum_layer_mean_us": 94.43040080368519,
+        "maximum_layer_mean_us": 97.58720025420189
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 2.209569600597024,
+        "mean_occurrence_us": 122.75386669983466,
+        "minimum_layer_mean_us": 113.21600005030632,
+        "maximum_layer_mean_us": 153.84480096399784
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.5642960050143302,
+        "mean_occurrence_us": 31.349778056351674,
+        "minimum_layer_mean_us": 30.700800474733114,
+        "maximum_layer_mean_us": 32.53920031711459
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.6782079998403787,
+        "mean_occurrence_us": 37.678222213354374,
+        "minimum_layer_mean_us": 36.70719973742962,
+        "maximum_layer_mean_us": 38.929599709808826
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_scale_mask_softmax_bf16",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/0",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/1",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/2",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/3",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/4",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/5",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/6",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/7",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/8",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/9",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/10",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/11",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/12",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/13",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/14",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/15",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/16",
+        "pim_interface_candidates/pim_scale_mask_softmax_bf16/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 0.6936480008065701,
+        "mean_occurrence_us": 38.53600004480945,
+        "minimum_layer_mean_us": 37.64639962464571,
+        "maximum_layer_mean_us": 40.86239989846945
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 1.0128543999046087,
+        "mean_occurrence_us": 56.269688883589374,
+        "minimum_layer_mean_us": 49.3215998634696,
+        "maximum_layer_mean_us": 85.05600038915873
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.25162240006029607,
+        "mean_occurrence_us": 13.979022225572002,
+        "minimum_layer_mean_us": 13.27840005978942,
+        "maximum_layer_mean_us": 15.409600082784891
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.3084255992434919,
+        "mean_occurrence_us": 17.134755513527328,
+        "minimum_layer_mean_us": 16.209600120782852,
+        "maximum_layer_mean_us": 17.79520008713007
+      }
+    },
+    {
+      "suite": "pim_interface_candidates",
+      "family": "pim_softmax_bf16_parity_pack",
+      "occurrences_per_step": 18,
+      "case_ids": [
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/0",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/1",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/2",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/3",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/4",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/5",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/6",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/7",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/8",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/9",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/10",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/11",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/12",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/13",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/14",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/15",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/16",
+        "pim_interface_candidates/pim_softmax_bf16_parity_pack/17"
+      ],
+      "eager_reused": {
+        "sum_case_means_ms": 1.2602047996595502,
+        "mean_occurrence_us": 70.0113777588639,
+        "minimum_layer_mean_us": 68.92480123788118,
+        "maximum_layer_mean_us": 70.77120020985603
+      },
+      "eager_entry_cold": {
+        "sum_case_means_ms": 1.688092800229788,
+        "mean_occurrence_us": 93.78293334609933,
+        "minimum_layer_mean_us": 88.39039988815784,
+        "maximum_layer_mean_us": 115.12160077691078
+      },
+      "graph_reused": {
+        "sum_case_means_ms": 0.39096639938652517,
+        "mean_occurrence_us": 21.720355521473618,
+        "minimum_layer_mean_us": 21.116799768060446,
+        "maximum_layer_mean_us": 22.44000006467104
+      },
+      "graph_entry_cold": {
+        "sum_case_means_ms": 0.4579520009458065,
+        "mean_occurrence_us": 25.441777830322582,
+        "minimum_layer_mean_us": 24.304000101983547,
+        "maximum_layer_mean_us": 26.50560000911355
+      }
+    }
+  ],
+  "rope": {
+    "eager_reused": {
+      "qk_apply_18_layers_ms": 1.4296399991959334,
+      "position_generation_once_ms": 0.11414879970252514,
+      "fp32_interface_qk_apply_18_layers_ms": 1.7206512022763492,
+      "native_rope_combined_sum_ms": 1.5437887988984587
+    },
+    "eager_entry_cold": {
+      "qk_apply_18_layers_ms": 1.7894672010093928,
+      "position_generation_once_ms": 0.17109920158982278,
+      "fp32_interface_qk_apply_18_layers_ms": 2.209569600597024,
+      "native_rope_combined_sum_ms": 1.9605664025992156
+    },
+    "graph_reused": {
+      "qk_apply_18_layers_ms": 0.5082063995301723,
+      "position_generation_once_ms": 0.015983999939635396,
+      "fp32_interface_qk_apply_18_layers_ms": 0.5642960050143302,
+      "native_rope_combined_sum_ms": 0.5241903994698077
+    },
+    "graph_entry_cold": {
+      "qk_apply_18_layers_ms": 0.6159439992159605,
+      "position_generation_once_ms": 0.022523200139403343,
+      "fp32_interface_qk_apply_18_layers_ms": 0.6782079998403787,
+      "native_rope_combined_sum_ms": 0.6384671993553639
+    }
+  },
+  "validation": {
+    "measured_cases": 458,
+    "primary_cases": 386,
+    "interface_supplement_cases": 72,
+    "samples_per_case_per_mode": 20,
+    "modes": 4,
+    "total_timed_segment_runs": 36640,
+    "all_outputs_bitwise_equal": true,
+    "source_hashes_verified": true,
+    "case_coverage_verified": true,
+    "other_gpu_pids_detected": false,
+    "occupancy_checks": 496,
+    "failed_attempt_excluded": "pi05_h16_segments_20261108_01: model parameters created inside inference_mode; no valid measurements"
+  },
+  "suites": {
+    "native_blocks": "Logical native operator blocks, isolated from the full pipeline; do not call their sum E2E.",
+    "handoff_composites": "Continuous GPU combinations; replace overlapping native block rows, never add both.",
+    "pim_interface_candidates": "Logical FP32 input variants; not physical PIM output/packing/coherency validation."
+  },
+  "pim_reference": {
+    "branch": "xinyao_1104",
+    "commit": "8764996de08741f248746b7094830360f666fbe6",
+    "files": [
+      "README.md",
+      "experiments/pi05-unified-gemv/TOKEN-PV.md"
+    ],
+    "note": "RoPE is on PIM in that reference. GPU-RoPE cases are alternatives, not an additional cost for PIM-RoPE. Partial-PV sum and logical P parity packing are supplied as GPU candidates."
+  },
+  "modes": {
+    "eager_reused": "Native function, external CUDA events; includes host submission gaps; fixed-address reuse control.",
+    "eager_entry_cold": "One 256MiB .ca eviction before segment, external CUDA events; includes host submission gaps.",
+    "graph_reused": "Same function captured, external timing events INSIDE CUDA graph; fixed-address reuse control.",
+    "graph_entry_cold": "One entry eviction, timing INSIDE graph; no internal evictions, no CPU graph-launch/dispatch cost."
+  },
+  "limitations": [
+    "Eviction is an empirically qualified cache-state proxy, not an architectural cache invalidate or real PIM handoff.",
+    "Entry eviction also affects GPU-resident constants/weights; their actual residency is not selectively reproduced.",
+    "GPU is otherwise idle; concurrent ViT/VLM competition and preemption are not measured.",
+    "No guarantee that output has drained to LPDDR or become PIM-visible at the recorded GPU event.",
+    "No DMA, host/PIM dispatch, physical bank unpack/pack, or inter-device coherency cost included.",
+    "Graph is a separately validated submission mode; original full-model baseline remains native eager.",
+    "Each run captures the deterministic fifth step; twenty fixed-buffer repetitions are not twenty distinct model requests.",
+    "A hybrid using graph submission needs an equivalently optimized GPU baseline before attributing any E2E speedup solely to PIM.",
+    "Summed case means are not a measured denoising step or full AE end-to-end time."
+  ],
+  "input_sha256": {
+    "raw/pi05_h16_segments_20261108_02/capture.json": "15ba8bf721f1af1251c48b3dcb615928128802ee2f50d8e23c85f2d11e639ba3",
+    "raw/pi05_h16_segment_probe_20261108_01/capture.json": "11469d2c61ca4bf2b146e43ea73c5cd01045af3a7e38d8bc79f9872eba465bb5",
+    "raw/pi05_h16_interfaces_20261108_01/capture.json": "a9b701cb3378ce3a5b76b9d416b0a85c8e69f40b2685cf5a62b2fbe263db5b73"
+  },
+  "source_urls": [
+    "https://docs.pytorch.org/docs/2.11/notes/cuda.html#cuda-graphs",
+    "https://docs.pytorch.org/docs/2.11/generated/torch.cuda.Event.html"
+  ]
+}

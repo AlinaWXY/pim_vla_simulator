@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-08",
+  "host": "fact-thor via dev0-public",
+  "code_root": "/var/tmp/shiyuhuang-vla-baseline/code/pi05_h16_segments_20261108",
+  "probe": "bash run.sh --mode probe --tag pi05_h16_segment_probe_20261108_01 --samples 20",
+  "excluded_initialization_failure": "bash run.sh --mode measure --tag pi05_h16_segments_20261108_01 --probe pi05_h16_segment_probe_20261108_01 --samples 20",
+  "accepted_primary": "bash run_v2.sh --mode measure --tag pi05_h16_segments_20261108_02 --probe pi05_h16_segment_probe_20261108_01 --samples 20",
+  "accepted_interfaces": "bash run_interfaces.sh --tag pi05_h16_interfaces_20261108_01 --probe pi05_h16_segment_probe_20261108_01",
+  "profiler": "none",
+  "cache_control": "256 MiB .ca eviction once before each cold segment, outside timing; no internal eviction",
+  "clock_control": "unchanged"
+}

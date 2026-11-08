@@ -1,0 +1,16 @@
+deep-space
+/fact_home/shiyuhuang
+fact-thor
+/fact_home/shiyuhuang
+fact-thor
+/var/tmp/shiyuhuang-vla-baseline
+/var/tmp/vla-venv/bin/python
+/var/tmp/vla-venv/bin/python
+18:33:42 Read existing checkpoint once via sequential readinto
+18:33:55 INTERFACE 1/72
+18:33:56 INTERFACE 13/72
+18:33:56 INTERFACE 25/72
+18:33:57 INTERFACE 37/72
+18:33:58 INTERFACE 49/72
+18:33:59 INTERFACE 61/72
+18:34:00 CAPTURE_COMPLETE interfaces

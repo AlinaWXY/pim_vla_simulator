@@ -1,0 +1,11 @@
+deep-space
+/fact_home/shiyuhuang
+fact-thor
+/fact_home/shiyuhuang
+fact-thor
+/var/tmp/shiyuhuang-vla-baseline
+/var/tmp/vla-venv/bin/python
+/var/tmp/vla-venv/bin/python
+17:55:17 Prepare 256 MiB cache-eviction buffer
+17:55:18 CACHE_PROBE {"reused": 224, "entry_once": 1053824, "per_kernel": 2104832}
+17:55:18 CAPTURE_COMPLETE probe

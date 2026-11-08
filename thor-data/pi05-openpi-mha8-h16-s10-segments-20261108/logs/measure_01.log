@@ -1,0 +1,24 @@
+deep-space
+/fact_home/shiyuhuang
+fact-thor
+/fact_home/shiyuhuang
+fact-thor
+/var/tmp/shiyuhuang-vla-baseline
+/var/tmp/vla-venv/bin/python
+/var/tmp/vla-venv/bin/python
+18:03:49 Prepare 256 MiB cache-eviction buffer
+18:03:54 Read existing checkpoint once via sequential readinto
+Traceback (most recent call last):
+  File "/var/tmp/shiyuhuang-vla-baseline/code/pi05_h16_segments_20261108/runner.py", line 124, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/var/tmp/shiyuhuang-vla-baseline/code/pi05_h16_segments_20261108/runner.py", line 72, in main
+    model,cache,call,reference,metadata=prepare(log,guard)
+                                        ^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/shiyuhuang-vla-baseline/code/pi05_h16_segments_20261108/builder.py", line 39, in prepare
+    conversion=convert(model)
+               ^^^^^^^^^^^^^^
+  File "/var/tmp/shiyuhuang-vla-baseline/code/pi05_h16_segments_20261108/mha8.py", line 8, in convert
+    unchanged=[(p,p._version,p.data_ptr(),tuple(p.shape)) for n,p in model.named_parameters()
+                  ^^^^^^^^^^
+RuntimeError: Inference tensors do not track version counter.
