@@ -1,0 +1,43 @@
+test_arbitration_presence_is_strict (test_config.ConfigurationTests.test_arbitration_presence_is_strict) ... ok
+test_hardware_multiplier (test_config.ConfigurationTests.test_hardware_multiplier) ... ok
+test_matrix (test_config.ConfigurationTests.test_matrix) ... ok
+test_only_five_structural_combinations (test_config.ConfigurationTests.test_only_five_structural_combinations) ... ok
+test_retired_switches_rejected (test_config.ConfigurationTests.test_retired_switches_rejected) ... ok
+test_watermark_validation (test_config.ConfigurationTests.test_watermark_validation) ... ok
+test_ae_stage_coverage_and_rope_boundary (test_config.InputTests.test_ae_stage_coverage_and_rope_boundary) ... ok
+test_calibration_cannot_accept_partial_or_shortened_kernel (test_config.InputTests.test_calibration_cannot_accept_partial_or_shortened_kernel) ... ok
+test_complete_vlm_preserves_measurements (test_config.InputTests.test_complete_vlm_preserves_measurements) ... ok
+test_logical_tensor_regions_and_physical_ring_capacity (test_config.InputTests.test_logical_tensor_regions_and_physical_ring_capacity) ... ok
+test_compatibility_uses_native_completion_and_keeps_negative_interference (test_config.ReportingTests.test_compatibility_uses_native_completion_and_keeps_negative_interference) ... ok
+test_line_ending_rebind_proves_byte_equivalence (test_config.RuntimeProvenanceTests.test_line_ending_rebind_proves_byte_equivalence) ... ok
+test_loaded_library_hash_tracks_content_not_path (test_config.RuntimeProvenanceTests.test_loaded_library_hash_tracks_content_not_path) ... ok
+test_missing_runtime_is_rejected (test_config.RuntimeProvenanceTests.test_missing_runtime_is_rejected) ... ok
+test_dq_conservation_and_historical_tensor_contract (test_programs.ProgramTests.test_dq_conservation_and_historical_tensor_contract) ... ok
+test_eighteen_physical_layers_are_disjoint_and_in_bounds (test_programs.ProgramTests.test_eighteen_physical_layers_are_disjoint_and_in_bounds) ... ok
+test_feature_q_and_k_cover_both_packed_halves (test_programs.ProgramTests.test_feature_q_and_k_cover_both_packed_halves) ... ok
+test_fused_has_six_mac_descriptors_and_optional_rope (test_programs.ProgramTests.test_fused_has_six_mac_descriptors_and_optional_rope) ... ok
+test_generator_rejects_capacity_or_dependency_corruption (test_programs.ProgramTests.test_generator_rejects_capacity_or_dependency_corruption) ... ok
+test_operator_scalar_mac_coverage_matches_tensor_shapes (test_programs.ProgramTests.test_operator_scalar_mac_coverage_matches_tensor_shapes) ... ok
+test_output_pool_allocation_and_two_o_tile_lifetimes (test_programs.ProgramTests.test_output_pool_allocation_and_two_o_tile_lifetimes) ... ok
+test_program_is_deterministic_and_has_no_timing_fields (test_programs.ProgramTests.test_program_is_deterministic_and_has_no_timing_fields) ... ok
+test_q_exchange_is_addressed_memory_not_masked_broadcast (test_programs.ProgramTests.test_q_exchange_is_addressed_memory_not_masked_broadcast) ... ok
+test_rank_rope_has_one_shared_unit_and_exact_work (test_programs.ProgramTests.test_rank_rope_has_one_shared_unit_and_exact_work) ... ok
+test_rope_and_layout_are_single_variable_traffic_differences (test_programs.ProgramTests.test_rope_and_layout_are_single_variable_traffic_differences) ... ok
+test_score_leaves_reduction_immediately_without_tile_cache (test_programs.ProgramTests.test_score_leaves_reduction_immediately_without_tile_cache) ... ok
+test_streaming_has_no_descriptor_or_staging (test_programs.ProgramTests.test_streaming_has_no_descriptor_or_staging) ... ok
+test_tensor_partition_is_bijective (test_programs.ProgramTests.test_tensor_partition_is_bijective) ... ok
+test_transient_arrays_have_complete_current_producers (test_programs.ProgramTests.test_transient_arrays_have_complete_current_producers) ... ok
+test_aliases_never_get_array_recovery (test_spec.SpecTests.test_aliases_never_get_array_recovery) ... ok
+test_all_48_interface_pairs (test_spec.SpecTests.test_all_48_interface_pairs) ... ok
+test_all_bg_is_broadcast (test_spec.SpecTests.test_all_bg_is_broadcast) ... ok
+test_completion_and_ca_metadata (test_spec.SpecTests.test_completion_and_ca_metadata) ... ok
+test_fixed_organization_and_clock (test_spec.SpecTests.test_fixed_organization_and_clock) ... ok
+test_jedec_numerical_values (test_spec.SpecTests.test_jedec_numerical_values) ... ok
+test_mac_frequency_and_row_count (test_spec.SpecTests.test_mac_frequency_and_row_count) ... ok
+test_private_issue_path_is_separate_from_execution (test_spec.SpecTests.test_private_issue_path_is_separate_from_execution) ... ok
+test_refresh_covers_pim_and_buffers (test_spec.SpecTests.test_refresh_covers_pim_and_buffers) ... ok
+
+----------------------------------------------------------------------
+Ran 38 tests in 1.928s
+
+OK

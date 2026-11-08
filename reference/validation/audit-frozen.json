@@ -1,0 +1,65 @@
+{
+  "auditor_sha256": "b70a03a9206ea231c6c6bf409e71ffde63cb5e1af83ebda75691e4de4c65b762",
+  "campaign": "/fact_data/xinyaowang/pim_vla_sim2_20261109/results/full-k4-final",
+  "checks": [
+    {
+      "files": 2,
+      "manifest": "frozen/runtime-SHA256SUMS"
+    },
+    {
+      "files": 591,
+      "manifest": "frozen/source-SHA256SUMS"
+    },
+    {
+      "files": 10,
+      "manifest": "frozen/config-SHA256SUMS"
+    },
+    {
+      "VLM_units": 2357,
+      "frozen_inputs": "verified",
+      "mac_freq_mult": 4,
+      "spec_sha256": "f68a7a24bf5e08915716f63a19a185b948493a75fc2708cca31e61e42c8d1efa"
+    },
+    {
+      "git_source_commit": "1e0b73bc8da695268fbf79f1013653b54120316e",
+      "tracked_files_verified": 586
+    }
+  ],
+  "files": {
+    "configs/b.json": "c8abd9997335ab66e53cb953f2358a41cd1473392274e0c560eb660fbdd31d9f",
+    "configs/c.json": "424b9eae588bcb79f078e6552b44f52498b91174822482b42cbeaa3ce9fd79bb",
+    "configs/d.json": "9d4ec50e1d4f4fc4631d2a4637f98c644751cbc16bc641ebafba3a382544bab8",
+    "configs/e-frfcfs.json": "1ff5c9bca767e0e420528f8ef6a53f222bff29a7597b312cd6152d6783191b12",
+    "configs/e-gap.json": "e14699321c34a794574a0fd677e99fcb580ac69d2f0f73d7c67e085e416cd06b",
+    "configs/e-lookahead.json": "4c6905f324cfae0f86b47ba46f990e8a62a4fbe433ef7f8006f4f96d652c607d",
+    "configs/e.json": "af5b888ca65a851004d5d33e67e27e78359288baedbb9677b99523af5057d9b5",
+    "configs/f.json": "66ae9bd895d91af164a7684d50770badc5ece485a8e2921b0eb64ae904bb9dfa",
+    "configs/g.json": "eee7a4d5f94a94f1ae3a7fb1048b1ac3402d603002bc463d557c969ef9de5c22",
+    "configs/spec-k4.json": "8ffd5b143b11ff11b9b8fbaab4631123839bf2b0f94f04a207878d69036fe18f",
+    "frozen/SOURCE_COMMIT": "b5d8eb9bdc3834082f4cbe24c62405b179a882628572cba9487f1a75d57c4bcf",
+    "frozen/config-SHA256SUMS": "45a0d09ccf166323d82e9063f20889792fad4464234f93d9a35b75cae556a454",
+    "frozen/runtime-SHA256SUMS": "ee8eb775c90e98e97886043c5ca3c4b7278a7ceb534cfe115458bf2d26d1baed",
+    "frozen/source-SHA256SUMS": "acd44e4564f0f231dab943280ea7040227f047234fa46dff001a2e006086392d",
+    "frozen/source/input-data/ae-feature_gpu_before.json": "1808d22648ef0e3d7810a5735a26ec87b40516888adcbb028f0a3cc49012db10",
+    "frozen/source/input-data/ae-token_gpu_after.json": "4545fe404dc04f206fed2f2042472a8f87d17977cf3b219dc124ae6301e35a8e",
+    "frozen/source/input-data/ae-token_gpu_before.json": "94fb7adb38e69ef9e3f388d48f2528a7317e484c707ad8cea4d97de6ad1aa81c",
+    "frozen/source/input-data/ae-token_local_after.json": "ab94ef84122e09981b57a385f1feceddaa0c8bc9238f00b8b3f063b0afe637a7",
+    "frozen/source/input-data/ae-token_local_before.json": "7fb23053d7277347515047b0adbbf9616523ec4ecefdb70e5dd740d743a77620",
+    "frozen/source/input-data/provenance.json": "6ead7fec7b5614a6b78d5a050b4062e243c620c3b3b43c7cb0b3186ac31bce88",
+    "frozen/source/input-data/vlm.json": "4024e7a68526f8c953598aa7fa52b6790ed8cd3d5b3008ad649868752e1157d0",
+    "frozen/source/programs/generated/feature_gpu_before.json": "2ff664f359fb79ffeb42aa97bded1bebe1e51f9b552ec6883e804ab65d3ba782",
+    "frozen/source/programs/generated/token_gpu_after.json": "596539f11e52d740ed5088d829a39b2e02de7f5a30722051ec18a1be3e876896",
+    "frozen/source/programs/generated/token_gpu_before.json": "4ba56004049ff701b8b7d7fbfdc784b14ce867748942a0b8e40b51034334930d",
+    "frozen/source/programs/generated/token_local_after.json": "004ed7f909b9104197f36c78950d275a47573ce1fb2e1e3738d16f01ba4d11ac",
+    "frozen/source/programs/generated/token_local_before.json": "a16246e270d192d463e1c12bca895946d31c7f6699dee1c74a54f6dd9a6361b5",
+    "jobs/worker.sbatch": "1b1aafc0e5f13b5b7e90abb259dc735a9f008085adf16b5c58e44002986ce64e",
+    "partition": "9c5955fc99a60b8f6dee6cf582c4420d91e1b3e2a201f532c91e2cbdfce7fa51",
+    "python-path": "681305b72b442a39ead82523cbd744e4ebce311acb91126a14dfcd2b990e6636"
+  },
+  "full_experiment_accepted": false,
+  "native_runs": [],
+  "passed": true,
+  "schema_version": 1,
+  "scope": "frozen",
+  "source_commit": "1e0b73bc8da695268fbf79f1013653b54120316e"
+}

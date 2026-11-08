@@ -1,0 +1,11 @@
+{
+  "archive": "completed-ae-solos.tar.gz",
+  "sha256": "e636d98422f61e2d1600b357776b27be39ae0e1625d75330c0a87c9003a280bc",
+  "source_commit": "1e0b73bc8da695268fbf79f1013653b54120316e",
+  "contents": ["Five complete AE solo raw.json, input-config.json, native.log and provenance.json", "Prepared experiment configs", "Frozen runtime, source and config SHA256 manifests", "Frozen source commit and independent audit-frozen.json"],
+  "scope": "18 layers x 10 denoising steps, five AE solo configurations, mac_freq_mult=4; not the concurrent ablation matrix",
+  "server_campaign": "dev0:/fact_data/xinyaowang/pim_vla_sim2_20261109/results/full-k4-final",
+  "full_runtime_and_generated_programs": "Preserved in server_campaign/frozen; source is pinned in Git and programs are deterministically generated",
+  "acceptance": "validation/full-k4-final-solos.json",
+  "calibration_and_following_work": "Paused by user on 2026-11-09; calibration candidates and collector cancelled, full case jobs never submitted"
+}

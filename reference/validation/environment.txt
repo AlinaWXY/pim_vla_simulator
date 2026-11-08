@@ -1,0 +1,7 @@
+Python 3.11.16
+g++ (GCC) 14.2.1 20240801 (Red Hat 14.2.1-1)
+cmake version 3.26.5
+ldd (GNU libc) 2.34
+Linux 5.14.0-503.33.1.el9_5.x86_64 x86_64 GNU/Linux
+CPU(s):                               128
+Model name:                           INTEL(R) XEON(R) GOLD 6548Y+

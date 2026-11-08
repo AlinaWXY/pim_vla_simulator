@@ -1,0 +1,52 @@
+completed combined total_us=616.606 commands=1134320
+[  2%] Built target fmt
+[  4%] Built target ramulator-power
+[ 27%] Built target yaml-cpp
+[ 31%] Built target ramulator-base
+[ 31%] Built target ramulator-translation
+[ 34%] Built target ramulator-memorysystem
+[ 42%] Built target ramulator-frontend
+[ 54%] Building CXX object CMakeFiles/test_pim_resources.dir/tests/test_pim_resources.cpp.o
+[ 56%] Built target ramulator-dram
+[ 87%] Built target ramulator-controller
+[ 88%] Built target ramulator
+[ 89%] Built target native_spec_tests
+[ 89%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 90%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 91%] Building CXX object CMakeFiles/native_lookahead_tests.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 92%] Linking CXX executable test_pim_resources
+[ 92%] Built target test_pim_resources
+[ 93%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 93%] Building CXX object CMakeFiles/native_lookahead_tests.dir/tests/native_lookahead_tests.cpp.o
+[ 95%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 95%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[ 96%] Building CXX object CMakeFiles/native_microbench.dir/tests/native_microbench.cpp.o
+[ 97%] Linking CXX executable native_lookahead_tests
+[ 97%] Built target native_lookahead_tests
+[ 98%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/frontend/impl/json_input.cpp.o
+[ 99%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/frontend/impl/pim_vla_frontend.cpp.o
+[ 99%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[100%] Linking CXX executable native_microbench
+[100%] Built target native_microbench
+[100%] Linking CXX executable pim_vla_sim
+[100%] Built target pim_vla_sim
+{"microbench":"pure_rd","bursts":64,"end_ck":151}
+{"microbench":"alternating_batches","bursts":64,"end_ck":545}
+{"microbench":"pure_wrgb","bursts":64,"end_ck":266}
+{"microbench":"wrgb_gpu_rd","gpu_issue_ck":254,"end_ck":279}
+{"microbench":"lookahead_barrier","head_wrgb_ck":17,"lookahead_wrgb_ck":14,"lookahead_gpu_ck":16}
+PimResources lifecycle tests passed
+{"diagnostic": "DQ overlap or return reordering at CK 101 RD -> WRGB", "fault_injection": "one_removed_RD_to_WRGB_sibling_rule", "status": "detected_by_passive_DQ_checker"}
+completed ae_solo total_us=0.470876 commands=256
+completed vlm_solo total_us=6.5735 commands=13456
+completed combined total_us=6.92338 commands=13744
+completed combined total_us=7.04438 commands=13712
+completed combined total_us=6.92338 commands=13744
+completed combined total_us=6.92338 commands=13744
+native frontend smoke: byte conservation, per-channel mix, causal kernels, bus bounds passed
+completed combined total_us=616.606 commands=1134320
+cc55236d1ba77a927280b14ca146dab4f69f2b20610d662acd5fafff2d5ae3af  results/assertion-performance/before/raw.json
+cc55236d1ba77a927280b14ca146dab4f69f2b20610d662acd5fafff2d5ae3af  results/assertion-performance/after/raw.json
+22.17 wall_s 21.96 user_s 253664 maxrss_kb
+6.41 wall_s 6.26 user_s 253224 maxrss_kb
+lazy assertion diagnostics preserve raw output byte-for-byte

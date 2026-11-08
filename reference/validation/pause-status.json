@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "timezone": "Asia/Shanghai",
+  "reason": "User requested uploading the branch first and postponing calibration and subsequent work",
+  "source_commit": "1e0b73bc8da695268fbf79f1013653b54120316e",
+  "ae_solo_array": {"job_id": 1976674, "tasks": "0..4", "status": "COMPLETED", "independent_acceptance_passed": true},
+  "calibration_array": {"job_id": 1976675, "tasks": "0..5", "status": "CANCELLED", "elapsed": "00:03:18", "accepted_calibration": false},
+  "collector": {"job_id": 1976676, "status": "CANCELLED", "elapsed": "00:00:00"},
+  "full_case_jobs_submitted": false,
+  "remaining_task_jobs_in_squeue": 0,
+  "partial_logs_preserved": true,
+  "native_midrun_checkpoint_available": false
+}

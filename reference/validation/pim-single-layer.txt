@@ -1,0 +1,281 @@
+-- The CXX compiler identification is GNU 14.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/rh/gcc-toolset-14/root/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Configuring pim_vla_sim2 ...
+-- Build type: Release
+Configuring yaml-cpp...
+Done configuring yaml-cpp.
+Configuring fmt...
+-- Version: 10.2.1
+-- Build type: Release
+Done configuring fmt.
+-- Configuring done (17.0s)
+-- Generating done (0.6s)
+-- Build files have been written to: /fact_data/xinyaowang/pim_vla_sim2_20261109/build
+[  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
+[  1%] Building CXX object ramulator2/src/ramulator/power/CMakeFiles/ramulator-power.dir/hbm/calculation.cpp.o
+[  2%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/factory.cpp.o
+[  2%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o
+[  3%] Building CXX object ramulator2/src/ramulator/power/CMakeFiles/ramulator-power.dir/ayna.cpp.o
+[  4%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o
+[  5%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o
+[  6%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/logger.cpp.o
+[  7%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o
+[  7%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/utils.cpp.o
+[  7%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o
+[  8%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/config.cpp.o
+[  9%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o
+[ 10%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o
+[ 10%] Built target ramulator-power
+[ 11%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.o
+[ 12%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/external.cpp.o
+[ 13%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/request.cpp.o
+[ 14%] Linking CXX static library libfmt.a
+[ 15%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o
+[ 15%] Built target ramulator-base
+[ 15%] Built target fmt
+[ 15%] Building CXX object ramulator2/src/ramulator/translation/CMakeFiles/ramulator-translation.dir/impl/no_translation.cpp.o
+[ 16%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/channel_mapper/impl/cache_line_interleave.cpp.o
+[ 16%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o
+[ 16%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/loadstore_trace.cpp.o
+[ 16%] Built target ramulator-translation
+[ 17%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/channel_mapper/impl/gem5_port_interleave.cpp.o
+[ 18%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/node.cpp.o
+[ 19%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/readwrite_trace.cpp.o
+[ 20%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o
+[ 21%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o
+[ 21%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/device.cpp.o
+[ 21%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/channel_mapper/impl/passthrough_channel_mapper.cpp.o
+[ 22%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/fptostring.cpp.o
+[ 23%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/dram_spec.cpp.o
+[ 24%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/latency_throughput_trace.cpp.o
+[ 24%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o
+[ 25%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/impl/generic_dram_system.cpp.o
+[ 26%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/node.cpp.o
+[ 27%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o
+[ 28%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR3.cpp.o
+[ 28%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o
+[ 28%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR4.cpp.o
+[ 29%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o
+[ 30%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/pum_trace.cpp.o
+[ 30%] Built target ramulator-memorysystem
+[ 30%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/simpleO3/simpleO3.cpp.o
+[ 31%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR4_PUM.cpp.o
+[ 32%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/null.cpp.o
+[ 33%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o
+[ 33%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o
+[ 34%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR4_VRR.cpp.o
+[ 35%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o
+[ 36%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/simpleO3/core.cpp.o
+[ 37%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/simpleO3/llc.cpp.o
+[ 38%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o
+[ 39%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR5.cpp.o
+[ 40%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/bhO3/bhO3.cpp.o
+[ 41%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o
+[ 41%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/bhO3/bhcore.cpp.o
+[ 41%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR5_VRR.cpp.o
+[ 43%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM1.cpp.o
+[ 43%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/bhO3/bhllc.cpp.o
+[ 44%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM2.cpp.o
+[ 44%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o
+[ 45%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o
+[ 45%] Built target ramulator-frontend
+[ 46%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o
+[ 47%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/controller_base.cpp.o
+[ 48%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM3.cpp.o
+[ 49%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o
+[ 49%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o
+[ 49%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM4.cpp.o
+[ 50%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o
+[ 51%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o
+[ 52%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/LPDDR5.cpp.o
+[ 52%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/scheduler/impl/frfcfs.cpp.o
+[ 53%] Linking CXX static library libyaml-cpp.a
+[ 54%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/LPDDR5XPIM.cpp.o
+[ 54%] Built target yaml-cpp
+[ 55%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/LPDDR6.cpp.o
+[ 55%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/GDDR6.cpp.o
+[ 56%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/GDDR7.cpp.o
+[ 57%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/scheduler/impl/frfcfs_rowhit.cpp.o
+[ 58%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/all_bank.cpp.o
+[ 59%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/per_bank.cpp.o
+[ 59%] Built target ramulator-dram
+[ 60%] Building CXX object CMakeFiles/test_pim_resources.dir/tests/test_pim_resources.cpp.o
+[ 60%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/hbm_per_bank_refresh.cpp.o
+[ 61%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/no_refresh.cpp.o
+[ 62%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/rowpolicy/impl/open.cpp.o
+[ 63%] Linking CXX executable test_pim_resources
+[ 63%] Built target test_pim_resources
+[ 64%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/rowpolicy/impl/closed_cap.cpp.o
+[ 64%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/addr_mapper_base.cpp.o
+[ 65%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/ch_ra_ba_ro_co.cpp.o
+[ 66%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/ro_ba_ra_co_ch.cpp.o
+[ 66%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/mop4clxor.cpp.o
+[ 67%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/passthrough_addr_mapper.cpp.o
+[ 68%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/rit_addr_mapper.cpp.o
+[ 69%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/command_counter.cpp.o
+[ 69%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/cmd_trace_recorder.cpp.o
+[ 70%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/issued_command_validation_hook.cpp.o
+[ 71%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/rfm_manager.cpp.o
+[ 72%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/para.cpp.o
+[ 72%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/oracle_rh.cpp.o
+[ 73%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/twice.cpp.o
+[ 74%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/graphene.cpp.o
+[ 75%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/hydra.cpp.o
+[ 75%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/rrs.cpp.o
+[ 76%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/aqua.cpp.o
+[ 77%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/samsung_trr.cpp.o
+[ 77%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/hynix_trr.cpp.o
+[ 78%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/ideal_trr.cpp.o
+[ 79%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/bin_trace_recorder.cpp.o
+[ 80%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/live_trace_streamer.cpp.o
+[ 80%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/generic_ddr_controller.cpp.o
+[ 81%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/pum_controller.cpp.o
+[ 82%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/lpddr_controller_base.cpp.o
+[ 83%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/lpddr5_controller.cpp.o
+[ 83%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/lpddr6_controller.cpp.o
+[ 84%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/hbm_controller_base.cpp.o
+[ 85%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/hbm12_controller.cpp.o
+[ 86%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/hbm34_controller.cpp.o
+[ 86%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/gddr7_controller.cpp.o
+[ 87%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/prac_controller.cpp.o
+[ 88%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/blockhammer_controller.cpp.o
+[ 88%] Built target ramulator-controller
+[ 89%] Linking CXX shared library /fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/libramulator.so
+[ 89%] Built target ramulator
+[ 89%] Building CXX object CMakeFiles/native_lookahead_tests.dir/tests/native_lookahead_tests.cpp.o
+[ 90%] Building CXX object CMakeFiles/native_microbench.dir/tests/native_microbench.cpp.o
+[ 91%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 91%] Building CXX object CMakeFiles/native_spec_tests.dir/tests/native_spec_tests.cpp.o
+[ 92%] Building CXX object CMakeFiles/native_lookahead_tests.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 93%] Linking CXX executable native_spec_tests
+[ 93%] Built target native_spec_tests
+[ 94%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 94%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 94%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[ 95%] Linking CXX executable native_lookahead_tests
+[ 95%] Built target native_lookahead_tests
+[ 96%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/frontend/impl/json_input.cpp.o
+[ 97%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/frontend/impl/pim_vla_frontend.cpp.o
+[ 98%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp: In static member function 'static int* PimVla::{anonymous}::ProgramSax::operation_integer(PimVla::{anonymous}::Frame&)':
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:139:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  139 |     if(k=="id")return &o.id;if(k=="slot")return &o.slot;if(k=="result_slot")return &o.result_slot;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:139:29: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  139 |     if(k=="id")return &o.id;if(k=="slot")return &o.slot;if(k=="result_slot")return &o.result_slot;
+      |                             ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:140:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  140 |     if(k=="rows")return &o.rows;if(k=="pairs")return &o.pairs;if(k=="dest_slot")return &o.dest_slot;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:140:33: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  140 |     if(k=="rows")return &o.rows;if(k=="pairs")return &o.pairs;if(k=="dest_slot")return &o.dest_slot;
+      |                                 ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:141:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  141 |     if(k=="source_bank")return &o.source_bank;if(k=="tensor_fragment")return &o.tensor_fragment;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:141:47: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  141 |     if(k=="source_bank")return &o.source_bank;if(k=="tensor_fragment")return &o.tensor_fragment;
+      |                                               ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:142:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  142 |     if(k=="output_columns")return &o.output_columns;if(k=="output_column")return &o.output_column;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:142:53: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  142 |     if(k=="output_columns")return &o.output_columns;if(k=="output_column")return &o.output_column;
+      |                                                     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:143:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  143 |     if(k=="fragment")return &o.fragment;if(k=="output_tile")return &o.output_tile;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:143:41: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  143 |     if(k=="fragment")return &o.fragment;if(k=="output_tile")return &o.output_tile;
+      |                                         ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:144:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  144 |     if(k=="kv_token")return &o.kv_token;if(k=="lanes")return &o.lanes;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:144:41: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  144 |     if(k=="kv_token")return &o.kv_token;if(k=="lanes")return &o.lanes;
+      |                                         ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:145:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  145 |     if(k=="elements")return &o.elements;if(k=="bytes")return &o.bytes;if(k=="token")return &o.token;
+      |     ^~
+/fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/src/ramulator/frontend/impl/json_input.cpp:145:41: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  145 |     if(k=="elements")return &o.elements;if(k=="bytes")return &o.bytes;if(k=="token")return &o.token;
+      |                                         ^~
+[ 99%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[100%] Linking CXX executable native_microbench
+[100%] Built target native_microbench
+[100%] Linking CXX executable pim_vla_sim
+[100%] Built target pim_vla_sim
+test_arbitration_presence_is_strict (test_config.ConfigurationTests.test_arbitration_presence_is_strict) ... ok
+test_hardware_multiplier (test_config.ConfigurationTests.test_hardware_multiplier) ... ok
+test_matrix (test_config.ConfigurationTests.test_matrix) ... ok
+test_only_five_structural_combinations (test_config.ConfigurationTests.test_only_five_structural_combinations) ... ok
+test_retired_switches_rejected (test_config.ConfigurationTests.test_retired_switches_rejected) ... ok
+test_watermark_validation (test_config.ConfigurationTests.test_watermark_validation) ... ok
+test_ae_stage_coverage_and_rope_boundary (test_config.InputTests.test_ae_stage_coverage_and_rope_boundary) ... ok
+test_calibration_cannot_accept_partial_or_shortened_kernel (test_config.InputTests.test_calibration_cannot_accept_partial_or_shortened_kernel) ... ok
+test_complete_vlm_preserves_measurements (test_config.InputTests.test_complete_vlm_preserves_measurements) ... ok
+test_logical_tensor_regions_and_physical_ring_capacity (test_config.InputTests.test_logical_tensor_regions_and_physical_ring_capacity) ... ok
+test_dq_conservation_and_historical_tensor_contract (test_programs.ProgramTests.test_dq_conservation_and_historical_tensor_contract) ... ok
+test_eighteen_physical_layers_are_disjoint_and_in_bounds (test_programs.ProgramTests.test_eighteen_physical_layers_are_disjoint_and_in_bounds) ... ok
+test_feature_q_and_k_cover_both_packed_halves (test_programs.ProgramTests.test_feature_q_and_k_cover_both_packed_halves) ... ok
+test_fused_has_six_mac_descriptors_and_optional_rope (test_programs.ProgramTests.test_fused_has_six_mac_descriptors_and_optional_rope) ... ok
+test_generator_rejects_capacity_or_dependency_corruption (test_programs.ProgramTests.test_generator_rejects_capacity_or_dependency_corruption) ... ok
+test_operator_scalar_mac_coverage_matches_tensor_shapes (test_programs.ProgramTests.test_operator_scalar_mac_coverage_matches_tensor_shapes) ... ok
+test_output_pool_allocation_and_two_o_tile_lifetimes (test_programs.ProgramTests.test_output_pool_allocation_and_two_o_tile_lifetimes) ... ok
+test_program_is_deterministic_and_has_no_timing_fields (test_programs.ProgramTests.test_program_is_deterministic_and_has_no_timing_fields) ... ok
+test_q_exchange_is_addressed_memory_not_masked_broadcast (test_programs.ProgramTests.test_q_exchange_is_addressed_memory_not_masked_broadcast) ... ok
+test_rank_rope_has_one_shared_unit_and_exact_work (test_programs.ProgramTests.test_rank_rope_has_one_shared_unit_and_exact_work) ... ok
+test_rope_and_layout_are_single_variable_traffic_differences (test_programs.ProgramTests.test_rope_and_layout_are_single_variable_traffic_differences) ... ok
+test_score_leaves_reduction_immediately_without_tile_cache (test_programs.ProgramTests.test_score_leaves_reduction_immediately_without_tile_cache) ... ok
+test_streaming_has_no_descriptor_or_staging (test_programs.ProgramTests.test_streaming_has_no_descriptor_or_staging) ... ok
+test_tensor_partition_is_bijective (test_programs.ProgramTests.test_tensor_partition_is_bijective) ... ok
+test_transient_arrays_have_complete_current_producers (test_programs.ProgramTests.test_transient_arrays_have_complete_current_producers) ... ok
+test_aliases_never_get_array_recovery (test_spec.SpecTests.test_aliases_never_get_array_recovery) ... ok
+test_all_48_interface_pairs (test_spec.SpecTests.test_all_48_interface_pairs) ... ok
+test_all_bg_is_broadcast (test_spec.SpecTests.test_all_bg_is_broadcast) ... ok
+test_completion_and_ca_metadata (test_spec.SpecTests.test_completion_and_ca_metadata) ... ok
+test_fixed_organization_and_clock (test_spec.SpecTests.test_fixed_organization_and_clock) ... ok
+test_jedec_numerical_values (test_spec.SpecTests.test_jedec_numerical_values) ... ok
+test_mac_frequency_and_row_count (test_spec.SpecTests.test_mac_frequency_and_row_count) ... ok
+test_private_issue_path_is_separate_from_execution (test_spec.SpecTests.test_private_issue_path_is_separate_from_execution) ... ok
+test_refresh_covers_pim_and_buffers (test_spec.SpecTests.test_refresh_covers_pim_and_buffers) ... ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 2.147s
+
+OK
+{"native_spec_checks":132,"status":"passed"}
+{"microbench":"pure_rd","bursts":64,"end_ck":151}
+{"microbench":"alternating_batches","bursts":64,"end_ck":545}
+{"microbench":"pure_wrgb","bursts":64,"end_ck":266}
+{"microbench":"wrgb_gpu_rd","gpu_issue_ck":254,"end_ck":279}
+{"native_lookahead":"passed","coverage":"future_DQ, native_preq, live_immutability, repeat, barrier, horizon, FIFO32"}
+PimResources lifecycle tests passed
+{"diagnostic": "DQ overlap or return reordering at CK 101 RD -> WRGB", "fault_injection": "one_removed_RD_to_WRGB_sibling_rule", "status": "detected_by_passive_DQ_checker"}
+completed ae_solo total_us=0.470876 commands=256
+completed vlm_solo total_us=6.5735 commands=13456
+completed combined total_us=6.92338 commands=13744
+completed combined total_us=7.04438 commands=13712
+completed combined total_us=6.92338 commands=13744
+completed combined total_us=6.92338 commands=13744
+native frontend smoke: byte conservation, per-channel mix, causal kernels, bus bounds passed
+{"variant": "feature_gpu_before", "path": "programs/generated/feature_gpu_before.json", "dq_bytes": 6242304, "sha256": "2ff664f359fb79ffeb42aa97bded1bebe1e51f9b552ec6883e804ab65d3ba782"}
+{"variant": "token_gpu_before", "path": "programs/generated/token_gpu_before.json", "dq_bytes": 5480448, "sha256": "4ba56004049ff701b8b7d7fbfdc784b14ce867748942a0b8e40b51034334930d"}
+{"variant": "token_local_before", "path": "programs/generated/token_local_before.json", "dq_bytes": 5283840, "sha256": "a16246e270d192d463e1c12bca895946d31c7f6699dee1c74a54f6dd9a6361b5"}
+{"variant": "token_gpu_after", "path": "programs/generated/token_gpu_after.json", "dq_bytes": 5087232, "sha256": "596539f11e52d740ed5088d829a39b2e02de7f5a30722051ec18a1be3e876896"}
+{"variant": "token_local_after", "path": "programs/generated/token_local_after.json", "dq_bytes": 4890624, "sha256": "004ed7f909b9104197f36c78950d275a47573ce1fb2e1e3738d16f01ba4d11ac"}
+PIM_SMOKE b
+completed ae_solo total_us=437.599 commands=559344
+PIM_SMOKE d
+completed ae_solo total_us=413.698 commands=575984
+PIM_SMOKE e
+completed ae_solo total_us=394.188 commands=583424
+PIM_SMOKE f
+completed ae_solo total_us=527.167 commands=947520
+PIM_SMOKE g
+completed ae_solo total_us=507.657 commands=955360
+all five actual PIM programs passed one layer

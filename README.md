@@ -6,11 +6,21 @@
 
 ## 当前验收状态
 
-2026-11-09，服务器 `dev0` 上的验证作业 **1976509** 已 `COMPLETED / 0:0`：spec、原生命令对矩阵、四个微基准、lookahead、资源生命周期、故障注入和合成前端验证通过；五种实际 PIM 程序均通过**单层**运行及 DQ 字节守恒检查。
+2026-11-09，已通过 38 项 Python 测试、132 项原生检查、四个时序微基准及 lookahead/barrier 回归、资源生命周期、故障注入和前端验证。五种实际 PIM 程序及八种并发配置的单层检查通过；**五种完整 18 层 × 10 步 AE solo 也已通过独立审计**，覆盖每阶段180次、逐通道DQ字节与占用周期守恒、二进制/运行库/输入来源一致性。
 
-**完整 18 层 × 10 步 AE、完整 VLM 校准、b–g 与三个仲裁消融的完整运行及重复一致性验收仍待完成。** 单层 smoke 不是完整实验结果，本 README 不提供未经完整验收的延迟或加速比。
+正式 AE 运行绑定源码 `1e0b73bc8da695268fbf79f1013653b54120316e`，`mac_freq_mult=4`，Slurm 数组作业为 `1976674`：
 
-验证日志：`/fact_data/xinyaowang/pim_vla_sim2_20261109/validate-1976509.log`。单层原始输出及 `validation.json` 位于该工作区的 `results/pim-smoke/`。这些运行文件不纳入 Git；导出的 spec 与 48 项命令对矩阵保存在 [reference/spec](reference/spec/)。
+| 程序 | 完整 AE solo / ms |
+|---|---:|
+| feature_gpu_before | 80.825733142 |
+| token_gpu_before | 76.648556502 |
+| token_local_before | 72.381632022 |
+| token_gpu_after | 97.128931984 |
+| token_local_after | 92.878612918 |
+
+验收记录见 [完整 AE 审计](reference/validation/full-k4-final-solos.json)，五份原始输出、配置与provenance见 [结果归档](reference/completed-ae-solos.tar.gz)（[归档校验信息](reference/completed-ae-solos.json)）；旧新差异及口径见 [对比说明](docs/legacy-comparison.md)。构建、微基准和单层并发日志保存在 [reference/validation](reference/validation/)。导出的 spec 与48项命令对矩阵位于 [reference/spec](reference/spec/)。
+
+**按用户2026-11-09要求，VLM校准及后续实验已暂停。** 六个校准候选作业与等待汇总作业已停止，已有日志和冻结输入保留；尚无通过验收的校准参数，完整 b–g/仲裁矩阵及两次重复一致性实验未运行。不得将上述 AE solo 结果当作并发消融结果。暂停位置见 [交接记录](docs/checkpoint-20261109.md)。
 
 ## 旧版本备份
 
