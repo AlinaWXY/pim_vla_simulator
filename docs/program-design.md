@@ -35,6 +35,9 @@ are 0–31; output-pool slots are 0–63. `source_regions` identifies exact
 FP32 source bytes by bank and byte offset, including a packet that collects
 data from two banks. Gather/cast operates on this existing output pool; the
 program introduces no rank result cache or unlimited packet scratch.
+Transfers consume these explicit words, so a later gather of disjoint words
+can overlap an earlier RDRES/LOCALWR completion tail; gather metadata remains
+ordered through CAST, and real RMW scratch retains its own lifetime checks.
 
 `pim_resources.h` enforces those identities independently of DRAM timing.
 It tracks validity, ready timestamps and in-flight readers for 32 SRF slots

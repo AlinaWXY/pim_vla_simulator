@@ -431,11 +431,11 @@ def resource_accesses(op):
     elif name == "CAST":
         reads.add(("gather", bank))
         writes.add(("gather", bank))
-    elif name in ("RDRES", "LOCALWR") and regions and op.get("source") != "reduction_output":
+    elif name in ("RDRES", "LOCALWR") and regions and op.get("source") == "rmw_scratch":
         owner = op.get("result_bank", op.get("source_bank", regions[0]["bank"]))
-        reads.add(("gather", owner))
-        if op.get("source") == "rmw_scratch":
-            reads.add(("rmw", owner))
+        reads.add(("rmw", owner))
+    # Transfers consume explicit output words, not last_gather_ metadata.
+    # Only CAST needs that metadata; disjoint packets may overlap DQ tails.
     if name == "LOCALWR" and op.get("source") == "rope_output":
         reads.add(("rope_output", bank, op["slot"]))
     return reads, writes

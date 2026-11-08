@@ -2,7 +2,8 @@
 import copy
 import json
 import unittest
-from programs.gen_pim_program import VARIANTS, EXTERNAL, generate, walk, validate_ops
+from programs.gen_pim_program import (VARIANTS, EXTERNAL, Builder, attach_hazard_dependencies,
+                                      generate, walk, validate_ops)
 from workloads import layout as L
 
 
@@ -262,6 +263,42 @@ class ProgramTests(unittest.TestCase):
         ops[0]["deps"] = [1]
         with self.assertRaisesRegex(ValueError, "earlier"):
             validate_ops(ops, 0)
+
+    def test_disjoint_output_transfers_do_not_serialize_gather(self):
+        first = [dict(bank=0, byte_offset=0, bytes=32)]
+        second = [dict(bank=0, byte_offset=32, bytes=32)]
+        for transfer in ("RDRES", "LOCALWR"):
+            for release in (False, True):
+                with self.subTest(transfer=transfer, release=release):
+                    b = Builder(0, "packet_hazards")
+                    ga = b.emit("GATHER", source_regions=first)
+                    ca = b.emit("CAST", deps=[ga], source_regions=first)
+                    read = b.emit(transfer, 4096, -1 if transfer == "RDRES" else 0,
+                                  deps=[ca], source_regions=first, result_bank=0,
+                                  release_result=release)
+                    gb = b.emit("GATHER", source_regions=second)
+                    cb = b.emit("CAST", deps=[gb], source_regions=second)
+                    # A replacement MAC does overwrite the first packet's words.
+                    replace = b.emit("MACAB", 8192, -1, rows=1, slot=0,
+                                     output_columns=1, output_column=0, fragment=0)
+                    attach_hazard_dependencies(b.ops)
+                    self.assertNotIn(read, completion_ancestors(b.ops, gb))
+                    self.assertNotIn(read, completion_ancestors(b.ops, cb))
+                    self.assertIn(ca, b.ops[gb]["deps"])
+                    self.assertIn(gb, b.ops[cb]["deps"])
+                    self.assertIn(read, completion_ancestors(b.ops, replace))
+
+        # RMW storage is real state, independent of the gather metadata selector.
+        b = Builder(0, "rmw_hazards")
+        load = b.emit("LOCALRD", 4096, dest="rmw_scratch")
+        gather = b.emit("GATHER", deps=[load], source="qkv_v_output", source_regions=first)
+        cast = b.emit("CAST", deps=[gather], source_regions=first)
+        store = b.emit("LOCALWR", 4096, deps=[cast], source="rmw_scratch",
+                       source_bank=0, source_regions=first)
+        reload = b.emit("LOCALRD", 4128, dest="rmw_scratch")
+        attach_hazard_dependencies(b.ops)
+        self.assertIn(load, b.ops[gather]["deps"])
+        self.assertIn(store, b.ops[reload]["deps"])
 
     def test_program_is_deterministic_and_has_no_timing_fields(self):
         p = self.programs["token_local_after"]
