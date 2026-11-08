@@ -1,0 +1,373 @@
+{
+  "binary_sha256": "42bb6028af5983b366b6a79b13e650cf85075d7bc32320aa26aa3a29a38cc2ca",
+  "calibration_executed": false,
+  "document_published": false,
+  "full_matrix_executed": false,
+  "measured_sources": {
+    "arithmetic-helper-measurements.json": "5b39c27eb0a4d016712aa6af43f1597227e7e118e7e426f1ea686f5cfc8bc3ec",
+    "direct-pv-handoff.json": "3cd09be1200ffd957bd10dabd6227353a65ea2c1575d82535405cb5ee1cc4c0c",
+    "natural-ae-kernel-ledger.json": "c28205aad5df067aafcf02592c27fff6b9b58e33a280537fde5bf4de718cc03e"
+  },
+  "requirements_sha256": "a8273123c0f306776eb09a8cc98269071b11d5e379e52398c1ae18f8a4c1fbfa",
+  "runtime_libraries": {
+    "libramulator.so": {
+      "path": "/fact_data/xinyaowang/pim_vla_sim2_20261109/results/version2-single-layer-1977315/frozen/lib/libramulator.so",
+      "sha256": "5d40bd44b5856697d84bb1b15399f2b13030bfa05d9995a497edd44399845623"
+    }
+  },
+  "schema_version": 1,
+  "source_commit": "f7c7af6eab0655b526773b9b15ed63e8e6f73add",
+  "spec_sha256": "e1c5e737c051ef01aa90bfbc5cb2f7ea4394967b2ab9a1962eced4b8f7942422",
+  "variants": {
+    "feature_gpu_before": {
+      "boundary": {
+        "first": "attention pre-normalization cast",
+        "last": "FFN residual add",
+        "retained_natural_gpu_ordinals": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          57,
+          58,
+          59,
+          60,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          78,
+          80,
+          83,
+          84
+        ],
+        "source_end_exclusive": 85,
+        "source_start": 30
+      },
+      "checks": [
+        {
+          "checked_commands": 478688,
+          "checks_passed": true,
+          "repetition": 0
+        },
+        {
+          "checked_commands": 478688,
+          "checks_passed": true,
+          "repetition": 1
+        }
+      ],
+      "program_sha256": "db18451a314372d2e913f771bf5c7ddcac94652e80cc87ffa9ffb80fcbdae379",
+      "raw_sha256": [
+        "15e828434c4eecc6f26155ca82c36cccebc4d5d1b150bb34491a2c7c8373e033",
+        "15e828434c4eecc6f26155ca82c36cccebc4d5d1b150bb34491a2c7c8373e033"
+      ],
+      "schedule_sha256": "b88025a624b173c38483566013f8a2c465261bdc196bed8d6f77e560ee6d16a9",
+      "wall_seconds": [
+        4.1777935535646975,
+        4.1734786429442465
+      ]
+    },
+    "token_gpu_after": {
+      "boundary": {
+        "first": "attention pre-normalization cast",
+        "last": "FFN residual add",
+        "retained_natural_gpu_ordinals": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          57,
+          58,
+          59,
+          60,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          78,
+          80,
+          83,
+          84
+        ],
+        "source_end_exclusive": 85,
+        "source_start": 30
+      },
+      "checks": [
+        {
+          "checked_commands": 715680,
+          "checks_passed": true,
+          "repetition": 0
+        },
+        {
+          "checked_commands": 715680,
+          "checks_passed": true,
+          "repetition": 1
+        }
+      ],
+      "program_sha256": "1bc24aeaa0049ed39396a7626eadd6a39c0cd45352d7ac6dba728531dd8dfc57",
+      "raw_sha256": [
+        "aba98defa1db7041d31fbcc647aafffe57e31b49c064dac367c562b3a7e8491b",
+        "aba98defa1db7041d31fbcc647aafffe57e31b49c064dac367c562b3a7e8491b"
+      ],
+      "schedule_sha256": "8a9649658a98e7586ab4d98ed51801f1017d903af2f5228e5cb08b8addadbcb2",
+      "wall_seconds": [
+        32.67151943966746,
+        33.288178694900125
+      ]
+    },
+    "token_gpu_before": {
+      "boundary": {
+        "first": "attention pre-normalization cast",
+        "last": "FFN residual add",
+        "retained_natural_gpu_ordinals": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          57,
+          58,
+          59,
+          60,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          78,
+          80,
+          83,
+          84
+        ],
+        "source_end_exclusive": 85,
+        "source_start": 30
+      },
+      "checks": [
+        {
+          "checked_commands": 470912,
+          "checks_passed": true,
+          "repetition": 0
+        },
+        {
+          "checked_commands": 470912,
+          "checks_passed": true,
+          "repetition": 1
+        }
+      ],
+      "program_sha256": "5b5e9f044e589e1862e99267b1f7603ef3569be54f0d70f6a79b4ca26963c4c0",
+      "raw_sha256": [
+        "294545a369231d595ea81de06d1137b1ecb10442be8b01a504bdda6262196d8f",
+        "294545a369231d595ea81de06d1137b1ecb10442be8b01a504bdda6262196d8f"
+      ],
+      "schedule_sha256": "3dc7ab8a752c25a81088cdf302deb9d48c7f343fb1c20937992870b847a189b0",
+      "wall_seconds": [
+        4.336063158232719,
+        4.2561014532111585
+      ]
+    },
+    "token_local_after": {
+      "boundary": {
+        "first": "attention pre-normalization cast",
+        "last": "FFN residual add",
+        "retained_natural_gpu_ordinals": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          57,
+          58,
+          59,
+          60,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          78,
+          80,
+          83,
+          84
+        ],
+        "source_end_exclusive": 85,
+        "source_start": 30
+      },
+      "checks": [
+        {
+          "checked_commands": 721280,
+          "checks_passed": true,
+          "repetition": 0
+        },
+        {
+          "checked_commands": 721280,
+          "checks_passed": true,
+          "repetition": 1
+        }
+      ],
+      "program_sha256": "69c383d7e6021760e11acc819972be3b61282de557189ecc94a1ce8f22c2f986",
+      "raw_sha256": [
+        "0ae3f5bf43695a689f96fcd63f95b46a4fff48102f4f56b5c433a2e93a97d297",
+        "0ae3f5bf43695a689f96fcd63f95b46a4fff48102f4f56b5c433a2e93a97d297"
+      ],
+      "schedule_sha256": "34c10d96e902d784533ffb436f0be0cf1ca70c22c6466cbdaa01f1a0d1c12bd4",
+      "wall_seconds": [
+        33.833646471612155,
+        33.04475897597149
+      ]
+    },
+    "token_local_before": {
+      "boundary": {
+        "first": "attention pre-normalization cast",
+        "last": "FFN residual add",
+        "retained_natural_gpu_ordinals": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          57,
+          58,
+          59,
+          60,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          78,
+          80,
+          83,
+          84
+        ],
+        "source_end_exclusive": 85,
+        "source_start": 30
+      },
+      "checks": [
+        {
+          "checked_commands": 476256,
+          "checks_passed": true,
+          "repetition": 0
+        },
+        {
+          "checked_commands": 476256,
+          "checks_passed": true,
+          "repetition": 1
+        }
+      ],
+      "program_sha256": "c60a2abdb4883f373e848cb3a29293bc7b338e6ab16e3dc09551cc141d359dbc",
+      "raw_sha256": [
+        "a4f4faab3af70350b3c92d8f7c2aac9c74378f716eac50818795a15b57b17564",
+        "a4f4faab3af70350b3c92d8f7c2aac9c74378f716eac50818795a15b57b17564"
+      ],
+      "schedule_sha256": "8e76a593d469c4ad32a1d327241ac1c3e6568fc362fbf4e40ada28e9d1070ec4",
+      "wall_seconds": [
+        4.2901636539027095,
+        4.328946917783469
+      ]
+    }
+  }
+}

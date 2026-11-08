@@ -1,0 +1,5 @@
+{"variant": "feature_gpu_before", "path": "results/version2-single-layer-1977315/frozen/programs/feature_gpu_before.json", "dq_bytes": 6242304, "sha256": "db18451a314372d2e913f771bf5c7ddcac94652e80cc87ffa9ffb80fcbdae379"}
+{"variant": "token_gpu_before", "path": "results/version2-single-layer-1977315/frozen/programs/token_gpu_before.json", "dq_bytes": 5480448, "sha256": "5b5e9f044e589e1862e99267b1f7603ef3569be54f0d70f6a79b4ca26963c4c0"}
+{"variant": "token_local_before", "path": "results/version2-single-layer-1977315/frozen/programs/token_local_before.json", "dq_bytes": 5283840, "sha256": "c60a2abdb4883f373e848cb3a29293bc7b338e6ab16e3dc09551cc141d359dbc"}
+{"variant": "token_gpu_after", "path": "results/version2-single-layer-1977315/frozen/programs/token_gpu_after.json", "dq_bytes": 5087232, "sha256": "1bc24aeaa0049ed39396a7626eadd6a39c0cd45352d7ac6dba728531dd8dfc57"}
+{"variant": "token_local_after", "path": "results/version2-single-layer-1977315/frozen/programs/token_local_after.json", "dq_bytes": 4890624, "sha256": "69c383d7e6021760e11acc819972be3b61282de557189ecc94a1ce8f22c2f986"}

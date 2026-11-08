@@ -1,0 +1,8 @@
+{
+  "archive": "version2-single-layer.tar.gz",
+  "bytes": 155579,
+  "includes": "All ten native raw/config/provenance outputs, single-layer inputs, summaries, validation logs and frozen manifest/spec. Executable/library/program files stay in the server frozen directory.",
+  "sha256": "f617fd45a6f53bbac3ffefa04f783e56e9d54dc20bb514da8900431a502ba83e",
+  "slurm_job_id": 1977315,
+  "source_commit": "f7c7af6eab0655b526773b9b15ed63e8e6f73add"
+}

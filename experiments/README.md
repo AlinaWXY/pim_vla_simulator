@@ -1,5 +1,21 @@
 # Native experiment workflow
 
+The current user-authorized scope is **Version2, step 0 / layer 0 only**.
+Calibration, full AE and end-to-end runs remain paused. Use the separate entry:
+
+```bash
+python programs/gen_pim_program.py --output programs/generated --compact
+python experiments/run_single_layer.py --binary build/pim_vla_sim \
+  --output results/version2-single-layer --repeats 2
+```
+
+This runs the five AE structures with no VLM path, no memory-traffic fit and no
+call to the full campaign. It includes both layer residuals and normalization,
+plus the measured streaming PV-to-O transpose. Global prefix/final work is
+outside this layer boundary. See [the Version2 report](../docs/version2-single-layer.md)
+for exact scope, source bindings and results. Every run requires a fresh output
+directory. The workflow below describes the paused full-campaign capability.
+
 `run.py` invokes `build/pim_vla_sim`; it does not schedule memory commands or
 reconstruct timing from traces. The source ledgers under `input-data/measured`
 are Thor measurements. The normalized inputs retain every measured kernel

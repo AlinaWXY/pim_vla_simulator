@@ -1,0 +1,24 @@
+Reusing byte-identical native runtime from the validated clean build; only generator dependencies changed.
+[  2%] Built target ramulator-power
+[  3%] Built target fmt
+[  6%] Built target ramulator-base
+[ 28%] Built target yaml-cpp
+[ 29%] Built target ramulator-translation
+[ 32%] Built target ramulator-memorysystem
+[ 40%] Built target ramulator-frontend
+[ 52%] Built target ramulator-dram
+[ 53%] Built target test_pim_resources
+[ 83%] Built target ramulator-controller
+[ 84%] Built target ramulator
+[ 87%] Built target native_spec_tests
+[ 87%] Built target native_lookahead_tests
+[ 94%] Built target pim_vla_sim
+[ 94%] Built target native_microbench
+[ 96%] Built target benchmark_program_input
+[100%] Built target native_sequencer_tests
+feature_gpu_before: total=460.850656 us PIM=322.153286 us GPU=138.697370 us
+token_gpu_before: total=422.385152 us PIM=296.824472 us GPU=125.560680 us
+token_local_before: total=393.291206 us PIM=295.625708 us GPU=97.665498 us
+token_gpu_after: total=416.763718 us PIM=296.195074 us GPU=120.568644 us
+token_local_after: total=387.498118 us PIM=294.824656 us GPU=92.673462 us
+results/version2-single-layer-1977315

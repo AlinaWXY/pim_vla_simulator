@@ -8,6 +8,8 @@
 
 当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**。VLM 校准、完整 AE 和端到端并发实验保持暂停。Version2 更新包括原生 ACTAB、每 bank RoPE、真实输出池归约暂存、描述符 FIFO32 有限乱序、Q 导入 epoch，以及 streaming PV→O 实测转置。单层结果与验证记录见 [Version2 单层报告](docs/version2-single-layer.md)。
 
+五种单层总延迟依次为 **460.851 / 422.385 / 393.291 / 416.764 / 387.498 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `f7c7af6`、作业 `1977315`；44 项 Python、222 项原生时序检查通过，五配置均两次逐字节一致。
+
 独立入口为 `python experiments/run_single_layer.py --output results/version2-single-layer --repeats 2`；它仅构造五种单层 AE 配置，不加载 VLM，也不调用完整实验入口。
 
 ## Version1 历史验收记录

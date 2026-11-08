@@ -1,0 +1,2 @@
+PimResources lifecycle tests passed
+PimResources accepts 154368 generated requests

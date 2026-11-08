@@ -1,0 +1,5 @@
+{"microbench":"pure_rd","bursts":64,"end_ck":151}
+{"microbench":"alternating_batches","bursts":64,"end_ck":545}
+{"microbench":"pure_wrgb","bursts":64,"end_ck":266}
+{"microbench":"wrgb_gpu_rd","gpu_issue_ck":254,"end_ck":279}
+{"microbench":"lookahead_barrier","head_wrgb_ck":17,"lookahead_wrgb_ck":14,"lookahead_gpu_ck":16}

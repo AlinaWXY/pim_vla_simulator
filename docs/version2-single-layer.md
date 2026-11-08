@@ -19,10 +19,50 @@ Layout 继续遵循用户要求保留 1108 的实际 feature/token 映射，包�
 - QKT 的归约结果存入现有每 bank 2 KiB 输出池，496 列批满后集中 LOCALWR；没有额外 rank score cache。streaming 仍逐列 RDRES。
 - 描述符内部 FIFO32 允许已满足依赖的后续操作及安全 ACT/PRE 提前发射。完成依赖保护数据，issue 依赖保护流水顺序；barrier、I/O epoch 和未发请求所需行限制重排。
 - Q 导入先完成整个 WR epoch，再 LOCALRD 装载 SRF。生成器为阵列、SRF、输出池、gather/CAST 和 RoPE 资源生成 RAW/WAR/WAW 依赖。
+- RDRES / LOCALWR 直接读取精确的输出池区域，不锁住另一份虚构的 gather 数据缓冲。不同输出字的 gather 与传输可以重叠；相同输出字的冲突、GATHER→CAST 元数据和 V 尾部 RMW scratch 生命周期仍受保护。
 
 ## 结果与验证
 
-实现与验证进行中；结果完成后补入本节。历史完整 AE 原始结果保持原样，不用于声称 Version2 已完成完整验证。
+最终模型源提交：`f7c7af6eab0655b526773b9b15ed63e8e6f73add`；Slurm 作业 `1977315` 成功退出。LPDDR5X-8533、16 通道、`mac_freq_mult=4`，单层原生行状态与周期刷新均保留。每种配置独立执行两次，两份 `raw.json` 逐字节一致。
+
+| 配置 | PIM / μs | GPU / μs | 单层总计 / μs |
+|---|---:|---:|---:|
+| Feature / GPU RoPE / streaming | 322.153 | 138.697 | 460.851 |
+| Token / GPU RoPE / streaming | 296.824 | 125.561 | 422.385 |
+| Token / bank RoPE / streaming | 295.626 | 97.665 | 393.291 |
+| Token / GPU RoPE / fused | 296.195 | 120.569 | 416.764 |
+| Token / bank RoPE / fused | 294.825 | 92.673 | 387.498 |
+
+GPU 列是已有实测 GPU 算子向上取整到 CK 后的总和；PIM 列来自原生事件时间戳。这不是完整 AE 或端到端时间，不能直接乘 180 充当完整模型结果。
+
+PIM 各阶段如下，单位 μs；“—”表示该配置不存在该阶段：
+
+| 阶段 | Feature/GPU/stream | Token/GPU/stream | Token/local/stream | Token/GPU/fused | Token/local/fused |
+|---|---:|---:|---:|---:|---:|
+| qkv | 64.809 | 64.081 | 64.081 | 64.027 | 64.027 |
+| rope | — | — | 1.180 | — | 1.367 |
+| rope_export | 1.698 | 1.786 | — | 1.840 | — |
+| rope_import | 1.324 | 1.430 | — | 1.430 | — |
+| q_exchange_export | 0.254 | 0.044 | 0.686 | 0.044 | 0.857 |
+| q_exchange_import | 0.000 | 1.288 | 1.275 | 1.288 | 1.044 |
+| qkt | 81.253 | 41.643 | 41.237 | 23.310 | 23.276 |
+| pv | 22.449 | 19.657 | 19.333 | 21.532 | 20.821 |
+| o | 21.599 | 37.958 | 37.748 | 37.030 | 37.739 |
+| gate_up | 68.156 | 68.260 | 68.260 | 70.700 | 70.700 |
+| down | 60.611 | 60.678 | 61.825 | 74.994 | 74.994 |
+
+在 token/GPU 配置中，fused 的 QKT 从 41.643 μs 降至 23.310 μs，但 Down 从 60.678 μs 增至 74.994 μs；PIM 合计仅减少约 0.629 μs。因此本次总时间收益不能全部归于 QKT，也不表示所有 fused 阶段都更快。
+
+验证通过：44 项 Python 测试、222 项原生时序检查、5 个总线微基准、lookahead 回归、8 个 FIFO32 调度回归、资源生命周期及 154,368 条生成请求重放、故障注入。快速 JSON 解析器与独立 Python 对照逐字段匹配 630,608 条 fused/local 操作，并拒绝 7 类非法输入。逐阶段/逐通道 DQ 字节和占用界限检查通过；全部 rank0/VLM 请求、VLM kernel、AE GPU 等待和 VLM 尾部均为零。
+
+原生运行库来自 `292cfbc` 的干净构建；最终 `f7c7af6` 只修改生成器、其回归测试和说明文档。运行脚本核对两提交的原生代码/spec 完全相同，并逐字节比较二进制与运行库，再重新生成全部程序、重做单层计时。构建和差异证据均在验证日志中。
+
+此前 `1977130` 的结果包含过度保守的 gather 依赖，只作为诊断留存；不纳入本报告或最终归档。历史 Version1 完整 AE 结果保持原样。
+
+- [汇总 CSV](../reference/version2-single-layer/single-layer-latency.csv)、[逐阶段 CSV](../reference/version2-single-layer/stage-latencies.csv)、[GPU 块 CSV](../reference/version2-single-layer/gpu-blocks.csv)。
+- [来源记录](../reference/version2-single-layer/provenance.json)、[独立审计](../reference/version2-single-layer/independent-audit.json)、[验证日志](../reference/version2-single-layer/validation/)。
+- [十份原始输出及配置归档](../reference/version2-single-layer.tar.gz)，SHA-256 `f617fd45a6f53bbac3ffefa04f783e56e9d54dc20bb514da8900431a502ba83e`。
+- 服务器冻结目录：`dev0:/fact_data/xinyaowang/pim_vla_sim2_20261109/results/version2-single-layer-1977315/`；完整程序、可执行文件、运行库及哈希清单保存在 `frozen/`。
 
 复现入口：
 

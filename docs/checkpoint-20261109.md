@@ -1,5 +1,9 @@
 # 2026-11-09 上传与暂停记录
 
+最新范围：用户随后提供 Version2，并要求仅查看 **一层、一个 denoising step** 的 latency。当前实现冻结源码为 `f7c7af6eab0655b526773b9b15ed63e8e6f73add`，新版单层验证与结果见 [Version2 单层报告](version2-single-layer.md)。校准及端到端实验仍暂停。
+
+以下是 Version1 的历史交接记录。`results/full-k4-final` 的冻结文件保持原样，不能把它们的校准/恢复配置与 Version2 的二进制或程序混用。将来恢复完整实验须先处理 Version2 报告中的待办，并建立新的冻结目录。
+
 用户要求：先上传 `xinyao_1109`，校准及之后的工作先暂停。
 
 已完成：旧代码完整备份及 `legacy-1108` 标签；Ramulator2原生重写；时序、资源、故障注入和单层并发验证；五种完整18层×10步AE solo及独立守恒/来源审计。具体时长和文件哈希见 [完整AE验收记录](../reference/validation/full-k4-final-solos.json)。
