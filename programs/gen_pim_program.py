@@ -25,6 +25,7 @@ VARIANTS = {
 }
 EXPECTED_DQ = dict(zip(VARIANTS, (6096, 5352, 5160, 4968, 4776)))
 EXTERNAL = {"RD", "WR", "WRGB", "RDRES"}
+QKT_BATCH_COLUMNS = (L.OUTPUT_BYTES // 4) - 16  # 16 temporary FP32 contributions per bank.
 
 
 class Builder:
@@ -104,9 +105,10 @@ def local_projection_spills(b, last, feature):
             gather = b.emit("GATHER", deps=[last], bank=bank, bytes=64, elements=16,
                             source_regions=regions, source="qkv_output")
             cast = b.emit("CAST", deps=[gather], bank=bank, elements=16,
-                          source="qkv_output", output_bytes=32)
+                          source="qkv_output", source_regions=regions, output_bytes=32)
             writes.append(b.emit("LOCALWR", L.WORK_BASE + col * 32, bank, deps=[cast],
-                                 source="qkv_output", output_bytes=32))
+                                 source="qkv_output", source_bank=bank,
+                                 source_regions=regions, output_bytes=32))
         for lane in range(16):
             offset = L.V_BASE + (30 * 16 + lane) * 32
             rd = b.emit("LOCALRD", offset, bank, deps=[last], dest="rmw_scratch")
@@ -118,8 +120,9 @@ def local_projection_spills(b, last, feature):
             gather = b.emit("GATHER", bank=bank, deps=[rd], bytes=32, elements=8,
                             source="qkv_v_output", source_regions=regions, preserve_lanes=preserve)
             cast = b.emit("CAST", bank=bank, deps=[gather], elements=8,
-                          zero_lanes=zero, output_bytes=32)
-            writes.append(b.emit("LOCALWR", offset, bank, deps=[cast], source="rmw_scratch"))
+                          source_regions=regions, zero_lanes=zero, output_bytes=32)
+            writes.append(b.emit("LOCALWR", offset, bank, deps=[cast], source="rmw_scratch",
+                                 source_bank=bank, source_regions=regions))
     return b.fence(writes)
 
 
@@ -142,19 +145,40 @@ def qkv(channel, feature, fused):
 
 def rope(channel, fused):
     outer, b = Builder(channel, "rope"), Builder(channel, "rope")
-    last_exec = []
-    writes = []
+    writes, last_store = [], {}
     for token in range(8):
+        coefficients, reads, q_exec, k_reads, k_exec = {}, {}, {}, {}, {}
         for bank in range(16):
-            coef = b.emit("LOCALRD", L.COEF_BASE + token * 32, bank, dest="rope_coefficient", token=token)
-            for which, base in enumerate((L.Q_BASE, L.K_SUFFIX_BASE)):
-                read = b.emit("LOCALRD", base + token * 32, bank, dest="rope_input", slot=which, token=token)
-                execute = b.emit("ROPE_EXEC", base + token * 32, bank,
-                                 deps=[coef, read] + last_exec, slot=which, pairs=8,
-                                 shared_unit="rank_rope", token=token)
-                last_exec = [execute]
-                writes.append(b.emit("LOCALWR", base + token * 32, bank, deps=[execute],
-                                     source="rope_output", slot=which, token=token))
+            coefficients[bank] = b.emit("LOCALRD", L.COEF_BASE + token * 32, bank,
+                                        dest="rope_coefficient", token=token)
+        for bank in range(16):
+            reads[bank] = b.emit("LOCALRD", L.Q_BASE + token * 32, bank,
+                                 dest="rope_input", slot=0, token=token)
+        # Q executes while K loads into the other slot. Banks are independent;
+        # no completion edge joins execution units on different banks.
+        for bank in range(16):
+            q_exec[bank] = b.emit("ROPE_EXEC", L.Q_BASE + token * 32, bank,
+                                  deps=[coefficients[bank], reads[bank]], slot=0,
+                                  pairs=8, shared_unit="bank_rope", token=token)
+            k_reads[bank] = b.emit("LOCALRD", L.K_SUFFIX_BASE + token * 32, bank,
+                                   deps=[reads[bank]], issue_deps=[q_exec[bank]],
+                                   dest="rope_input", slot=1, token=token)
+        for bank in range(16):
+            k_exec[bank] = b.emit("ROPE_EXEC", L.K_SUFFIX_BASE + token * 32, bank,
+                                  deps=[coefficients[bank], k_reads[bank]], slot=1,
+                                  issue_deps=[q_exec[bank]], pairs=8,
+                                  shared_unit="bank_rope", token=token)
+        q_stores = {}
+        for bank in range(16):
+            q_stores[bank] = b.emit("LOCALWR", L.Q_BASE + token * 32, bank,
+                                    deps=[q_exec[bank]] + ([last_store[bank]] if bank in last_store else []),
+                                    source="rope_output", slot=0, token=token)
+            writes.append(q_stores[bank])
+        for bank in range(16):
+            last_store[bank] = b.emit("LOCALWR", L.K_SUFFIX_BASE + token * 32, bank,
+                                      deps=[k_exec[bank], q_stores[bank]],
+                                      source="rope_output", slot=1, token=token)
+            writes.append(last_store[bank])
     b.fence(writes)
     if fused:
         outer.descriptor("rope", b)
@@ -193,39 +217,61 @@ def q_exchange(channel, gpu_rope, feature, export):
                        dest_slot=2 * token + channel % 2, tensor="local_Q")
         return b.ops
     # The stage boundary is a global barrier across all sixteen channels.
+    writes = []
     for token in range(8):
         for bank in range(16):
-            wr = b.emit("WR", L.Q_IMPORT_BASE + token * 32, bank,
-                        epoch="q_import", tensor="remote_Q", source_channel=channel ^ 1,
-                        source_offset=L.Q_BASE + token * 32)
-            b.emit("LOCALRD", L.Q_IMPORT_BASE + token * 32, bank, deps=[wr],
+            writes.append(b.emit("WR", L.Q_IMPORT_BASE + token * 32, bank,
+                                 epoch="q_import", tensor="remote_Q", source_channel=channel ^ 1,
+                                 source_offset=L.Q_BASE + token * 32))
+    complete = b.fence(writes)
+    for token in range(8):
+        for bank in range(16):
+            b.emit("LOCALRD", L.Q_IMPORT_BASE + token * 32, bank, deps=[complete],
                    dest_slot=2 * token + 1 - channel % 2, tensor="remote_Q")
     return b.ops
 
 
 def qkt(channel, feature, fused):
     outer, b = Builder(channel, "qkt"), Builder(channel, "qkt")
-    previous = []
+    previous, reductions = [], []
     n = 992 if feature else 496
     for token in range(n):
         mac = b.emit("MACQK", L.key_offset(token, feature), -1, deps=previous,
                      slot=0, rows=16, lanes=8 if feature else 16,
                      weight_lane_offset=8 * (token % 2) if feature else 0,
                      kv_token=token, output_bytes_per_bank=64, output_columns=1)
+        word = 16 + token % QKT_BATCH_COLUMNS if fused else 16
         reduce = b.emit("REDUCE", bank=-1, deps=[mac], elements=16,
                         levels=["bank_group", "rank"], kv_token=token,
-                        cache_result=False)
+                        reduction_word=word, cache_result=False,
+                        result_storage="bank_query_output_pool")
+        reductions.append(reduce)
+        if fused:
+            previous = [reduce]
+            if len(reductions) < QKT_BATCH_COLUMNS and token != n - 1:
+                continue
+            full = b.fence(reductions)
+            outputs = []
+            first = token + 1 - len(reductions)
+            for stored in range(first, token + 1):
+                for packet in range(2):
+                    bank, offset = L.score_location(stored, packet)
+                    regions = [dict(bank=q, byte_offset=(16 + stored % QKT_BATCH_COLUMNS) * 4, bytes=4)
+                               for q in range(packet * 8, packet * 8 + 8)]
+                    outputs.append(b.emit("LOCALWR", offset, bank, deps=[full],
+                                          source="reduction_output", result_slot=packet,
+                                          source_regions=regions, release_result=True, kv_token=stored))
+            previous = [b.fence(outputs)]
+            reductions = []
+            continue
         outputs = []
         for packet in range(2):
-            if fused:
-                bank, offset = L.score_location(token, packet)
-                outputs.append(b.emit("LOCALWR", offset, bank, deps=[reduce],
-                                      source="reduction_output", result_slot=packet,
-                                      release_result=True, kv_token=token))
-            else:
-                outputs.append(b.emit("RDRES", packet * 32, -1, deps=[reduce],
-                                      source="reduction_output", result_slot=packet,
-                                      release_result=True, kv_token=token, epoch="score_stream"))
+            regions = [dict(bank=q, byte_offset=word * 4, bytes=4)
+                       for q in range(packet * 8, packet * 8 + 8)]
+            outputs.append(b.emit("RDRES", packet * 32, -1, deps=[reduce],
+                                  source="reduction_output", result_slot=packet,
+                                  source_regions=regions, release_result=True,
+                                  kv_token=token, epoch="score_stream"))
         previous = outputs
     if fused:
         run = outer.descriptor("qkt", b)
@@ -260,7 +306,7 @@ def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0):
         ready = gather
         if bf16:
             ready = b.emit("CAST", bank=bank, deps=[gather], elements=elements, output_bytes=32,
-                           output_tile=tile)
+                           source_regions=regions, output_tile=tile)
         last.append(b.emit("RDRES", packet * 32, -1, deps=[ready], result_bank=bank,
                            result_slot=(query * features_per_bank + lane) // 8,
                            source_regions=regions, output_tile=tile, release_result=True, epoch=epoch))
@@ -280,10 +326,12 @@ def pv(channel, feature, fused):
                 gather = b.emit("GATHER", bank=fragment, deps=[last], bytes=64, elements=16,
                                 source="pv_output", result_slot=query * 2, result_bank=fragment,
                                 source_regions=[dict(bank=fragment, byte_offset=query * 64, bytes=64)])
-                cast = b.emit("CAST", bank=fragment, deps=[gather], elements=16, output_bytes=32)
+                regions = [dict(bank=fragment, byte_offset=query * 64, bytes=64)]
+                cast = b.emit("CAST", bank=fragment, deps=[gather], elements=16,
+                              source_regions=regions, output_bytes=32)
                 bank, offset = L.staging(fragment, query, 16)
                 writes.append(b.emit("LOCALWR", offset, bank, deps=[cast], source="pv_bf16",
-                                     release_result=True))
+                                     source_bank=fragment, source_regions=regions, release_result=True))
         b.fence(writes)
         outer.descriptor("pv", b, [seal])
         return outer.ops
@@ -332,9 +380,98 @@ def walk(ops):
         yield from walk(op.get("children", []))
 
 
+def resource_accesses(op):
+    """Exact RAW/WAR/WAW identities; values are metadata, never timing rules."""
+    reads, writes = set(), set()
+    name, addr = op["op"], op["addr"]
+    banks = range(16) if addr[2] == -1 else (addr[2] * 4 + addr[3],)
+    bank = addr[2] * 4 + addr[3]
+    if name in ("RD", "LOCALRD", "MACAB", "MACQK"):
+        reads.update(("array", b, addr[4], addr[5]) for b in banks)
+    elif name in ("WR", "LOCALWR"):
+        writes.update(("array", b, addr[4], addr[5]) for b in banks)
+    if name in ("WRGB", "BCAST"):
+        writes.update(("srf", b, op.get("slot", 0)) for b in range(16))
+        if name == "BCAST":
+            reads.add(("srf", op["source_bank"], op.get("slot", 0)))
+    elif name == "LOCALRD":
+        if op.get("dest_slot", -1) >= 0:
+            writes.add(("srf", bank, op["dest_slot"]))
+        elif op.get("dest") == "rope_coefficient":
+            writes.add(("rope_coef", bank))
+        elif op.get("dest") == "rope_input":
+            writes.add(("rope_input", bank, op["slot"]))
+        elif op.get("dest") == "rmw_scratch":
+            writes.add(("rmw", bank))
+    elif name in ("MACAB", "MACQK"):
+        for b in range(16):
+            reads.update(("srf", b, s) for s in range(op.get("slot", 0), op.get("slot", 0) + op["rows"]))
+            for q in range(op["rows"]):
+                key = ("output", b, q * op["output_columns"] + op.get("output_column", 0))
+                writes.add(key)
+                if name == "MACAB" and op["fragment"] > 0:
+                    reads.add(key)
+    elif name == "REDUCE":
+        reads.update(("output", b, q) for b in range(16) for q in range(16))
+        writes.update(("output", b, op["reduction_word"]) for b in range(16))
+    elif name == "ROPE_EXEC":
+        reads.update((("rope_coef", bank), ("rope_input", bank, op["slot"])))
+        writes.add(("rope_output", bank, op["slot"]))
+    regions = op.get("source_regions", ())
+    pool_words = {("output", r["bank"], word) for r in regions
+                  for word in range(r["byte_offset"] // 4, (r["byte_offset"] + r["bytes"]) // 4)}
+    if name in ("GATHER", "CAST", "RDRES", "LOCALWR"):
+        reads.update(pool_words)
+        if name == "CAST" or op.get("release_result", False):
+            writes.update(pool_words)
+    if name == "GATHER":
+        writes.add(("gather", bank))
+        if op.get("source") == "qkv_v_output":
+            reads.add(("rmw", bank))
+    elif name == "CAST":
+        reads.add(("gather", bank))
+        writes.add(("gather", bank))
+    elif name in ("RDRES", "LOCALWR") and regions and op.get("source") != "reduction_output":
+        owner = op.get("result_bank", op.get("source_bank", regions[0]["bank"]))
+        reads.add(("gather", owner))
+        if op.get("source") == "rmw_scratch":
+            reads.add(("rmw", owner))
+    if name == "LOCALWR" and op.get("source") == "rope_output":
+        reads.add(("rope_output", bank, op["slot"]))
+    return reads, writes
+
+
+def attach_hazard_dependencies(ops):
+    """Make issue-order assumptions explicit before a controller may reorder.
+
+    A write follows the last writer and every preceding reader of that cell.
+    A read follows the last writer. Descriptor children have an independent ID
+    space; outer descriptor completion already orders their externally visible
+    consumers. No dependency is removed, and barriers retain their explicit scope.
+    """
+    writers, readers = {}, {}
+    for op in ops:
+        if "children" in op:
+            attach_hazard_dependencies(op["children"])
+        read, write = resource_accesses(op)
+        deps = set(op["deps"])
+        for key in read | write:
+            if key in writers:
+                deps.add(writers[key])
+        for key in write:
+            deps.update(readers.get(key, ()))
+        op["deps"] = sorted(deps)
+        for key in write:
+            writers[key] = op["id"]
+            readers.pop(key, None)
+        for key in read - write:
+            readers.setdefault(key, set()).add(op["id"])
+
+
 def validate_ops(ops, channel):
     for i, op in enumerate(ops):
-        if op["id"] != i or any(type(d) is not int or not 0 <= d < i for d in op["deps"]):
+        if op["id"] != i or any(type(d) is not int or not 0 <= d < i
+                                for d in op["deps"] + op.get("issue_deps", [])):
             raise ValueError("dependency must reference an earlier operation in its scope")
         ch, rank, bg, bank, row, col = op["addr"]
         if ch != channel or rank != 1 or row < 0 or not 0 <= col < 64:
@@ -347,6 +484,8 @@ def validate_ops(ops, channel):
             raise ValueError("MAC input exceeds SRF capacity")
         if not 0 <= op.get("result_slot", 0) < 64 or op.get("output_bytes_per_bank", 0) > 2048:
             raise ValueError("output pool capacity exceeded")
+        if op["op"] == "REDUCE" and not 16 <= op["reduction_word"] < 512:
+            raise ValueError("reduction result overlaps MAC scratch or exceeds output pool")
         for region in op.get("source_regions", []):
             if not (0 <= region["bank"] < 16 and region["byte_offset"] >= 0 and
                     region["bytes"] > 0 and region["byte_offset"] + region["bytes"] <= 2048):
@@ -379,6 +518,7 @@ def generate(variant, channel_count=16):
     for name, factory in factories:
         channels = [factory(c) for c in range(channel_count)]
         for c, ops in enumerate(channels):
+            attach_hazard_dependencies(ops)
             validate_ops(ops, c)
             for op in walk(ops):
                 counts[op["op"]] = counts.get(op["op"], 0) + 1
@@ -389,12 +529,18 @@ def generate(variant, channel_count=16):
     if dq != expected:
         raise ValueError(f"DQ mismatch: {dq} != {expected}")
     sources = [Path(__file__), ROOT / "programs/descriptors.py", ROOT / "workloads/layout.py"]
-    return dict(schema_version=1, variant=variant, channels=channel_count,
+    contract = L.contract(layout)
+    contract["buffers"].update(rope_units_per_rank=16, rope_input_slots_per_bank=2,
+                                rope_output_fifo_entries_per_bank=2,
+                                qkt_scratch_words_per_bank=16,
+                                qkt_reduction_words_per_bank=QKT_BATCH_COLUMNS)
+    return dict(schema_version=1, architecture_version=2, variant=variant, channels=channel_count,
                 layout=layout, rope=rope_location, dataflow=flow, repetitions=dict(layers=18, steps=10),
                 address_format=["channel", "rank", "bank_group", "bank", "row", "column_32B"],
-                slot_unit_bytes=32, dependency_semantics="completion; indices local to stage/channel or descriptor children",
+                slot_unit_bytes=32,
+                dependency_semantics="deps require completion; issue_deps require issue; indices local to stage/channel or descriptor children",
                 source_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources},
-                tensor_contract=L.contract(layout), counts=counts,
+                tensor_contract=contract, counts=counts,
                 expected_dq_bytes=dq, expected_dq_bytes_per_layer=dq, stages=stages)
 
 

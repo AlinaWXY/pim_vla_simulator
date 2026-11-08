@@ -6,6 +6,16 @@ from programs.gen_pim_program import VARIANTS, EXTERNAL, generate, walk, validat
 from workloads import layout as L
 
 
+def completion_ancestors(ops, index):
+    pending, seen = list(ops[index]["deps"]), set()
+    while pending:
+        current = pending.pop()
+        if current not in seen:
+            seen.add(current)
+            pending.extend(ops[current]["deps"])
+    return seen
+
+
 def audit_transient_array_producers(program):
     """Independent address coverage audit; initialized weights/prefix are excluded."""
     producers = {}
@@ -143,30 +153,70 @@ class ProgramTests(unittest.TestCase):
             self.assertEqual(sum(o["op"] == "ROPE_RUN" for o in ops), int("local" in v))
             self.assertFalse(any(o["op"] == "WRGB" for o in ops))
 
-    def test_rank_rope_has_one_shared_unit_and_exact_work(self):
+    def test_bank_rope_double_schedule_fifo_and_exact_work(self):
         for variant in ("token_local_before", "token_local_after"):
             ops = list(walk(self.stage(variant, "rope")))
             self.assertEqual(sum(o["op"] == "LOCALRD" for o in ops), 384)
             self.assertEqual(sum(o["op"] == "LOCALWR" for o in ops), 256)
             execs = [o for o in ops if o["op"] == "ROPE_EXEC"]
             self.assertEqual(sum(o["pairs"] for o in execs), 2048)
-            self.assertEqual({o["shared_unit"] for o in execs}, {"rank_rope"})
-            for previous, current in zip(execs, execs[1:]):
-                self.assertIn(previous["id"], current["deps"])
+            self.assertEqual(len(execs), 256)
+            self.assertEqual({o["shared_unit"] for o in execs}, {"bank_rope"})
+            if variant.endswith("after"):
+                ops = ops[0]["children"]
+            for bank in range(16):
+                local = [o for o in ops if o["addr"][2:4] == [bank // 4, bank % 4]]
+                previous_k_store = None
+                for token in range(8):
+                    work = [o for o in local if o.get("token") == token]
+                    q, k = [o for o in work if o["op"] == "ROPE_EXEC"]
+                    k_load = next(o for o in work if o["op"] == "LOCALRD" and
+                                  o.get("dest") == "rope_input" and o["slot"] == 1)
+                    q_store, k_store = [o for o in work if o["op"] == "LOCALWR"]
+                    self.assertLess(q["id"], k_load["id"])
+                    self.assertLess(k_load["id"], k["id"])
+                    self.assertIn(q["id"], k_load["issue_deps"])
+                    self.assertIn(q["id"], k["issue_deps"])
+                    self.assertNotIn(q["id"], completion_ancestors(ops, k_load["id"]))
+                    self.assertNotIn(q["id"], completion_ancestors(ops, k["id"]))
+                    self.assertIn(q_store["id"], k_store["deps"])
+                    if previous_k_store is not None:
+                        self.assertIn(previous_k_store, q_store["deps"])
+                    previous_k_store = k_store["id"]
+                    for execute in (q, k):
+                        self.assertTrue(all(ops[d]["addr"][2:4] == execute["addr"][2:4]
+                                            for d in execute["deps"]))
 
-    def test_score_leaves_reduction_immediately_without_tile_cache(self):
+    def test_score_uses_existing_pool_and_fused_flushes_full_batch(self):
         for variant in VARIANTS:
             ops = self.stage(variant, "qkt")
             if variant.endswith("after"):
                 ops = ops[0]["children"]
             macs = [o for o in ops if o["op"] == "MACQK"]
             self.assertEqual(len(macs), 992 if variant.startswith("feature") else 496)
+            reductions = [o for o in ops if o["op"] == "REDUCE"]
+            self.assertTrue(all(not o["cache_result"] for o in reductions))
+            if variant.endswith("after"):
+                writes = [o for o in ops if o["op"] == "LOCALWR"]
+                self.assertEqual(len(writes), 992)
+                self.assertGreater(min(o["id"] for o in writes), max(o["id"] for o in reductions))
+                self.assertEqual({o["reduction_word"] for o in reductions}, set(range(16, 512)))
+                # Each bank owns one query's scores and 16 contribution words.
+                self.assertEqual((16 + len(reductions)) * 4, 2048)
+                for write in writes:
+                    token, packet = write["kv_token"], write["result_slot"]
+                    self.assertEqual(write["source_regions"],
+                                     [dict(bank=q, byte_offset=(16 + token) * 4, bytes=4)
+                                      for q in range(packet * 8, packet * 8 + 8)])
+                    self.assertIn(reductions[token]["id"], completion_ancestors(ops, write["id"]))
+                continue
             for mac in macs:
                 red, p0, p1 = ops[mac["id"] + 1:mac["id"] + 4]
                 self.assertEqual(red["op"], "REDUCE")
-                self.assertFalse(red["cache_result"])
-                self.assertEqual([p0["op"], p1["op"]], ["LOCALWR"] * 2 if variant.endswith("after") else ["RDRES"] * 2)
-                self.assertEqual(p0["deps"], [red["id"]])
+                self.assertEqual(red["reduction_word"], 16)
+                self.assertEqual([p0["op"], p1["op"]], ["RDRES"] * 2)
+                self.assertIn(red["id"], p0["deps"])
+                self.assertEqual(sum(r["bytes"] for r in p0["source_regions"]), 32)
 
     def test_output_pool_allocation_and_two_o_tile_lifetimes(self):
         for variant, p in self.programs.items():
@@ -183,28 +233,25 @@ class ProgramTests(unittest.TestCase):
             if variant.endswith("after"):
                 ops = ops[0]["children"]
             first_tile1 = next(o for o in ops if o.get("output_tile") == 1 and o["op"] == "MACAB")
-            inputs = [ops[i] for i in first_tile1["deps"]]
-            if variant.endswith("after"):
-                inputs = [ops[o["deps"][0]] for o in inputs]  # BCAST -> LOCALRD
-            barriers = {d for o in inputs for d in o["deps"]}
-            self.assertEqual(len(barriers), 1)
-            barrier = ops[barriers.pop()]
-            self.assertEqual(barrier["op"], "BARRIER")
-            self.assertEqual(len(barrier["deps"]), 512)
-            self.assertTrue(all(ops[i]["op"] == "RDRES" and ops[i]["output_tile"] == 0 for i in barrier["deps"]))
+            exports = {o["id"] for o in ops if o["op"] == "RDRES" and o["output_tile"] == 0}
+            self.assertEqual(len(exports), 512)
+            self.assertTrue(exports <= completion_ancestors(ops, first_tile1["id"]))
 
     def test_q_exchange_is_addressed_memory_not_masked_broadcast(self):
-        for variant in ("token_gpu_before", "token_local_before"):
+        for variant in ("token_gpu_before", "token_local_before", "token_gpu_after", "token_local_after"):
             ops = self.stage(variant, "q_exchange_import")
             writes = [o for o in ops if o["op"] == "WR"]
             self.assertEqual(len(writes), 128)
             self.assertEqual({o["source_channel"] for o in writes}, {1})
             self.assertFalse(any(o["op"] == "WRGB" for o in ops))
-            for wr in writes:
-                rd = ops[wr["id"] + 1]
-                self.assertEqual(rd["op"], "LOCALRD")
-                self.assertEqual(rd["deps"], [wr["id"]])
+            reads = [o for o in ops if o["op"] == "LOCALRD"]
+            self.assertEqual(len(reads), 128)
+            self.assertLess(max(o["id"] for o in writes), min(o["id"] for o in reads))
+            self.assertEqual({o["epoch"] for o in writes}, {"q_import"})
+            all_writes = {o["id"] for o in writes}
+            for wr, rd in zip(writes, reads):
                 self.assertEqual(rd["addr"], wr["addr"])
+                self.assertTrue(all_writes <= completion_ancestors(ops, rd["id"]))
 
     def test_generator_rejects_capacity_or_dependency_corruption(self):
         ops = copy.deepcopy(self.stage("token_gpu_before", "qkv"))

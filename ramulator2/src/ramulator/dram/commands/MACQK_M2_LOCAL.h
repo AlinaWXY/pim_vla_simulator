@@ -1,5 +1,5 @@
 #pragma once
 #include "ramulator/dram/commands/PIMCommandsCommon.h"
 namespace Ramulator::Cmd {
-template<class T> struct MACQK_M2_LOCAL : PIMArrayReadAll<T> {};
+template<class T> struct MACQK_M2_LOCAL : PIMArrayReadAll<T, true> {};
 }

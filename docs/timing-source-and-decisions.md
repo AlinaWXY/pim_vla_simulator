@@ -59,9 +59,12 @@ pipeline; no extra unspecified tail is added. This is a model assumption
 from section 5.1, not a measured PE RTL latency. Sensitivity uses k=1,2,4.
 
 Local 32-byte array transfers use 4 CK service. SRF multicast/gather use
-2 CK, cast 1 CK, rank reduction 4 CK, and RoPE latency 4 CK with initiation
-interval 1 CK. The latter values preserve the old rank-RoPE architectural
-assumptions; they are distinct from JEDEC memory protocol timings.
+2 CK, cast 1 CK, rank reduction 4 CK, and RoPE pair latency 4 CK with pair
+initiation interval 1 CK. Version2 specifies one RoPE PE per bank. Each
+32-byte instruction contains eight pairs, so the Bank-level instruction
+initiation interval is 8 CK and completion is 7 + 4 = 11 CK. A second bank
+can execute independently; K can load while Q rotates. These values are
+architectural assumptions, distinct from JEDEC memory protocol timings.
 Descriptors occupy external CA for 21 CK and decode for 1 CK.
 
 Native timing rules retain one logical receive tick for local commands,
@@ -71,20 +74,47 @@ one, while `metadata.external_ca` is zero; explicit spec bus constraints
 exclude local commands from the external CA. Metadata also carries private
 CA occupancy separately. Private ACT/PRE and
 MAC aliases update the **same** native bank state and timing histories.
-All local operations (`LOCALRD`, `LOCALWR`, broadcast, gather, cast,
-reduction, and RoPE) share this one-command-per-CK rank-internal issue path.
-This fixed architectural assumption applies both to the autonomous local
-state machine in streaming and to descriptor expansion in fused operation;
-it does not require a programmable rank controller for streaming. Each local
-issue occupies private CA for 1 CK and occupies no external CA or DQ.
+Version2 distinguishes streaming fixed-function local operations (`LOCALRD`,
+`LOCALWR`, broadcast, gather, cast, reduction, and RoPE) from fused descriptor
+expansion. Base local commands occupy neither CA bus nor DQ. Their `_LOCAL`
+aliases occupy the fused rank controller's private CA for 1 CK, without
+external CA or DQ. Alias pairs update the same native execution constraints.
 Instruction issue is separate from execution: LOCALRD/LOCALWR timing remains
-bank-scoped, cast is bank-scoped, and broadcast/gather/reduction/RoPE retain
+bank-scoped, cast and RoPE are bank-scoped, and broadcast/gather/reduction retain
 their own rank-unit initiation intervals. No shared rank-wide data-port lock
 serializes these independent units until completion. For example, two local
-reads to different banks may issue 1 CK apart, while the same bank retains
+streaming reads to different banks have no rank-CA spacing, while the same bank retains
 its 4 CK read-to-read constraint.
 Refresh blocks SRAM IO conservatively as required by the task, and waits
 for issued SRAM IO data bursts before entering refresh.
+
+## Version2 ACTAB (ACT4 x 4)
+
+`ACTAB` occupies external CA for 2 CK. Its `ACTAB_LOCAL` alias is one fused
+private instruction and occupies private CA for 1 CK. Both have a logical
+native reception length of one tick, so timings are measured from the issue
+timestamp specified by Version2 without a multi-cycle receive adjustment.
+These command encodings are PIM architectural assumptions, not JEDEC commands.
+
+The exported spec supplies `command_expansions`: sixteen `ACT2_PULSE`
+reservations, four per batch at offsets 0, 16, 32, and 48 CK. Batch i targets
+bank i in each BG. DRAMDevice applies their ordinary ACT2 timing and row-state
+updates using the same native nodes. LOCALRD readiness is therefore 20, 36,
+52, and 68 CK by bank; the all-bank MAC waits 68 CK. Each pulse contributes
+one activation to the existing shared four-entry FAW history, also used by
+ordinary ACT2, private ACT2, and REFpb. ACTAB admission waits until the latest
+such activation is at least one FAW old so its first batch has four slots.
+
+Reservations update future readiness immediately. The last four pulses at
+t+48 block ordinary ACT2/REFpb through t+64; thus no subsequent legal issue
+can insert an earlier timestamp into this activation history. Other commands
+remain governed by their own Bank/Rank constraints. The snapshot lookahead
+already copies all affected row state, readiness, and shared histories; no
+controller timer or separate expansion event queue is needed.
+
+All-bank MAC prerequisites select ACTAB only for a fully closed rank. Mixed
+rows or any wrong open row first request PREab. Native PREab-to-ACTAB is 23 CK.
+Single-bank LOCALRD/LOCALWR continue to use ordinary ACT1/ACT2 prerequisites.
 
 `build_spec(k)` exports native config and command completion/DQ metadata.
 The bus checker consumes this metadata, not a replayed trace or a second
@@ -112,7 +142,7 @@ descriptor instead of inventing a nested program schedule.
 
 `tests/native_lookahead_tests.cpp` covers future DQ behind a local operation,
 explicit dependencies, barriers, a 32-operation limit, horizon truncation,
-all-bank split-activation prerequisites, deterministic repeated forecasts,
+all-bank activation prerequisites, deterministic repeated forecasts,
 and byte-for-byte-equivalent live state before and after prediction.
 
 ## Validation
@@ -123,5 +153,7 @@ metadata, MAC scaling, refresh coverage, and fixed topology validation.
 `python tests/test_spec.py --export reference/spec` writes the full native
 configuration and regression command matrix. `tests/native_spec_tests.cpp`
 repeats every matrix boundary against real DRAMDevice, checks prerequisite
-address resolution and paired-bank refresh. It must be built and run on the
+address resolution, paired-bank refresh, all sixteen staggered ACTAB bank
+boundaries, shared FAW reservations, PREab recovery, CA occupancy, and bank
+RoPE pipelines. It must be built and run on the
 server before claiming native validation passed.

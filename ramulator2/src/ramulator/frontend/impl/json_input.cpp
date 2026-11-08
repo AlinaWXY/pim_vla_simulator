@@ -9,7 +9,7 @@
 namespace PimVla {
 namespace {
 using Json = nlohmann::json;
-enum class Kind {Root, Contract, Stages, Stage, Channels, Channel, Op, Children, Address, Deps, Regions, Region, SkipObject, SkipArray};
+enum class Kind {Root, Contract, Stages, Stage, Channels, Channel, Op, Children, Address, Deps, IssueDeps, Regions, Region, SkipObject, SkipArray};
 struct Frame {
   Kind kind;
   std::string key;
@@ -107,6 +107,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
       else if(parent.kind==Kind::Op) {
         if(parent.key=="addr")kind=Kind::Address;
         else if(parent.key=="deps")kind=Kind::Deps;
+        else if(parent.key=="issue_deps")kind=Kind::IssueDeps;
         else if(parent.key=="children")kind=Kind::Children;
         else if(parent.key=="source_regions")kind=Kind::Regions;
       }
@@ -126,6 +127,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
       stack.back().channel_count=f.channel_count;
     } else if(f.kind==Kind::Address)stack.back().operation.addr=std::move(f.integers);
     else if(f.kind==Kind::Deps)stack.back().operation.deps=std::move(f.integers);
+    else if(f.kind==Kind::IssueDeps)stack.back().operation.issue_deps=std::move(f.integers);
     else if(f.kind==Kind::Children)stack.back().operation.children=std::move(f.operations);
     else if(f.kind==Kind::Regions)stack.back().operation.source_regions=std::move(f.regions);
     return true;
@@ -149,6 +151,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
     if(k=="fragment")return &o.fragment;
     if(k=="output_tile")return &o.output_tile;
     if(k=="kv_token")return &o.kv_token;
+    if(k=="reduction_word")return &o.reduction_word;
     if(k=="lanes")return &o.lanes;
     if(k=="elements")return &o.elements;
     if(k=="bytes")return &o.bytes;
@@ -158,7 +161,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
   bool integer_field() {
     if(stack.empty())return false;
     auto& f=stack.back();
-    return f.kind==Kind::Address||f.kind==Kind::Deps||f.kind==Kind::Region||
+    return f.kind==Kind::Address||f.kind==Kind::Deps||f.kind==Kind::IssueDeps||f.kind==Kind::Region||
         (f.kind==Kind::Root&&f.key=="schema_version")||
         (f.kind==Kind::Contract&&f.key=="layer_stride_bytes_per_bank")||(f.kind==Kind::Op&&operation_integer(f));
   }
@@ -166,7 +169,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
     if(!integer_field())return true;
     require(value>=INT_MIN&&value<=INT_MAX,"integer out of range in PIM program");
     auto& f=stack.back();int v=static_cast<int>(value);
-    if(f.kind==Kind::Address||f.kind==Kind::Deps)f.integers.push_back(v);
+    if(f.kind==Kind::Address||f.kind==Kind::Deps||f.kind==Kind::IssueDeps)f.integers.push_back(v);
     else if(f.kind==Kind::Root)schema_version=v;
     else if(f.kind==Kind::Contract) {require(v>0,"layer stride must be positive");layer_stride_bytes=v;}
     else if(f.kind==Kind::Op) {*operation_integer(f)=v;if(f.key=="id")f.explicit_id=true;}
@@ -184,7 +187,9 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
     require(o.addr[1]==1,"PIM may only access rank1");
     require(o.slot>=0&&o.slot<32,"SRF capacity exceeded");
     require(o.result_slot>=0&&o.result_slot<64,"output pool capacity exceeded");
+    require(o.reduction_word>=16&&o.reduction_word<512,"reduction outside bank output pool");
     for(int d:o.deps)require(d>=0&&d<o.id,"dependency must point to previous request");
+    for(int d:o.issue_deps)require(d>=0&&d<o.id,"issue dependency must point to previous request");
   }
 };
 }

@@ -11,17 +11,18 @@ from ramulator.dram.spec import TimingConstraint as TC
 ROWS = (1, 2, 4, 8, 16, 32)
 IO_ALIASES = {"RD": "RDRES", "RDA": "RDRES", "WR": "WRGB", "WRA": "WRGB"}
 ROW_ALIASES = {c: c + "_LOCAL" for c in ("ACT1", "ACT2", "PREpb", "PREab")}
+ACT_ALL = ["ACTAB", "ACTAB_LOCAL"]
+ACT_PULSE = "ACT2_PULSE"
 MAC_ROWS = {f"{kind}_M{rows}{suffix}": rows
             for kind in ("MACAB", "MACQK") for rows in ROWS
             for suffix in ("", "_LOCAL")}
 MAC_ROWS.update({"MACAB": 16, "MACQK": 16, "MACAB_LOCAL": 16, "MACQK_LOCAL": 16})
 MACS = list(MAC_ROWS)
 LOCAL_EVENTS = ["LOCALRD", "LOCALWR", "BCAST", "GATHER", "CAST", "REDUCE", "ROPE_EXEC"]
-# A fixed one-command/CK rank-internal issue path serves autonomous local
-# events in streaming and descriptor-expanded commands in fused programs.
-# Issue occupancy is independent of each unit's execution latency.
-PRIVATE = list(ROW_ALIASES.values()) + [c for c in MACS if c.endswith("_LOCAL")] + LOCAL_EVENTS
-NO_EXTERNAL_CA = set(PRIVATE)
+LOCAL_ALIASES = {c: c + "_LOCAL" for c in LOCAL_EVENTS}
+# Streaming fixed-function units do not use the fused rank controller's CA.
+PRIVATE = list(ROW_ALIASES.values()) + [c for c in MACS if c.endswith("_LOCAL")] + list(LOCAL_ALIASES.values()) + ["ACTAB_LOCAL"]
+NO_EXTERNAL_CA = set(PRIVATE + LOCAL_EVENTS + [ACT_PULSE])
 
 
 def _copy(tc, pre=None, fol=None, level=None):
@@ -52,9 +53,15 @@ def _constraints():
         # Rank RD/WR -> PREab is an array recovery rule, not an IO rule.
         if tc.level in ("Channel", "Rank", "BankGroup") and all(c in IO_ALIASES for c in tc.preceding + tc.following):
             tc = _copy(tc, _expand(tc.preceding, IO_ALIASES), _expand(tc.following, IO_ALIASES))
-        tc = _copy(tc, _expand(tc.preceding, ROW_ALIASES), _expand(tc.following, ROW_ALIASES))
+        # Internal ACT4 pulses use the normal ACT2 array rules and shared FAW
+        # history. ACTAB admission must satisfy every bank's recovery rules.
+        pre = _expand(_expand(tc.preceding, ROW_ALIASES), {"ACT2": ACT_PULSE})
+        fol = _expand(_expand(tc.following, ROW_ALIASES), {"ACT2": ACT_PULSE})
+        if "ACT2" in tc.following:
+            fol += ACT_ALL
+        tc = _copy(tc, pre, list(dict.fromkeys(fol)))
         result.append(tc)
-    acts = ["ACT2", "ACT2_LOCAL"]
+    acts = ["ACT2", "ACT2_LOCAL", ACT_PULSE]
     pres = ["PREpb", "PREab", "PREpb_LOCAL", "PREab_LOCAL"]
     reads = ["RD", "RDA"]
     writes = ["WR", "WRA"]
@@ -73,25 +80,29 @@ def _constraints():
     for cmd, rows in MAC_ROWS.items():
         # One column fetch feeds M rows; reads overlap PE processing.
         result.append(TC("Bank", [cmd], MACS, f"max(nCCDL,nMAC{rows})"))
-    for cmd, timing in (("BCAST","nBCAST"),("GATHER","nGATHER"),("REDUCE","nREDUCE"),("ROPE_EXEC","nROPEII")):
+    # Four simultaneous activations require an empty rolling FAW window.
+    # Each of the 16 primitive updates enters the shared native history.
+    result.append(TC("Rank", acts + ["REFpb"], ACT_ALL, "nFAW"))
+    for cmd, timing in (("BCAST","nBCAST"),("GATHER","nGATHER"),("REDUCE","nREDUCE")):
         result.append(TC("Rank", [cmd], [cmd], timing))
     result.append(TC("Bank", ["CAST"], ["CAST"], "nCAST"))
+    result.append(TC("Bank", ["ROPE_EXEC"], ["ROPE_EXEC"], "nROPEBatch"))
     # Refresh applies even to buffer IO; this is the requested conservative
     # rank model. REFpb uses native paired-bank targeting (n and n+8).
-    nonrefresh = [c for c in LPDDR5.commands + list(ROW_ALIASES.values()) + MACS + LOCAL_EVENTS + ["WRGB", "RDRES", "MAC_RUN", "ROPE_RUN"] if c not in ("REFab", "REFpb")]
+    nonrefresh = [c for c in LPDDR5.commands + list(ROW_ALIASES.values()) + MACS + LOCAL_EVENTS + ACT_ALL + [ACT_PULSE, "WRGB", "RDRES", "MAC_RUN", "ROPE_RUN"] if c not in ("REFab", "REFpb")]
     result += [TC("Rank", ["REFab"], nonrefresh, "nRFC"),
                TC("Bank", ["REFpb"], nonrefresh, "nRFCpb")]
     result += [TC("Rank", ["WRGB"], ["REFab"], "nCWL+nBL_min"),
                TC("Rank", ["RDRES"], ["REFab"], "nCL+nBL_min"),
                TC("Bank", ["WRGB"], ["REFpb"], "nCWL+nBL_min"),
                TC("Bank", ["RDRES"], ["REFpb"], "nCL+nBL_min")]
-    return result
+    return [_copy(tc, _expand(tc.preceding, LOCAL_ALIASES), _expand(tc.following, LOCAL_ALIASES)) for tc in result]
 
 
 class LPDDR5XPIM(LPDDR5):
     name = "LPDDR5XPIM"
-    commands = LPDDR5.commands + ["WRGB", "RDRES"] + MACS + list(ROW_ALIASES.values()) + LOCAL_EVENTS + ["MAC_RUN", "ROPE_RUN"]
-    timing_params = LPDDR5.timing_params + ["nRCDWR", "nDQ_RTW", "nDQ_WTR", "nDQ_RANK_WTW"] + [f"nMAC{r}" for r in ROWS] + ["nLOCALRD", "nLOCALWR", "nBCAST", "nGATHER", "nCAST", "nREDUCE", "nROPE", "nROPEII", "nDESCDecode"]
+    commands = LPDDR5.commands + ["WRGB", "RDRES"] + MACS + list(ROW_ALIASES.values()) + LOCAL_EVENTS + ["MAC_RUN", "ROPE_RUN"] + ACT_ALL + [ACT_PULSE] + list(LOCAL_ALIASES.values())
+    timing_params = LPDDR5.timing_params + ["nRCDWR", "nDQ_RTW", "nDQ_WTR", "nDQ_RANK_WTW"] + [f"nMAC{r}" for r in ROWS] + ["nLOCALRD", "nLOCALWR", "nBCAST", "nGATHER", "nCAST", "nREDUCE", "nROPE", "nROPEII", "nROPEBatch", "nDESCDecode"]
     # Internal commands retain one logical receive tick: native shared FAW
     # histories record clk + command_cycles - 1. External CA is metadata-only.
     command_cycles = {"MAC_RUN": 21, "ROPE_RUN": 21}
@@ -124,7 +135,7 @@ class LPDDR5XPIM(LPDDR5):
         # multicast, cast pipeline, two-level rank reduction and RoPE PE.
         t.update(nDQ_RTW=2, nDQ_WTR=1, nDQ_RANK_WTW=1,
                  nLOCALRD=4, nLOCALWR=4, nBCAST=2, nGATHER=2,
-                 nCAST=1, nREDUCE=4, nROPE=4, nROPEII=1, nDESCDecode=1)
+                 nCAST=1, nREDUCE=4, nROPE=4, nROPEII=1, nROPEBatch=8, nDESCDecode=1)
 
     def resolve(self):
         for k, v in {"rate":8533,"tCK_ps":938}.items():
@@ -135,6 +146,17 @@ class LPDDR5XPIM(LPDDR5):
             t[f"nMAC{r}"] = 4*r//self.mac_freq_mult
         return org, t
 
+    def to_config(self):
+        config = super().to_config()
+        _, t = self.resolve()
+        idx = {c: i for i, c in enumerate(self.commands)}
+        # Each batch activates bank i in all four BGs. Offsets are spec data;
+        # native DRAMDevice performs the primitive reservations atomically.
+        pulses = [[idx[ACT_PULSE], i*t["nFAW"], [[2, bg], [3, i]]]
+                  for i in range(4) for bg in range(4)]
+        config["command_expansions"] = [[idx[c], pulses] for c in ACT_ALL]
+        return config
+
     @classmethod
     def _generate_bus_constraints(cls, idx, cycles, mult):
         external = [idx[c] for c in cls.commands if c not in NO_EXTERNAL_CA]
@@ -144,7 +166,7 @@ class LPDDR5XPIM(LPDDR5):
         result = []
         for name in cls.commands:
             if name not in NO_EXTERNAL_CA:
-                result.append([0, [idx[name]], external, cycles.get(name, 1)])
+                result.append([0, [idx[name]], external, 2 if name == "ACTAB" else cycles.get(name, 1)])
         for name in PRIVATE:
             result.append([1, [idx[name]], private, 1])
         return result
@@ -166,9 +188,12 @@ def build_spec(mac_freq_mult=4):
     commands = {}
     event_cycles = {"LOCALRD":"nLOCALRD","LOCALWR":"nLOCALWR","BCAST":"nBCAST",
                     "GATHER":"nGATHER","CAST":"nCAST","REDUCE":"nREDUCE","ROPE_EXEC":"nROPE"}
+    event_cycles.update({LOCAL_ALIASES[c]: t for c,t in list(event_cycles.items())})
     for i, c in enumerate(spec.commands):
         meta = {"id":i,"external_ca":0 if c in NO_EXTERNAL_CA else spec.command_cycles.get(c,1),
                 "private_ca":1 if c in PRIVATE else 0,"completion":0,"dq_latency":0,"dq_cycles":0,"direction":"none"}
+        if c == "ACTAB":
+            meta["external_ca"] = 2
         if c in ("RD","RDA","RDRES","WR","WRA","WRGB"):
             read = c in ("RD","RDA","RDRES")
             meta.update(dq_latency=timings["nCL" if read else "nCWL"], dq_cycles=timings["nBL_min"], direction="read" if read else "write")
@@ -182,6 +207,8 @@ def build_spec(mac_freq_mult=4):
             meta["completion"] = meta["external_ca"] + timings["nDESCDecode"]
         elif c in ("REFab","REFpb"):
             meta["completion"] = timings["nRFC" if c == "REFab" else "nRFCpb"]
+        elif c in ACT_ALL:
+            meta["completion"] = 3*timings["nFAW"] + timings["nRCD"]
         commands[c] = meta
     native_commands = {name:{**{k:v for k,v in meta.items() if k not in ("dq_latency","dq_cycles","direction")},
                              "latency":meta["dq_latency"], "burst":meta["dq_cycles"],
@@ -192,4 +219,4 @@ def build_spec(mac_freq_mult=4):
                                  "sibling_R_R":timings["nCS"],"sibling_W_W":timings["nDQ_RANK_WTW"]}}
     return {"dram":spec.to_config(),"timings":timings,"commands":commands,"metadata":metadata,"organization":org,
             "mac_freq_mult":mac_freq_mult,"clock_ps":timings["tCK_ps"],
-            "source":"JESD209-5C + task-document 2026-11-09 PIM assumptions"}
+            "source":"JESD209-5C + Version2 task-document 2026-11-09 PIM assumptions"}

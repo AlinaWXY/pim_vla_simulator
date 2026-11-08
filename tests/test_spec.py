@@ -6,7 +6,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "ramulator2" / "python"))
-from ramulator.dram.lpddr5x_pim import LPDDR5XPIM, build_spec, MAC_ROWS, NO_EXTERNAL_CA, PRIVATE, LOCAL_EVENTS
+from ramulator.dram.lpddr5x_pim import LPDDR5XPIM, build_spec, MAC_ROWS, NO_EXTERNAL_CA, PRIVATE, LOCAL_EVENTS, LOCAL_ALIASES
 
 
 def issue_gap(spec, first, second, relation):
@@ -106,12 +106,41 @@ class SpecTests(unittest.TestCase):
                                     for e in self.spec["dram"]["timing_constraints"]))
         for name in LOCAL_EVENTS:
             self.assertEqual(c[name]["dq_cycles"],0)
+            self.assertEqual(c[name]["private_ca"],0)
+            self.assertEqual(c[LOCAL_ALIASES[name]]["private_ca"],1)
         self.assertEqual(c["LOCALRD"]["completion"],4)
-        self.assertEqual(issue_gap(self.spec,"LOCALRD","LOCALRD","same_bg"),1)
-        self.assertEqual(issue_gap(self.spec,"LOCALRD","BCAST","same_bg"),1)
+        self.assertEqual(issue_gap(self.spec,"LOCALRD","LOCALRD","same_bg"),0)
+        self.assertEqual(issue_gap(self.spec,"LOCALRD","BCAST","same_bg"),0)
         self.assertEqual(issue_gap(self.spec,"LOCALRD","WRGB","same_bg"),0)
         self.assertEqual(issue_gap(self.spec,"BCAST","BCAST","same_bg"),2)
         self.assertEqual(issue_gap(self.spec,"REDUCE","REDUCE","same_bg"),4)
+
+    def test_actab_native_expansion_and_ca(self):
+        c=self.spec["commands"]
+        self.assertEqual(c["ACTAB"]["external_ca"],2)
+        self.assertEqual(c["ACTAB_LOCAL"]["private_ca"],1)
+        self.assertEqual(c["ACTAB_LOCAL"]["external_ca"],0)
+        self.assertEqual(c["ACTAB"]["completion"],68)
+        expansions=dict(self.spec["dram"]["command_expansions"])
+        expected=[[c["ACT2_PULSE"]["id"],16*i,[[2,bg],[3,i]]] for i in range(4) for bg in range(4)]
+        self.assertEqual(expansions[c["ACTAB"]["id"]],expected)
+        self.assertEqual(expansions[c["ACTAB_LOCAL"]["id"]],expected)
+        shared=[e for e in self.spec["dram"]["timing_constraints"] if len(e)>6]
+        faw=[e for e in shared if c["ACT2_PULSE"]["id"] in e[1] and e[0]==1 and e[4]==4]
+        self.assertEqual(len(faw),1)
+        for name in ("ACT2","ACT2_LOCAL","REFpb"):
+            self.assertIn(c[name]["id"],faw[0][1])
+            self.assertIn(c[name]["id"],faw[0][2])
+
+    def test_rope_bank_vector_pipeline(self):
+        c=self.spec["commands"]
+        self.assertEqual(self.spec["timings"]["nROPEBatch"],8)
+        self.assertEqual(c["ROPE_EXEC"]["completion"]+7*self.spec["timings"]["nROPEII"],11)
+        for a in ("ROPE_EXEC","ROPE_EXEC_LOCAL"):
+            for b in ("ROPE_EXEC","ROPE_EXEC_LOCAL"):
+                self.assertTrue(any(e[0]==3 and c[a]["id"] in e[1] and c[b]["id"] in e[2] and e[3]==8
+                                    for e in self.spec["dram"]["timing_constraints"]))
+        self.assertEqual(issue_gap(self.spec,"ROPE_EXEC","ROPE_EXEC","same_bg"),0)
 
     def test_mac_frequency_and_row_count(self):
         for k in (1,2,4):

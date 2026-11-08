@@ -1,5 +1,7 @@
 # 重写方案需求与验收映射
 
+> 本页是 Version1 / 源码 `1e0b73b` 的历史验收记录，下述完整 AE 数字不能作为 Version2 的验证。当前 Version2 只进行单层、单个 denoising step 检查，见 [单层报告](version2-single-layer.md)；校准与端到端实验保持暂停。
+
 依据 [2026-11-09 任务文档](rewrite-plan.txt)。本次上传已完成：**38 项 Python 测试、132 项 native 检查、5 个微基准（含 lookahead barrier）、5 种 PIM 单层、8 种并发单层配置，以及 5 种完整 18 层 × 10 步 AE solo**。证据见 [Python 测试](../reference/validation/python-tests.txt)、[原生构建与测试](../reference/validation/native-build-and-tests.txt)、[PIM 单层](../reference/validation/pim-single-layer.txt) 与 [并发单层](../reference/validation/concurrency-smoke.txt)。
 
 完整 AE solo 的冻结源码为 1e0b73bc8da695268fbf79f1013653b54120316e，作业数组为1976674；五个任务均完成并通过独立审核，见 [full-k4-final-solos.json](../reference/validation/full-k4-final-solos.json)。[已完成 AE 原始结果归档](../reference/completed-ae-solos.tar.gz) 包含五组 raw/provenance/config、冻结清单及 audit-frozen，SHA-256 为 e636d98422f61e2d1600b357776b27be39ae0e1625d75330c0a87c9003a280bc。

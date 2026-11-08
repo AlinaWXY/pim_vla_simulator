@@ -25,3 +25,12 @@ target_compile_options(test_pim_resources PRIVATE -UNDEBUG -Wall -Wextra -Werror
 add_executable(native_lookahead_tests tests/native_lookahead_tests.cpp
   ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp)
 target_link_libraries(native_lookahead_tests PRIVATE ramulator)
+add_executable(benchmark_program_input tools/benchmark_program_input.cpp
+  ramulator2/src/ramulator/frontend/impl/json_input.cpp)
+target_link_libraries(benchmark_program_input PRIVATE ramulator)
+add_executable(native_sequencer_tests tests/native_sequencer_tests.cpp
+  ramulator2/src/ramulator/controller/impl/pim_controller.cpp
+  ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp
+  ramulator2/src/ramulator/plugin/bus_checker.cpp)
+target_link_libraries(native_sequencer_tests PRIVATE ramulator)
+target_compile_options(native_sequencer_tests PRIVATE -Wall -Wextra -O3)

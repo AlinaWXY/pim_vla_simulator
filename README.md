@@ -4,7 +4,13 @@
 
 上游基线为 CMU-SAFARI/ramulator2 **`7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`**（2026-11-03，项目版本 2.1）。原任务保存在 [重写方案](docs/rewrite-plan.txt)，逐项交付状态见 [需求矩阵](docs/requirements-matrix.md)。
 
-## 当前验收状态
+## Version2 单层检查
+
+当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**。VLM 校准、完整 AE 和端到端并发实验保持暂停。Version2 更新包括原生 ACTAB、每 bank RoPE、真实输出池归约暂存、描述符 FIFO32 有限乱序、Q 导入 epoch，以及 streaming PV→O 实测转置。单层结果与验证记录见 [Version2 单层报告](docs/version2-single-layer.md)。
+
+独立入口为 `python experiments/run_single_layer.py --output results/version2-single-layer --repeats 2`；它仅构造五种单层 AE 配置，不加载 VLM，也不调用完整实验入口。
+
+## Version1 历史验收记录
 
 2026-11-09，已通过 38 项 Python 测试、132 项原生检查、四个时序微基准及 lookahead/barrier 回归、资源生命周期、故障注入和前端验证。五种实际 PIM 程序及八种并发配置的单层检查通过；**五种完整 18 层 × 10 步 AE solo 也已通过独立审计**，覆盖每阶段180次、逐通道DQ字节与占用周期守恒、二进制/运行库/输入来源一致性。
 

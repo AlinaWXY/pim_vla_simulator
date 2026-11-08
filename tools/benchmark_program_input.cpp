@@ -17,11 +17,12 @@ struct SemanticDigest {
     for(const auto& o:ops) {
       ++count;
       add(o.name);add(o.epoch);add(o.id);add(o.slot);add(o.result_slot);add(o.rows);add(o.pairs);
-      add(o.dest_slot);add(o.source_bank);add(o.tensor_fragment);add(o.output_columns);add(o.output_column);
+      add(o.dest_slot);add(o.source_bank);add(o.tensor_fragment);add(o.output_columns);add(o.output_column);add(o.reduction_word);
       add(o.fragment);add(o.output_tile);add(o.kv_token);add(o.lanes);add(o.elements);add(o.bytes);add(o.token);
       add(o.release_result?1:0);add(o.dest);add(o.source);
       add(o.addr.size());for(int n:o.addr)add(n);
       add(o.deps.size());for(int n:o.deps)add(n);
+      add(o.issue_deps.size());for(int n:o.issue_deps)add(n);
       add(o.source_regions.size());for(const auto& r:o.source_regions){add(r.bank);add(r.byte_offset);add(r.bytes);}
       operations(o.children);
     }

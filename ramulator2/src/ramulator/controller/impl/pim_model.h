@@ -27,10 +27,12 @@ struct Operation {
   int id=0,slot=0,result_slot=0,rows=1,pairs=1;
   int dest_slot=-1,source_bank=0,tensor_fragment=-1,output_columns=1,output_column=0;
   int fragment=0,output_tile=0,kv_token=0,lanes=16,elements=16,bytes=32,token=0;
+  int reduction_word=16;
   bool release_result=false;
   std::string dest,source;
   std::vector<ResourceRegion> source_regions;
   std::vector<int> deps;
+  std::vector<int> issue_deps;
   std::vector<Operation> children;
 };
 struct ProgramStage { std::string name; std::array<std::vector<Operation>,16> channels; };
@@ -63,9 +65,15 @@ struct Cursor {
   size_t next=0;
   size_t decoded_until=0;
   std::vector<Clock> done;
+  std::vector<uint8_t> dispatched;
   Clock tail=0;
-  void reset(const std::vector<Operation>* p,Clock now) {ops=p;next=0;decoded_until=p?std::min<size_t>(32,p->size()):0;done.assign(p?p->size():0,NEVER);tail=now;}
-  void advance() {require(next<decoded_until,"instruction FIFO underflow");++next;decoded_until=std::min(ops->size(),next+32);}
+  void reset(const std::vector<Operation>* p,Clock now) {ops=p;next=0;decoded_until=p?std::min<size_t>(32,p->size()):0;done.assign(p?p->size():0,NEVER);dispatched.assign(p?p->size():0,0);tail=now;}
+  void mark(size_t index,Clock complete) {
+    require(index>=next&&index<decoded_until&&!dispatched[index],"instruction FIFO invalid dispatch");
+    dispatched[index]=1;done[index]=complete;tail=std::max(tail,complete);
+    while(next<ops->size()&&dispatched[next])++next;
+    decoded_until=std::min(ops->size(),next+32);
+  }
   bool issued() const {return !ops || next==ops->size();}
 };
 struct Candidate {
@@ -106,6 +114,7 @@ class PIMController {
   uint64_t gpu_read_bytes=0,gpu_write_bytes=0,pim_read_bytes=0,pim_write_bytes=0;
   std::vector<uint64_t> gpu_command_counts;
   uint64_t gpu_row_hits=0,gpu_row_misses=0;
+  uint64_t out_of_order_issues=0,prefetched_prerequisites=0;
   explicit PIMController(int ch,const ConfigNode& spec_cfg,const ConfigNode& metadata);
   void set_stage(const std::vector<Operation>& ops,int stage_id,Clock clk,const std::string& name="microbench");
   void begin_kernel(const Kernel* k,Clock clk);
@@ -125,6 +134,7 @@ class PIMController {
   Candidate next_refresh(Clock clk);
   Candidate make_candidate(int final,const AddrVec_t& addr,Candidate::Source src,Clock earliest,bool local=false);
   void finish_pim(const Candidate& c,Clock clk);
+  bool blocked_by_owner(const Candidate& c,Clock clk) const;
   Clock dependencies(const Operation& op,const Cursor& cursor) const;
   bool protect_pim(const Candidate& gpu,const Candidate& pim,Clock clk);
 };

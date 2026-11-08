@@ -60,6 +60,33 @@ void DRAMSpec::load_config(const ConfigNode& config) {
   }
   command_slot_cycles = dram["command_slot_cycles"].as<int>(1);
 
+  // [parent command, [[primitive command, offset, [[level, address], ...]], ...]]
+  command_expansions.resize(command_count);
+  ConfigNode expansions_node = dram["command_expansions"];
+  if (expansions_node) {
+    for (const auto& entry : expansions_node.seq()) {
+      const auto& e = entry.seq();
+      int parent = e[0].as<int>();
+      if (parent < 0 || parent >= command_count) throw std::runtime_error("Invalid expansion parent");
+      Clk_t previous = -1;
+      for (const auto& primitive : e[1].seq()) {
+        const auto& p = primitive.seq();
+        CommandExpansion x{p[0].as<int>(), p[1].as<Clk_t>(), {}};
+        if (x.command < 0 || x.command >= command_count || x.command == parent || x.offset < previous || x.offset < 0)
+          throw std::runtime_error("Invalid or unsorted command expansion");
+        previous = x.offset;
+        for (const auto& patch : p[2].seq()) {
+          const auto& a = patch.seq();
+          int level = a[0].as<int>(), value = a[1].as<int>();
+          if (level < 0 || level >= level_count || value < 0 || value >= organization.level_sizes[level])
+            throw std::runtime_error("Invalid expansion address override");
+          x.address_overrides.emplace_back(level, value);
+        }
+        command_expansions[parent].push_back(std::move(x));
+      }
+    }
+  }
+
   // Config-time mode switches (pre-resolved by Python)
   ConfigNode modes_node = dram["modes"];
   if (modes_node) {

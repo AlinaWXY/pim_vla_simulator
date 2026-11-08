@@ -165,7 +165,9 @@ int run(const std::string& config_file,const std::string& output) {
     out<<",\""<<pair.second<<"\":"<<count;
   }
   uint64_t hits=0,misses=0;for(const auto& mc:channels){hits+=mc->gpu_row_hits;misses+=mc->gpu_row_misses;}
-  out<<",\"GPU_row_hits\":"<<hits<<",\"GPU_row_misses\":"<<misses<<"},\n\"stages\":[";
+  uint64_t reordered=0,prefetched=0;for(const auto& mc:channels){reordered+=mc->out_of_order_issues;prefetched+=mc->prefetched_prerequisites;}
+  out<<",\"GPU_row_hits\":"<<hits<<",\"GPU_row_misses\":"<<misses
+     <<",\"PIM_out_of_order_issues\":"<<reordered<<",\"PIM_prefetched_prerequisites\":"<<prefetched<<"},\n\"stages\":[";
   for(size_t i=0;i<results.size();i++){const auto& r=results[i];if(i)out<<',';
     out<<"{\"stage_id\":"<<r.id<<",\"name\":"<<json_string(r.name)<<",\"step\":"<<r.step<<",\"layer\":"<<r.layer<<",\"start_us\":"<<us(r.start)<<",\"end_us\":"<<us(r.end)<<",\"duration_us\":"<<us(r.end-r.start)<<",\"gpu_wait_us\":"<<us(r.wait)<<"}";}
   out<<"],\n\"kernels\":[";

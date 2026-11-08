@@ -13,7 +13,8 @@ import hashlib
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiments.config import CASES, case_config, validate_calibration, validate_config, variant_name
-from experiments.prepare_inputs import ae_schedule, normalize_vlm
+from experiments.prepare_inputs import ae_schedule, normalize_vlm, layer_boundaries, single_layer_schedule, gpu_measurements
+from experiments.run_single_layer import prepare as prepare_single_layer, VARIANTS as SINGLE_LAYER_VARIANTS
 from calib.calibrate_vlm import assess
 from experiments.native import runtime_libraries, library_hashes
 from analysis.report import summarize
@@ -175,6 +176,51 @@ class InputTests(unittest.TestCase):
                         self.assertEqual(sum(e.get("name") == "rope_apply" for e in subset[a:b]), 10)
                     else:
                         self.assertFalse(any(e.get("name") == "rope_apply" for e in subset))
+
+    def test_streaming_transpose_is_measured_once_between_pv_and_o(self):
+        _, transpose = gpu_measurements(self.data)
+        self.assertAlmostEqual(transpose["feature"], 4.352, places=9)
+        self.assertAlmostEqual(transpose["token"], 4.992, places=9)
+        for variant in SINGLE_LAYER_VARIANTS:
+            schedule = json.loads((self.data / f"ae-{variant}.json").read_text())
+            positions = [i for i, e in enumerate(schedule["events"]) if e.get("name") == "pv_to_o_transpose"]
+            self.assertEqual(len(positions), 180 if variant.endswith("before") else 0)
+            for i in positions:
+                self.assertEqual(schedule["events"][i - 1]["stage"], "pv")
+                self.assertEqual(schedule["events"][i + 1]["stage"], "o")
+                self.assertEqual(schedule["events"][i]["us"], transpose[variant.split("_")[0]])
+
+    def test_single_layer_has_both_residuals_and_excludes_global_work(self):
+        ledger = json.loads((self.data / "measured/natural-ae-kernel-ledger.json").read_text())
+        self.assertEqual(layer_boundaries(ledger)[0], (30, 85))
+        for variant in SINGLE_LAYER_VARIANTS:
+            full = json.loads((self.data / f"ae-{variant}.json").read_text())
+            schedule = single_layer_schedule(full, ledger)
+            self.assertTrue(all(e["step"] == 0 and e["layer"] == 0 for e in schedule["events"]))
+            natural = [e["source_ordinal"] for e in schedule["events"] if e["kind"] == "gpu" and e["source_ordinal"] >= 0]
+            self.assertEqual((min(natural), max(natural)), (30, 84))
+            self.assertTrue({64, 65, 83, 84}.issubset(natural))
+            self.assertNotIn(62, natural)
+            full["events"] = [e for e in full["events"] if not (e["step"] == 0 and e["layer"] == 0 and e.get("source_ordinal") == 84)]
+            with self.assertRaises(ValueError):
+                single_layer_schedule(full, ledger)
+
+    def test_single_layer_runner_prepares_only_ae_without_vlm_or_fit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            programs = root / "programs"
+            programs.mkdir()
+            for variant in SINGLE_LAYER_VARIANTS:
+                (programs / f"{variant}.json").write_text("{}")
+            configs = prepare_single_layer(root / "output", input_dir=self.data, program_dir=programs,
+                                           spec={"mac_freq_mult": 4})
+            self.assertEqual(len(configs), 5)
+            for cfg in configs.values():
+                self.assertEqual(cfg["run_kind"], "ae_solo")
+                self.assertEqual(cfg["mode"], "serial")
+                self.assertTrue({"vlm_path", "calibration", "arbitration"}.isdisjoint(cfg))
+                schedule = json.loads(Path(cfg["ae_schedule_path"]).read_text())
+                self.assertTrue(all(count == 1 for count in schedule["stage_occurrences"].values()))
 
     def test_calibration_cannot_accept_partial_or_shortened_kernel(self):
         with self.assertRaises(ValueError):

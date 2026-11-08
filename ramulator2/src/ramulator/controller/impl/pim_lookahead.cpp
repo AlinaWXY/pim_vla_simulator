@@ -55,12 +55,12 @@ struct NativeLookahead::Impl {
   int command(const Operation& op,bool local) const {
     std::string name=op.name;
     if(mac(name))name+="_M"+std::to_string(op.rows);
-    if(local&&(mac(name)||name=="ACT1"||name=="ACT2"||name=="PREpb"||name=="PREab"))name+="_LOCAL";
+    if(local&&shadow.m_spec->has_command(name+"_LOCAL"))name+="_LOCAL";
     return shadow.m_spec->get_command_id(name);
   }
   int private_row(int cmd,bool local) const {
     const auto& n=shadow.m_spec->command_names.at(cmd);
-    if(local&&(n=="ACT1"||n=="ACT2"||n=="PREpb"||n=="PREab"))
+    if(local&&shadow.m_spec->has_command(n+"_LOCAL"))
       return shadow.m_spec->get_command_id(n+"_LOCAL");
     return cmd;
   }

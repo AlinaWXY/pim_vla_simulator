@@ -2,69 +2,31 @@
   "arithmetic_helpers_included": true,
   "excluded": "Old PIM traces, external arbitration, DQ postprocessing and all latency offsets",
   "generated": {
-    "ae-feature_gpu_before.json": "1808d22648ef0e3d7810a5735a26ec87b40516888adcbb028f0a3cc49012db10",
-    "ae-token_gpu_after.json": "4545fe404dc04f206fed2f2042472a8f87d17977cf3b219dc124ae6301e35a8e",
-    "ae-token_gpu_before.json": "94fb7adb38e69ef9e3f388d48f2528a7317e484c707ad8cea4d97de6ad1aa81c",
-    "ae-token_local_after.json": "ab94ef84122e09981b57a385f1feceddaa0c8bc9238f00b8b3f063b0afe637a7",
-    "ae-token_local_before.json": "7fb23053d7277347515047b0adbbf9616523ec4ecefdb70e5dd740d743a77620",
+    "ae-feature_gpu_before.json": "a5ed98fe49d9d9f248402f0cfcbd2826b2796e7981c9a2841c4eba8401799606",
+    "ae-token_gpu_after.json": "3ffd64f1d8cc4d048cb763c2a4923e5a8763c5653f30cf165b781b9577aa4e0a",
+    "ae-token_gpu_before.json": "dc23dfc9d2db168a77fdfacedd5f6cf8f99b81760eff7cdefe97789c3b78e7f2",
+    "ae-token_local_after.json": "0ecf6eba432b61d70b7d30ab0fa1ecbecbdda8e9b8fc1969840b653a70fb8042",
+    "ae-token_local_before.json": "9716dcb4e6b9b7ae86a303660d51857ca3500b717a0471ef245b3b78311d1114",
     "vlm.json": "4024e7a68526f8c953598aa7fa52b6790ed8cd3d5b3008ad649868752e1157d0"
   },
   "included": "Thor measured durations and traffic counts only",
-  "line_ending_rebindings": [
-    {
-      "path": "input-data/measured/vlm-memory-demand.json",
-      "previous_sha256": "24d03d012c746fce3a1d3f0b78322b2c320583f24e1ce0f6580e5b8520add406",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "079628f69ac48817d0bef5c7aada3e7e333bfafc0966882a7dd9f58322c092ac"
-    },
-    {
-      "path": "input-data/ae-feature_gpu_before.json",
-      "previous_sha256": "cba5c8095397bac955c60cf0358ecad2665dc40c64ce88ed4ea5faa0ae00289e",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "1808d22648ef0e3d7810a5735a26ec87b40516888adcbb028f0a3cc49012db10"
-    },
-    {
-      "path": "input-data/ae-token_gpu_after.json",
-      "previous_sha256": "e281d9b70d57350a950b78709fca07fd2b264d88693b0321edf6ffbf8b3c7b1b",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "4545fe404dc04f206fed2f2042472a8f87d17977cf3b219dc124ae6301e35a8e"
-    },
-    {
-      "path": "input-data/ae-token_gpu_before.json",
-      "previous_sha256": "99e755fd6eea3d5db310e6609142426a164ebc649d0f79dc0ad14a82260ea86d",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "94fb7adb38e69ef9e3f388d48f2528a7317e484c707ad8cea4d97de6ad1aa81c"
-    },
-    {
-      "path": "input-data/ae-token_local_after.json",
-      "previous_sha256": "f82444037a5f62e0d36c366fb94e14ff51fbc48fce073078cec6ae4b402fdecf",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "ab94ef84122e09981b57a385f1feceddaa0c8bc9238f00b8b3f063b0afe637a7"
-    },
-    {
-      "path": "input-data/ae-token_local_before.json",
-      "previous_sha256": "c3626882591c435c6e87e76786ce5f99c75029ad1f5d5e4e07e2e9261b3e1a8b",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "7fb23053d7277347515047b0adbbf9616523ec4ecefdb70e5dd740d743a77620"
-    },
-    {
-      "path": "input-data/vlm.json",
-      "previous_sha256": "5f484d9783097bd166fb0298b72af40a5ae75c176a22f32e939ba9d119115734",
-      "reason": "Only LF/CRLF byte conversion; no JSON data or timing change",
-      "sha256": "4024e7a68526f8c953598aa7fa52b6790ed8cd3d5b3008ad649868752e1157d0"
-    }
-  ],
   "schema_version": 1,
   "sources": {
     "arithmetic-helper-measurements.json": {
       "sha256": "5b39c27eb0a4d016712aa6af43f1597227e7e118e7e426f1ea686f5cfc8bc3ec",
       "source_relative_path": "gpu/handoff-measurements.json"
     },
+    "direct-pv-handoff.json": {
+      "sha256": "3cd09be1200ffd957bd10dabd6227353a65ea2c1575d82535405cb5ee1cc4c0c",
+      "source_relative_path": "gpu/direct-pv-handoff.json"
+    },
     "natural-ae-kernel-ledger.json": {
       "sha256": "c28205aad5df067aafcf02592c27fff6b9b58e33a280537fde5bf4de718cc03e",
       "source_relative_path": "online-arbitration-preparation/natural-ae-kernel-ledger.json"
     },
     "vlm-memory-demand.json": {
+      "byte_conversion": "CRLF to LF only",
+      "captured_sha256": "24d03d012c746fce3a1d3f0b78322b2c320583f24e1ce0f6580e5b8520add406",
       "sha256": "079628f69ac48817d0bef5c7aada3e7e333bfafc0966882a7dd9f58322c092ac",
       "source_relative_path": "gpu/uniform-memory-demand.json"
     },

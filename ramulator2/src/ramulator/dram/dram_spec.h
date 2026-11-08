@@ -34,6 +34,15 @@ struct PairRule {
   int xor_mask = 0;
 };
 
+// A compound command reserves primitive native timing/state updates at offsets
+// from its issue. The spec must reserve the affected resource until the last
+// primitive, so later external issues cannot be inserted into that history.
+struct CommandExpansion {
+  int command;
+  Clk_t offset;
+  std::vector<std::pair<int, int>> address_overrides;
+};
+
 // Organization hierarchy of the device
 struct Organization {
   /// The DQ width.
@@ -120,6 +129,7 @@ struct DRAMSpec {
   std::vector<DRAMCommandMeta> command_meta;
   std::vector<BankTarget> bank_targets;
   std::vector<PairRule> pair_rules;  // per command, used by BankTarget::Pair
+  std::vector<std::vector<CommandExpansion>> command_expansions;
 
   // Non-templated function arrays (action, preq, rowhit, rowopen)
   FuncArrays funcs;

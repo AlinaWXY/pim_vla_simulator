@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <deque>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -22,8 +23,6 @@ class PimResources {
       ensure(w.busy<=now && w.ready<=now,"stage boundary precedes output completion");
     for (const auto& bank:srf_) for (const auto& s:bank)
       ensure(s.busy<=now && s.ready<=now,"stage boundary precedes SRF completion");
-    for (const auto& w:reduction_)
-      ensure(w.busy<=now && w.ready<=now,"stage boundary precedes reduction completion");
     for(int b=0;b<BANKS;++b) {
       ensure(coef_[b].busy<=now && coef_[b].ready<=now,"stage boundary precedes coefficient completion");
       for(int s=0;s<2;++s) {
@@ -32,8 +31,8 @@ class PimResources {
         ensure(rope_output_[b][s].busy<=now && rope_output_[b][s].ready<=now,
                "stage boundary precedes RoPE output completion");
       }
+      ensure(rope_fifo_[b].empty(),"stage boundary precedes RoPE FIFO consumption");
     }
-    ensure(rope_busy_<=now,"stage boundary precedes RoPE completion");
     stage_=name; ++epoch_;
     for (auto& regions:last_gather_) regions.clear();
     // Q stays in each bank's SRF across export/import and QKT stages.
@@ -74,17 +73,13 @@ class PimResources {
           int index=q*o.output_columns+o.output_column;
           const auto& out=output_[b][index];
           at=std::max(at,out.busy);
+          if(o.name=="MACQK" && out.generation>>32==epoch_)
+            ensure(!out.valid,"MACQK overwrites an unconsumed contribution");
           if(o.name=="MACAB" && o.fragment>0) {
             ensure(out.valid && out.generation==generation(o) && out.fragment==o.fragment-1,
                    "MAC accumulation has no preceding fragment output");
             at=std::max(at,out.ready);
           }
-        }
-      }
-      if(o.name=="MACQK") for(const auto& w:reduction_) {
-        if(w.generation==reduction_generation(o.kv_token-1)) {
-          ensure(!w.valid,"next QK column would overwrite unconsumed reduction output");
-          at=std::max(at,w.busy);
         }
       }
     } else if(o.name=="REDUCE") {
@@ -95,7 +90,8 @@ class PimResources {
                "REDUCE reads an unproduced QK contribution");
         at=std::max(at,w.ready);
       }
-      for(const auto& w:reduction_) {
+      for(int b=0;b<BANKS;++b) {
+        const auto& w=output_[b][o.reduction_word];
         if(w.generation>>32==epoch_) ensure(!w.valid,"REDUCE overwrites unread scores");
         at=std::max(at,w.busy);
       }
@@ -106,19 +102,9 @@ class PimResources {
       const int b=bank(o);
       ensure(!last_gather_[b].empty(),"CAST has no gathered output values");
       at=read_regions(o,last_gather_[b],at);
-    } else if(o.name=="RDRES" || (o.name=="LOCALWR" && o.source=="reduction_output")) {
-      if(o.source=="reduction_output") {
-        ensure(o.result_slot>=0 && o.result_slot<2,"reduction packet outside 64-byte result");
-        for(int i=o.result_slot*8;i<(o.result_slot+1)*8;++i) {
-          const auto& w=reduction_[i];
-          ensure(w.valid && w.generation==reduction_generation(o.kv_token),
-                 "result read precedes QK reduction or rereads a released result");
-          at=std::max(at,w.ready);
-        }
-      } else {
-        ensure(!o.source_regions.empty(),"RDRES must identify produced output words");
-        at=read_regions(o,o.source_regions,at);
-      }
+    } else if(o.name=="RDRES" || (o.name=="LOCALWR" && !o.source_regions.empty())) {
+      ensure(!o.source_regions.empty(),"result transfer must identify produced output words");
+      at=read_regions(o,o.source_regions,at);
     } else if(o.name=="ROPE_EXEC") {
       const int b=bank(o);
       ensure(o.slot<2,"RoPE has two input vectors");
@@ -129,13 +115,18 @@ class PimResources {
              "RoPE executes without matching coefficients");
       const auto& output=rope_output_[b][o.slot];
       ensure(!output.valid,"RoPE overwrites an unconsumed output vector");
-      at=std::max({at,input.ready,coef.ready,rope_busy_,output.busy});
+      ensure(rope_fifo_[b].size()<2,"RoPE output FIFO exceeds two entries");
+      // Bank-local vector initiation interval is imposed by the native spec.
+      // Completion protects the source slot, not every other bank or slot.
+      at=std::max({at,input.ready,coef.ready,output.busy});
     } else if(o.name=="LOCALWR" && o.source=="rope_output") {
       const int b=bank(o);
       ensure(o.slot<2,"RoPE has two output vectors");
       const auto& w=rope_output_[b][o.slot];
       ensure(w.valid && w.epoch==epoch_ && w.fragment==o.token,
              "RoPE store precedes execution or rereads a released output");
+      ensure(!rope_fifo_[b].empty() && rope_fifo_[b].front()==o.slot,
+             "RoPE store violates output FIFO order");
       at=std::max(at,w.ready);
     }
     return at;
@@ -161,9 +152,16 @@ class PimResources {
         }
       }
     } else if(o.name=="REDUCE") {
-      for(int b=0;b<BANKS;++b) for(int q=0;q<16;++q)
-        output_[b][q].busy=std::max(output_[b][q].busy,complete);
-      for(auto& w:reduction_) {w.valid=true;w.ready=complete;w.generation=reduction_generation(o.kv_token);}
+      for(int b=0;b<BANKS;++b) {
+        for(int q=0;q<16;++q) {
+          auto& contribution=output_[b][q];
+          contribution.busy=std::max(contribution.busy,complete);
+          contribution.valid=false;
+        }
+        // Query b resides in bank b: 64B scratch + 496 FP32 scores = 2KiB.
+        auto& w=output_[b][o.reduction_word];
+        w.valid=true;w.ready=complete;w.generation=reduction_generation(o.kv_token);
+      }
     } else if(o.name=="GATHER") {
       auto& regions=last_gather_[bank(o)];regions.clear();
       for(const auto& r:o.source_regions) regions.push_back({r.bank,r.byte_offset,r.bytes});
@@ -173,19 +171,16 @@ class PimResources {
       for(const auto& r:last_gather_[bank(o)])
         for(int i=r.byte_offset/4;i<(r.byte_offset+r.bytes)/4;++i)
           output_[r.bank][i].ready=std::max(output_[r.bank][i].ready,complete);
-    } else if(o.name=="RDRES" || (o.name=="LOCALWR" && o.source=="reduction_output")) {
-      if(o.source=="reduction_output") {
-        for(int i=o.result_slot*8;i<(o.result_slot+1)*8;++i) {
-          reduction_[i].busy=std::max(reduction_[i].busy,complete);
-          reduction_[i].valid=false;
-        }
-      } else lock_regions(o.source_regions,complete,o.release_result);
+    } else if(o.name=="RDRES" || (o.name=="LOCALWR" && !o.source_regions.empty())) {
+      lock_regions(o.source_regions,complete,o.release_result);
     } else if(o.name=="ROPE_EXEC") {
       const int b=bank(o);auto& input=rope_input_[b][o.slot];
-      input.busy=complete;input.valid=false;coef_[b].busy=complete;rope_busy_=complete;
+      input.busy=complete;input.valid=false;coef_[b].busy=std::max(coef_[b].busy,complete);
       fill_vector(rope_output_[b][o.slot],o.token,complete);
+      rope_fifo_[b].push_back(o.slot);
     } else if(o.name=="LOCALWR" && o.source=="rope_output") {
-      auto& w=rope_output_[bank(o)][o.slot];w.valid=false;w.busy=complete;
+      int b=bank(o);auto& w=rope_output_[b][o.slot];w.valid=false;w.busy=complete;
+      rope_fifo_[b].pop_front();
     }
   }
 
@@ -194,13 +189,12 @@ class PimResources {
   struct Word {bool valid=false;Time ready=0,busy=0;uint64_t generation=0;int fragment=-1;};
   std::array<std::array<Slot,SRF_SLOTS>,BANKS> srf_{};
   std::array<std::array<Word,OUTPUT_WORDS>,BANKS> output_{};
-  std::array<Word,16> reduction_{}; // validity scoreboard, not an added data cache
   std::array<Slot,BANKS> coef_{};
   std::array<std::array<Slot,2>,BANKS> rope_input_{},rope_output_{};
+  std::array<std::deque<int>,BANKS> rope_fifo_{};
   std::array<std::vector<ResourceRegion>,BANKS> last_gather_{};
   std::string stage_;
   uint64_t epoch_=0;
-  Time rope_busy_=0;
 
   static void ensure(bool ok,const char* message) {
     if(!ok) throw std::runtime_error(std::string("PIM resource violation: ")+message);
@@ -219,6 +213,9 @@ class PimResources {
              o.rows*o.output_columns<=OUTPUT_WORDS,"MAC output exceeds 2KiB pool");
       ensure(o.fragment>=0 && o.output_tile>=0,"invalid MAC fragment/tile");
     }
+    if(o.name=="REDUCE")
+      ensure(o.reduction_word>=16 && o.reduction_word<OUTPUT_WORDS,
+             "reduction result overlaps scratch or exceeds 2KiB pool");
     for(const auto& r:o.source_regions) {
       ensure(r.bank>=0 && (r.bank)<BANKS && r.byte_offset>=0 && r.bytes>0 &&
              r.byte_offset%4==0 && r.bytes%4==0 && r.byte_offset+r.bytes<=2048,
@@ -232,7 +229,8 @@ class PimResources {
     return o.name=="MACQK"?reduction_generation(o.kv_token):(epoch_<<32)|static_cast<uint32_t>(o.output_tile);
   }
   template<class Op,class Regions> Time read_regions(const Op& o,const Regions& regions,Time at) const {
-    const uint64_t expected=(epoch_<<32)|static_cast<uint32_t>(o.output_tile);
+    const uint64_t expected=o.source=="reduction_output"?reduction_generation(o.kv_token):
+                            (epoch_<<32)|static_cast<uint32_t>(o.output_tile);
     for(const auto& r:regions) for(int i=r.byte_offset/4;i<(r.byte_offset+r.bytes)/4;++i) {
       const auto& w=output_[r.bank][i];
       ensure(w.valid && w.generation==expected,"read of unproduced, stale, or released output word");

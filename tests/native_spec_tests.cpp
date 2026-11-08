@@ -70,12 +70,24 @@ int main(int argc, char** argv) {
       auto d=device(spec); int rd=d.m_spec->get_command_id("LOCALRD");
       AddrVec_t a={0,1,0,0,0,0},other={0,1,0,1,0,0};
       d.issue_command(rd,a,100);
-      require(!d.check_timing(rd,other,100),"private CA accepted simultaneous local issues");
+      require(d.check_timing(rd,other,100),"streaming fixed-function local reads were rank-serialized");
       require(d.check_timing(rd,other,101),"different-bank local read inherited a rank data-port lock");
       require(!d.check_timing(rd,a,103)&&d.check_timing(rd,a,104),"local read lost bank CCD boundary");
       require(d.check_timing(d.m_spec->get_command_id("BCAST"),{0,1,-1,-1,0,0},101),"local read locked independent rank unit until completion");
       require(d.check_timing(d.m_spec->get_command_id("WRGB"),{0,1,-1,-1,0,0},100),"private issue occupied external CA");
       checks+=5;
+    }
+    // Fused private CA is one instruction/CK; array timing is shared with the
+    // streaming aliases, while independent banks retain separate pipelines.
+    {
+      auto d=device(spec); int rd=d.m_spec->get_command_id("LOCALRD_LOCAL");
+      int base=d.m_spec->get_command_id("LOCALRD");
+      AddrVec_t a={0,1,0,0,0,0},other={0,1,0,1,0,0};
+      d.issue_command(rd,a,100);
+      require(!d.check_timing(rd,other,100)&&d.check_timing(rd,other,101),"fused local private CA boundary");
+      require(d.check_timing(base,other,100),"fixed-function command occupied private CA");
+      require(!d.check_timing(base,a,103)&&d.check_timing(base,a,104),"local aliases lost shared bank timing");
+      checks+=3;
     }
     // No open row is needed for SRAM/pool IO; array operations retain prerequisites.
     {
@@ -88,10 +100,78 @@ int main(int argc, char** argv) {
         auto id=d.m_spec->get_command_id(c);
         AddrVec_t a={0,1,c.find("MAC")==0?-1:0,c.find("MAC")==0?-1:0,0,0};
         auto pre=d.get_preq_command(id,a,0);
-        require(pre==d.m_spec->get_command_id("ACT1"),"missing closed-bank ACT1 prereq: "+c);
+        const bool mac=c.find("MAC")==0;
+        const std::string expected=mac?(c.ends_with("_LOCAL")?"ACTAB_LOCAL":"ACTAB"):"ACT1";
+        require(pre==d.m_spec->get_command_id(expected),"missing closed-bank activation prereq: "+c);
         auto pa=d.preq_addr_vec(id,pre,a,0);
-        require(pa[2]>=0 && pa[3]>=0,"broadcast prereq not resolved to physical bank"); checks+=2;
+        require(mac?(pa[2]==-1&&pa[3]==-1):(pa[2]>=0&&pa[3]>=0),"activation prerequisite addressing"); checks+=2;
       }
+    }
+    // ACT4x4 reserves all sixteen activations in native histories, with
+    // staggered per-bank RCD and one external two-CK command.
+    for (const std::string command:{"ACTAB","ACTAB_LOCAL"}) {
+      auto d=device(spec); const auto* s=d.m_spec;
+      const int act=s->get_command_id(command), rd=s->get_command_id("LOCALRD");
+      const int mac=s->get_command_id("MACAB_M16"), normal=s->get_command_id("ACT2");
+      AddrVec_t all={0,1,-1,-1,7,0};
+      require(d.get_preq_command(act,all,100)==act,"ACTAB closed prerequisite identity");
+      d.issue_command(act,all,100);
+      for (int bg=0;bg<4;++bg) for (int bank=0;bank<4;++bank) {
+        AddrVec_t a={0,1,bg,bank,7,0}; int ready=120+16*bank;
+        require(d.get_preq_command(rd,a,ready)==rd,"ACTAB failed to open a bank");
+        require(!d.check_timing(rd,a,ready-1)&&d.check_timing(rd,a,ready),"ACTAB per-bank staggered RCD");
+        checks+=2;
+      }
+      require(!d.check_timing(mac,all,167)&&d.check_timing(mac,all,168),"ACTAB all-bank ready is not 68 CK");
+      auto* rank=d.node_at({0,1,0,0,7,0},1);
+      require(rank->m_cmd_ready_clk[normal]==164,"four ACT4 batches did not reserve shared FAW through 64 CK");
+      bool found=false;
+      for (const auto& history:rank->m_shared_window_history) {
+        if (history.size()==4 && history[0]==148 && history[1]==148 && history[2]==148 && history[3]==148) found=true;
+      }
+      require(found,"ACTAB failed to record four last-batch ACT pulses in shared history");
+      require(!d.check_timing(normal,{0,1,0,0,8,0},163),"ordinary ACT2 entered reserved FAW");
+      // At 165 bank0's RC is also satisfied; the shared chronological history
+      // can then accept an ordinary ACT2 after the last reserved pulse.
+      int prebank=s->get_command_id("PREpb"),first=s->get_command_id("ACT1");
+      require(d.check_timing(prebank,{0,1,0,0,7,0},145),"first-batch bank could not precharge independently at RAS");
+      d.issue_command(prebank,{0,1,0,0,7,0},145);
+      d.issue_command(first,{0,1,0,0,8,0},164);
+      require(d.check_timing(normal,{0,1,0,0,8,0},165),"ordinary ACT2 blocked after FAW and bank RC");
+      d.issue_command(normal,{0,1,0,0,8,0},165);
+      require(rank->m_cmd_ready_clk[act]>=181,"ordinary ACT did not constrain next ACTAB admission");
+      checks+=8;
+    }
+    // Mixed/open rows close the whole rank before ACTAB. PREab recovery is
+    // 23 CK, and the externally encoded command occupies CA for exactly 2 CK.
+    {
+      auto d=device(spec); const auto* s=d.m_spec;
+      int mac=s->get_command_id("MACAB_M16"),act=s->get_command_id("ACTAB"),pre=s->get_command_id("PREab");
+      AddrVec_t all={0,1,-1,-1,9,0};
+      d.issue_command(s->get_command_id("ACT1"),{0,1,0,0,2,0},100);
+      d.issue_command(s->get_command_id("ACT2"),{0,1,0,0,2,0},101);
+      require(d.get_preq_command(mac,all,200)==pre,"mixed rows did not request PREab");
+      require(d.get_preq_command(act,all,200)==pre,"ACTAB admitted a nonclosed rank");
+      d.issue_command(pre,all,200);
+      require(d.get_preq_command(mac,all,223)==act,"PREab did not enable ACTAB");
+      require(!d.check_timing(act,all,222)&&d.check_timing(act,all,223),"PREab to ACTAB must be 23 CK");
+      d.issue_command(act,all,223);
+      int wrgb=s->get_command_id("WRGB");
+      require(!d.check_timing(wrgb,{0,0,-1,-1,0,0},224)&&d.check_timing(wrgb,{0,0,-1,-1,0,0},225),"ACTAB external CA must occupy 2 CK");
+      checks+=5;
+    }
+    // One RoPE PE per bank: eight pairs start in eight CK; the fourth-cycle
+    // pair latency gives eleven-CK completion, without a completion-time lock.
+    {
+      auto d=device(spec); int rope=d.m_spec->get_command_id("ROPE_EXEC");
+      int local=d.m_spec->get_command_id("ROPE_EXEC_LOCAL");
+      AddrVec_t a={0,1,0,0,0,0},other={0,1,0,1,0,0};
+      d.issue_command(rope,a,100);
+      require(d.check_timing(rope,other,100),"RoPE PE incorrectly shared across banks");
+      require(!d.check_timing(rope,a,107)&&d.check_timing(rope,a,108),"RoPE vector initiation interval must be 8 CK");
+      require(!d.check_timing(local,a,107)&&d.check_timing(local,a,108),"RoPE aliases lost shared vector pipeline");
+      require(d.check_timing(d.m_spec->get_command_id("LOCALRD"),a,101),"RoPE execution prevented overlapping K load");
+      checks+=4;
     }
     // Native REFpb pair targeting must block both banks n and n+8, and full-bank PIM.
     {

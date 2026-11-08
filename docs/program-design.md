@@ -3,7 +3,11 @@
 `programs/gen_pim_program.py` generates JSON directly from tensor definitions.
 It does not read an old native trace, a CA/DQ event file, or a replay schedule.
 All five valid layout/RoPE/dataflow variants are generated with source hashes.
-The stage driver repeats one layer for 18 layers and 10 denoising steps.
+This document describes the Version2 implementation. The current requested
+measurement is **one layer and one denoising step**, with coefficients and
+weights already resident; calibration and full end-to-end runs are paused.
+The workload format retains the full 18-layer, 10-step schedule, but that
+capability is not a claim that Version2 full-workload experiments have run.
 The JSON is a layer-relative address template: the controller adds
 `layer * 512` to its array row index, equivalent to 1MiB per bank per layer.
 Descriptor base fields are also relative to the current layer; their
@@ -13,12 +17,16 @@ the same layer's allocation. The 18MiB per-bank reservation fits within
 the 64MiB bank capacity of the 8Gb/rank organization. The largest relative
 reservation ends at 1MiB, so adjacent layers cannot overlap.
 
-Each stage contains sixteen ordered channel programs. Stage completion is a
+Each stage contains sixteen channel programs. Stage completion is a
 global barrier. `deps` refers to **completion**, with indices local to a
 stage/channel program; a descriptor's children use a separate index space.
-Operations without dependencies may issue after their predecessor has issued,
-subject to the controller's resource and DRAM checks. `BARRIER` has no command
-or latency. It completes only after its listed producers complete.
+Streaming outer requests issue in program order. Fused descriptor children
+may issue out of order within the decoded 32-entry window, subject to explicit
+dependencies, resource identities, and native DRAM checks. `issue_deps` waits
+for a producer's **issue**, allowing overlap with its execution; it does not
+replace a completion dependency on consumed data. `BARRIER` has no command or
+latency. It fences the window and waits for preceding issued completion tails
+as well as its explicit dependencies.
 
 Addresses are `[channel,rank,BG,bank,row,column]`; column is a 32-byte column
 within a 2KiB row. Whole-rank MAC, WRGB and RDRES use BG/bank `-1`.
@@ -31,8 +39,8 @@ program introduces no rank result cache or unlimited packet scratch.
 `pim_resources.h` enforces those identities independently of DRAM timing.
 It tracks validity, ready timestamps and in-flight readers for 32 SRF slots
 and 512 FP32 output words per bank, plus the bounded RoPE input/output state.
-The reduction array in this class is a validity scoreboard for sixteen
-scores, not allocated result SRAM. First-fragment MAC initializes a word;
+QK reduction results occupy words in this existing bank output pool, not a
+separate rank score cache. First-fragment MAC initializes a word;
 subsequent fragments must accumulate the immediately preceding partial sum.
 RDRES locks exactly its source words through the spec-supplied completion,
 and a subsequent MAC cannot overwrite them before that timestamp. Invalid
@@ -47,7 +55,16 @@ its input or overwrite output until all 512 first-tile exports complete.
 `MAC_RUN`/`ROPE_RUN` carries eight retained version-2 wire words and CRC16,
 plus a timing-free expansion. The controller must feed these children through
 its finite 32-entry internal FIFO and complete the descriptor after all
-children finish. Array commands in children use private rank CA. External
+children finish. Dependency-ready younger instructions and their ACT/PRE
+prerequisites may issue early; younger preopening cannot replace a different
+row still required by an older unissued array request. Named I/O epochs and
+barriers fence this reordering. The generator adds explicit RAW, WAR and WAW
+completion dependencies for exact array columns, SRF slots, output words,
+gather/RMW state and RoPE slots, rather than relying on textual issue order.
+Only the RoPE overlap edges use `issue_deps` deliberately. Array and local
+commands in children use their private-CA aliases. Streaming local operations
+use fixed-function units with no external or private CA; their ACT/PRE
+prerequisites still use external CA. External
 RDRES operations between O tiles still use external CA/DQ and their named
 I/O epoch. A local-RoPE fused layer has six MAC descriptors plus one RoPE
 descriptor (147 CA CK under the spec); GPU-RoPE has six (126 CA CK). Decode
@@ -57,7 +74,10 @@ The Q exchange has two global stages, `q_exchange_export` and
 `q_exchange_import`. The old bank-addressed Q_REMOTE behavior cannot be
 represented as WRGB's same-data-to-all-banks broadcast. The new program uses
 ordinary addressed WR to a dedicated per-bank `[0x15000,0x15800)` Q-import
-region, followed by LOCALRD to the proper query SRF slot. Q export and import
+region. For each token-layout channel/rank, all **128 ordinary WR** operations
+form one `q_import` I/O epoch; a completion barrier follows them, then **128
+LOCALRD** operations fill the proper query SRF slots. The program does not
+alternate a WR with its matching LOCALRD. Q export and import
 retain their original external byte counts. All peer exports finish before
 imports start. This adds real row/write/local-read costs relative to the old
 targeted-buffer-write interpretation and is an intentional physicalization.
@@ -103,29 +123,48 @@ then eight new/eight padding. Gather source regions explicitly select the
 right QKV accumulator rows and lanes. Gate/Up exports FP32 complete feature
 shards; Down exports FP32 complete output shards, with no cross-rank sum.
 
-The new task deliberately changes two other old execution assumptions:
-one shared RoPE unit per rank replaces independently active bank units; and
-QK reductions emit each 64B query-score column immediately, as two RDRES
-bursts (streaming) or two LOCALWR packets (fused), with no 1KiB rank score
-tile cache. The fused score array is bulk-read only after all QK work ends.
-MAC completion tails, correct WRGB/RDRES CL/CWL, row constraints and the
-addressed Q-import path also change timing. Therefore the task's request that
-every standalone difference be attributable only to buffer I/O turnaround
-cannot literally hold alongside these structural requirements. Reports must
-identify each modeled change rather than normalize away the difference.
-In particular, a whole-bank MAC is not an all-bank ACT primitive: every
-target bank must undergo legal ACT1/ACT2 preparation, including RRD/FAW
-limits. The old AttAcc-style ACTAB operation is absent from the new command
-set. Its removal can materially change activation overhead.
+Streaming QK reductions export each 64B query-score column immediately as
+two RDRES bursts. Fused token QK uses the existing 2KiB output pool in every
+bank: FP32 words **0–15** are MAC scratch, while words **16–511** hold one
+query's reduced scores for **496 K columns**. Query q's reduced score resides
+in bank q. Thus all 496 token-layout columns fit before any score spill;
+there is no separate score tile cache. After all reductions complete, a
+barrier permits **992 LOCALWR** packets to write the scores to DRAM, two
+32-byte packets per column. Each packet gathers eight 4-byte score words
+from eight banks. The descriptor completes only after this spill, then
+**992 ordinary RD** packets export the score array in `score_export`.
+
+Whole-rank MAC prerequisites use Version2 `ACTAB` (ACT4 x 4), not sixteen
+controller-issued split activations. Its spec-defined internal batches
+activate one bank per BG at offsets 0, 16, 32 and 48 CK. Bank reads become
+ready at 20, 36, 52 and 68 CK; all-bank MAC waits for the last batch. Native
+activation histories enforce the rolling FAW window shared with ordinary
+ACT, and a nonclosed rank first requires PREab. Single-bank local transfers
+retain ordinary ACT1/ACT2 prerequisites. Timing and completion differences
+from the legacy simulator include this activation model, MAC completion
+tails, correct WRGB/RDRES CL/CWL and turnaround, and addressed Q import.
+Reports must explain these differences without applying a constant correction.
 
 RoPE coefficient values are precomputed BF16 sin/cos for the actual model
 position IDs. The generated operations cover every pair, input and output,
 but this is a timing/layout model and does not execute tensor numerics.
-The per-bank RoPE validity records describe vector views in the existing
-SRF/output pools, not additional bank PEs or independently allocated SRAM.
-RoPE follows the completed QKV spills and precedes Q residency, so these
-views do not overlap live GEMV or QK inputs. The sole rank RoPE execution
-resource arbitrates all bank vectors.
+Version2 has **one independent RoPE PE per bank**, each with two input slots
+and a two-entry output FIFO. Its validity records describe vector views in
+the existing SRF/output pools, not additional unbounded SRAM. RoPE follows
+completed QKV cast/spills and precedes Q residency, so these views do not
+overlap live GEMV or QK inputs. Each rank/layer executes **384 LOCALRD, 256
+LOCALWR and 256 ROPE_EXEC** operations. Every EXEC rotates one 32-byte vector
+(eight pairs): the pair II is 1 CK, vector II is **8 CK**, and the final pair
+completes after **11 CK**. The spec applies this pipeline constraint per bank;
+the resource model enforces input lifetime and FIFO capacity/order without
+locking the PE until completion.
+
+The double schedule loads coefficients and Q into slot 0, issues Q EXEC,
+then loads K into slot 1 while Q executes. K load and K EXEC have an issue
+dependency on Q EXEC, while K EXEC also waits for its own input/coefficient
+completion. Q and K stores consume their completed FIFO entries in order.
+No execution-completion edge serializes different banks. Fused ROPE_RUN
+expands this same sequence through the private-CA 32-entry window.
 
 Feature W_O full residency is arranged as sixteen rotated feature-shard
 slots, each 16KiB per bank, placing the active shard in slot zero. Token W_O

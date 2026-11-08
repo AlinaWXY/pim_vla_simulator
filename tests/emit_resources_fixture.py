@@ -6,7 +6,7 @@ from programs.gen_pim_program import generate, VARIANTS, walk
 
 FIELDS = dict(slot=0, dest_slot=-1, source_bank=0, tensor_fragment=-1, rows=1,
               output_columns=1, output_column=0, fragment=0, output_tile=0,
-              kv_token=0, elements=16, result_slot=0, token=0, release_result=False)
+              kv_token=0, elements=16, result_slot=0, token=0, release_result=False, reduction_word=16)
 
 with Path(sys.argv[1]).open("w", encoding="ascii", newline="\n") as stream:
     for variant in VARIANTS:

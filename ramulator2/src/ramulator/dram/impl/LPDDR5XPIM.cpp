@@ -13,13 +13,21 @@
 #include "ramulator/dram/commands/ACT1_LOCAL.h"
 #include "ramulator/dram/commands/ACT2.h"
 #include "ramulator/dram/commands/ACT2_LOCAL.h"
+#include "ramulator/dram/commands/ACT2_PULSE.h"
+#include "ramulator/dram/commands/ACTAB.h"
+#include "ramulator/dram/commands/ACTAB_LOCAL.h"
 #include "ramulator/dram/commands/BCAST.h"
+#include "ramulator/dram/commands/BCAST_LOCAL.h"
 #include "ramulator/dram/commands/CAST.h"
+#include "ramulator/dram/commands/CAST_LOCAL.h"
 #include "ramulator/dram/commands/CAS_RD.h"
 #include "ramulator/dram/commands/CAS_WR.h"
 #include "ramulator/dram/commands/GATHER.h"
+#include "ramulator/dram/commands/GATHER_LOCAL.h"
 #include "ramulator/dram/commands/LOCALRD.h"
+#include "ramulator/dram/commands/LOCALRD_LOCAL.h"
 #include "ramulator/dram/commands/LOCALWR.h"
+#include "ramulator/dram/commands/LOCALWR_LOCAL.h"
 #include "ramulator/dram/commands/MACAB.h"
 #include "ramulator/dram/commands/MACAB_LOCAL.h"
 #include "ramulator/dram/commands/MACAB_M1.h"
@@ -57,9 +65,11 @@
 #include "ramulator/dram/commands/RDA.h"
 #include "ramulator/dram/commands/RDRES.h"
 #include "ramulator/dram/commands/REDUCE.h"
+#include "ramulator/dram/commands/REDUCE_LOCAL.h"
 #include "ramulator/dram/commands/REFab.h"
 #include "ramulator/dram/commands/REFpb.h"
 #include "ramulator/dram/commands/ROPE_EXEC.h"
+#include "ramulator/dram/commands/ROPE_EXEC_LOCAL.h"
 #include "ramulator/dram/commands/ROPE_RUN.h"
 #include "ramulator/dram/commands/WR.h"
 #include "ramulator/dram/commands/WRA.h"
@@ -73,7 +83,7 @@ class LPDDR5XPIM : public DRAMSpec {
     enum : int { Channel, Rank, BankGroup, Bank, Row, Column, COUNT };
   };
   struct Command {
-    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, WRGB, RDRES, MACAB_M1, MACAB_M1_LOCAL, MACAB_M2, MACAB_M2_LOCAL, MACAB_M4, MACAB_M4_LOCAL, MACAB_M8, MACAB_M8_LOCAL, MACAB_M16, MACAB_M16_LOCAL, MACAB_M32, MACAB_M32_LOCAL, MACQK_M1, MACQK_M1_LOCAL, MACQK_M2, MACQK_M2_LOCAL, MACQK_M4, MACQK_M4_LOCAL, MACQK_M8, MACQK_M8_LOCAL, MACQK_M16, MACQK_M16_LOCAL, MACQK_M32, MACQK_M32_LOCAL, MACAB, MACQK, MACAB_LOCAL, MACQK_LOCAL, ACT1_LOCAL, ACT2_LOCAL, PREpb_LOCAL, PREab_LOCAL, LOCALRD, LOCALWR, BCAST, GATHER, CAST, REDUCE, ROPE_EXEC, MAC_RUN, ROPE_RUN, COUNT };
+    enum : int { ACT1, ACT2, PREpb, PREab, CAS_RD, CAS_WR, RD, WR, RDA, WRA, REFab, REFpb, WRGB, RDRES, MACAB_M1, MACAB_M1_LOCAL, MACAB_M2, MACAB_M2_LOCAL, MACAB_M4, MACAB_M4_LOCAL, MACAB_M8, MACAB_M8_LOCAL, MACAB_M16, MACAB_M16_LOCAL, MACAB_M32, MACAB_M32_LOCAL, MACQK_M1, MACQK_M1_LOCAL, MACQK_M2, MACQK_M2_LOCAL, MACQK_M4, MACQK_M4_LOCAL, MACQK_M8, MACQK_M8_LOCAL, MACQK_M16, MACQK_M16_LOCAL, MACQK_M32, MACQK_M32_LOCAL, MACAB, MACQK, MACAB_LOCAL, MACQK_LOCAL, ACT1_LOCAL, ACT2_LOCAL, PREpb_LOCAL, PREab_LOCAL, LOCALRD, LOCALWR, BCAST, GATHER, CAST, REDUCE, ROPE_EXEC, MAC_RUN, ROPE_RUN, ACTAB, ACTAB_LOCAL, ACT2_PULSE, LOCALRD_LOCAL, LOCALWR_LOCAL, BCAST_LOCAL, GATHER_LOCAL, CAST_LOCAL, REDUCE_LOCAL, ROPE_EXEC_LOCAL, COUNT };
   };
   struct State {
     enum : int { Opened, Closed, Activating, N_A, COUNT };
@@ -83,7 +93,7 @@ class LPDDR5XPIM : public DRAMSpec {
     rate, nBL_min, nBL_max, nCL, nRCD, nRP, nRPab, nRAS, nRC, nWR, nRTP, nCWL, nPPD, nCCDS, nCCDL, nCCDS_WR,
     nCCDL_WR, nRRDS, nRRDL, nWTRS, nWTRL, nFAW, nRFC, nRFCpb, nREFI, nREFIpb, nWCKPST, nCAS, nAAD, nCS, tCK_ps,
     nPBR2PBR, nPBR2ACT, nRCDWR, nDQ_RTW, nDQ_WTR, nDQ_RANK_WTW, nMAC1, nMAC2, nMAC4, nMAC8, nMAC16, nMAC32, nLOCALRD,
-    nLOCALWR, nBCAST, nGATHER, nCAST, nREDUCE, nROPE, nROPEII, nDESCDecode, COUNT
+    nLOCALWR, nBCAST, nGATHER, nCAST, nREDUCE, nROPE, nROPEII, nROPEBatch, nDESCDecode, COUNT
     };
   };
 
@@ -103,7 +113,10 @@ class LPDDR5XPIM : public DRAMSpec {
       Cmd::MACQK_LOCAL<LPDDR5XPIM>, Cmd::ACT1_LOCAL<LPDDR5XPIM>, Cmd::ACT2_LOCAL<LPDDR5XPIM>,
       Cmd::PREpb_LOCAL<LPDDR5XPIM>, Cmd::PREab_LOCAL<LPDDR5XPIM>, Cmd::LOCALRD<LPDDR5XPIM>, Cmd::LOCALWR<LPDDR5XPIM>,
       Cmd::BCAST<LPDDR5XPIM>, Cmd::GATHER<LPDDR5XPIM>, Cmd::CAST<LPDDR5XPIM>, Cmd::REDUCE<LPDDR5XPIM>,
-      Cmd::ROPE_EXEC<LPDDR5XPIM>, Cmd::MAC_RUN<LPDDR5XPIM>, Cmd::ROPE_RUN<LPDDR5XPIM>
+      Cmd::ROPE_EXEC<LPDDR5XPIM>, Cmd::MAC_RUN<LPDDR5XPIM>, Cmd::ROPE_RUN<LPDDR5XPIM>, Cmd::ACTAB<LPDDR5XPIM>,
+      Cmd::ACTAB_LOCAL<LPDDR5XPIM>, Cmd::ACT2_PULSE<LPDDR5XPIM>, Cmd::LOCALRD_LOCAL<LPDDR5XPIM>,
+      Cmd::LOCALWR_LOCAL<LPDDR5XPIM>, Cmd::BCAST_LOCAL<LPDDR5XPIM>, Cmd::GATHER_LOCAL<LPDDR5XPIM>,
+      Cmd::CAST_LOCAL<LPDDR5XPIM>, Cmd::REDUCE_LOCAL<LPDDR5XPIM>, Cmd::ROPE_EXEC_LOCAL<LPDDR5XPIM>
   >;
 
   LPDDR5XPIM(const ConfigNode& config) {
@@ -115,14 +128,14 @@ class LPDDR5XPIM : public DRAMSpec {
 
     // String name maps + reverse lookup vectors
     set_names(levels, level_names, {"Channel", "Rank", "BankGroup", "Bank", "Row", "Column"});
-    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "WRGB", "RDRES", "MACAB_M1", "MACAB_M1_LOCAL", "MACAB_M2", "MACAB_M2_LOCAL", "MACAB_M4", "MACAB_M4_LOCAL", "MACAB_M8", "MACAB_M8_LOCAL", "MACAB_M16", "MACAB_M16_LOCAL", "MACAB_M32", "MACAB_M32_LOCAL", "MACQK_M1", "MACQK_M1_LOCAL", "MACQK_M2", "MACQK_M2_LOCAL", "MACQK_M4", "MACQK_M4_LOCAL", "MACQK_M8", "MACQK_M8_LOCAL", "MACQK_M16", "MACQK_M16_LOCAL", "MACQK_M32", "MACQK_M32_LOCAL", "MACAB", "MACQK", "MACAB_LOCAL", "MACQK_LOCAL", "ACT1_LOCAL", "ACT2_LOCAL", "PREpb_LOCAL", "PREab_LOCAL", "LOCALRD", "LOCALWR", "BCAST", "GATHER", "CAST", "REDUCE", "ROPE_EXEC", "MAC_RUN", "ROPE_RUN"});
+    set_names(commands, command_names, {"ACT1", "ACT2", "PREpb", "PREab", "CAS_RD", "CAS_WR", "RD", "WR", "RDA", "WRA", "REFab", "REFpb", "WRGB", "RDRES", "MACAB_M1", "MACAB_M1_LOCAL", "MACAB_M2", "MACAB_M2_LOCAL", "MACAB_M4", "MACAB_M4_LOCAL", "MACAB_M8", "MACAB_M8_LOCAL", "MACAB_M16", "MACAB_M16_LOCAL", "MACAB_M32", "MACAB_M32_LOCAL", "MACQK_M1", "MACQK_M1_LOCAL", "MACQK_M2", "MACQK_M2_LOCAL", "MACQK_M4", "MACQK_M4_LOCAL", "MACQK_M8", "MACQK_M8_LOCAL", "MACQK_M16", "MACQK_M16_LOCAL", "MACQK_M32", "MACQK_M32_LOCAL", "MACAB", "MACQK", "MACAB_LOCAL", "MACQK_LOCAL", "ACT1_LOCAL", "ACT2_LOCAL", "PREpb_LOCAL", "PREab_LOCAL", "LOCALRD", "LOCALWR", "BCAST", "GATHER", "CAST", "REDUCE", "ROPE_EXEC", "MAC_RUN", "ROPE_RUN", "ACTAB", "ACTAB_LOCAL", "ACT2_PULSE", "LOCALRD_LOCAL", "LOCALWR_LOCAL", "BCAST_LOCAL", "GATHER_LOCAL", "CAST_LOCAL", "REDUCE_LOCAL", "ROPE_EXEC_LOCAL"});
     set_names(states, state_names, {"Opened", "Closed", "Activating", "N_A"});
     set_names(timings, timing_names, {
         "rate", "nBL_min", "nBL_max", "nCL", "nRCD", "nRP", "nRPab", "nRAS", "nRC", "nWR", "nRTP", "nCWL", "nPPD",
         "nCCDS", "nCCDL", "nCCDS_WR", "nCCDL_WR", "nRRDS", "nRRDL", "nWTRS", "nWTRL", "nFAW", "nRFC", "nRFCpb",
         "nREFI", "nREFIpb", "nWCKPST", "nCAS", "nAAD", "nCS", "tCK_ps", "nPBR2PBR", "nPBR2ACT", "nRCDWR", "nDQ_RTW",
         "nDQ_WTR", "nDQ_RANK_WTW", "nMAC1", "nMAC2", "nMAC4", "nMAC8", "nMAC16", "nMAC32", "nLOCALRD", "nLOCALWR",
-        "nBCAST", "nGATHER", "nCAST", "nREDUCE", "nROPE", "nROPEII", "nDESCDecode"
+        "nBCAST", "nGATHER", "nCAST", "nREDUCE", "nROPE", "nROPEII", "nROPEBatch", "nDESCDecode"
     });
 
     // Static spec data

@@ -9,7 +9,7 @@ import tempfile
 
 FIELDS = [("op", ""), ("epoch", ""), ("id", None), ("slot", 0), ("result_slot", 0),
           ("rows", 1), ("pairs", 1), ("dest_slot", -1), ("source_bank", 0), ("tensor_fragment", -1),
-          ("output_columns", 1), ("output_column", 0), ("fragment", 0), ("output_tile", 0),
+          ("output_columns", 1), ("output_column", 0), ("reduction_word", 16), ("fragment", 0), ("output_tile", 0),
           ("kv_token", 0), ("lanes", 16), ("elements", 16), ("bytes", 32), ("token", 0),
           ("release_result", 0), ("dest", ""), ("source", "")]
 
@@ -31,7 +31,7 @@ def semantic_digest(program):
             for name, default in FIELDS:
                 value = op.get(name, i if name == "id" else default)
                 add(int(value) if isinstance(value, bool) else value)
-            for name in ("addr", "deps"):
+            for name in ("addr", "deps", "issue_deps"):
                 values = op.get(name, [])
                 add(len(values))
                 for v in values:
@@ -77,6 +77,8 @@ def main():
             {"schema_version": 1, "stages": [{"name": "bad", "channels": [[]]}]},
             {"schema_version": 1, "stages": [{"name": "bad", "channels": [[{"op": "WRGB", "addr": [0, 0, -1, -1, 0, 0]}]] + [[]] * 15}]},
             {"schema_version": 1, "stages": [{"name": "bad", "channels": [[{"op": "WRGB", "addr": [0, 1, -1, -1, 0, 0], "deps": [0]}]] + [[]] * 15}]},
+            {"schema_version": 1, "stages": [{"name": "bad", "channels": [[{"op": "WRGB", "addr": [0, 1, -1, -1, 0, 0], "issue_deps": [0]}]] + [[]] * 15}]},
+            {"schema_version": 1, "stages": [{"name": "bad", "channels": [[{"op": "REDUCE", "addr": [0, 1, -1, -1, 0, 0], "reduction_word": 512}]] + [[]] * 15}]},
         ]
         for i, program in enumerate(invalid):
             path = directory / f"invalid-{i}.json"

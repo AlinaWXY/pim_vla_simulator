@@ -22,6 +22,15 @@ void DRAMDevice::issue_command(int command, const AddrVec_t& addr_vec, Clk_t clk
     node_at(partner, m_spec->pair_rules[command].level)->update_timing(command, partner, clk);
   }
   apply_action(command, addr_vec, clk);
+  // Reserve each primitive using the SAME node histories and ready clocks.
+  // No controller event or second timing implementation is involved. Future
+  // state is visible immediately, but native readiness prevents early access.
+  for (const auto& primitive : m_spec->command_expansions[command]) {
+    AddrVec_t target = addr_vec;
+    for (const auto& [level, value] : primitive.address_overrides) target[level] = value;
+    m_root->update_timing(primitive.command, target, clk + primitive.offset);
+    apply_action(primitive.command, target, clk + primitive.offset);
+  }
 }
 
 bool DRAMDevice::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) {

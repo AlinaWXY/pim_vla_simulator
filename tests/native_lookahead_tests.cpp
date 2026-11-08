@@ -59,15 +59,24 @@ int main(int argc,char** argv) {
     std::vector<Operation> many;for(int i=0;i<100;i++)many.push_back(operation("CAST",i));
     std::vector<Clock> many_done(100,NEVER);
     require(predictor.predict(live,many,0,many_done,100,200,false).size()==32,"forecast exceeded 32 request FIFO");
-    // Actual native prerequisites must be expanded, including all 16 banks.
+    // ACTAB is one predicted command; its sixteen staggered native primitives
+    // affect the snapshot readiness without becoming controller instructions.
     std::vector<Operation> array={operation("MACAB",0)};std::vector<Clock> array_done={NEVER};
     before=fingerprint(live);
     f=predictor.predict(live,array,0,array_done,100,200,true);
-    int act1=live.m_spec->get_command_id("ACT1_LOCAL"),act2=live.m_spec->get_command_id("ACT2_LOCAL");
-    int n1=0,n2=0;for(const auto& e:f){n1+=e.cmd==act1;n2+=e.cmd==act2;}
-    require(n1==16&&n2==16,"forecast did not expand full-rank split activation");
-    require(find_time(f,live.m_spec->get_command_id("MACAB_M1_LOCAL"))<NEVER,"forecast omitted final private MAC");
+    int act=live.m_spec->get_command_id("ACTAB_LOCAL");
+    int count=0;for(const auto& e:f)count+=e.cmd==act;
+    require(count==1&&find_time(f,act)==100,"forecast did not issue one full-rank ACTAB");
+    require(find_time(f,live.m_spec->get_command_id("MACAB_M1_LOCAL"))==168,"forecast ignored staggered ACTAB completion");
     require(fingerprint(live)==before,"private prerequisite prediction mutated live rows");
+    // A snapshot taken after real ACTAB carries future reservations and opened
+    // rows; only the final command remains and it still cannot start early.
+    live.issue_command(live.m_spec->get_command_id("ACTAB"),array[0].addr,200);
+    before=fingerprint(live);
+    f=predictor.predict(live,array,0,array_done,220,100,true);
+    require(find_time(f,act)==NEVER,"snapshot lost committed ACTAB row state");
+    require(find_time(f,live.m_spec->get_command_id("MACAB_M1_LOCAL"))==268,"snapshot lost future ACTAB ready clocks");
+    require(fingerprint(live)==before,"ACTAB snapshot forecast changed live reservations");
     std::cout<<"{\"native_lookahead\":\"passed\",\"coverage\":\"future_DQ, native_preq, live_immutability, repeat, barrier, horizon, FIFO32\"}\n";
     return 0;
   } catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}
