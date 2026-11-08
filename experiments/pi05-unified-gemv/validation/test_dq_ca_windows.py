@@ -167,8 +167,21 @@ class NativeFixtureTests(unittest.TestCase):
     def test_disabled_controller_logs_are_not_misread_as_free_ca(self):
         self.result["config"]["pim_rank_controller"]=False
         self.dump(self.case/"simulation/result.json",self.result)
-        with self.assertRaisesRegex(ValueError,"enabled hierarchical controller"):
+        with self.assertRaisesRegex(ValueError,"Flat CA trace contains private rank commands"):
             C.analyze_case(self.case,"disabled")
+
+    def test_flat_global_logs_are_counted_without_a_rank_controller(self):
+        self.result['config']['pim_rank_controller']=False
+        self.dump(self.case/'simulation/result.json',self.result)
+        for ch in range(16):
+            self.csv(self.case/f'simulation/rank_ca_events.csv.ch{ch}',
+                ('clock','ready_at','Channel','Rank','command','scope'),
+                [ResourceTests.ca(23,24,channel=ch,command='RDRES')])
+        report=C.analyze_case(self.case,'flat')
+        self.assertEqual(report['ca_provenance']['model'],'flat_shared_ca')
+        self.assertEqual(report['rank_ca_accounting'],[])
+        row=next(r for r in report['records'] if r['channel']==0 and r['resource']=='global_ca')
+        self.assertEqual(row['resource_busy_us'],1)
 
     def test_verified_portable_legacy_contract_rebuilds_actual_trace(self):
         self.remove_ca()

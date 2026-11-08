@@ -2,7 +2,7 @@
 // ownership/coverage metadata, not another rank-sized data buffer.
 bool m_unified_gemv = false;
 bool m_stream_inputs=false,m_gpu_rope=false,m_feature_layout=false;
-bool direct_weight(const Request& r) const { return m_stream_inputs && gemv_offset(r)<786432; }
+bool direct_weight(const Request& r) const { return m_stream_inputs && (gemv_offset(r)<786432 || !m_rank_controller); }
 int m_gemv_port_cycles = 2;
 std::string m_gemv_events_path;
 std::ofstream m_gemv_events;

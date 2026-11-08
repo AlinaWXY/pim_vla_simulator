@@ -4,6 +4,16 @@ from dataclasses import replace
 from pathlib import Path
 import reproduce as R
 
+def evaluation_config(case,variant):
+    """Before has a flat controller and continuous GPU WRGB input supply."""
+    import evaluation_workload as E,coarse_workload
+    v=E.VARIANTS[variant]
+    opts={**coarse_workload.OPTIONS,'rank_descriptors':False,'score_dram_spill':v['after']}
+    base=R.config_for(case,**opts)
+    return replace(base,pim_coarse_commands=v['after'],pim_stream_inputs=not v['after'],
+        pim_gpu_rope=v['gpu_rope'],pim_feature_layout=v['feature'],
+        pim_rank_controller=v['after'],pim_rank_staging=v['after'],pim_staging_banks=2 if v['after'] else 1)
+
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True)
     ap.add_argument('--variants',nargs='+',default=['feature_gpu_before','token_gpu_before','token_local_before','token_gpu_after','token_local_after'])
@@ -22,9 +32,7 @@ def main():
         for case in a.cases:
             d=a.output/variant/case;d.mkdir(parents=True,exist_ok=False)
             m=E.generate(d/'workload.trace',case,variant);R.dump(d/'manifest.json',m)
-            opts={**coarse_workload.OPTIONS,'rank_descriptors':False,'score_dram_spill':v['after']}
-            cfg=replace(R.config_for(case,**opts),pim_coarse_commands=v['after'],
-                        pim_stream_inputs=not v['after'],pim_gpu_rope=v['gpu_rope'],pim_feature_layout=v['feature'])
+            cfg=evaluation_config(case,variant)
             result=run_trace(cfg,d/'workload.trace',d/'simulation')
             dq=sum(result['issued_commands'].get(c,0)*32 for c in R.EXTERNAL)
             assert dq==m['expected_dq_bytes']['total'],(variant,case,dq,m['expected_dq_bytes'])

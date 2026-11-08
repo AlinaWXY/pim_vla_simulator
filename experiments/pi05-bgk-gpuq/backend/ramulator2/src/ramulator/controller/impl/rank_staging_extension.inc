@@ -84,7 +84,17 @@ void init_rank_staging() {
   if(m_rank_staging && (!m_rank_controller || !m_unified_gemv || m_ffn_dram))
     throw std::runtime_error("rank staging requires rank controller, unified GEMV and GPU FFN");
   m_rank_ca_ready.resize(m_inputs.size(),0);
-  if(!m_rank_controller) return;
+  if(!m_rank_controller) {
+    // Log the existing flat shared-CA timing model. No private controller,
+    // ingress descriptor, queue, or internal rank CA is introduced here.
+    m_device.command_observer=[this](int command,const AddrVec_t& a,Clk_t clock) {
+      const auto& name=m_device.m_spec->command_names[command];
+      if(name=="LOCALRD" || name=="LOCALWR") return; // Existing flat-model local ports.
+      const int cycles=std::max(1,m_device.m_spec->command_cycles[command]);
+      record_ca(clock,clock+cycles,a[m_rank_level],name,"global");
+    };
+    return;
+  }
   m_device.command_admission=[this](int command,const AddrVec_t& a,Clk_t clock) {
     return rank_ca_available(a[m_rank_level],clock) && (m_rank_fine_context || clock>=m_global_ca_ready);
   };

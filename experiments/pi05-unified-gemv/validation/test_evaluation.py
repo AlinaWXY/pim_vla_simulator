@@ -5,7 +5,7 @@ import evaluation_workload as E
 
 class EvaluationContracts(unittest.TestCase):
     def test_matrix_byte_conservation(self):
-        expected={'feature_gpu_before':5904,'token_gpu_before':4968,'token_local_before':4776,
+        expected={'feature_gpu_before':6096,'token_gpu_before':5352,'token_local_before':5160,
                   'token_gpu_after':4968,'token_local_after':4776}
         with tempfile.TemporaryDirectory() as td:
             p=Path(td)/'x.trace'
@@ -22,8 +22,34 @@ class EvaluationContracts(unittest.TestCase):
                 else:
                     self.assertNotIn('MAC_RUN',text)
                     self.assertIn('PIM_WR_GB ',text)
+                    self.assertNotIn('PIM_STAGE_',text)
+                    self.assertNotIn('PIM_PV_SPILL ',text)
+                    self.assertNotIn('PIM_O_REWIND ',text)
                     # Ordinary input ST must disappear; only GPU RoPE imports remain.
                     self.assertEqual(layer['counts'].get('ST',0),4096 if E.VARIANTS[v]['gpu_rope'] else 0)
+
+    def test_before_has_no_rank_controller_and_every_linear_input_uses_dq(self):
+        sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+        from reproduce_evaluation import evaluation_config
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)/'x.trace'
+            for v in E.VARIANTS:
+                cfg=evaluation_config('serial_layer_control',v)
+                self.assertEqual(cfg.pim_rank_controller,E.VARIANTS[v]['after'])
+                self.assertEqual(cfg.pim_rank_staging,E.VARIANTS[v]['after'])
+                self.assertEqual(cfg.pim_stream_inputs,not E.VARIANTS[v]['after'])
+                if E.VARIANTS[v]['after']:continue
+                m=E.generate(p,'serial_layer_control',v);text=p.read_text().splitlines()
+                for s in m['segments']:
+                    lines=text[s['line_start']-1:s['line_end']]
+                    if any(x.startswith('PIM_MAC_AB ') for x in lines):
+                        self.assertTrue(any(x.startswith('PIM_WR_GB ') for x in lines),s['name'])
+                # PV partial leaves PIM before the same values can feed either O tile.
+                exports=[s for s in m['segments'] if s['name'].endswith('pv_result_gpu_export')]
+                self.assertEqual(len(exports),1)
+                e=exports[0]
+                count=sum(x.startswith('PIM_RD_RES ') for x in text[e['line_start']-1:e['line_end']])
+                self.assertEqual(count*32,16*(4096 if E.VARIANTS[v]['feature'] else 8192))
 
     def test_feature_ownership_and_packing(self):
         subsets=[list(range(0,64))+list(range(128,192)),list(range(64,128))+list(range(192,256))]

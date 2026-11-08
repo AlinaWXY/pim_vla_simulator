@@ -1,5 +1,8 @@
 # 线性算子期间的共享 CA：e / g 原生 trace 复核
 
+**基线定义纠正：本文使用的 before 配置错误地启用了 rank controller，并在 O projection 保留本地 DRAM 输入。它不是用户指定的“无 rank controller、计算期间由 GPU 持续广播输入”的融合前基线。本文的 e/g 比较及 before DQ/CA 数值撤回，仅保留为误配置归档。请改用 [修正基线](../direct-before-corrected/REPORT.zh-CN.md)。**
+
+
 日期：2026-11-08。读取 dev0 原生 job1971246 的两组 `serial_layer_control`，逐个检查全部16个channel；没有重新生成GPU请求，也没有使用ρ、在途请求数或读写比例。**旧参数化请求模型的 c–g 延迟不再用于 Evaluation 或推断融合收益。**
 
 结论：细命令版在计算期间持续、反复向共享CA发令，粗命令版将这些命令移入rank内执行，外部CA只剩少量维护。e 的空隙以数个CK为主，g出现微秒级长空隙。共享CA忙时会挡住同channel的GPU命令；GPU依赖尚未返回的数据时也会停顿。原始trace能证明资源冲突和窗口形态，不能独自给出GPU停顿时长或新的e/g端到端延迟。

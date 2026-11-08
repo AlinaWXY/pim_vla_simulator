@@ -82,7 +82,7 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
                     "pim_feature_layout": config.pim_feature_layout,
                     "pim_coarse_events_path": str(output / f"coarse_runs.csv.ch{channel}") if config.pim_coarse_commands else "",
                     "rank_descriptor_events_path": str(output / f"rank_descriptors.csv.ch{channel}") if config.pim_rank_descriptors else "",
-                    "rank_ca_events_path": str(output / f"rank_ca_events.csv.ch{channel}") if config.pim_rank_controller else "",
+                    "rank_ca_events_path": str(output / f"rank_ca_events.csv.ch{channel}"),
                     "staging_events_path": str(output / f"staging_events.csv.ch{channel}") if config.pim_rank_staging else "",
                     "gemv_port_cycles": config.gemv_port_cycles,
                     "unified_gemv_events_path": str(output / f"unified_gemv.csv.ch{channel}") if config.pim_unified_gemv else "",
@@ -594,5 +594,18 @@ def run_trace(config: MemoryConfig, trace_path: str | Path, output_dir: str | Pa
         result["rank_controller_model"]["shared_rank_commands"]=["array ACT/PRE/LOCALRD/LOCALWR", "MAC", "external RD/WR/RDRES/WRGB"]
         result["unified_gemv_model"]["port_sharing"]="Array/MAC share rank CA; multicast/gather/cast retain data-port service without pseudo CA"
         result["pim_model"]["transfer_scheduling"]="Two-bank staging; descriptor-generated local loads and MAC; multicast is a local data-path action"
+    if config.pim_stream_inputs and not config.pim_rank_controller:
+        result['config'].update(pim_rank_controller=False,pim_rank_staging=False,
+            pim_rank_descriptors=False,pim_coarse_commands=False)
+        result['input_control_model']=dict(rank_controller=False,
+            input_source='GPU WRGB bursts throughout each linear operator, including O',
+            input_DRAM_staging=False,CA='flat shared external CA',private_rank_CA=False,
+            native_CA_log='rank_ca_events.csv.chN contains global rows only; legacy filename retained')
+        if config.pim_o_projection:
+            size=4096 if config.pim_feature_layout else 8192
+            result['o_projection_model'].update(source_banks=[],local_input_bytes_per_rank=0,
+                input_path='PV BF16 export to GPU followed by two scans of GPU broadcast input',
+                GPU_input_bytes_per_rank_per_scan=size,GPU_PV_export_bytes_per_rank=size,
+                GPU_reordering_latency='unmeasured; native model charges interface bursts and PIM commands only')
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     return result

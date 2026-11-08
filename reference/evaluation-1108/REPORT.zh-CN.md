@@ -1,5 +1,8 @@
 # xinyao_1108：布局、RoPE 与空闲窗口实验
 
+**基线定义纠正：本文使用的 before 配置错误地启用了 rank controller，并在 O projection 保留本地 DRAM 输入。它不是用户指定的“无 rank controller、计算期间由 GPU 持续广播输入”的融合前基线。本文的 e/g 比较及 before DQ/CA 数值撤回，仅保留为误配置归档。请改用 [修正基线](direct-before-corrected/REPORT.zh-CN.md)。**
+
+
 完成日期：2026-11-08。原生仿真在 dev0 的 CPU Slurm 节点运行，最终 matrix job **1971246**，分析 job **1971300**，最终验证 job **1971301**。分支从 `xinyao_1107` 的 `cfe0f6a` 建立。
 
 ## 结果口径

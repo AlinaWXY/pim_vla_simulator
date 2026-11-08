@@ -1,0 +1,11 @@
+{
+  "variant": "token_local_after",
+  "case": "serial_layer_control",
+  "latency_us": 210.34181,
+  "memory_cycles": 224245,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 4890624,
+  "trace_sha256": "68bf2d06735acc46d7f969c9ab92cf214772cdec9794d714b8995377ba975471",
+  "native_library_sha256": "5cdc451ff5dbc3f69a6fd030c273653c2fa9d5c9f0b3328b83e76bed01ec0ba6",
+  "complete_heterogeneous_E2E": false
+}

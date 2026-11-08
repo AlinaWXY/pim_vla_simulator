@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "changed_native_sources": [
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/lpddr5_controller.cpp",
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/o_projection_extension.inc",
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/rank_staging_extension.inc",
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/unified_gemv_extension.inc",
+    "experiments/pi05-bgk-gpuq/backend/ramulator2/src/ramulator/controller/impl/v_cache_extension.inc",
+    "experiments/pi05-bgk-gpuq/backend/simulator/backend.py",
+    "experiments/pi05-bgk-gpuq/backend/simulator/config.py",
+    "experiments/pi05-unified-gemv/reproduce_evaluation.py",
+    "experiments/pi05-unified-gemv/source/evaluation_workload.py"
+  ],
+  "operator_resource_scopes_checked": 86,
+  "all_16_channels_match": true
+}

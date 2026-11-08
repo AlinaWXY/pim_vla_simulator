@@ -133,9 +133,9 @@ def analyze_case(directory,flow,legacy_ca_contract=None):
     require(all(ca_present) or not any(ca_present),"Partial CA logs cannot establish all-channel availability")
     fallback=None
     if all(ca_present):
-        require(cfg.get("pim_rank_controller",False),"Recorded rank CA logs require an enabled hierarchical controller")
-        provenance=dict(status="recorded",model="hierarchical_global_and_rank_ca",
-            definition="Only scope=global occupies shared global CA. scope=rank occupies the named rank resource, including internal fine commands. A command may be logged once globally and separately on its target rank; those are distinct resources.")
+        hierarchical=cfg.get("pim_rank_controller",False)
+        provenance=dict(status="recorded",model="hierarchical_global_and_rank_ca" if hierarchical else "flat_shared_ca",
+            definition="Only scope=global occupies shared global CA. Rank-private CA exists only when pim_rank_controller is enabled.")
     elif legacy_ca_contract is not None:
         cycles,internal,provenance=verified_legacy_contract(legacy_ca_contract,directory,manifest,result,count)
         fallback=(cycles,internal)
@@ -154,10 +154,14 @@ def analyze_case(directory,flow,legacy_ca_contract=None):
         external_count+=len(dq[channel])
         if all(ca_present):
             paths.append(ca_paths[channel])
-            resources=ca_intervals(read_csv(ca_paths[channel]),ratio,channel)
+            ca_rows=read_csv(ca_paths[channel])
+            if not cfg.get('pim_rank_controller',False):
+                require(all(r['scope']=='global' for r in ca_rows),'Flat CA trace contains private rank commands')
+            resources=ca_intervals(ca_rows,ratio,channel)
             ca[channel]=resources["global_ca"]
-            rank_stats.append(dict(channel=channel,**{f"{name}_busy_us":maximal_idle_windows(items,0,wall)[0]*tick_us
-                for name,items in resources.items()}))
+            if cfg.get('pim_rank_controller',False):
+                rank_stats.append(dict(channel=channel,**{f"{name}_busy_us":maximal_idle_windows(items,0,wall)[0]*tick_us
+                    for name,items in resources.items()}))
         elif fallback is not None:
             ca[channel]=reconstruct_legacy_ca(rows,ratio,*fallback)
     require(external_count*32==manifest["expected_dq_bytes"]["total"],"Native DQ byte contract mismatch")

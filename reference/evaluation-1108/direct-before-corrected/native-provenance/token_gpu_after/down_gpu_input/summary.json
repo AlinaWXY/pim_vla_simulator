@@ -1,0 +1,11 @@
+{
+  "variant": "token_gpu_after",
+  "case": "down_gpu_input",
+  "latency_us": 58.646574,
+  "memory_cycles": 62523,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 2162688,
+  "trace_sha256": "30b5f0e539487e844e64fb8618443b5986c94eb80457e0ecdb03ab1765207e47",
+  "native_library_sha256": "5cdc451ff5dbc3f69a6fd030c273653c2fa9d5c9f0b3328b83e76bed01ec0ba6",
+  "complete_heterogeneous_E2E": false
+}

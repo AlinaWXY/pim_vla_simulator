@@ -19,8 +19,8 @@ bool output_all(const std::array<uint16_t,16>& masks) const {
   return std::all_of(masks.begin(),masks.end(),[](uint16_t mask){return mask==65535;});
 }
 void init_v_cache() {
-  if(m_whole_srf && (!m_unified_gemv || !m_rank_staging))
-    throw std::runtime_error("Whole SRF requires unified GEMV and rank staging");
+  if(m_whole_srf && (!m_unified_gemv || !(m_rank_staging || m_stream_inputs)))
+    throw std::runtime_error("Whole SRF requires unified GEMV and staged or streamed inputs");
   if(m_token_pv && !m_whole_srf)
     throw std::runtime_error("Token PV requires whole SRF");
   if(m_qkv_fusion && (!m_token_pv || !m_rank_rope))
@@ -63,7 +63,7 @@ bool output_retired() const {
   if(m_output_macs!=m_output_expected_macs) return false;
   const bool qk=m_output_base==0 || m_output_base==393216;
   const bool local_v=m_token_pv && (m_output_base==131072 || m_output_base==393216);
-  const bool local_pv=m_o_projection && m_output_base==163840;
+  const bool local_pv=m_o_projection && !direct_o_input() && m_output_base==163840;
   if(qk && !output_all(m_output_qk_spills)) return false;
   if(local_v && !output_all(m_v_spills)) return false;
   if(local_pv && !output_all(m_o_pv_spills)) return false;
@@ -76,7 +76,7 @@ bool output_other_ready() {
     // Every result packet may be issued while its final DQ completion is still
     // pending. Wait for that legal tail; missing packets remain an error.
     const bool local=m_output_base==0 || m_output_base==393216 ||
-      (m_token_pv && m_output_base==131072) || (m_o_projection && m_output_base==163840);
+      (m_token_pv && m_output_base==131072) || (m_o_projection && !direct_o_input() && m_output_base==163840);
     if(!local && m_output_macs==m_output_expected_macs &&
        m_output_exports==output_export_packets() && m_output_export_done<m_output_exports) return false;
     throw std::runtime_error("Output owner change before complete result drain");
@@ -131,7 +131,7 @@ bool output_export_ready(const Request& req) {
   if(m_output_base<0 || m_output_macs!=m_output_expected_macs)
     throw std::runtime_error("Result export requires complete output owner");
   if(m_output_base==0 || m_output_base==393216 || (m_token_pv && m_output_base==131072) ||
-     (m_o_projection && m_output_base==163840))
+     (m_o_projection && !direct_o_input() && m_output_base==163840))
     throw std::runtime_error("Local projection output must use spill instead of GPU export");
   if(gemv_offset(req)!=m_output_exports*32 || m_output_exports>=output_export_packets())
     throw std::runtime_error("Output export address/count mismatch");
@@ -146,6 +146,9 @@ void output_export_issued(const Request& req) {
 void output_complete(const Request& req) {
   if(!m_whole_srf || req.type_id!=Request::Type::PIM_RD_RES) return;
   if(++m_output_export_done>m_output_exports) throw std::runtime_error("Output completed before export issue");
+  if(direct_o_input() && m_output_base==163840 && m_output_export_done==output_export_packets()) m_o_gpu_input_ready=true;
+  if(direct_o_input() && is_o_weight_base(m_output_base) && m_output_export_done==output_export_packets())
+    m_o_next_tile=(m_output_base-O_WEIGHT_BASE)/o_tile_bytes()+1;
   if(m_output_base==786432+o_tile_bytes() && m_output_export_done==output_export_packets()) m_o_completed=true;
 }
 void prepare_v_cache_spill(Request& req) {

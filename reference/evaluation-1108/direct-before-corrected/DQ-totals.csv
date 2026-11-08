@@ -1,0 +1,6 @@
+variant,DQ_KiB_per_layer_step,DQ_MiB_AE_180,native_stage_sum_us,complete_parallel_latency_measured
+feature_gpu_before,6096.0,1071.5625,155.260574,False
+token_gpu_before,5352.0,940.78125,151.21498,False
+token_local_before,5160.0,907.03125,155.09079599999998,False
+token_gpu_after,4968.0,873.28125,206.44066799999996,False
+token_local_after,4776.0,839.53125,210.07635599999998,False

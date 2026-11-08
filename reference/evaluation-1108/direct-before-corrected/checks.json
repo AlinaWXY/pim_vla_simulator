@@ -1,0 +1,183 @@
+{
+  "status": "passed",
+  "cases": [
+    {
+      "variant": "feature_gpu_before",
+      "case": "chain",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "feature_gpu_before",
+      "case": "pv",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "feature_gpu_before",
+      "case": "gate_up_gpu",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "feature_gpu_before",
+      "case": "down_gpu_input",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "feature_gpu_before",
+      "case": "serial_layer_control",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "case": "chain",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "case": "pv",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "case": "gate_up_gpu",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "case": "down_gpu_input",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "case": "serial_layer_control",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_before",
+      "case": "chain",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_before",
+      "case": "pv",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_before",
+      "case": "gate_up_gpu",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_before",
+      "case": "down_gpu_input",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_before",
+      "case": "serial_layer_control",
+      "flat_CA_matches_native": true,
+      "after_native_byte_identical": false,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "case": "chain",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "case": "pv",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "case": "gate_up_gpu",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "case": "down_gpu_input",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "case": "serial_layer_control",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_after",
+      "case": "chain",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_after",
+      "case": "pv",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_after",
+      "case": "gate_up_gpu",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_after",
+      "case": "down_gpu_input",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    },
+    {
+      "variant": "token_local_after",
+      "case": "serial_layer_control",
+      "flat_CA_matches_native": false,
+      "after_native_byte_identical": true,
+      "DQ_and_CA_disjoint_per_resource": true
+    }
+  ],
+  "channels_per_case": 16,
+  "after_native_trace_files_identical": 320,
+  "before_CA_trace_files_verified": 240
+}

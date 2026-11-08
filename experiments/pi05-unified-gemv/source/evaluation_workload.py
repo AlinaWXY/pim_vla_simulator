@@ -33,6 +33,9 @@ def finish(path,case,segments,records,variant,**extra):
     dq['total']=sum(dq.values())
     return dict(case=case,variant=variant,segments=segments,counts=dict(counts),
         expected_dq_bytes=dq,configuration=VARIANTS[variant],numerical_compute=False,
+        input_control_contract=dict(rank_controller=VARIANTS[variant]['after'],
+            input_path='DRAM staging with local reads' if VARIANTS[variant]['after'] else 'GPU WRGB supplied throughout each operator, including O',
+            ca_path='coarse global descriptors and private rank commands' if VARIANTS[variant]['after'] else 'flat shared external CA; no rank controller'),
         dimensions=dict(H=16,heads=8,head_dim=256,hidden=1024,FFN=4096,valid_KV=984,padded_KV=992),
         **extra)
 
@@ -53,11 +56,15 @@ def token(path,case,variant):
         name=s['name'];short=name.split('/')[-1]
         items=[r for r in raw[s['line_start']-1:s['line_end']] if not r.startswith('BARRIER')]
         if not v['after'] and s.get('kind')=='input_staging':continue
+        if not v['after'] and short=='pv_result_dram_spill':
+            emit('pv_result_gpu_export',[f'PIM_RD_RES {addr(ch,0,off)}' for off in range(0,8192,32) for ch in range(16)],'external_read')
+            continue
+        if not v['after'] and short=='o_projection_input_rewind':continue
         if v['gpu_rope'] and short in ('rope_local','rope_run'):
             emit('gpu_rope_export',gpu_rope_records('LD'),'external_read')
             emit('gpu_rope_import',gpu_rope_records('ST'),'external_write')
             continue
-        if not v['after'] and not short.startswith('o_projection'):
+        if not v['after']:
             rewritten=[]
             for r in items:
                 f=r.split()
@@ -70,7 +77,7 @@ def token(path,case,variant):
         emit('gpu_q_ready' if v['gpu_rope'] and short=='q_export_to_gpu' else name,
              items,'producer_ready' if v['gpu_rope'] and short=='q_export_to_gpu' else s.get('kind','coarse_work'))
     return finish(path,case,segments,out,variant,
-        source_generator='coarse_workload' if v['after'] else 'workload with direct external inputs',
+        source_generator='coarse_workload' if v['after'] else 'flat-controller GPU-broadcast inputs including PV-to-O round trip',
         coarse_commands=v['after'],feature_geometry=None)
 
 def feature(path,case,variant):
@@ -124,19 +131,14 @@ def feature(path,case,variant):
     else:
         w.phase('pv_input_compute',lambda:gemm(163840,62,8),kind='pipeline')
         w.phase('pv_gemv_release',release,kind='gemv_release')
-        from rank_staging import input_offset,source_bank
-        def spill():
-            w.ranks('PIM_STAGE_BEGIN',524288,'4096 16')
-            for pair in range(0,8,2):
-                for q in range(16):
-                    for f in (pair,pair+1):w.ranks('PIM_PV_SPILL',input_offset(f,q,16,2),bank=source_bank(f,2))
-            w.ranks('PIM_STAGE_SEAL',524288)
-        w.phase('pv_result_dram_spill',spill,kind='local_write')
+        def export_pv():
+            for off in range(0,4096,32):w.ranks('PIM_RD_RES',off)
+        w.phase('pv_result_gpu_export',export_pv,kind='external_read')
         for tile in range(2):
-            if tile:w.phase('o_projection_input_rewind',lambda:w.ranks('PIM_O_REWIND',524288),kind='gemv_release')
             def compute(tile=tile):
                 for first in range(0,8,2):
-                    for f in (first,first+1):w.ranks('PIM_STAGE_FRAGMENT',input_offset(f,0,16,2),f%2,bank=source_bank(f,2))
+                    for f in (first,first+1):
+                        for q in range(16):w.ranks('PIM_WR_GB',q*32,f%2)
                     for f in (first,first+1):
                         for col in range(32):w.ranks('PIM_MAC_AB',786432+tile*8192+(f*32+col)*32,f%2)
             w.phase(f'o_projection_tile_{tile}_compute',compute,kind='local_compute')

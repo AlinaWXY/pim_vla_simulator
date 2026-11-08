@@ -61,8 +61,8 @@ class MemoryConfig:
                      "pim_score_dram_spill", "pim_o_projection", "pim_pv_bf16_output"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError(f"{name} must be boolean")
-        if self.pim_whole_srf and (not self.pim_unified_gemv or not self.pim_rank_staging):
-            raise ValueError("Whole SRF requires unified GEMV and rank staging")
+        if self.pim_whole_srf and (not self.pim_unified_gemv or not (self.pim_rank_staging or self.pim_stream_inputs)):
+            raise ValueError("Whole SRF requires unified GEMV and staged or streamed inputs")
         if self.pim_token_pv and not self.pim_whole_srf:
             raise ValueError("Token PV requires whole SRF")
         if self.pim_qkv_fusion and (not self.pim_token_pv or not self.pim_rank_rope):
@@ -73,8 +73,9 @@ class MemoryConfig:
             raise ValueError("Score DRAM spill requires rank RoPE and rank controller")
         if self.pim_pv_bf16_output and not self.pim_token_pv:
             raise ValueError("BF16 PV output requires token PV")
-        if self.pim_o_projection and (not self.pim_pv_bf16_output or not self.pim_rank_staging or self.pim_staging_banks != 2):
-            raise ValueError("O projection requires BF16 PV output and two-bank rank staging")
+        direct_o = self.pim_stream_inputs and not self.pim_rank_controller
+        if self.pim_o_projection and (not self.pim_pv_bf16_output or not (direct_o or self.pim_rank_staging and self.pim_staging_banks == 2)):
+            raise ValueError("O projection requires BF16 PV output and direct GPU inputs or two-bank rank staging")
         if type(self.pim_coarse_commands) is not bool or (self.pim_coarse_commands and
                 (not self.pim_rank_controller or not self.pim_whole_srf or self.pim_staging_banks != 2 or self.pim_rank_descriptors)):
             raise ValueError("Coarse mode requires two-bank whole-SRF rank controller without legacy rank descriptors")

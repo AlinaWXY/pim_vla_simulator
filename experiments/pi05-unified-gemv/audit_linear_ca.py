@@ -68,6 +68,10 @@ def audit(directory, variant, records, details, sources, clips):
         paths.extend([cp, tp])
         ca, timeline = read_csv(cp), read_csv(tp)
         resources = {k: [] for k in ['global_ca', 'rank0_ca', 'rank1_ca', 'dq']}
+        hierarchical=r['config'].get('pim_rank_controller',False)
+        if not hierarchical:
+            assert all(e['scope']=='global' for e in ca)
+            resources.pop('rank0_ca');resources.pop('rank1_ca')
         for e in ca:
             assert int(e['Channel']) == ch
             a, b = issue_tick(e['clock'], ratio), issue_tick(e['ready_at'], ratio)
@@ -100,6 +104,7 @@ def audit(directory, variant, records, details, sources, clips):
                 key = f'{variant}/{op}'
                 if key not in clips:
                     clips[key] = dict(variant=variant,operator=op,phase=s['name'],origin_ck=(left-1)/ratio+1,
+                                      rank_controller=hierarchical,
                                       length_ns=(right-left)*tick_ns,
                                       resources={k:[((x-left)*tick_ns,(y-x)*tick_ns) for x,y in union(items,left,right)]
                                                  for k,items in resources.items() if k!='dq_global_ca'})
@@ -119,7 +124,9 @@ def plot(clips, output):
         for j, v in enumerate(['token_local_before','token_local_after']):
             c = clips[f'{v}/{op}']; ax=axes[i,j]
             for k, resource in enumerate(resources):
-                ax.broken_barh(c['resources'][resource],(3-k-.3,.6),facecolors=colors[k])
+                if resource not in c['resources']:
+                    ax.text(12,3-k,'No rank controller',va='center',fontsize=8,color='#777777')
+                else:ax.broken_barh(c['resources'][resource],(3-k-.3,.6),facecolors=colors[k])
             ax.set_title(f"{op} | {'e: before' if j==0 else 'g: after'} | CK {c['origin_ck']:.0f}",fontsize=10)
             ax.set_yticks([3,2,1,0],labels);ax.set_xlim(0,512*.938);ax.grid(axis='x',alpha=.2)
             if i==4: ax.set_xlabel('Time from sample start (ns)')

@@ -16,7 +16,7 @@ def main():
         ('duplicate_GPU_Q_import','chain','ST ','duplicate','Duplicate GPU Q tap'),
         ('incomplete_GPU_Q_import','chain','ST ','delete','query'),
         ('direct_input_row_overflow','chain','PIM_WR_GB ','overflow','external row exceeds'),
-        ('incomplete_PV_to_O','pv','PIM_PV_SPILL ','delete','staging seal requires every declared input write'),
+        ('incomplete_PV_to_O','pv','PIM_RD_RES ','delete','Output export address/count mismatch'),
     ):
         d=a.output/name;d.mkdir();p=d/'workload.trace';E.generate(p,case,'feature_gpu_before')
         lines=p.read_text().splitlines();i=next(i for i,x in enumerate(lines) if x.startswith(needle))
@@ -25,8 +25,8 @@ def main():
         else:
             f=lines[i].split();f[1]=str(E.addr(0,0,512));lines[i]=' '.join(f)
         p.write_text('\n'.join(lines)+'\n')
-        opts={**coarse_workload.OPTIONS,'rank_descriptors':False,'score_dram_spill':False}
-        cfg=replace(R.config_for(case,**opts),pim_stream_inputs=True,pim_gpu_rope=True,pim_feature_layout=True,max_cycles=100000)
+        from reproduce_evaluation import evaluation_config
+        cfg=replace(evaluation_config(case,'feature_gpu_before'),max_cycles=100000)
         try:run_trace(cfg,p,d/'simulation')
         except Exception as exc:
             error=str(exc);assert expected.lower() in error.lower(),(name,error,expected)

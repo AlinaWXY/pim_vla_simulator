@@ -1,5 +1,8 @@
 # xinyao_1108：允许 kernel 跨窗口推进的参数化请求仲裁
 
+**基线定义纠正：本文使用的 before 配置错误地启用了 rank controller，并在 O projection 保留本地 DRAM 输入。它不是用户指定的“无 rank controller、计算期间由 GPU 持续广播输入”的融合前基线。本文的 e/g 比较及 before DQ/CA 数值撤回，仅保留为误配置归档。请改用 [修正基线](../direct-before-corrected/REPORT.zh-CN.md)。**
+
+
 日期：2026-11-08。取消整kernel装入单窗口的限制后，曾进行了参数化请求重放。最终运行job **1971324**；复用native job1971246及已有GPU/VLM测量，没有重测纯GPU或VLM baseline。本报告保留请求级重放的探索性结果；最终并行Evaluation仍需校准。原始DQ流量与native时间线不变。
 
 **c–g是条件性模型估计，不是采集到的真实GPU访存trace或硬件端到端测量。扫描范围也不是置信区间或真实性能上下界。** 原有Nsys记录只有kernel顺序和时长；cold AE NCU记录没有DRAM请求量；既有Thor探测未暴露DRAM读写计数器。没有将L2流量冒充DRAM流量。

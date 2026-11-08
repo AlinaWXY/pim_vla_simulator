@@ -1,10 +1,10 @@
 # xinyao_1108：布局、RoPE 与空闲窗口 Evaluation
 
-在 dev0 完成 5 种配置 × 5 个 native cases，复用已有 GPU/VLM 测量。三种布局/RoPE 的 DQ 总量分别为每层每步 5904、4968、4776 KiB。并行评估保留kernel依赖顺序、允许跨窗口推进，并须计入后续AE GPU算子的干扰；现有合成请求重放尚不足以给出可信的并行端到端结果。
+**融合前基线已按用户定义修正：无 rank controller、无输入 DRAM 暂存，线性算子计算期间持续由 GPU 通过 WRGB 广播输入，占用外部 DQ 与共享 CA。融合后才使用 rank controller、DRAM 暂存与粗命令。**
 
-**停止使用ρ、在途数和读写比的合成假设推断Evaluation；旧请求模型c–g延迟仅归档，不作为性能结论。** 新的[逐线性算子CA审计](reference/evaluation-1108/linear-ca-audit/REPORT.zh-CN.md)只分析原生trace：MAC区间内，QKV/Gate-Up/Down的共享CA占用从e的11.99%/7.88%/15.79%降到g的约0.07%；e的典型CA空隙仅3–15 CK，g出现约3.88µs长空隙。不能再用整层平均占用说明GPU不会阻塞。旧重放没有kernel内部访存—计算依赖，也没有完整rank CA/bank时序；详见[旧请求模型与弃用说明](reference/evaluation-1108/request-model/REPORT.zh-CN.md)。
+此前 job1971246 的 before 错误地保留 rank controller 和 PV→O 本地输入路径，其 before DQ/CA 表、e/g 比较及受影响的串行/并行 latency 均撤回，旧文件只作误配置归档。ρ、在途数和读写比的合成假设也不再用于 Evaluation。
 
-原始仿真数据：[DQ总量](reference/evaluation-1108/DQ-traffic.csv)、[DQ时间线](reference/evaluation-1108/dq-timeline.png)。[原始实验报告](reference/evaluation-1108/REPORT.zh-CN.md)中的整kernel窗口评估保留作历史策略对照；最终并行Evaluation仍需校准外部CA命令时序和GPU访存依赖。
+新的原生数据、配置检查和逐算子 CA/DQ 分析见[修正基线报告](reference/evaluation-1108/direct-before-corrected/REPORT.zh-CN.md)。并行 Evaluation 仍须保持 kernel 依赖顺序、允许跨窗口推进并计入后续 AE GPU 算子的干扰；不恢复整 kernel 单窗口限制。
 
 ## xinyao_1107 历史记录：MAC_RUN / ROPE_RUN 粗细命令
 

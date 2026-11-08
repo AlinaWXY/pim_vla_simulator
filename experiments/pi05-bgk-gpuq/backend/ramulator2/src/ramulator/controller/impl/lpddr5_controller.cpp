@@ -196,6 +196,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_whole_srf, bool, "pim_whole_srf").default_val(false);
     RAMULATOR_PARSE_PARAM(m_v_cache_preinstalled, bool, "v_cache_preinstalled").default_val(false);
     RAMULATOR_PARSE_PARAM(m_v_cache_path, std::string, "v_cache_events_path").default_val("");
+    RAMULATOR_PARSE_PARAM(m_stream_inputs, bool, "pim_stream_inputs").default_val(false);
     init_v_cache();
     RAMULATOR_PARSE_PARAM(m_score_dram_spill, bool, "pim_score_dram_spill").default_val(false);
     RAMULATOR_PARSE_PARAM(m_score_spill_path, std::string, "score_spill_events_path").default_val("");
@@ -205,7 +206,6 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_o_projection_path, std::string, "o_projection_events_path").default_val("");
     init_o_projection();
     RAMULATOR_PARSE_PARAM(m_coarse_commands, bool, "pim_coarse_commands").default_val(false);
-    RAMULATOR_PARSE_PARAM(m_stream_inputs, bool, "pim_stream_inputs").default_val(false);
     RAMULATOR_PARSE_PARAM(m_gpu_rope, bool, "pim_gpu_rope").default_val(false);
     RAMULATOR_PARSE_PARAM(m_feature_layout, bool, "pim_feature_layout").default_val(false);
     if(m_feature_layout && (!m_gpu_rope || !m_stream_inputs || m_coarse_commands))
@@ -217,7 +217,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     LPDDR5Controller::setup(frontend, memory_system);
     if(m_rank_controller && (!m_device.command_admission || !m_device.command_observer))
       throw std::runtime_error("rank controller command hooks were not installed");
-    if(m_rank_controller && !m_rank_ca_path.empty()) {
+    if(!m_rank_ca_path.empty()) {
       m_rank_ca_events.open(m_rank_ca_path);
       if(!m_rank_ca_events) throw std::runtime_error("Cannot open rank CA events");
       m_rank_ca_events<<"clock,ready_at,Channel,Rank,command,scope\n";
