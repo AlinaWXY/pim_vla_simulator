@@ -1,0 +1,2 @@
+ordinal,kind,begin_us,end_us,kernel_us,launch_us,window_begin_us,window_end_us
+0,kernel,161.4080293125,162.4448293125,1.0368,0,161.4080293125,192.8404093125
