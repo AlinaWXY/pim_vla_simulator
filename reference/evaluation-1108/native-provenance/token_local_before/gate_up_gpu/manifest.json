@@ -1,0 +1,65 @@
+{
+  "case": "gate_up_gpu",
+  "variant": "token_local_before",
+  "segments": [
+    {
+      "name": "gate_up_local_input_and_compute",
+      "start": 0,
+      "end": 1,
+      "line_start": 2,
+      "line_end": 49154,
+      "kind": "local_compute"
+    },
+    {
+      "name": "gate_up_local_input_and_compute_gemv_release",
+      "start": 1,
+      "end": 2,
+      "line_start": 49155,
+      "line_end": 49187,
+      "kind": "gemv_release"
+    },
+    {
+      "name": "gate_up_result_export",
+      "start": 2,
+      "end": 3,
+      "line_start": 49188,
+      "line_end": 65572,
+      "kind": "export"
+    }
+  ],
+  "counts": {
+    "BARRIER": 4,
+    "PIM_WR_GB": 16384,
+    "PIM_MAC_AB": 32768,
+    "PIM_GEMV_RELEASE": 32,
+    "PIM_RD_RES": 16384
+  },
+  "expected_dq_bytes": {
+    "dram_read": 0,
+    "dram_write": 0,
+    "pim_input_write": 524288,
+    "pim_result_read": 524288,
+    "score_export": 0,
+    "q_export": 0,
+    "q_remote": 0,
+    "total": 1048576
+  },
+  "configuration": {
+    "feature": false,
+    "gpu_rope": false,
+    "after": false
+  },
+  "numerical_compute": false,
+  "dimensions": {
+    "H": 16,
+    "heads": 8,
+    "head_dim": 256,
+    "hidden": 1024,
+    "FFN": 4096,
+    "valid_KV": 984,
+    "padded_KV": 992
+  },
+  "source_generator": "workload with direct external inputs",
+  "coarse_commands": false,
+  "feature_geometry": null
+}

@@ -1,0 +1,11 @@
+{
+  "variant": "feature_gpu_before",
+  "case": "pv",
+  "latency_us": 30.579738000000003,
+  "memory_cycles": 32601,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 1032192,
+  "trace_sha256": "96814929b8b35131794a492268f2895444b3e40b100b1c2667add393d50af9e5",
+  "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96",
+  "complete_heterogeneous_E2E": false
+}

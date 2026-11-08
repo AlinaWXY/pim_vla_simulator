@@ -34,6 +34,9 @@ class MemoryConfig:
     pim_rank_controller: bool = False
     pim_rank_descriptors: bool = False
     pim_coarse_commands: bool = False
+    pim_stream_inputs: bool = False
+    pim_gpu_rope: bool = False
+    pim_feature_layout: bool = False
     channel_independent_dispatch: bool = False
     channel_queue_capacity: int = 32
     gemv_port_cycles: int = 2

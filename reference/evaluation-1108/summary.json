@@ -1,0 +1,215 @@
+{
+  "branch": "xinyao_1108",
+  "native_run": "results/evaluation-1971246",
+  "evaluation": [
+    {
+      "case": "a",
+      "variant": "pure_GPU_existing",
+      "AE_ms": 118.02454513549804,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0,
+      "total_ms": 222.97504117012022,
+      "kind": "existing measured phase means"
+    },
+    {
+      "case": "b",
+      "variant": "feature_gpu_before",
+      "AE_ms": 82.99109029333336,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0,
+      "total_ms": 187.94158632795555,
+      "kind": "known-term hybrid model; not hardware E2E"
+    },
+    {
+      "case": "c",
+      "variant": "feature_gpu_before",
+      "AE_ms": 82.99109029333336,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0.0,
+      "total_ms": 187.94158632795555,
+      "kind": "known-term hybrid model; not hardware E2E"
+    },
+    {
+      "case": "d",
+      "variant": "token_gpu_before",
+      "AE_ms": 80.09707693333331,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0.0,
+      "total_ms": 185.0475729679555,
+      "kind": "known-term hybrid model; not hardware E2E"
+    },
+    {
+      "case": "e",
+      "variant": "token_local_before",
+      "AE_ms": 69.33098807999997,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0.0,
+      "total_ms": 174.28148411462217,
+      "kind": "known-term hybrid model; not hardware E2E"
+    },
+    {
+      "case": "f",
+      "variant": "token_gpu_after",
+      "AE_ms": 86.16178862833348,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0.0010368,
+      "total_ms": 191.11124786295568,
+      "kind": "known-term hybrid model; not hardware E2E"
+    },
+    {
+      "case": "g",
+      "variant": "token_local_after",
+      "AE_ms": 75.36311365500012,
+      "VLM_ms": 104.95049603462219,
+      "overlap_ms": 0.0010368,
+      "total_ms": 180.3125728896223,
+      "kind": "known-term hybrid model; not hardware E2E"
+    }
+  ],
+  "traffic": [
+    {
+      "variant": "feature_gpu_before",
+      "bytes_per_layer_step": 6045696,
+      "KiB_per_layer_step": 5904.0,
+      "bytes_per_AE": 1088225280,
+      "MiB_per_AE": 1037.8125,
+      "reduction_vs_feature_percent": 0.0
+    },
+    {
+      "variant": "token_gpu_before",
+      "bytes_per_layer_step": 5087232,
+      "KiB_per_layer_step": 4968.0,
+      "bytes_per_AE": 915701760,
+      "MiB_per_AE": 873.28125,
+      "reduction_vs_feature_percent": 15.85365853658537
+    },
+    {
+      "variant": "token_local_before",
+      "bytes_per_layer_step": 4890624,
+      "KiB_per_layer_step": 4776.0,
+      "bytes_per_AE": 880312320,
+      "MiB_per_AE": 839.53125,
+      "reduction_vs_feature_percent": 19.10569105691057
+    },
+    {
+      "variant": "token_gpu_after",
+      "bytes_per_layer_step": 5087232,
+      "KiB_per_layer_step": 4968.0,
+      "bytes_per_AE": 915701760,
+      "MiB_per_AE": 873.28125,
+      "reduction_vs_feature_percent": 15.85365853658537
+    },
+    {
+      "variant": "token_local_after",
+      "bytes_per_layer_step": 4890624,
+      "KiB_per_layer_step": 4776.0,
+      "bytes_per_AE": 880312320,
+      "MiB_per_AE": 839.53125,
+      "reduction_vs_feature_percent": 19.10569105691057
+    }
+  ],
+  "models": [
+    {
+      "variant": "feature_gpu_before",
+      "AE_known_model_ms": 82.99109029333336,
+      "VLM_measured_ms": 104.95049603462219,
+      "serial_known_model_ms": 187.94158632795555,
+      "overlap_whole_kernel_ms": 0.0,
+      "parallel_known_model_ms": 187.94158632795555,
+      "placed_VLM_kernels": 0,
+      "next_kernel_us": 1.0368,
+      "next_launch_us": 43.291,
+      "overlap_with_host_API_reserved_ms": 0.0,
+      "joint_idle_total_ms": 22.82295227580598,
+      "longest_joint_window_us": 0.504644,
+      "GPU_known_model_ms": 54.92245333333342,
+      "PIM_known_model_ms": 28.068636959999953
+    },
+    {
+      "variant": "token_gpu_before",
+      "AE_known_model_ms": 80.09707693333331,
+      "VLM_measured_ms": 104.95049603462219,
+      "serial_known_model_ms": 185.0475729679555,
+      "overlap_whole_kernel_ms": 0.0,
+      "parallel_known_model_ms": 185.0475729679555,
+      "placed_VLM_kernels": 0,
+      "next_kernel_us": 1.0368,
+      "next_launch_us": 43.291,
+      "overlap_with_host_API_reserved_ms": 0.0,
+      "joint_idle_total_ms": 22.835441159644773,
+      "longest_joint_window_us": 0.49432599999999993,
+      "GPU_known_model_ms": 52.44277333333305,
+      "PIM_known_model_ms": 27.654303600000254
+    },
+    {
+      "variant": "token_local_before",
+      "AE_known_model_ms": 69.33098807999997,
+      "VLM_measured_ms": 104.95049603462219,
+      "serial_known_model_ms": 174.28148411462217,
+      "overlap_whole_kernel_ms": 0.0,
+      "parallel_known_model_ms": 174.28148411462217,
+      "placed_VLM_kernels": 0,
+      "next_kernel_us": 1.0368,
+      "next_launch_us": 43.291,
+      "overlap_with_host_API_reserved_ms": 0.0,
+      "joint_idle_total_ms": 23.483280239614587,
+      "longest_joint_window_us": 0.49432599999999993,
+      "GPU_known_model_ms": 40.786560000000115,
+      "PIM_known_model_ms": 28.544428079999847
+    },
+    {
+      "variant": "token_gpu_after",
+      "AE_known_model_ms": 86.16178862833348,
+      "VLM_measured_ms": 104.95049603462219,
+      "serial_known_model_ms": 191.1122846629557,
+      "overlap_whole_kernel_ms": 0.0010368,
+      "parallel_known_model_ms": 191.11124786295568,
+      "placed_VLM_kernels": 1,
+      "next_kernel_us": 144.5696,
+      "next_launch_us": 10.1112,
+      "overlap_with_host_API_reserved_ms": 0.0,
+      "joint_idle_total_ms": 32.89543487978522,
+      "longest_joint_window_us": 3.8851959999999996,
+      "GPU_known_model_ms": 52.44277333333312,
+      "PIM_known_model_ms": 33.71901529500035
+    },
+    {
+      "variant": "token_local_after",
+      "AE_known_model_ms": 75.36311365500012,
+      "VLM_measured_ms": 104.95049603462219,
+      "serial_known_model_ms": 180.3136096896223,
+      "overlap_whole_kernel_ms": 0.0010368,
+      "parallel_known_model_ms": 180.3125728896223,
+      "placed_VLM_kernels": 1,
+      "next_kernel_us": 144.5696,
+      "next_launch_us": 10.1112,
+      "overlap_with_host_API_reserved_ms": 0.0,
+      "joint_idle_total_ms": 33.67851479981539,
+      "longest_joint_window_us": 3.88332,
+      "GPU_known_model_ms": 40.786560000000016,
+      "PIM_known_model_ms": 34.5765536550001
+    }
+  ],
+  "policy": {
+    "VLM": "vision + language prefix",
+    "GPU_baseline_rerun": false,
+    "VLM_baseline_rerun": false,
+    "parallel": "AE + VLM - whole ordered kernels fitted inside all-16-channel DQ and shared-CA idle windows",
+    "preemption": false,
+    "kernel_reordering": false,
+    "dispatch": "primary fits whole measured device kernels; prerequisite memory operations reserve windows but are not counted as compute savings; reserving host CUDA API duration is separate sensitivity",
+    "same_tensor_IO": "GPU RoPE RD/WR, native input staging ST and bulk score RD assigned to existing GPU producer/consumer; physical raw counters retained",
+    "GPU_AE": "retained NCU cold kernel means; added boundary CUDA device kernel medians",
+    "arithmetic_precision": "timing and layout simulator, not tensor-executing numerical simulator"
+  },
+  "unmeasured": [
+    "GPU kernel duration change for final rank-replicated tensor layout / padded data",
+    "cache-coherence, visibility, fences and actual GPU/PIM scheduler/context-switch overhead",
+    "step-external Euler/host overhead under the changed execution schedule",
+    "actual GPU/PIM concurrent execution and interference"
+  ],
+  "validation": [
+    "All five unchanged token/local/after cases match 1107 native cycles and DQ bytes exactly"
+  ],
+  "source_native_provenance_sha256": "7c179a20c067f442eef60a5c18f4f41f61fd6d75deca3b6c88390371a50223b1"
+}

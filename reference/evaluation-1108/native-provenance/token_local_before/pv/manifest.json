@@ -1,0 +1,126 @@
+{
+  "case": "pv",
+  "variant": "token_local_before",
+  "segments": [
+    {
+      "name": "pv_local_input_compute",
+      "start": 0,
+      "end": 1,
+      "line_start": 2,
+      "line_end": 15874,
+      "kind": "local_compute"
+    },
+    {
+      "name": "pv_gemv_release",
+      "start": 1,
+      "end": 2,
+      "line_start": 15875,
+      "line_end": 15907,
+      "kind": "gemv_release"
+    },
+    {
+      "name": "pv_result_dram_spill",
+      "start": 2,
+      "end": 3,
+      "line_start": 15908,
+      "line_end": 20036,
+      "kind": "local_write"
+    },
+    {
+      "name": "o_projection_tile_0_compute",
+      "start": 3,
+      "end": 4,
+      "line_start": 20037,
+      "line_end": 28485,
+      "kind": "local_compute"
+    },
+    {
+      "name": "o_projection_tile_0_release",
+      "start": 4,
+      "end": 5,
+      "line_start": 28486,
+      "line_end": 28518,
+      "kind": "gemv_release"
+    },
+    {
+      "name": "o_projection_tile_0_export",
+      "start": 5,
+      "end": 6,
+      "line_start": 28519,
+      "line_end": 36711,
+      "kind": "external_read"
+    },
+    {
+      "name": "o_projection_input_rewind",
+      "start": 6,
+      "end": 7,
+      "line_start": 36712,
+      "line_end": 36728,
+      "kind": "gemv_release"
+    },
+    {
+      "name": "o_projection_tile_1_compute",
+      "start": 7,
+      "end": 8,
+      "line_start": 36729,
+      "line_end": 45177,
+      "kind": "local_compute"
+    },
+    {
+      "name": "o_projection_tile_1_release",
+      "start": 8,
+      "end": 9,
+      "line_start": 45178,
+      "line_end": 45210,
+      "kind": "gemv_release"
+    },
+    {
+      "name": "o_projection_tile_1_export",
+      "start": 9,
+      "end": 10,
+      "line_start": 45211,
+      "line_end": 53403,
+      "kind": "external_read"
+    }
+  ],
+  "counts": {
+    "BARRIER": 11,
+    "PIM_WR_GB": 7936,
+    "PIM_MAC_AB": 24320,
+    "PIM_GEMV_RELEASE": 96,
+    "PIM_STAGE_BEGIN": 16,
+    "PIM_PV_SPILL": 4096,
+    "PIM_STAGE_SEAL": 16,
+    "PIM_STAGE_FRAGMENT": 512,
+    "PIM_RD_RES": 16384,
+    "PIM_O_REWIND": 16
+  },
+  "expected_dq_bytes": {
+    "dram_read": 0,
+    "dram_write": 0,
+    "pim_input_write": 253952,
+    "pim_result_read": 524288,
+    "score_export": 0,
+    "q_export": 0,
+    "q_remote": 0,
+    "total": 778240
+  },
+  "configuration": {
+    "feature": false,
+    "gpu_rope": false,
+    "after": false
+  },
+  "numerical_compute": false,
+  "dimensions": {
+    "H": 16,
+    "heads": 8,
+    "head_dim": 256,
+    "hidden": 1024,
+    "FFN": 4096,
+    "valid_KV": 984,
+    "padded_KV": 992
+  },
+  "source_generator": "workload with direct external inputs",
+  "coarse_commands": false,
+  "feature_geometry": null
+}

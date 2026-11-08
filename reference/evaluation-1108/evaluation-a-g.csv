@@ -1,0 +1,8 @@
+case,variant,AE_ms,VLM_ms,overlap_ms,total_ms,kind
+a,pure_GPU_existing,118.02454513549804,104.95049603462219,0,222.97504117012022,existing measured phase means
+b,feature_gpu_before,82.99109029333336,104.95049603462219,0,187.94158632795555,known-term hybrid model; not hardware E2E
+c,feature_gpu_before,82.99109029333336,104.95049603462219,0.0,187.94158632795555,known-term hybrid model; not hardware E2E
+d,token_gpu_before,80.09707693333331,104.95049603462219,0.0,185.0475729679555,known-term hybrid model; not hardware E2E
+e,token_local_before,69.33098807999997,104.95049603462219,0.0,174.28148411462217,known-term hybrid model; not hardware E2E
+f,token_gpu_after,86.16178862833348,104.95049603462219,0.0010368,191.11124786295568,known-term hybrid model; not hardware E2E
+g,token_local_after,75.36311365500012,104.95049603462219,0.0010368,180.3125728896223,known-term hybrid model; not hardware E2E

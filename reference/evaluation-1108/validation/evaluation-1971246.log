@@ -1,0 +1,100 @@
+[  4%] Built target fmt
+[ 19%] Built target nanobind-static
+[ 63%] Built target yaml-cpp
+  unchanged python/ramulator/__init__.py
+  unchanged python/ramulator/addr_mapper/__init__.py
+  unchanged python/ramulator/addr_mapper/ch_ra_ba_ro_co.py
+  unchanged python/ramulator/addr_mapper/mop4_clxor.py
+  unchanged python/ramulator/addr_mapper/pass_through_addr_mapper.py
+  unchanged python/ramulator/addr_mapper/rit_addr_mapper.py
+  unchanged python/ramulator/addr_mapper/ro_ba_ra_co_ch.py
+  unchanged python/ramulator/channel_mapper/__init__.py
+  unchanged python/ramulator/channel_mapper/cache_line_interleave.py
+  unchanged python/ramulator/channel_mapper/gem5_port_interleave.py
+  unchanged python/ramulator/channel_mapper/pass_through_channel_mapper.py
+  unchanged python/ramulator/controller/__init__.py
+  unchanged python/ramulator/controller/block_hammer.py
+  unchanged python/ramulator/controller/gddr7.py
+  unchanged python/ramulator/controller/generic_ddr.py
+  unchanged python/ramulator/controller/hbm12.py
+  unchanged python/ramulator/controller/hbm34.py
+  unchanged python/ramulator/controller/lpddr5.py
+  wrote python/ramulator/controller/lpddr5_pim.py
+  unchanged python/ramulator/controller/lpddr6.py
+  unchanged python/ramulator/controller/prac.py
+  unchanged python/ramulator/controller_plugin/__init__.py
+  unchanged python/ramulator/controller_plugin/aqua.py
+  unchanged python/ramulator/controller_plugin/bin_trace_recorder.py
+  unchanged python/ramulator/controller_plugin/cmd_trace_recorder.py
+  unchanged python/ramulator/controller_plugin/command_counter.py
+  unchanged python/ramulator/controller_plugin/graphene.py
+  unchanged python/ramulator/controller_plugin/hydra.py
+  unchanged python/ramulator/controller_plugin/hynix_trr.py
+  unchanged python/ramulator/controller_plugin/ideal_trr.py
+  unchanged python/ramulator/controller_plugin/issued_command_validation_hook.py
+  unchanged python/ramulator/controller_plugin/live_trace_streamer.py
+  unchanged python/ramulator/controller_plugin/oracle_rh.py
+  unchanged python/ramulator/controller_plugin/para.py
+  unchanged python/ramulator/controller_plugin/rfm_manager.py
+  unchanged python/ramulator/controller_plugin/rrs.py
+  unchanged python/ramulator/controller_plugin/samsung_trr.py
+  unchanged python/ramulator/controller_plugin/t_wi_ce_ideal.py
+  unchanged python/ramulator/dram/__init__.py
+  unchanged python/ramulator/frontend/__init__.py
+  unchanged python/ramulator/frontend/bho3.py
+  unchanged python/ramulator/frontend/external.py
+  unchanged python/ramulator/frontend/latency_throughput_trace.py
+  unchanged python/ramulator/frontend/load_store_trace.py
+  unchanged python/ramulator/frontend/partition_trace.py
+  unchanged python/ramulator/frontend/read_write_trace.py
+  unchanged python/ramulator/frontend/simple_o3.py
+  unchanged python/ramulator/memory_system/__init__.py
+  unchanged python/ramulator/memory_system/generic_dram.py
+  unchanged python/ramulator/refresh_manager/__init__.py
+  unchanged python/ramulator/refresh_manager/all_bank.py
+  unchanged python/ramulator/refresh_manager/hbm34_per_bank_refresh.py
+  unchanged python/ramulator/refresh_manager/no_refresh.py
+  unchanged python/ramulator/refresh_manager/per_bank.py
+  unchanged python/ramulator/row_policy/__init__.py
+  unchanged python/ramulator/row_policy/closed_cap.py
+  unchanged python/ramulator/row_policy/open.py
+  unchanged python/ramulator/scheduler/__init__.py
+  unchanged python/ramulator/scheduler/frfcfs.py
+  unchanged python/ramulator/scheduler/frfcfs_row_hit.py
+  unchanged python/ramulator/translation/__init__.py
+  unchanged python/ramulator/translation/no_translation.py
+  unchanged src/ramulator/dram/impl/LPDDR5XPIM.cpp
+
+Generated 1 DRAM standard(s): LPDDR5XPIM
+Generated 50 Python component wrapper(s)
+[ 63%] Built target codegen
+[ 64%] Building CXX object CMakeFiles/ramulator.dir/src/ramulator/controller/impl/lpddr5_controller.cpp.o
+[ 66%] Linking CXX shared library /fact_data/xinyaowang/pim_vla_xinyao_1108_20261108/experiments/pi05-bgk-gpuq/backend/ramulator2/libramulator.so
+[ 97%] Built target ramulator
+[ 98%] Linking CXX shared module /fact_data/xinyaowang/pim_vla_xinyao_1108_20261108/experiments/pi05-bgk-gpuq/backend/ramulator2/python/ramulator/_ramulator.cpython-311-x86_64-linux-gnu.so
+[100%] Built target _ramulator
+{"variant": "feature_gpu_before", "case": "chain", "latency_us": 55.694688, "memory_cycles": 59376, "tCK_ns": 0.938, "external_DQ_bytes": 1802240, "trace_sha256": "f0b212ccf0e9bcb175d1f3ff60d73dc6e8b2566c23172a4ec10dcf23b1d1a869", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "feature_gpu_before", "case": "pv", "latency_us": 30.579738000000003, "memory_cycles": 32601, "tCK_ns": 0.938, "external_DQ_bytes": 1032192, "trace_sha256": "96814929b8b35131794a492268f2895444b3e40b100b1c2667add393d50af9e5", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "feature_gpu_before", "case": "gate_up_gpu", "latency_us": 40.111694, "memory_cycles": 42763, "tCK_ns": 0.938, "external_DQ_bytes": 1048576, "trace_sha256": "0cff1cb8c17ab44119d4edb2707862f02a433d1f20d19358323e86bb9aa6762b", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "feature_gpu_before", "case": "down_gpu_input", "latency_us": 30.639770000000002, "memory_cycles": 32665, "tCK_ns": 0.938, "external_DQ_bytes": 2162688, "trace_sha256": "1462cbc10f52e41c3ea6d6d22011843cef96c5085c13b938b061b6d7c811d9c0", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "feature_gpu_before", "case": "serial_layer_control", "latency_us": 157.41234599999999, "memory_cycles": 167817, "tCK_ns": 0.938, "external_DQ_bytes": 6045696, "trace_sha256": "998c2ddae3ca19df91918586ec4b63d5c377c1ce73527208215d8d782add7108", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_before", "case": "chain", "latency_us": 43.085154, "memory_cycles": 45933, "tCK_ns": 0.938, "external_DQ_bytes": 1097728, "trace_sha256": "73e07881e6f8a6af0a578af2d85e61420eaac2e8bd00a34c8a04607eec7083b4", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_before", "case": "pv", "latency_us": 40.837706, "memory_cycles": 43537, "tCK_ns": 0.938, "external_DQ_bytes": 778240, "trace_sha256": "6b4a4242909fe06247373b401c4d91908e9740dc92d5a3b04816c1510d5715df", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_before", "case": "gate_up_gpu", "latency_us": 40.111694, "memory_cycles": 42763, "tCK_ns": 0.938, "external_DQ_bytes": 1048576, "trace_sha256": "0cff1cb8c17ab44119d4edb2707862f02a433d1f20d19358323e86bb9aa6762b", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_before", "case": "down_gpu_input", "latency_us": 30.639770000000002, "memory_cycles": 32665, "tCK_ns": 0.938, "external_DQ_bytes": 2162688, "trace_sha256": "1462cbc10f52e41c3ea6d6d22011843cef96c5085c13b938b061b6d7c811d9c0", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_before", "case": "serial_layer_control", "latency_us": 154.84035, "memory_cycles": 165075, "tCK_ns": 0.938, "external_DQ_bytes": 5087232, "trace_sha256": "2780b7b04ed5320ce74b2f78f1dcff7ff9d9756fbc7564b0af77e3009a74a56c", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_before", "case": "chain", "latency_us": 46.990986, "memory_cycles": 50097, "tCK_ns": 0.938, "external_DQ_bytes": 901120, "trace_sha256": "9b016cd9935718f5d108adf84b7c43c0607ec02b337df0d92c3986978787d8ae", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_before", "case": "pv", "latency_us": 40.837706, "memory_cycles": 43537, "tCK_ns": 0.938, "external_DQ_bytes": 778240, "trace_sha256": "6b4a4242909fe06247373b401c4d91908e9740dc92d5a3b04816c1510d5715df", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_before", "case": "gate_up_gpu", "latency_us": 40.111694, "memory_cycles": 42763, "tCK_ns": 0.938, "external_DQ_bytes": 1048576, "trace_sha256": "0cff1cb8c17ab44119d4edb2707862f02a433d1f20d19358323e86bb9aa6762b", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_before", "case": "down_gpu_input", "latency_us": 30.639770000000002, "memory_cycles": 32665, "tCK_ns": 0.938, "external_DQ_bytes": 2162688, "trace_sha256": "1462cbc10f52e41c3ea6d6d22011843cef96c5085c13b938b061b6d7c811d9c0", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_before", "case": "serial_layer_control", "latency_us": 158.746182, "memory_cycles": 169239, "tCK_ns": 0.938, "external_DQ_bytes": 4890624, "trace_sha256": "f88c7dedb117ac0d72ffbaf942568a801a203d339f9a0d98a81dc610a0f367a3", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_after", "case": "chain", "latency_us": 56.256550000000004, "memory_cycles": 59975, "tCK_ns": 0.938, "external_DQ_bytes": 1097728, "trace_sha256": "8c67e4437add6ff1b6ef6cbc7b1f8f19f0527abd202919a92b779a57166f95eb", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_after", "case": "pv", "latency_us": 44.398354, "memory_cycles": 47333, "tCK_ns": 0.938, "external_DQ_bytes": 778240, "trace_sha256": "1b701bf58389e9bd5125f36b62ceae80c194e93dbcf1c89b1a5d33f878670024", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_after", "case": "gate_up_gpu", "latency_us": 47.13919, "memory_cycles": 50255, "tCK_ns": 0.938, "external_DQ_bytes": 1048576, "trace_sha256": "e1eec394d572f26b6caa7560c884aa44bcef0d76fb4fa2bf01f77b1da0042dd7", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_after", "case": "down_gpu_input", "latency_us": 58.646574, "memory_cycles": 62523, "tCK_ns": 0.938, "external_DQ_bytes": 2162688, "trace_sha256": "30b5f0e539487e844e64fb8618443b5986c94eb80457e0ecdb03ab1765207e47", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_gpu_after", "case": "serial_layer_control", "latency_us": 206.919986, "memory_cycles": 220597, "tCK_ns": 0.938, "external_DQ_bytes": 5087232, "trace_sha256": "33445802feff7ee04fe8c03b9f02d695e74a797fdc7ce8d868dd29f6c50fd095", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_after", "case": "chain", "latency_us": 59.892238, "memory_cycles": 63851, "tCK_ns": 0.938, "external_DQ_bytes": 901120, "trace_sha256": "6728d23b274e7597f91e9c33b89b9673d77dad028d25864bfacc2f760b01f7ba", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_after", "case": "pv", "latency_us": 44.398354, "memory_cycles": 47333, "tCK_ns": 0.938, "external_DQ_bytes": 778240, "trace_sha256": "1b701bf58389e9bd5125f36b62ceae80c194e93dbcf1c89b1a5d33f878670024", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_after", "case": "gate_up_gpu", "latency_us": 47.13919, "memory_cycles": 50255, "tCK_ns": 0.938, "external_DQ_bytes": 1048576, "trace_sha256": "e1eec394d572f26b6caa7560c884aa44bcef0d76fb4fa2bf01f77b1da0042dd7", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_after", "case": "down_gpu_input", "latency_us": 58.646574, "memory_cycles": 62523, "tCK_ns": 0.938, "external_DQ_bytes": 2162688, "trace_sha256": "30b5f0e539487e844e64fb8618443b5986c94eb80457e0ecdb03ab1765207e47", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}
+{"variant": "token_local_after", "case": "serial_layer_control", "latency_us": 210.34181, "memory_cycles": 224245, "tCK_ns": 0.938, "external_DQ_bytes": 4890624, "trace_sha256": "68bf2d06735acc46d7f969c9ab92cf214772cdec9794d714b8995377ba975471", "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96", "complete_heterogeneous_E2E": false}

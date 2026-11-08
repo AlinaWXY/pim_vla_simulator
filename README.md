@@ -1,4 +1,10 @@
-# xinyao_1107：MAC_RUN / ROPE_RUN 粗细命令
+# xinyao_1108：布局、RoPE 与空闲窗口 Evaluation
+
+在 dev0 完成 5 种配置 × 5 个 native cases，复用已有 GPU/VLM 测量。三种布局/RoPE 的 DQ 总量分别为每层每步 5904、4968、4776 KiB；完整 kernel 按序放入全部16 channel 的 DQ/共享CA联合空闲窗口，不能直接减去累计 idle。b–g 为已知项混合模型，尚非真实 GPU/PIM 硬件端到端测量。
+
+本次交付：[完整报告](reference/evaluation-1108/REPORT.zh-CN.md)、[a–g 延迟](reference/evaluation-1108/evaluation-a-g.csv)、[DQ 总量](reference/evaluation-1108/DQ-traffic.csv)、[DQ 时间线](reference/evaluation-1108/dq-timeline.png)。来源、复现命令和验证记录见报告。
+
+## xinyao_1107 历史记录：MAC_RUN / ROPE_RUN 粗细命令
 
 新版本在原有 layout、本地 RoPE、QKT score 集中导出和 PIM O projection 上调整命令接口。计算统一为每 rank 每算子一条256-bit描述符，QKᵀ和O各一条；输入、结果和跨rank搬运保留直接DQ读写。字段、CA周期、执行语义和复现命令见[粗细命令说明](experiments/pi05-unified-gemv/COMMANDS.zh-CN.md)，原生前后对比与图见[本次报告](reference/commands-1107/REPORT.zh-CN.md)。
 

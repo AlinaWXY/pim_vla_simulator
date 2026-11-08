@@ -6,6 +6,8 @@ bool m_o_completed=false;
 std::string m_o_projection_path;
 std::ofstream m_o_projection_events;
 static constexpr int O_WEIGHT_BASE=786432,O_TILE_BYTES=16384,O_STAGE_BASE=524288;
+int o_tile_bytes() const { return m_feature_layout?8192:16384; }
+int o_input_bytes() const { return m_feature_layout?4096:8192; }
 std::array<uint16_t,16> m_o_pv_spills{};
 int m_o_next_tile=0,m_o_pv_spill_count=0,m_o_export_phase=0;
 // One 64B conversion packet per rank. Reuse waits for the prior LOCALWR data
@@ -15,7 +17,7 @@ size_t s_o_gather_bytes=0,s_o_cast_bytes=0,s_o_transfer_bytes=0,s_o_local_write_
 bool is_o_command(const Request& req) const {
   return req.type_id==Request::Type::PIM_PV_SPILL || req.type_id==Request::Type::PIM_O_REWIND;
 }
-bool is_o_weight_base(int base) const { return base==O_WEIGHT_BASE || base==O_WEIGHT_BASE+O_TILE_BYTES; }
+bool is_o_weight_base(int base) const { return base==O_WEIGHT_BASE || base==O_WEIGHT_BASE+o_tile_bytes(); }
 bool output_bf16() const {
   return (m_pv_bf16_output && m_output_base==163840) || is_o_weight_base(m_output_base);
 }
@@ -40,7 +42,7 @@ void setup_o_projection() {
 void record_o(const Request& req,const char* op,Clk_t ready,int bytes,int source=-1,int destination=-1,int query=-1,int fragment=-1) {
   if(!m_o_projection_events) return;
   const auto& a=req.pim_origin_addr_vec.empty()?req.addr_vec:req.pim_origin_addr_vec;
-  const int tile=is_o_weight_base(m_output_base)?(m_output_base-O_WEIGHT_BASE)/O_TILE_BYTES:-1;
+  const int tile=is_o_weight_base(m_output_base)?(m_output_base-O_WEIGHT_BASE)/o_tile_bytes():-1;
   m_o_projection_events<<m_clk<<','<<ready<<','<<op<<','<<m_channel_id<<",1,"<<a[m_bg_level]<<','<<a[m_bank_level]<<','
     <<a[m_device.m_spec->get_level_id("Row")]<<','<<a[m_device.m_spec->get_level_id("Column")]<<','<<source<<','<<destination<<','
     <<query<<','<<fragment<<','<<tile<<','<<bytes<<','<<m_stage.generation<<','<<req.ingress_id<<','<<gemv_offset(req)<<'\n';
@@ -51,9 +53,9 @@ void o_output_begin(int base) {
     m_o_pv_spills.fill(0);m_o_pv_spill_count=0;m_o_next_tile=0;m_o_completed=false;
   }
   if(is_o_weight_base(base)) {
-    if(!m_o_projection || !output_all(m_o_pv_spills) || !m_stage.active || !m_stage.sealed || m_stage.bytes!=8192)
+    if(!m_o_projection || !output_all(m_o_pv_spills) || !m_stage.active || !m_stage.sealed || m_stage.bytes!=o_input_bytes())
       throw std::runtime_error("O MAC requires complete locally produced PV input");
-    if((base-O_WEIGHT_BASE)/O_TILE_BYTES!=m_o_next_tile)
+    if((base-O_WEIGHT_BASE)/o_tile_bytes()!=m_o_next_tile)
       throw std::runtime_error("O tile order requires explicit input rewind");
   }
 }
@@ -108,21 +110,21 @@ bool send_o_command(Request& req) {
 bool issue_o_command(ReqBuffer::iterator it) {
   if(it->type_id==Request::Type::PIM_O_REWIND) {
     if(m_output_base!=O_WEIGHT_BASE || m_o_next_tile!=0 || !m_stage.active || !m_stage.sealed ||
-       m_stage.bytes!=8192 || m_stage.rows!=16 || m_stage.loads.size()!=256)
+       m_stage.bytes!=o_input_bytes() || m_stage.rows!=16 || m_stage.loads.size()!=size_t(o_input_bytes()/32))
       throw std::runtime_error("O rewind requires complete first tile and full first input scan");
     if(!rank_ca_available(1,m_clk) || !output_other_ready()) return false;
     if(!rank_pseudo("O_REWIND")) return false;
     whole_stage_begin(16);
     m_stage.loads.clear();++m_stage.generation;m_o_next_tile=1;
-    record_o(*it,"INPUT_REWIND",m_clk,8192);
+    record_o(*it,"INPUT_REWIND",m_clk,o_input_bytes());
     enqueue_bgk_done(it,m_clk);return true;
   }
-  if(!m_stage.active || m_stage.sealed || m_stage.base!=O_STAGE_BASE || m_stage.bytes!=8192 || m_stage.rows!=16)
+  if(!m_stage.active || m_stage.sealed || m_stage.base!=O_STAGE_BASE || m_stage.bytes!=o_input_bytes() || m_stage.rows!=16)
     throw std::runtime_error("PV spill requires active unsealed 8192B two-bank staging");
   const int offset=stage_logical_offset(*it),packet=(offset-O_STAGE_BASE)/32;
-  if(offset<O_STAGE_BASE || offset>=O_STAGE_BASE+8192 || offset%32)
+  if(offset<O_STAGE_BASE || offset>=O_STAGE_BASE+o_input_bytes() || offset%32)
     throw std::runtime_error("PV spill outside local input payload");
-  const int source=packet/16,query=packet%16;
+  const int source=(packet/16)*(m_feature_layout?2:1),query=packet%16;
   const int destination=4*it->addr_vec[m_bg_level]+it->addr_vec[m_bank_level];
   if(it->pim_q_stage==0) {
     if(m_output_base!=163840 || m_output_macs!=m_output_expected_macs)
@@ -153,17 +155,17 @@ bool issue_o_command(ReqBuffer::iterator it) {
   if(it->command!=m_localwr) return true;
   const Clk_t ready=m_clk+m_bank_write_cycles+m_local_recovery;
   m_o_packet_free=m_clk+m_bank_write_cycles;
-  m_stage.writes.at(offset)=ready;m_o_pv_spills[source]|=1<<query;++m_o_pv_spill_count;
+  m_stage.writes.at(offset)=ready;m_o_pv_spills[source]|=1<<query; if(m_feature_layout) m_o_pv_spills[source+1]|=1<<query; ++m_o_pv_spill_count;
   m_output_ready=std::max(m_output_ready,ready);
   s_o_local_write_bytes+=32;++s_bank_local_writes;
   record_o(*it,"PV_LOCALWR_BF16",ready,32,source,destination,query,source);
   record_stage(*it,"LOCAL_PRODUCER_WRITE",m_clk,ready);
-  if(m_o_pv_spill_count==256) record_o(*it,"PV_INPUT_COMPLETE",ready,8192);
+  if(m_o_pv_spill_count==o_input_bytes()/32) record_o(*it,"PV_INPUT_COMPLETE",ready,o_input_bytes());
   enqueue_bgk_done(it,ready);return true;
 }
 void finish_o_projection() {
   if(m_o_projection && m_o_pv_spill_count &&
-     (m_o_pv_spill_count!=256 || m_o_next_tile!=1 || !m_o_completed))
+     (m_o_pv_spill_count!=o_input_bytes()/32 || m_o_next_tile!=1 || !m_o_completed))
     throw std::runtime_error("Incomplete local PV to O projection chain");
   if(m_o_export_phase) throw std::runtime_error("Incomplete BF16 result packing");
   if(m_clk<m_o_packet_free) throw std::runtime_error("BF16 packet reused before consumer service finished");

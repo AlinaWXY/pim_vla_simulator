@@ -1,0 +1,11 @@
+{
+  "variant": "feature_gpu_before",
+  "case": "serial_layer_control",
+  "latency_us": 157.41234599999999,
+  "memory_cycles": 167817,
+  "tCK_ns": 0.938,
+  "external_DQ_bytes": 6045696,
+  "trace_sha256": "998c2ddae3ca19df91918586ec4b63d5c377c1ce73527208215d8d782add7108",
+  "native_library_sha256": "14ae8626be476b3b9ef5b73acc24ee9e670726acfe75465599a96faeb16f3f96",
+  "complete_heterogeneous_E2E": false
+}

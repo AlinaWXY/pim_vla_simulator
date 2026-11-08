@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include "ramulator/base/base.h"
 #include "ramulator/controller/impl/lpddr_controller_base.h"
 #include "ramulator/controller/refresh/i_refresh_manager.h"
@@ -204,6 +205,11 @@ class LPDDR5PIMController final : public LPDDR5Controller {
     RAMULATOR_PARSE_PARAM(m_o_projection_path, std::string, "o_projection_events_path").default_val("");
     init_o_projection();
     RAMULATOR_PARSE_PARAM(m_coarse_commands, bool, "pim_coarse_commands").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_stream_inputs, bool, "pim_stream_inputs").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_gpu_rope, bool, "pim_gpu_rope").default_val(false);
+    RAMULATOR_PARSE_PARAM(m_feature_layout, bool, "pim_feature_layout").default_val(false);
+    if(m_feature_layout && (!m_gpu_rope || !m_stream_inputs || m_coarse_commands))
+      throw std::runtime_error("Feature baseline requires GPU RoPE and direct fine input mode");
     RAMULATOR_PARSE_PARAM(m_run_path, std::string, "pim_coarse_events_path").default_val("");
   }
 
@@ -286,7 +292,8 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         throw std::runtime_error("Fine compute/local requests cannot cross the coarse command interface");
       return send_impl(req);
     }
-    const bool coarse=m_rank_controller && req.type_id>=Request::Type::PIM_MAC_AB;
+    const bool coarse=m_rank_controller && req.type_id>=Request::Type::PIM_MAC_AB &&
+      !(m_gpu_rope && req.type_id==Request::Type::PIM_Q_EXPORT);
     if(coarse && m_clk<m_global_ca_ready) return false;
     const bool accepted=send_impl(req);
     if(accepted && coarse) {
@@ -307,7 +314,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
          req.type_id != Request::Type::PIM_Z_LOAD && req.type_id != Request::Type::PIM_GEMV_RELEASE && req.type_id != Request::Type::PIM_STAGE_LOAD && req.type_id != Request::Type::PIM_STAGE_FRAGMENT)) {
       throw std::runtime_error("PIM buffer annotation requires WRGB/MACAB and slot 0/1");
     }
-    if(req.pim_buffer>1 && req.type_id!=Request::Type::PIM_MAC_AB && req.type_id!=Request::Type::PIM_STAGE_LOAD &&
+    if(req.pim_buffer>1 && !(m_stream_inputs && req.type_id==Request::Type::PIM_WR_GB) && req.type_id!=Request::Type::PIM_MAC_AB && req.type_id!=Request::Type::PIM_STAGE_LOAD &&
        req.type_id!=Request::Type::PIM_STAGE_FRAGMENT && req.type_id!=Request::Type::PIM_GEMV_RELEASE)
       throw std::runtime_error("Extended SRF views require staged eight-row input");
     // Map before admission so overlapping-bank requests can apply backpressure
@@ -343,6 +350,7 @@ class LPDDR5PIMController final : public LPDDR5Controller {
       auto callback = req.callback;
       req.callback = [this, callback, staging_write, score_key](Request& done) {
         score_read_complete(done,score_key);
+        gpu_rope_complete(done);
         if (done.type_id == Request::Type::Write) {
           m_normal_ready_at = std::max(m_normal_ready_at, m_clk + m_write_recovery);
           if(staging_write) {
@@ -699,8 +707,10 @@ class LPDDR5PIMController final : public LPDDR5Controller {
         if(state.kind!=GemvSlot::Q) throw std::runtime_error("Unified QKT requires a retained Q slot");
         for(auto mask:state.lanes) if(mask!=65535) throw std::runtime_error("Unified QKT missing query/lane coverage");
         const int v=state.mac_columns;
-        const int expected=v<484?65536+32*v:v<492?81920+32*(16+v-484):81920+32*(24+v-492);
-        if(v>=496 || gemv_offset(req)!=expected) throw std::runtime_error("Unified QKT K scan order/coverage mismatch");
+        const int expected=m_feature_layout?
+          (v<968?65536+32*(v/2):v<984?81920+32*(16+(v-968)/2):81920+32*(24+(v-984)/2)):
+          (v<484?65536+32*v:v<492?81920+32*(16+v-484):81920+32*(24+v-492));
+        if(v>=(m_feature_layout?992:496) || gemv_offset(req)!=expected) throw std::runtime_error("Unified QKT K scan order/coverage mismatch");
       }
     }
     for (size_t b=0;b<m_bank_inputs.size();++b) {

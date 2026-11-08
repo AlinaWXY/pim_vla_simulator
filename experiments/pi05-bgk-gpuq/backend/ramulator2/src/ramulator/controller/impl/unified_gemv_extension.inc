@@ -1,6 +1,8 @@
 // H16 opt-in input storage: two 512B slots in each PIM bank. State below is
 // ownership/coverage metadata, not another rank-sized data buffer.
 bool m_unified_gemv = false;
+bool m_stream_inputs=false,m_gpu_rope=false,m_feature_layout=false;
+bool direct_weight(const Request& r) const { return m_stream_inputs && gemv_offset(r)<786432; }
 int m_gemv_port_cycles = 2;
 std::string m_gemv_events_path;
 std::ofstream m_gemv_events;
@@ -30,11 +32,11 @@ int gemv_columns(const Request& r) const {
   }
   if (off>=393216 && off<491520) {
     if(!m_qkv_fusion) throw std::runtime_error("Fused QKV address requires pim_qkv_fusion");
-    return 48;
+    return m_feature_layout?24:48;
   }
   if (off>=163840 && off<180224) {
     if(!m_token_pv) throw std::runtime_error("Token V cache requires pim_token_pv");
-    return 16;
+    return m_feature_layout?8:16;
   }
   if (off<65536 || (off>=262144 && off<327680)) return 32;
   if (off>=83968 && off<116736) return 8;
@@ -51,7 +53,7 @@ int gemv_columns(const Request& r) const {
 }
 int gemv_weight_base(const Request& r) const {
   const int off=gemv_offset(r);
-  if(off>=786432 && off<819200) return 786432+(off-786432)/16384*16384;
+  if(off>=786432 && off<819200) return 786432+(off-786432)/o_tile_bytes()*o_tile_bytes();
   if (off>=393216 && off<491520) return 393216;
   if (off>=163840 && off<180224) return 163840;
   if (off>=131072 && off<163840) return 131072;
@@ -62,6 +64,7 @@ int gemv_mac_column(const Request& r) const {
 }
 int gemv_rows(const Request& r) const {
   const int off=gemv_offset(r);
+  if(m_feature_layout && off>=393216 && off<491520) return 16;
   return (off<65536 || (off>=131072 && off<163840) || (off>=393216 && off<491520))?8:16;
 }
 int gemv_service(const Request& r) const { return m_unified_gemv?gemv_rows(r):m_mac_interval; }
@@ -106,7 +109,7 @@ void gemv_start_bank(int bank,int slot,GemvSlot::Kind kind) {
   ++state.generation;
 }
 bool gemv_external_ready(const Request& req) {
-  if(m_whole_srf) throw std::runtime_error("Whole SRF input requires complete DRAM staging");
+  if(m_whole_srf && !m_stream_inputs) throw std::runtime_error("Whole SRF input requires complete DRAM staging");
   if(req.pim_buffer<0) throw std::runtime_error("Unified GEMV requires explicit input slot");
   if(m_gemv_ingress_owner || m_clk<m_gemv_ingress_free) return false;
   if(!gemv_slot_idle(req.pim_buffer)) return false;
@@ -227,7 +230,7 @@ bool issue_gemv_release(ReqBuffer::iterator it) {
   if(!gemv_slot_idle(slot) || m_clk<m_local_ports[1] || m_clk<m_rank_reduction_ready) return false;
   for(int bank=16;bank<32;++bank) {
     const auto& state=m_gemv_slots[bank][slot];
-    if(state.kind==GemvSlot::Q && state.mac_columns!=496)
+    if(state.kind==GemvSlot::Q && state.mac_columns!=(m_feature_layout?992:496))
       throw std::runtime_error("Unified GEMV Q release requires completed 496-token K scan");
     if(state.kind!=GemvSlot::Empty && state.kind!=GemvSlot::Q &&
         (!state.expected_columns || state.mac_columns!=state.expected_columns))

@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "tests": [
+    {
+      "test": "GPU_import_without_export",
+      "status": "passed",
+      "observed_rejection": "GPU RoPE import before export"
+    },
+    {
+      "test": "duplicate_GPU_Q_import",
+      "status": "passed",
+      "observed_rejection": "Duplicate GPU Q tap"
+    },
+    {
+      "test": "incomplete_GPU_Q_import",
+      "status": "passed",
+      "observed_rejection": "Unified QKT missing query/lane coverage"
+    },
+    {
+      "test": "direct_input_row_overflow",
+      "status": "passed",
+      "observed_rejection": "Unified GEMV external row exceeds 512B slot"
+    },
+    {
+      "test": "incomplete_PV_to_O",
+      "status": "passed",
+      "observed_rejection": "staging seal requires every declared input write"
+    }
+  ]
+}

@@ -12,9 +12,44 @@ struct RopeBank {
   std::vector<RopeOutput> outputs; // two 32B output FIFO entries, distinct from input buffers
   std::unordered_map<Addr_t, Clk_t> spill_ready, rotated_ready;
   uint64_t query_mask = 0;
+  std::unordered_set<Addr_t> gpu_exported;
 };
 std::vector<RopeBank> m_rope_banks;
 
+void gpu_rope_complete(const Request& req) {
+  if(!m_gpu_rope || req.addr_vec[m_rank_level]!=1) return;
+  const int off=gemv_offset(req),col=(off-81920)/32;
+  if(off<82176 || off>=82688) return;
+  auto& bank=m_rope_banks[rr_bank(req)];
+  if(req.type_id==Request::Type::Read) {
+    if(!bank.spill_ready.count(req.addr)) throw std::runtime_error("GPU RoPE read before projection spill");
+    bank.gpu_exported.insert(req.addr);
+  } else if(req.type_id==Request::Type::Write) {
+    if(!bank.gpu_exported.count(req.addr)) throw std::runtime_error("GPU RoPE import before export");
+    bank.rotated_ready[req.addr]=m_clk+m_write_recovery;
+    if(col<16) {
+      // Tap the GPU-produced Q store into the resident SRF. The feature layout
+      // packs two 8-feature queries; the token layout carries one 16-feature query.
+      const int b=rr_bank(req),q=m_feature_layout?2*(col-8):2*(col-8)+m_channel_id%2;
+      const int rows=m_feature_layout?2:1,query_bits=(m_feature_layout?3:1)<<q;
+      whole_q_ready(b);
+      auto& state=m_gemv_slots[b][0];
+      if(state.kind!=GemvSlot::Empty && state.kind!=GemvSlot::Q)
+        throw std::runtime_error("GPU Q tap overlaps unreleased projection input");
+      for(int j=0;j<rows;++j) if(state.lanes[q+j]) throw std::runtime_error("Duplicate GPU Q tap");
+      if(state.kind==GemvSlot::Empty) gemv_start_bank(b,0,GemvSlot::Q);
+      auto& input=m_bank_inputs[b][0];
+      const Clk_t start=std::max({m_clk,m_local_ports[1],input.ready_at});
+      const Clk_t ready=start+m_gemv_port_cycles;
+      // Feature rows use eight packed lanes, with zero extension at the MAC;
+      // one incoming 32B packet is charged once on the local port in both layouts.
+      for(int j=0;j<rows;++j) state.lanes[q+j]=65535;
+      input.written=true;input.ready_at=ready;m_local_ports[1]=ready;
+      bank.query_mask|=query_bits;
+      record_gemv(req,"GPU_Q_TAP",start,ready,1<<(b-16),query_bits,65535,32,state.generation);
+    }
+  }
+}
 bool is_rank_rope(const Request& r) const { return r.type_id >= Request::Type::PIM_SPILL && r.type_id <= Request::Type::PIM_Q_REMOTE; }
 int rr_bank(const Request& r) const {
   return (r.addr_vec[m_rank_level] * m_bgs + r.addr_vec[m_bg_level]) * m_banks_per_bg + r.addr_vec[m_bank_level];
@@ -80,6 +115,17 @@ void rr_notify_command(Request& req) {
 }
 bool rr_export(ReqBuffer::iterator it) {
   auto& bank = m_rope_banks[rr_bank(*it)];
+  if(m_gpu_rope) {
+    // Producer/dependency token only: GPU already owns the rotated Q, and its
+    // local store was tapped above. Re-reading Q over DQ would count it twice.
+    const auto found=bank.rotated_ready.find(it->addr);
+    const int q=2*(rr_column(*it)-rr_local_queries())+m_channel_id%2;
+    if(found==bank.rotated_ready.end() || !(bank.query_mask&(uint64_t{1}<<q)))
+      throw std::runtime_error("GPU Q ready token before imported Q");
+    if(m_clk<std::max(found->second,m_bank_inputs[rr_bank(*it)][0].ready_at)) return false;
+    record_bgk(*it,m_clk,0,"GPU_Q_READY");
+    enqueue_bgk_done(it,m_clk);return true;
+  }
   if (it->pim_q_stage == 0) {
     const auto ready = bank.rotated_ready.find(it->addr);
     if (ready == bank.rotated_ready.end()) throw std::runtime_error("Q export precedes RoPE store");
@@ -157,7 +203,7 @@ bool issue_rank_rope(ReqBuffer::iterator it, bool local_port) {
       bank.query_mask = 0;
       m_bank_inputs[b][0].written = false;
     }
-    bank.rotated_ready.erase(it->addr);
+    bank.rotated_ready.erase(it->addr); bank.gpu_exported.erase(it->addr);
     it->depart = bank.cast_busy = m_clk + m_cast_cycles;
     it->pim_q_stage = 1;
     record_bgk(*it, it->depart, m_cast_cycles, "PIM_CAST");

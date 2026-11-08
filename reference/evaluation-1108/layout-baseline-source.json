@@ -1,0 +1,404 @@
+{
+  "scope": "One layer, one denoising step, QKV/RoPE/QKT/softmax boundary/PV/O; no FFN",
+  "config": {
+    "heads": 8,
+    "query_tokens": 16,
+    "valid_kv_tokens": 984,
+    "padded_kv_tokens": 992,
+    "head_dim": 256,
+    "hidden": 1024,
+    "active_ranks": 16,
+    "banks_per_rank": 16,
+    "tCK_ns": 0.938,
+    "physical_ranks": "rank1 in each of sixteen channels; rank0 reserved for GPU",
+    "transfer_dtypes": "BF16 input/weights/P/context/O; FP32 scores"
+  },
+  "baseline": {
+    "kind": "Analytical RoPE-paired K/V feature-sharded baseline; native timing not implemented",
+    "rank_qkv_output": [
+      16,
+      128
+    ],
+    "rank_kv_cache": [
+      992,
+      128
+    ],
+    "bank_kv_cache": [
+      992,
+      8
+    ],
+    "rank_o_input": [
+      16,
+      128
+    ],
+    "rank_o_active_weight": [
+      128,
+      1024
+    ],
+    "rank_o_output": [
+      16,
+      1024
+    ],
+    "intra_rank_broadcast": true,
+    "pv_stays_local": true,
+    "all_ranks_compute": true
+  },
+  "current": {
+    "rank_qkv_output": [
+      8,
+      256
+    ],
+    "rank_kv_cache": [
+      496,
+      256
+    ],
+    "bank_kv_cache": [
+      496,
+      16
+    ],
+    "rank_o_input": [
+      16,
+      256
+    ],
+    "rank_o_active_weight": [
+      256,
+      1024
+    ],
+    "rank_o_output": [
+      16,
+      1024
+    ],
+    "intra_rank_broadcast": true,
+    "pv_stays_local": true,
+    "all_ranks_compute": true
+  },
+  "dq": {
+    "baseline_bytes": 2572288,
+    "current_bytes": 1679360,
+    "saved_bytes": 892928,
+    "reduction_percent": 34.71337579617835,
+    "rows": [
+      {
+        "transfer": "QKV input X",
+        "baseline_KiB": 512.0,
+        "current_KiB": 256.0,
+        "saved_KiB": 256.0
+      },
+      {
+        "transfer": "Q forwarding: read source",
+        "baseline_KiB": 0.0,
+        "current_KiB": 64.0,
+        "saved_KiB": -64.0
+      },
+      {
+        "transfer": "Q forwarding: write peer",
+        "baseline_KiB": 0.0,
+        "current_KiB": 64.0,
+        "saved_KiB": -64.0
+      },
+      {
+        "transfer": "QKT FP32 score export",
+        "baseline_KiB": 992.0,
+        "current_KiB": 496.0,
+        "saved_KiB": 496.0
+      },
+      {
+        "transfer": "PV BF16 probability input",
+        "baseline_KiB": 496.0,
+        "current_KiB": 248.0,
+        "saved_KiB": 248.0
+      },
+      {
+        "transfer": "PV to O external transfer",
+        "baseline_KiB": 0.0,
+        "current_KiB": 0.0,
+        "saved_KiB": 0.0
+      },
+      {
+        "transfer": "O BF16 partial export",
+        "baseline_KiB": 512.0,
+        "current_KiB": 512.0,
+        "saved_KiB": 0.0
+      }
+    ],
+    "formula_baseline": "R*M*X*2 + 2*H*M*S*4 + 2*H*M*S*2 + R*M*X*2",
+    "formula_current": "R*M/2*X*2 + 2*H*M*D*2 + H*M*S*4 + H*M*S*2 + R*M*X*2",
+    "general_saving_bytes": "2*H*M*X + 6*H*M*S - 4*H*M*D",
+    "excluded": "One-time weights/KV initialization, GPU-internal memory traffic; final O reduction on GPU"
+  },
+  "weights": [
+    {
+      "matrix": "Wq",
+      "unique_bytes": 4194304,
+      "baseline_active_bytes": 4194304,
+      "current_active_bytes": 8388608,
+      "current_declared_resident_bytes": 8388608,
+      "baseline_copies": 1,
+      "current_active_copies": 2,
+      "current_declared_resident_copies": 2
+    },
+    {
+      "matrix": "Wk",
+      "unique_bytes": 4194304,
+      "baseline_active_bytes": 4194304,
+      "current_active_bytes": 8388608,
+      "current_declared_resident_bytes": 8388608,
+      "baseline_copies": 1,
+      "current_active_copies": 2,
+      "current_declared_resident_copies": 2
+    },
+    {
+      "matrix": "Wv",
+      "unique_bytes": 4194304,
+      "baseline_active_bytes": 4194304,
+      "current_active_bytes": 8388608,
+      "current_declared_resident_bytes": 8388608,
+      "baseline_copies": 1,
+      "current_active_copies": 2,
+      "current_declared_resident_copies": 2
+    },
+    {
+      "matrix": "Wo",
+      "unique_bytes": 4194304,
+      "baseline_active_bytes": 4194304,
+      "current_active_bytes": 8388608,
+      "current_declared_resident_bytes": 67108864,
+      "baseline_copies": 1,
+      "current_active_copies": 2,
+      "current_declared_resident_copies": 16
+    }
+  ],
+  "initialization": {
+    "baseline_minimum_weight_upload_MiB": 16,
+    "current_active_only_upload_MiB": 32,
+    "current_declared_full_residency_upload_MiB": 88,
+    "active_only_extra_bytes_break_even_reuses": 18.788990825688074,
+    "full_residency_extra_bytes_break_even_reuses": 84.55045871559633,
+    "caveat": "Byte costs if each resident weight is externally loaded once; not per-step traffic; no initialization latency measured"
+  },
+  "macs": [
+    {
+      "operator": "QKV",
+      "baseline_MACs": 100663296,
+      "current_MACs": 100663296,
+      "baseline_ideal_full_utilization_us": 23.052288,
+      "current_ideal_full_utilization_us": 23.052288
+    },
+    {
+      "operator": "QKT",
+      "baseline_MACs": 32505856,
+      "current_MACs": 32505856,
+      "baseline_ideal_full_utilization_us": 7.443968,
+      "current_ideal_full_utilization_us": 7.443968
+    },
+    {
+      "operator": "PV",
+      "baseline_MACs": 32505856,
+      "current_MACs": 32505856,
+      "baseline_ideal_full_utilization_us": 7.443968,
+      "current_ideal_full_utilization_us": 7.443968
+    },
+    {
+      "operator": "O",
+      "baseline_MACs": 33554432,
+      "current_MACs": 67108864,
+      "baseline_ideal_full_utilization_us": 7.684095999999999,
+      "current_ideal_full_utilization_us": 15.368191999999999
+    }
+  ],
+  "total_MACs": {
+    "baseline": 199229440,
+    "current": 232783872
+  },
+  "gpu_reduction": {
+    "common_final_O_additions": 245760,
+    "baseline_extra_score_additions": 126976,
+    "arithmetic_latency_us": null
+  },
+  "dq_payload_busy": {
+    "baseline_us_per_channel": 9.425023999999999,
+    "current_us_per_channel": 6.15328,
+    "interpretation": "Payload burst occupancy only, NOT transfer completion or total latency"
+  },
+  "native_latency": {
+    "current_bulk_score_stage_sum_us": 104.410656,
+    "current_stream_score_stage_sum_us": 94.86087800000001,
+    "baseline_stage_sum_us": null,
+    "current_complete_latency_us": null,
+    "baseline_complete_latency_us": null,
+    "groups": [
+      {
+        "stage": "QKV + local cache/RoPE",
+        "current_model_us": 33.680795312499995,
+        "baseline_model_us": "NOT_SIMULATED"
+      },
+      {
+        "stage": "Q forwarding",
+        "current_model_us": 4.510842,
+        "baseline_model_us": "NOT_SIMULATED"
+      },
+      {
+        "stage": "QKT + score spill/export",
+        "current_model_us": 21.868532,
+        "baseline_model_us": "NOT_SIMULATED"
+      },
+      {
+        "stage": "PV + local O input staging",
+        "current_model_us": 16.351245312499998,
+        "baseline_model_us": "NOT_SIMULATED"
+      },
+      {
+        "stage": "O input/compute/export",
+        "current_model_us": 27.997424,
+        "baseline_model_us": "NOT_SIMULATED"
+      },
+      {
+        "stage": "Phase boundary overhead",
+        "current_model_us": 0.0018173750001508893,
+        "baseline_model_us": "NOT_SIMULATED"
+      }
+    ],
+    "interpretation": "Existing independent-stage native model sums, not a fresh continuous full-attention run",
+    "unknowns": [
+      "GPU score reduction for baseline",
+      "GPU scaling/softmax",
+      "GPU final O reduction",
+      "GPU Q forwarding/dispatch overhead",
+      "GPU packing/dispatch",
+      "concurrent VLM interference"
+    ],
+    "baseline_implementation_gaps": [
+      "QKV columns/rows fixed at48/8 for current fused mapping",
+      "RoPE/Q ownership hard-coded to token parity",
+      "QKT validates496 tokens and all16 feature lanes per bank",
+      "O input validates8192B per rank; feature baseline needs4096B",
+      "No current native binary or configured WSL distribution available locally"
+    ]
+  },
+  "analytical_service_caveat": "MAC/4096*CK assumes full16-lane utilization. Feature baseline QKT has8 useful features/bank; a one-dot16-lane unit without two-dot packing can take twice the ideal QKT service. No service-demand number is a latency prediction.",
+  "broadcast": {
+    "current_qkv_source_bytes": 262144,
+    "current_qkv_bank_delivery_bytes": 4194304,
+    "baseline_qkv_source_bytes": 524288,
+    "baseline_qkv_bank_delivery_bytes": 8388608,
+    "multicast_delivery_factor": 16,
+    "baseline_uses_same_facility": true,
+    "source": "same-rank multicast after local source read; multicast itself adds no separate service in current model"
+  },
+  "validation": {
+    "dq_matches_current_native_counters": true,
+    "weight_reads_match_native_counters": true,
+    "stage_groups_close": true,
+    "algebra": "FP64 at current attention shapes, eight heads",
+    "algebra_checks": [
+      {
+        "head": 0,
+        "feature_score_max_abs": 1.1102230246251565e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 7.979727989493313e-17,
+        "token_output_max_abs": 8.673617379884035e-17
+      },
+      {
+        "head": 1,
+        "feature_score_max_abs": 1.249000902703301e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 5.551115123125783e-17,
+        "token_output_max_abs": 7.632783294297951e-17
+      },
+      {
+        "head": 2,
+        "feature_score_max_abs": 1.2923689896027213e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 5.551115123125783e-17,
+        "token_output_max_abs": 7.28583859910259e-17
+      },
+      {
+        "head": 3,
+        "feature_score_max_abs": 1.249000902703301e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 8.326672684688674e-17,
+        "token_output_max_abs": 8.326672684688674e-17
+      },
+      {
+        "head": 4,
+        "feature_score_max_abs": 1.249000902703301e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 5.551115123125783e-17,
+        "token_output_max_abs": 8.326672684688674e-17
+      },
+      {
+        "head": 5,
+        "feature_score_max_abs": 1.5265566588595902e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 7.632783294297951e-17,
+        "token_output_max_abs": 6.938893903907228e-17
+      },
+      {
+        "head": 6,
+        "feature_score_max_abs": 1.249000902703301e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 7.632783294297951e-17,
+        "token_output_max_abs": 6.938893903907228e-17
+      },
+      {
+        "head": 7,
+        "feature_score_max_abs": 1.3183898417423734e-16,
+        "token_score_max_abs": 0.0,
+        "feature_output_max_abs": 6.938893903907228e-17,
+        "token_output_max_abs": 7.45931094670027e-17
+      }
+    ],
+    "BF16_accuracy_validated": false,
+    "baseline_native_simulated": false
+  },
+  "sources": [
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\reference\\o-projection\\both\\chain\\summary.json",
+      "sha256": "b3b3bcb40e4d950f15db38b921b7d0059fe89f5e9f4ab1bf811796d74a024a48"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\reference\\o-projection\\both\\pv\\summary.json",
+      "sha256": "c4a6114abda2be955916fa067b176f101d3e70c4b7f2870d394b8428b926ba1c"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\reference\\o-projection\\oproj_only\\chain\\summary.json",
+      "sha256": "1b0cb5f2292a1271fa1481a9b57c4a879e15c1433c7e84015e8ae98845001b55"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\reference\\o-projection\\oproj_only\\pv\\summary.json",
+      "sha256": "c4a6114abda2be955916fa067b176f101d3e70c4b7f2870d394b8428b926ba1c"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\reference\\o-projection\\both\\channel-analysis.json",
+      "sha256": "77399e6ae400326acf44df66bbfadede4c9068f1c3129bdb9bd928fcf86dd1bc"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-unified-gemv\\source\\qkv_token_layout.py",
+      "sha256": "68935e93d5fd1421e6a567bfb535877cb536c0312785c6ee6e181eaadc43e390"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-unified-gemv\\source\\o_projection_layout.py",
+      "sha256": "23eaa9620fe9d54606feb9373ffb8e41336ff9e52a9df4f3386d0c94fae5cd1b"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-unified-gemv\\source\\rank_staging.py",
+      "sha256": "addd115f5407d359c1e3c58e780936a1574aa20d3ce5f20fa104a743193bdb69"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-bgk-gpuq\\backend\\ramulator2\\src\\ramulator\\controller\\impl\\unified_gemv_extension.inc",
+      "sha256": "3f06e7a5837e1e93708efeac3b654f460970000f066fafa7bcaa8aa099ff6ac8"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-bgk-gpuq\\backend\\ramulator2\\src\\ramulator\\controller\\impl\\rank_rope_extension.inc",
+      "sha256": "81521d67af5a48a2528e77dd40ab54af0192825c637029b2e982d7ed07a34a65"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-bgk-gpuq\\backend\\ramulator2\\src\\ramulator\\controller\\impl\\rank_staging_extension.inc",
+      "sha256": "069a65a7f9a647540caa3442ffd0a04f114cabcd1316774f90bc4aacbd076d97"
+    },
+    {
+      "path": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\publish-xinyao_1104_O_Projection\\experiments\\pi05-bgk-gpuq\\backend\\ramulator2\\src\\ramulator\\controller\\impl\\lpddr5_controller.cpp",
+      "sha256": "e3d18bd506550c6fb5e732d17a95ebd3723b9be4611d5033fd6fc0c9b1920305"
+    }
+  ]
+}

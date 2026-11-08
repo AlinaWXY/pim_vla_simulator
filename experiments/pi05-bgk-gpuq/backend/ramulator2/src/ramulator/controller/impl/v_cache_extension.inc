@@ -46,12 +46,14 @@ void record_v_cache(const Request& req,const char* op,Clk_t ready,int bytes,int 
   m_v_cache_events<<m_clk<<','<<ready<<','<<op<<','<<m_channel_id<<','<<a[m_rank_level]<<','
     <<a[m_bg_level]<<','<<a[m_bank_level]<<','<<a[m_device.m_spec->get_level_id("Row")]<<','
     <<a[m_device.m_spec->get_level_id("Column")]<<','<<bytes<<','<<req.ingress_id<<','
-    <<m_v_source_columns<<','<<(lane<0?-1:lane+(m_v_source_columns==48?32:0))<<','
-    <<(lane<0?0:8)<<','<<(lane<0?0:15)<<','<<(lane<0?0:4080)<<','<<(lane<0?0:61440)<<'\n';
+    <<m_v_source_columns<<','<<(lane<0?-1:m_feature_layout?16+lane%8:lane+(m_v_source_columns==48?32:0))<<','
+    <<(lane<0?0:8)<<','<<(lane<0?0:m_feature_layout?(lane<8?255:0):15)<<','
+    <<(lane<0?0:m_feature_layout?(lane<8?65280:255):4080)<<','
+    <<(lane<0?0:m_feature_layout?(lane<8?0:65280):61440)<<'\n';
 }
 int output_fragments(int base) const {
-  if(is_o_weight_base(base)) return 16;
-  if(base==163840) return 31;
+  if(is_o_weight_base(base)) return m_feature_layout?8:16;
+  if(base==163840) return m_feature_layout?62:31;
   if(base==100352) return 62;
   if(base==327680) return m_ffn_dram?64:256;
   return 64;
@@ -144,7 +146,7 @@ void output_export_issued(const Request& req) {
 void output_complete(const Request& req) {
   if(!m_whole_srf || req.type_id!=Request::Type::PIM_RD_RES) return;
   if(++m_output_export_done>m_output_exports) throw std::runtime_error("Output completed before export issue");
-  if(m_output_base==802816 && m_output_export_done==output_export_packets()) m_o_completed=true;
+  if(m_output_base==786432+o_tile_bytes() && m_output_export_done==output_export_packets()) m_o_completed=true;
 }
 void prepare_v_cache_spill(Request& req) {
   if(!m_token_pv) throw std::runtime_error("V cache spill requires pim_token_pv");

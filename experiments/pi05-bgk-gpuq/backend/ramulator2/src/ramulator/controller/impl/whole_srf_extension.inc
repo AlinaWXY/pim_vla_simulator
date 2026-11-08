@@ -42,6 +42,19 @@ void whole_fill_start(const Request& req) {
 bool whole_mac_ready(const Request& req) const {
   if(!m_whole_srf) return true;
   const int rows=gemv_rows(req),views=1024/(rows*32);
+  if(direct_weight(req)) {
+    const int fragment=(gemv_offset(req)-gemv_weight_base(req))/(gemv_columns(req)*32);
+    const int valid=std::min(views,output_fragments(gemv_weight_base(req))-(fragment/views)*views);
+    if(req.pim_buffer<0 || req.pim_buffer>=views) throw std::runtime_error("Direct input exceeds 1KiB SRF");
+    for(int s=0;s<valid;++s) for(int b=16;b<32;++b) {
+      const auto& state=m_gemv_slots[b][s];
+      if(state.kind!=GemvSlot::External) return false;
+      for(int q=0;q<rows;++q) if(state.lanes[q]!=65535) return false;
+      for(int q=rows;q<16;++q) if(state.lanes[q]) throw std::runtime_error("Direct batch excess row");
+      if(m_clk<m_bank_inputs[b][s].ready_at) return false;
+    }
+    return true;
+  }
   if(rows!=m_whole_rows || req.pim_buffer<0 || req.pim_buffer>=views || m_whole_batch<0)
     throw std::runtime_error("SRF view exceeds physical 1KiB capacity");
   const int fragments=m_stage.bytes/(rows*32);

@@ -244,7 +244,7 @@ bool issue_stage(ReqBuffer::iterator it) {
 }
 
 void stage_mac_identity(const Request& req) const {
-  if(!m_rank_staging) return;
+  if(!m_rank_staging || direct_weight(req)) return;
   const int slot=req.pim_buffer,offset=gemv_offset(req);
   if(m_whole_srf && (m_stage.rows<=0 || slot<0 || slot>=1024/(m_stage.rows*32)))
     throw std::runtime_error("SRF view exceeds physical 1KiB capacity");

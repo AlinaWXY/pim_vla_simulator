@@ -1,0 +1,1628 @@
+{
+  "case": "chain",
+  "variant": "feature_gpu_before",
+  "segments": [
+    {
+      "name": "projection_input_compute",
+      "start": 0,
+      "end": 1,
+      "line_start": 2,
+      "line_end": 40962,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_WR_GB": 16384,
+        "PIM_MAC_AB": 24576
+      },
+      "kind": "projection"
+    },
+    {
+      "name": "projection_qkv_local_spill",
+      "start": 1,
+      "end": 2,
+      "line_start": 40963,
+      "line_end": 49155,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_SPILL": 8192
+      },
+      "kind": "local_write"
+    },
+    {
+      "name": "projection_gemv_release",
+      "start": 2,
+      "end": 3,
+      "line_start": 49156,
+      "line_end": 49188,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_GEMV_RELEASE": 32
+      },
+      "kind": "gemv_release"
+    },
+    {
+      "name": "gpu_rope_export",
+      "start": 3,
+      "end": 4,
+      "line_start": 49189,
+      "line_end": 53285,
+      "counts": {
+        "BARRIER": 1,
+        "LD": 4096
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "gpu_rope_import",
+      "start": 4,
+      "end": 5,
+      "line_start": 53286,
+      "line_end": 57382,
+      "counts": {
+        "BARRIER": 1,
+        "ST": 4096
+      },
+      "kind": "external_write"
+    },
+    {
+      "name": "qk_tile_0_compute",
+      "start": 5,
+      "end": 6,
+      "line_start": 57383,
+      "line_end": 57639,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_0_export",
+      "start": 6,
+      "end": 7,
+      "line_start": 57640,
+      "line_end": 58152,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_1_compute",
+      "start": 7,
+      "end": 8,
+      "line_start": 58153,
+      "line_end": 58409,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_1_export",
+      "start": 8,
+      "end": 9,
+      "line_start": 58410,
+      "line_end": 58922,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_2_compute",
+      "start": 9,
+      "end": 10,
+      "line_start": 58923,
+      "line_end": 59179,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_2_export",
+      "start": 10,
+      "end": 11,
+      "line_start": 59180,
+      "line_end": 59692,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_3_compute",
+      "start": 11,
+      "end": 12,
+      "line_start": 59693,
+      "line_end": 59949,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_3_export",
+      "start": 12,
+      "end": 13,
+      "line_start": 59950,
+      "line_end": 60462,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_4_compute",
+      "start": 13,
+      "end": 14,
+      "line_start": 60463,
+      "line_end": 60719,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_4_export",
+      "start": 14,
+      "end": 15,
+      "line_start": 60720,
+      "line_end": 61232,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_5_compute",
+      "start": 15,
+      "end": 16,
+      "line_start": 61233,
+      "line_end": 61489,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_5_export",
+      "start": 16,
+      "end": 17,
+      "line_start": 61490,
+      "line_end": 62002,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_6_compute",
+      "start": 17,
+      "end": 18,
+      "line_start": 62003,
+      "line_end": 62259,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_6_export",
+      "start": 18,
+      "end": 19,
+      "line_start": 62260,
+      "line_end": 62772,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_7_compute",
+      "start": 19,
+      "end": 20,
+      "line_start": 62773,
+      "line_end": 63029,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_7_export",
+      "start": 20,
+      "end": 21,
+      "line_start": 63030,
+      "line_end": 63542,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_8_compute",
+      "start": 21,
+      "end": 22,
+      "line_start": 63543,
+      "line_end": 63799,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_8_export",
+      "start": 22,
+      "end": 23,
+      "line_start": 63800,
+      "line_end": 64312,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_9_compute",
+      "start": 23,
+      "end": 24,
+      "line_start": 64313,
+      "line_end": 64569,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_9_export",
+      "start": 24,
+      "end": 25,
+      "line_start": 64570,
+      "line_end": 65082,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_10_compute",
+      "start": 25,
+      "end": 26,
+      "line_start": 65083,
+      "line_end": 65339,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_10_export",
+      "start": 26,
+      "end": 27,
+      "line_start": 65340,
+      "line_end": 65852,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_11_compute",
+      "start": 27,
+      "end": 28,
+      "line_start": 65853,
+      "line_end": 66109,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_11_export",
+      "start": 28,
+      "end": 29,
+      "line_start": 66110,
+      "line_end": 66622,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_12_compute",
+      "start": 29,
+      "end": 30,
+      "line_start": 66623,
+      "line_end": 66879,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_12_export",
+      "start": 30,
+      "end": 31,
+      "line_start": 66880,
+      "line_end": 67392,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_13_compute",
+      "start": 31,
+      "end": 32,
+      "line_start": 67393,
+      "line_end": 67649,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_13_export",
+      "start": 32,
+      "end": 33,
+      "line_start": 67650,
+      "line_end": 68162,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_14_compute",
+      "start": 33,
+      "end": 34,
+      "line_start": 68163,
+      "line_end": 68419,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_14_export",
+      "start": 34,
+      "end": 35,
+      "line_start": 68420,
+      "line_end": 68932,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_15_compute",
+      "start": 35,
+      "end": 36,
+      "line_start": 68933,
+      "line_end": 69189,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_15_export",
+      "start": 36,
+      "end": 37,
+      "line_start": 69190,
+      "line_end": 69702,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_16_compute",
+      "start": 37,
+      "end": 38,
+      "line_start": 69703,
+      "line_end": 69959,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_16_export",
+      "start": 38,
+      "end": 39,
+      "line_start": 69960,
+      "line_end": 70472,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_17_compute",
+      "start": 39,
+      "end": 40,
+      "line_start": 70473,
+      "line_end": 70729,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_17_export",
+      "start": 40,
+      "end": 41,
+      "line_start": 70730,
+      "line_end": 71242,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_18_compute",
+      "start": 41,
+      "end": 42,
+      "line_start": 71243,
+      "line_end": 71499,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_18_export",
+      "start": 42,
+      "end": 43,
+      "line_start": 71500,
+      "line_end": 72012,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_19_compute",
+      "start": 43,
+      "end": 44,
+      "line_start": 72013,
+      "line_end": 72269,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_19_export",
+      "start": 44,
+      "end": 45,
+      "line_start": 72270,
+      "line_end": 72782,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_20_compute",
+      "start": 45,
+      "end": 46,
+      "line_start": 72783,
+      "line_end": 73039,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_20_export",
+      "start": 46,
+      "end": 47,
+      "line_start": 73040,
+      "line_end": 73552,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_21_compute",
+      "start": 47,
+      "end": 48,
+      "line_start": 73553,
+      "line_end": 73809,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_21_export",
+      "start": 48,
+      "end": 49,
+      "line_start": 73810,
+      "line_end": 74322,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_22_compute",
+      "start": 49,
+      "end": 50,
+      "line_start": 74323,
+      "line_end": 74579,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_22_export",
+      "start": 50,
+      "end": 51,
+      "line_start": 74580,
+      "line_end": 75092,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_23_compute",
+      "start": 51,
+      "end": 52,
+      "line_start": 75093,
+      "line_end": 75349,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_23_export",
+      "start": 52,
+      "end": 53,
+      "line_start": 75350,
+      "line_end": 75862,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_24_compute",
+      "start": 53,
+      "end": 54,
+      "line_start": 75863,
+      "line_end": 76119,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_24_export",
+      "start": 54,
+      "end": 55,
+      "line_start": 76120,
+      "line_end": 76632,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_25_compute",
+      "start": 55,
+      "end": 56,
+      "line_start": 76633,
+      "line_end": 76889,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_25_export",
+      "start": 56,
+      "end": 57,
+      "line_start": 76890,
+      "line_end": 77402,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_26_compute",
+      "start": 57,
+      "end": 58,
+      "line_start": 77403,
+      "line_end": 77659,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_26_export",
+      "start": 58,
+      "end": 59,
+      "line_start": 77660,
+      "line_end": 78172,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_27_compute",
+      "start": 59,
+      "end": 60,
+      "line_start": 78173,
+      "line_end": 78429,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_27_export",
+      "start": 60,
+      "end": 61,
+      "line_start": 78430,
+      "line_end": 78942,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_28_compute",
+      "start": 61,
+      "end": 62,
+      "line_start": 78943,
+      "line_end": 79199,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_28_export",
+      "start": 62,
+      "end": 63,
+      "line_start": 79200,
+      "line_end": 79712,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_29_compute",
+      "start": 63,
+      "end": 64,
+      "line_start": 79713,
+      "line_end": 79969,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_29_export",
+      "start": 64,
+      "end": 65,
+      "line_start": 79970,
+      "line_end": 80482,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_30_compute",
+      "start": 65,
+      "end": 66,
+      "line_start": 80483,
+      "line_end": 80739,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_30_export",
+      "start": 66,
+      "end": 67,
+      "line_start": 80740,
+      "line_end": 81252,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_31_compute",
+      "start": 67,
+      "end": 68,
+      "line_start": 81253,
+      "line_end": 81509,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_31_export",
+      "start": 68,
+      "end": 69,
+      "line_start": 81510,
+      "line_end": 82022,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_32_compute",
+      "start": 69,
+      "end": 70,
+      "line_start": 82023,
+      "line_end": 82279,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_32_export",
+      "start": 70,
+      "end": 71,
+      "line_start": 82280,
+      "line_end": 82792,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_33_compute",
+      "start": 71,
+      "end": 72,
+      "line_start": 82793,
+      "line_end": 83049,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_33_export",
+      "start": 72,
+      "end": 73,
+      "line_start": 83050,
+      "line_end": 83562,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_34_compute",
+      "start": 73,
+      "end": 74,
+      "line_start": 83563,
+      "line_end": 83819,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_34_export",
+      "start": 74,
+      "end": 75,
+      "line_start": 83820,
+      "line_end": 84332,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_35_compute",
+      "start": 75,
+      "end": 76,
+      "line_start": 84333,
+      "line_end": 84589,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_35_export",
+      "start": 76,
+      "end": 77,
+      "line_start": 84590,
+      "line_end": 85102,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_36_compute",
+      "start": 77,
+      "end": 78,
+      "line_start": 85103,
+      "line_end": 85359,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_36_export",
+      "start": 78,
+      "end": 79,
+      "line_start": 85360,
+      "line_end": 85872,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_37_compute",
+      "start": 79,
+      "end": 80,
+      "line_start": 85873,
+      "line_end": 86129,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_37_export",
+      "start": 80,
+      "end": 81,
+      "line_start": 86130,
+      "line_end": 86642,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_38_compute",
+      "start": 81,
+      "end": 82,
+      "line_start": 86643,
+      "line_end": 86899,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_38_export",
+      "start": 82,
+      "end": 83,
+      "line_start": 86900,
+      "line_end": 87412,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_39_compute",
+      "start": 83,
+      "end": 84,
+      "line_start": 87413,
+      "line_end": 87669,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_39_export",
+      "start": 84,
+      "end": 85,
+      "line_start": 87670,
+      "line_end": 88182,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_40_compute",
+      "start": 85,
+      "end": 86,
+      "line_start": 88183,
+      "line_end": 88439,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_40_export",
+      "start": 86,
+      "end": 87,
+      "line_start": 88440,
+      "line_end": 88952,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_41_compute",
+      "start": 87,
+      "end": 88,
+      "line_start": 88953,
+      "line_end": 89209,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_41_export",
+      "start": 88,
+      "end": 89,
+      "line_start": 89210,
+      "line_end": 89722,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_42_compute",
+      "start": 89,
+      "end": 90,
+      "line_start": 89723,
+      "line_end": 89979,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_42_export",
+      "start": 90,
+      "end": 91,
+      "line_start": 89980,
+      "line_end": 90492,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_43_compute",
+      "start": 91,
+      "end": 92,
+      "line_start": 90493,
+      "line_end": 90749,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_43_export",
+      "start": 92,
+      "end": 93,
+      "line_start": 90750,
+      "line_end": 91262,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_44_compute",
+      "start": 93,
+      "end": 94,
+      "line_start": 91263,
+      "line_end": 91519,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_44_export",
+      "start": 94,
+      "end": 95,
+      "line_start": 91520,
+      "line_end": 92032,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_45_compute",
+      "start": 95,
+      "end": 96,
+      "line_start": 92033,
+      "line_end": 92289,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_45_export",
+      "start": 96,
+      "end": 97,
+      "line_start": 92290,
+      "line_end": 92802,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_46_compute",
+      "start": 97,
+      "end": 98,
+      "line_start": 92803,
+      "line_end": 93059,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_46_export",
+      "start": 98,
+      "end": 99,
+      "line_start": 93060,
+      "line_end": 93572,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_47_compute",
+      "start": 99,
+      "end": 100,
+      "line_start": 93573,
+      "line_end": 93829,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_47_export",
+      "start": 100,
+      "end": 101,
+      "line_start": 93830,
+      "line_end": 94342,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_48_compute",
+      "start": 101,
+      "end": 102,
+      "line_start": 94343,
+      "line_end": 94599,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_48_export",
+      "start": 102,
+      "end": 103,
+      "line_start": 94600,
+      "line_end": 95112,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_49_compute",
+      "start": 103,
+      "end": 104,
+      "line_start": 95113,
+      "line_end": 95369,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_49_export",
+      "start": 104,
+      "end": 105,
+      "line_start": 95370,
+      "line_end": 95882,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_50_compute",
+      "start": 105,
+      "end": 106,
+      "line_start": 95883,
+      "line_end": 96139,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_50_export",
+      "start": 106,
+      "end": 107,
+      "line_start": 96140,
+      "line_end": 96652,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_51_compute",
+      "start": 107,
+      "end": 108,
+      "line_start": 96653,
+      "line_end": 96909,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_51_export",
+      "start": 108,
+      "end": 109,
+      "line_start": 96910,
+      "line_end": 97422,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_52_compute",
+      "start": 109,
+      "end": 110,
+      "line_start": 97423,
+      "line_end": 97679,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_52_export",
+      "start": 110,
+      "end": 111,
+      "line_start": 97680,
+      "line_end": 98192,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_53_compute",
+      "start": 111,
+      "end": 112,
+      "line_start": 98193,
+      "line_end": 98449,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_53_export",
+      "start": 112,
+      "end": 113,
+      "line_start": 98450,
+      "line_end": 98962,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_54_compute",
+      "start": 113,
+      "end": 114,
+      "line_start": 98963,
+      "line_end": 99219,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_54_export",
+      "start": 114,
+      "end": 115,
+      "line_start": 99220,
+      "line_end": 99732,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_55_compute",
+      "start": 115,
+      "end": 116,
+      "line_start": 99733,
+      "line_end": 99989,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_55_export",
+      "start": 116,
+      "end": 117,
+      "line_start": 99990,
+      "line_end": 100502,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_56_compute",
+      "start": 117,
+      "end": 118,
+      "line_start": 100503,
+      "line_end": 100759,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_56_export",
+      "start": 118,
+      "end": 119,
+      "line_start": 100760,
+      "line_end": 101272,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_57_compute",
+      "start": 119,
+      "end": 120,
+      "line_start": 101273,
+      "line_end": 101529,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_57_export",
+      "start": 120,
+      "end": 121,
+      "line_start": 101530,
+      "line_end": 102042,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_58_compute",
+      "start": 121,
+      "end": 122,
+      "line_start": 102043,
+      "line_end": 102299,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_58_export",
+      "start": 122,
+      "end": 123,
+      "line_start": 102300,
+      "line_end": 102812,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_59_compute",
+      "start": 123,
+      "end": 124,
+      "line_start": 102813,
+      "line_end": 103069,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_59_export",
+      "start": 124,
+      "end": 125,
+      "line_start": 103070,
+      "line_end": 103582,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_60_compute",
+      "start": 125,
+      "end": 126,
+      "line_start": 103583,
+      "line_end": 103839,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_60_export",
+      "start": 126,
+      "end": 127,
+      "line_start": 103840,
+      "line_end": 104352,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_tile_61_compute",
+      "start": 127,
+      "end": 128,
+      "line_start": 104353,
+      "line_end": 104609,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_MAC_QK": 256
+      },
+      "kind": "qk"
+    },
+    {
+      "name": "qk_tile_61_export",
+      "start": 128,
+      "end": 129,
+      "line_start": 104610,
+      "line_end": 105122,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_RD_BG": 512
+      },
+      "kind": "external_read"
+    },
+    {
+      "name": "qk_gemv_release",
+      "start": 129,
+      "end": 130,
+      "line_start": 105123,
+      "line_end": 105139,
+      "counts": {
+        "BARRIER": 1,
+        "PIM_GEMV_RELEASE": 16
+      },
+      "kind": "gemv_release"
+    }
+  ],
+  "counts": {
+    "BARRIER": 131,
+    "PIM_WR_GB": 16384,
+    "PIM_MAC_AB": 24576,
+    "PIM_SPILL": 8192,
+    "PIM_GEMV_RELEASE": 48,
+    "LD": 4096,
+    "ST": 4096,
+    "PIM_MAC_QK": 15872,
+    "PIM_RD_BG": 31744
+  },
+  "expected_dq_bytes": {
+    "dram_read": 131072,
+    "dram_write": 131072,
+    "pim_input_write": 524288,
+    "pim_result_read": 0,
+    "score_export": 1015808,
+    "q_export": 0,
+    "q_remote": 0,
+    "total": 1802240
+  },
+  "configuration": {
+    "feature": true,
+    "gpu_rope": true,
+    "after": false
+  },
+  "numerical_compute": false,
+  "dimensions": {
+    "H": 16,
+    "heads": 8,
+    "head_dim": 256,
+    "hidden": 1024,
+    "FFN": 4096,
+    "valid_KV": 984,
+    "padded_KV": 992
+  },
+  "coarse_commands": false,
+  "feature_geometry": {
+    "rank_qkv": [
+      16,
+      128
+    ],
+    "rank_kv": [
+      992,
+      128
+    ],
+    "bank_kv": [
+      992,
+      8
+    ],
+    "rank_o_input": [
+      16,
+      128
+    ],
+    "QK_two_tokens_per_32B": true,
+    "QK_useful_lanes_per_dot": 8,
+    "QK_two_dot_packing": false,
+    "rank_feature_subset": "r0=[0:64,128:192], r1=[64:128,192:256]",
+    "feature_bank": "bank=(feature_in_rank//8); RoPE computed by GPU",
+    "provenance": "outputs/attention-full-comparison/comparison.json"
+  }
+}
