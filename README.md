@@ -1,8 +1,10 @@
 # xinyao_1108：布局、RoPE 与空闲窗口 Evaluation
 
-在 dev0 完成 5 种配置 × 5 个 native cases，复用已有 GPU/VLM 测量。三种布局/RoPE 的 DQ 总量分别为每层每步 5904、4968、4776 KiB；完整 kernel 按序放入全部16 channel 的 DQ/共享CA联合空闲窗口，不能直接减去累计 idle。b–g 为已知项混合模型，尚非真实 GPU/PIM 硬件端到端测量。
+在 dev0 完成 5 种配置 × 5 个 native cases，复用已有 GPU/VLM 测量。三种布局/RoPE 的 DQ 总量分别为每层每步 5904、4968、4776 KiB。最新并行评估已取消“整kernel装入单窗口”，改为按channel、32B请求、CA/DQ预约和目标rank refresh仲裁，允许kernel持续执行并计入后续AE GPU算子的等待。
 
-本次交付：[完整报告](reference/evaluation-1108/REPORT.zh-CN.md)、[a–g 延迟](reference/evaluation-1108/evaluation-a-g.csv)、[DQ 总量](reference/evaluation-1108/DQ-traffic.csv)、[DQ 时间线](reference/evaluation-1108/dq-timeline.png)。来源、复现命令和验证记录见报告。
+**最新主表是参数化模型估计，不是真实GPU访存trace或硬件E2E测量。** 中间参数配置下c–g分别为160.091、157.704、145.952、157.586、145.889ms；70组扫描和10项新验证通过。见[请求仲裁报告及假设](reference/evaluation-1108/request-model/REPORT.zh-CN.md)、[最新a–g主表](reference/evaluation-1108/request-model/evaluation-a-g.csv)、[敏感性范围](reference/evaluation-1108/request-model/sensitivity-range.csv)。
+
+原始物理数据：[DQ总量](reference/evaluation-1108/DQ-traffic.csv)、[DQ时间线](reference/evaluation-1108/dq-timeline.png)。[原始实验报告](reference/evaluation-1108/REPORT.zh-CN.md)中的整kernel窗口评估保留作历史策略对照，其并行主表已由上述请求模型替代。
 
 ## xinyao_1107 历史记录：MAC_RUN / ROPE_RUN 粗细命令
 

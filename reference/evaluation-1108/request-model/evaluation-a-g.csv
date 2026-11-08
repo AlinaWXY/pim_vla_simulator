@@ -1,0 +1,8 @@
+case,variant,AE_ms,VLM_ms,overlap_ms,total_ms,kind
+a,pure_GPU_existing,118.02454513549804,104.95049603462219,0,222.97504117012022,existing measured phase means
+b,feature_gpu_before,82.99109029333336,104.95049603462219,0,187.94158632795555,known-term hybrid model; not hardware E2E
+c,feature_gpu_before,125.3775909925,104.950496034625,70.23694313893749,160.0911438881875,parameterized request reservation replay; NOT measured GPU memory trace
+d,token_gpu_before,114.02243155225,104.950496034625,61.2685348594375,157.7043927274375,parameterized request reservation replay; NOT measured GPU memory trace
+e,token_local_before,99.2850335739375,104.950496034625,58.283608342125,145.9519212664375,parameterized request reservation replay; NOT measured GPU memory trace
+f,token_gpu_after,136.18288868487502,104.950496034625,83.5477254470625,157.5856592724375,parameterized request reservation replay; NOT measured GPU memory trace
+g,token_local_after,112.65821338131249,104.950496034625,71.7193935648125,145.889315851125,parameterized request reservation replay; NOT measured GPU memory trace

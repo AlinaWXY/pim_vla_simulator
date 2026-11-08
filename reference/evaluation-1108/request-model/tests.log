@@ -1,0 +1,15 @@
+test_CA_and_DQ_may_be_served_at_distinct_times (test_request_model.RequestReplayTests.test_CA_and_DQ_may_be_served_at_distinct_times) ... ok
+test_GPU_byte_demand_is_identical_across_layouts_and_start_times (test_request_model.RequestReplayTests.test_GPU_byte_demand_is_identical_across_layouts_and_start_times) ... ok
+test_busy_DQ_does_not_stop_compute_only_kernel (test_request_model.RequestReplayTests.test_busy_DQ_does_not_stop_compute_only_kernel) ... ok
+test_channels_arbitrate_independently (test_request_model.RequestReplayTests.test_channels_arbitrate_independently) ... ok
+test_dependency_order_and_net_savings_identity (test_request_model.RequestReplayTests.test_dependency_order_and_net_savings_identity) ... ok
+test_kernel_crosses_PIM_boundary_and_AE_waits (test_request_model.RequestReplayTests.test_kernel_crosses_PIM_boundary_and_AE_waits) ... ok
+test_rank0_refresh_blocks_gpu_request (test_request_model.RequestReplayTests.test_rank0_refresh_blocks_gpu_request) ... ok
+test_rank1_refresh_only_blocks_its_CA_pulse (test_request_model.RequestReplayTests.test_rank1_refresh_only_blocks_its_CA_pulse) ... ok
+test_request_queue_and_solo_calibration (test_request_model.RequestReplayTests.test_request_queue_and_solo_calibration) ... ok
+test_single_burst_uses_small_gap_not_kernel_sized_gap (test_request_model.RequestReplayTests.test_single_burst_uses_small_gap_not_kernel_sized_gap) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.002s
+
+OK
