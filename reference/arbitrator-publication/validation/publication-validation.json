@@ -1,0 +1,37 @@
+{
+  "job": 1975153,
+  "state": "COMPLETED",
+  "elapsed": "00:05:37",
+  "exit_code": "0:0",
+  "independent_checkout": true,
+  "transaction_tests": 51,
+  "native_transfer_matrix_cases": 144,
+  "reproduced_cases": [
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g"
+  ],
+  "all_stage_and_placement_rows_match": true,
+  "e_audit_all_16_channels_900_stages_match": true,
+  "baseline_summary_and_all_channel_csv_match": true,
+  "baseline_all_channel_CSV_sha256": "0dba6effa7456cfe2bde2e5a21174e6234878e4eff735a2136464c7d097d37db",
+  "portable_plot_analysis_matches": true,
+  "tested_model_and_entry_source_sha256": {
+    "sequential_transactions.cpp": "fa6047b3a0c6812314ca1e0aa1e92ee9fbdb07af52fecb4b93323b53d142036a",
+    "sequential_rows.h": "704cc0e60485fa4200b7b7ed78646590b2404fe441175ab1c143d73a6230d061",
+    "sequential_timing.h": "92d1664fd1505b4a34b258fab26fa63627b958415d00b8b381bdcdc1a34c5423",
+    "online_transactions.cpp": "9c379ea62787168c771e6a12f759f0116e3d9615b485eec4688cb10726c3f6b9",
+    "uniform_transactions.cpp": "cd689582c4af581103ba950e36c98f91f14e6a90c8b03aed44514b4e33891087",
+    "run_sequential_transactions.py": "29f8f961928c91a0757ce9a803c247306ba8185ff0e9c12879bcf91267217182",
+    "run_arbitrator.py": "e52ed2d70d2ce30c42a90f7bbb58a1af35a8343180f24d00b43459ca93151a5f",
+    "verify_arbitrator.py": "16e5f479a8bb8adc2ef50a2782b2a136918697e7f184feaae0efbf8afbb917b0",
+    "arbitrator-audit/build_diagnostic.py": "d9cad3c34255f2ac2148428fe15439b4acfaaaa7549051c68d122b2b69a8f419",
+    "arbitrator-audit/replay_insertions.py": "9dd78133967e21aea91fd3679c816880101d3beecf5ff7c47f69c987bb207536",
+    "arbitrator-audit/audit_impl.h": "f0c0c2e9bd236bc5b644a78801d3f175414f10cdf5875e40ecef0aad35764cff",
+    "arbitrator-audit/audit_types.h": "b9ee7a5cb156f8a78e7f36f5d24b277fd77f2f4fbde8c690bea9031331e4732e"
+  },
+  "note": "The final publication additionally records this validation and selects an installed plotting font. The model, replay, diagnostic counters, and entry-point source bytes are unchanged from the independent checkout test."
+}

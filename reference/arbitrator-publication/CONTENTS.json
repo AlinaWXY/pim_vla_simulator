@@ -1,0 +1,10 @@
+{
+  "branch": "xinyao_arbitrator",
+  "base_commit": "02b883096a8270e5e9e99086c835588370f5bd16",
+  "native_job": 1971385,
+  "corrected_replay_job": 1974571,
+  "e_insertion_audit_job": 1974893,
+  "entry": "experiments/pi05-unified-gemv/run_arbitrator.py",
+  "source_policy": "Core arbiter bytes preserved from the validated timing fix; only portable wrappers, audit paths, publication verification, and documentation added.",
+  "binary_policy": "Build shared libraries from source; archived binary hashes are provenance, not shipped executables."
+}

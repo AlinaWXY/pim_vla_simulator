@@ -1,81 +1,74 @@
-# xinyao_1108：布局、RoPE 与空闲窗口 Evaluation
+# xinyao_arbitrator：GPU/PIM 共享 CA/DQ 仲裁器
 
-**融合前基线已按用户定义修正：无 rank controller、无输入 DRAM 暂存，线性算子计算期间持续由 GPU 通过 WRGB 广播输入，占用外部 DQ 与共享 CA。融合后才使用 rank controller、DRAM 暂存与粗命令。**
+本分支发布修复后的因果仲裁器、完整重放输入、融合前后 c–g 结果，以及 e 的 GPU 访存插入统计。修复了 **WRGB→RD 的 2 CK 发射间隔**和普通跨 rank **RD→WR 的 15 CK 发射间隔**遗漏；命令发射与延迟 DQ 返回分别检查。
 
-此前 job1971246 的 before 错误地保留 rank controller 和 PV→O 本地输入路径，其 before DQ/CA 表、e/g 比较及受影响的串行/并行 latency 均撤回，旧文件只作误配置归档。ρ、在途数和读写比的合成假设也不再用于 Evaluation。
+这是独立的 CPU 时序重放模型。GPU mover kernel/SM 竞争、cache 驻留/补充、实际地址与 warp 调度尚未建模，结果不是 Thor 并发硬件实测。原有均匀到达、连续地址与 L2 写流量代理假设均保留。
 
-新的原生数据、配置检查和逐算子 CA/DQ 分析见[修正基线报告](reference/evaluation-1108/direct-before-corrected/REPORT.zh-CN.md)。并行 Evaluation 仍须保持 kernel 依赖顺序、允许跨窗口推进并计入后续 AE GPU 算子的干扰；不恢复整 kernel 单窗口限制。
+## 入口
 
-## xinyao_1107 历史记录：MAC_RUN / ROPE_RUN 粗细命令
+| 内容 | 位置 |
+|---|---|
+| 模型机制、输入、复现与边界 | [仲裁器说明](experiments/pi05-unified-gemv/ARBITRATOR.zh-CN.md) |
+| 当前仲裁实现 | [sequential_transactions.cpp](experiments/pi05-unified-gemv/sequential_transactions.cpp)、[原生发射时序](experiments/pi05-unified-gemv/sequential_timing.h)、[行状态](experiments/pi05-unified-gemv/sequential_rows.h) |
+| 修复前后 c–g 对比 | [comparison.csv](reference/evaluation-1108/native-timing-fix/comparison.csv)、[核对记录](reference/evaluation-1108/native-timing-fix/comparison.json) |
+| 最新完整结果与逐 kernel/stage 明细 | [with-rows](reference/evaluation-1108/native-timing-fix/with-rows) |
+| e 的 DQ 插入位置、图和统计口径 | [e 插入报告](reference/evaluation-1108/e-dq-insertion-audit/REPORT.zh-CN.md) |
+| 原始 GPU 广播基线的逐空闲窗口 | [基线空闲统计](reference/evaluation-1108/gpu-broadcast-dq-idle/REPORT.zh-CN.md) |
+| 原生 before 基线来源 | [job 1971385](reference/evaluation-1108/direct-before-corrected/REPORT.zh-CN.md) |
+| 发布文件校验 | [SHA256SUMS.json](reference/arbitrator-publication/SHA256SUMS.json) |
 
-新版本在原有 layout、本地 RoPE、QKT score 集中导出和 PIM O projection 上调整命令接口。计算统一为每 rank 每算子一条256-bit描述符，QKᵀ和O各一条；输入、结果和跨rank搬运保留直接DQ读写。字段、CA周期、执行语义和复现命令见[粗细命令说明](experiments/pi05-unified-gemv/COMMANDS.zh-CN.md)，原生前后对比与图见[本次报告](reference/commands-1107/REPORT.zh-CN.md)。
+## 修复后的结果
 
-以下保留调整前的历史实验记录。
+原始重跑作业 `1974571`，51 项测试通过；144 种命令对/层级关系与原生 LPDDR5XPIM 表一致。三个新增回归均能在旧库上复现失败。4,680 个 PIM 阶段的独立时间和 VLM 参考时间未变。
 
-## 四条历史数据流比较（仅分析已有记录）
+发布前另在独立 checkout 使用本分支入口完成作业 `1975153`（5分37秒）：51 项测试、c–g 全部 stage/placement、e 全通道统计均与快照一致。见[发布验证](reference/arbitrator-publication/validation/publication-validation.json)和[核对输出](reference/arbitrator-publication/validation/verification.json)。原始广播基线全通道 CSV 也已逐字节复现。
 
-最新比较按用户指定的四条路径排列，复用原生 jobs `1903036`、`1924418`，未重跑仿真。完整表格、DQ 时间线、DQ/CA 最长单段空闲及来源见[四条路径报告](reference/dataflow-comparison/REPORT.zh-CN.md)。
+| 配置 | PIM 等待：旧 → 新 / ms | 总延迟：旧 → 新 / ms | 总延迟变化 / ms |
+|---|---:|---:|---:|
+| c：融合前 · feature GPU 广播 | 7.764477 → 8.088888 | 140.380266 → 140.682225 | +0.301959 |
+| d：融合前 · token GPU | 6.345897 → 6.619480 | 136.802506 → 137.063866 | +0.261360 |
+| e：融合前 · token local | 6.592487 → 6.871574 | 131.312270 → 131.639969 | +0.327699 |
+| f：融合后 · token GPU | 0.111282 → 0.111282 | 137.366234 → 137.366234 | +0.000000 |
+| g：融合后 · token local | 0.139953 → 0.139953 | 132.316063 → 132.316063 | +0.000000 |
 
-| 路径 | 已建模 AE 部分 / ms（18层×10步） | O projection 是否计时 | DQ utilization（16-channel平均） |
-|---|---:|---|---:|
-| ① 直接广播至 GEMV buffer | 19.757319 | GPU O 未计时 | 18.705% |
-| ② 两 bank 暂存，score 流式导出 | 30.831197 | GPU O 未计时 | 9.621% |
-| ③ 两 bank 暂存，score 集中导出 | 32.550157 | GPU O 未计时 | 9.113% |
-| ④ 同③，PIM O projection | 37.841434 | 已计 PIM O：5.039536 ms | 8.524% |
+总延迟沿用旧报告的参考偏差抵消口径；[原始总时长](reference/evaluation-1108/native-timing-fix/with-rows/evaluation-b-g.csv)同步保留。VLM 独立模型为 196.457296 ms，已有 GPU 计时为 104.950496 ms，抵消偏差为 91.506800 ms。该偏差很大，不能用此表确定真实硬件加速或 e/g 排序。
 
-上表是独立单层阶段和的外推，**不是完整 AE 端到端测量**。①另有 QKV 融合、PV 分片、输出精度和调度差异，因此①→②不是单独改变输入路径的消融。
+f/g 保留整段外部 I/O 所有权交接，所以这次修正没有改变它们的结果。混合 WRGB/RDRES 与普通访存的额外 1/2 CK DQ 保护间隔是保守扩展，不能称为原生 AttAcc 已定义的电气时序。
 
-![四条路径 AE 计时与 DQ breakdown](reference/dataflow-comparison/ae-latency-dq-utilization.png)
+## e 的实际插入位置
 
-主窗口指标不累计碎片：DQ 取最长完整工作窗口；CA 取最长实际单段空闲；joint 取完整 DQ 工作范围内最长的一段 DQ/CA 同时空闲。QKT 的 DQ 最长窗口①②③④分别为 `0.490574 / 0.559048 / 19.383770 / 19.383770 µs`，其中①②各为31个分离窗口，不能相加称为连续时间。②③④虽然都有47.638206 µs的Down DQ完整窗口，但共享CA最长单段仅1.093708 µs。
+对修复后 e 的 900 个 PIM 阶段、16 个 channel 做只读诊断，作业 `1974893`。全部阶段结果、VLM placement 和请求计数与原重跑一致。
 
-## 原有两个开关的2×2实验
+| 原始 DQ 空档 | GPU burst 数（16 通道合计） | PIM 期间占比 | 典型位置 |
+|---|---:|---:|---|
+| 2 CK | 15,883,421 | 21.29% | WRGB 广播之间、RDRES 导出之间；需要扩展空档 |
+| 3–16 CK | 4,233,706 | 5.67% | 主要是 RDRES→RDRES 的 6 CK 间隔 |
+| 17–64 CK | 4,395,446 | 5.89% | Down 的 48 CK、普通 RD 间隔等 |
+| 65–256 CK | 6,415,587 | 8.60% | Down 的 65 CK、PV 的 240 CK 等 |
+| >256 CK | 43,470,420 | 58.27% | Gate/Up、O 的 496/513 CK，chain 的 1380 CK 等 |
+| 阶段末尾 | 208,980 | 0.28% | 最后一笔 PIM DQ 之后、16 个 channel 均完成之前 |
 
-在 `xinyao_1104` 基础上实现两个独立开关，并在 dev0 完成四组原生模拟。实验 1：每处理 16 个本地 K token，将 score tile 写回 DRAM，全部完成后统一读取到 GPU。实验 2：PV 部分结果写回 DRAM，经 bank0/4 读出并广播到 16 bank，执行 O projection。
+分母是 PIM 尚未结束期间的 **74,607,560** 个完整 GPU DQ burst。每个 burst 为 32 B / 2 CK。原始 2 CK 空档对应位置的 burst 都需要扩展空档；长窗口中有保持长度即可容纳数据的情况，也有需要延展边界的情况。
 
-四组共同采用 PV/O 的 BF16 输入、权重和结果，FP32 累加；QKT score 保持 FP32。**主比较改为最长连续完整工作窗口，而非累计无 DQ 时间；实验 2 的时延包含 PV 和 PIM O projection。** 此前累计口径的报告保留在 [previous-cumulative-report](reference/o-projection/previous-cumulative-report/)。
+![Gate/Up 中短空档扩展与长窗口利用](reference/evaluation-1108/e-dq-insertion-audit/e-dq-insertion-examples.png)
 
-下表为 channel 0 在各工作范围内的**最长一个连续、无外部 DQ 的完整工作窗口**，单位 µs。窗口由完整计算/本地操作阶段组成；相邻阶段之间若只有无 DQ 的控制段则连接，遇到外部传输阶段即分开。传输阶段内部的 DQ idle 小间隙不计入，也不跨独立案例拼接。
+整个已启动 VLM 前缀包含 312,053,120 个 burst，其中 237,443,252 个（76.09%）发生在对应 PIM 阶段结束之后，另有 2,308 个跨越边界。尾部执行已计入 AE GPU wait（75.419926 ms），不属于填充 PIM 空闲，上表排除了它们。
 
-| 工作范围 | 非1非2 | 1非2 | 2非1 | 1和2 |
-|---|---:|---:|---:|---:|
-| QKT | 0.559048 | 19.383770 | 0.559048 | 19.383770 |
-| PV；实验 2 为 PV+O | 11.784094 | 11.784094 | 25.124330 | 25.124330 |
-| Gate / Up | 40.757038 | 40.757038 | 40.757038 | 40.757038 |
-| Down | 47.638206 | 47.638206 | 47.638206 | 47.638206 |
+## 复现
 
-实验 1 将 QKT 的 31 个分离窗口变为 1 个连续窗口；实验 2 的 PV+O 有 2 个窗口，最长为 25.124330 µs，不能把两者相加称为连续。完整 QKV/RoPE/QKT/V chain 的最长窗口四组均为 32.435102 µs，会掩盖 QKT 的变化，因此单列 QKT。窗口包含本地等待、refresh 和内部控制，不等于 MAC 活跃时间，也不是已测 GPU 可用时间。完整数据见 [continuous-dq.json](reference/o-projection/continuous-dq/continuous-dq.json)、[范围汇总](reference/o-projection/continuous-dq/continuous-dq-summary.csv)和[逐连续工作窗口](reference/o-projection/continuous-dq/continuous-dq-complete-work-windows.csv)。
-
-以下 latency 与 DQ utilization 保留作总量核算。时间为每层、每 denoising step 的**内存/PIM 模型时间**，由 QKV/RoPE/QKT、PV 或 PV+O、Gate/Up、Down 四个独立阶段相加；它不是一个连续窗口。非实验 2 组未计 GPU O projection，所有组未计 GPU softmax、最终跨 rank 求和等算术，因此不能直接解读为端到端加速比较。
-
-| 组合 | 模型 latency (µs) | 相对非1非2 (µs) | DQ busy/ch0 (µs) | DQ utilization/ch0 | 外部 DQ 总量 (KiB) |
-|---|---:|---:|---:|---:|---:|
-| 非1非2（GPU O 未计时） | 171.284428 | 0 | 16.478784 | 9.621% | 4392 |
-| 1非2（GPU O 未计时） | 180.834206 | +9.549778 | 16.478784 | 9.113% | 4392 |
-| 2非1（已计 PIM O） | 200.680410 | +29.395982 | 17.919552 | 8.929% | 4776 |
-| 1和2（已计 PIM O） | 210.230188 | +38.945760 | 17.919552 | 8.524% | 4776 |
-
-![Latency 与 DQ breakdown](reference/o-projection/latency-dq-breakdown.png)
-
-详细分析见[实验报告](reference/o-projection/REPORT.zh-CN.md)，机器可读数据包括[四组汇总](reference/o-projection/comparison.json)、[各阶段](reference/o-projection/stage-comparison.csv)、[全部 16 channel](reference/o-projection/channel-comparison.csv)、[逐 phase](reference/o-projection/phase-comparison.csv)。
-
-PV 基线为 14.953596 µs，实验 2 的 **PV+O 为 44.349578 µs**。其中 O 子流程为 27.997424 µs：读取/广播/计算 20.257986、结果导出 7.731934、控制 0.007504；另有 PV 结果落 DRAM 的 3.320520 µs。相对基线净增 29.395982 µs，还扣除了被替换的 PV 导出 1.921962 µs，因此该差值不是纯 O 耗时。
-
-实验 1 不减少外部 score 字节数，增加本地写回和最终普通 DRAM 读取，改变 DQ 发生的时机。实验 2 在各 rank 上先投影、最后交给 GPU 求和，导出的 BF16 部分结果由 128 KiB 变成 512 KiB，外部 DQ 增加 384 KiB。DQ 百分比下降也受到模型总时间增长影响，不能单凭该比例判断流量减少或性能改善。
-
-原 QKT 每计算 16 个 K token 就导出 1 KiB FP32 score tile，计算和导出交替，因此 QKT 整段中的 DQ 不是持续为零。实验 1 将逐 tile 的外部导出变成本地写回，最后统一读出。具体说明与时间线见报告。
-
-当前 PV 每个 rank 保留某个 head 的 token 奇/偶分片部分和，因此线性 O projection 可以在 rank 内先执行，再对 8 heads × 2 parity 的结果求和。每 rank 配置完整 `[2048,1024]` BF16 W_O 常驻副本（4 MiB/rank、共 64 MiB），当前计算只访问本 head `[256,1024]` 子块（共 8 MiB 活跃权重）。其余权重预置且不访问；初始化时间不计入本次稳态实验。完整常驻布局在测量后补充，20 组 trace 与配置的精确一致性证明见[来源绑定](reference/o-projection/source-result-binding.json)。
-
-原生运行 job `1924418` 包含四组各 5 案例，以及新版 backend 的 5 个旧模式回归案例。原实验的 141 项 Python 测试和 73 项 native guards（52 项旧 guards、8 项 score guards、13 项 O guards）通过；其中 O 的一项报错文字断言经过单项重试，原失败与修正记录均保留。验证包含所有 16 channel 的命令/地址覆盖、ACT1/ACT2、CA/DQ 冲突、SRF/累加器容量、scratch 与 DRAM 生命周期。详见[原实验验证](reference/o-projection/validation.json)、[补充验证](reference/o-projection/postchecks/summary.json)；本次连续窗口分析的新增测试另见[连续窗口复核](reference/o-projection/continuous-review-validation.json)。
+Linux、Python 3.10+、支持 C++20 的 `g++`；无需 GPU。测试和重放使用 Python 标准库；重新绘图才需要 Matplotlib 和中文字体。
 
 ```bash
-PYTHON="$(command -v python)" JOBS=4 bash experiments/pi05-unified-gemv/build.sh
-python experiments/pi05-unified-gemv/reproduce_o_projection.py --output results/four-way
-python experiments/pi05-unified-gemv/reproduce.py --skip-tests \
-  --cases chain pv gate_up_gpu down_gpu_input serial_layer_control --output results/legacy
-python experiments/pi05-unified-gemv/validate_o_projection_results.py \
-  --experiment results/four-way --legacy results/legacy --reference reference
+# 核对发布文件和结果恒等式
+python3 experiments/pi05-unified-gemv/verify_arbitrator.py
+
+# 编译、51 项测试、重跑 c–g，并重跑 e 的全通道插入统计
+python3 experiments/pi05-unified-gemv/run_arbitrator.py --output outputs/arbitrator --audit-e
+
+# 只编译和测试
+python3 experiments/pi05-unified-gemv/run_arbitrator.py --output outputs/arbitrator --tests-only
 ```
 
-布局、资源成本和建模范围见[O-PROJECTION.md](experiments/pi05-unified-gemv/O-PROJECTION.md)。这是时序与数据映射模型，没有执行神经网络 tensor 数值；BF16 部分结果舍入与求和顺序的精度影响尚未验证。原始事件和源码快照归档位于本地 `results/o-projection-1924418/`，SHA256 见[归档清单](reference/o-projection/archive-manifest.json)。此前 token-PV 版本的 FP32 输出结果保留在[历史 README](README-pv-token.md)及原 `reference/` 中，不作为本次四组的共同 BF16 基线。
+新输出写入 `outputs/arbitrator`，参考数据保存在 `reference/`。入口会核对重跑结果与发布快照；若修改模型后结果不同，会明确报错。数据准备脚本与完整输入都包含在分支中，不需要访问原计算节点的绝对路径。
+
+历史布局和原生模拟记录见 [原 xinyao_1108 首页](README-xinyao_1108.md)。当前仲裁结果以本页链接的 `native-timing-fix` 为准。

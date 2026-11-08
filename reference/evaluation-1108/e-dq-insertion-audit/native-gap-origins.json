@@ -1,0 +1,112 @@
+[
+  {
+    "case": "chain",
+    "gap_CK": 1380,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 1850,
+    "commands": {
+      "MACAB": 161,
+      "PREab": 2,
+      "ACTAB": 2
+    }
+  },
+  {
+    "case": "chain",
+    "gap_CK": 4320,
+    "previous": "WRGB",
+    "next": "RD",
+    "begin_CK": 27760,
+    "commands": {
+      "MACAB": 192,
+      "PREab": 3,
+      "ACTAB": 3,
+      "REFab": 2,
+      "PREpb": 32,
+      "ACT1": 32,
+      "ACT2": 32,
+      "LOCALRD": 640,
+      "LOCALWR": 768,
+      "RD": 1
+    }
+  },
+  {
+    "case": "chain",
+    "gap_CK": 262,
+    "previous": "RDRES",
+    "next": "RDRES",
+    "begin_CK": 37922,
+    "commands": {
+      "MACQK": 16
+    }
+  },
+  {
+    "case": "gate_up_gpu",
+    "gap_CK": 513,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 126,
+    "commands": {
+      "MACAB": 33
+    }
+  },
+  {
+    "case": "gate_up_gpu",
+    "gap_CK": 496,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 701,
+    "commands": {
+      "MACAB": 31,
+      "PREab": 1
+    }
+  },
+  {
+    "case": "down_gpu_input",
+    "gap_CK": 65,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 126,
+    "commands": {
+      "MACAB": 5
+    }
+  },
+  {
+    "case": "down_gpu_input",
+    "gap_CK": 48,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 253,
+    "commands": {
+      "MACAB": 3
+    }
+  },
+  {
+    "case": "pv",
+    "gap_CK": 257,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 126,
+    "commands": {
+      "MACAB": 17
+    }
+  },
+  {
+    "case": "pv",
+    "gap_CK": 240,
+    "previous": "WRGB",
+    "next": "WRGB",
+    "begin_CK": 445,
+    "commands": {
+      "MACAB": 15
+    }
+  },
+  {
+    "case": "pv",
+    "gap_CK": 6,
+    "previous": "RDRES",
+    "next": "RDRES",
+    "begin_CK": 10169,
+    "commands": {}
+  }
+]
