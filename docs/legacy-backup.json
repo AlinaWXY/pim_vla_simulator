@@ -1,0 +1,13 @@
+{
+  "legacy_tag": "legacy-1108",
+  "legacy_commit": "2b8645e",
+  "host": "dev0",
+  "directory": "/fact_data/xinyaowang/backups/pim-vla-legacy-1108-20261109",
+  "contents": "Full directory archives, including Git history, uncommitted files, build products and results; separate status, HEAD and binary diff records",
+  "archives": {
+    "pim_vla_simulator.tar": "b123f94b6d100231ddcd9269b786bc6214cd06dbdfb042979c0d5531122758f6",
+    "pim_vla_xinyao_1108_20261108.tar": "2b59a49fb2e2a523ec984c5584825345c4fb3237e684be7e523243c5fdca56fe",
+    "pim_vla_arbitrator_publication_20261108.tar": "2c7d11378ee9bbacce2703d9261eb099ff1201a530e2fe7234d8b48f62417fa0"
+  },
+  "git_bundle": "legacy-1108.bundle"
+}

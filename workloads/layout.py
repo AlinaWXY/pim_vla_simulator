@@ -1,0 +1,165 @@
+"""Physical tensor ownership; no DRAM timing or old simulator imports.
+
+Addresses use [channel, rank, bank_group, bank, row, 32-byte-column].
+The original branch's byte-address formulas are retained explicitly.
+"""
+CHANNELS = 16
+BANKS = 16
+ROW_BYTES = 2048
+BURST_BYTES = 32
+HEADS, HEAD_DIM, HIDDEN, QUERIES, PREFIX = 8, 256, 1024, 16, 968
+PADDED_KV = 992
+SRF_BYTES, OUTPUT_BYTES = 1024, 2048
+LAYER_STRIDE_BYTES = 1 << 20
+LAYERS, STEPS = 18, 10
+QKV_BASE, V_BASE = 0x60000, 0x28000
+K_PREFIX_BASE, WORK_BASE = 0x10000, 0x14000
+Q_BASE, K_SUFFIX_BASE, COEF_BASE = 0x14100, 0x14200, 0x14000
+Q_IMPORT_BASE = 0x15000
+STAGING_BASE, SCORE_BASE, O_BASE = 0x80000, 0xA0000, 0xC0000
+GU_BASE, DOWN_BASE = 0x40000, 0x50000
+
+
+def address(channel, offset, bank=0, rank=1):
+    if not 0 <= channel < CHANNELS or rank not in (0, 1):
+        raise ValueError("invalid channel/rank")
+    if offset < 0 or offset % BURST_BYTES or bank not in range(-1, BANKS):
+        raise ValueError("unaligned offset or invalid bank")
+    row, within = divmod(offset, ROW_BYTES)
+    bg, ba = (-1, -1) if bank == -1 else divmod(bank, 4)
+    return [channel, rank, bg, ba, row, within // BURST_BYTES]
+
+
+def layer_address(relative, layer):
+    if not 0 <= layer < LAYERS or len(relative) != 6 or relative[1] != 1:
+        raise ValueError("invalid PIM layer address")
+    result = list(relative)
+    result[4] += layer * (LAYER_STRIDE_BYTES // ROW_BYTES)
+    return result
+
+
+def feature_owner(feature):
+    if not 0 <= feature < HEAD_DIM:
+        raise ValueError("invalid feature")
+    pair = feature % 128
+    return pair // 8, 2 * (pair % 8) + feature // 128
+
+
+def feature_from_lane(bank, lane):
+    if not 0 <= bank < 16 or not 0 <= lane < 16:
+        raise ValueError("invalid feature lane")
+    return bank * 8 + lane // 2 + 128 * (lane % 2)
+
+
+def feature_shard_from_lane(channel, bank, lane):
+    """1108 feature baseline: natural feature order within each 128-wide shard."""
+    if not 0 <= channel < 16 or not 0 <= bank < 16 or not 0 <= lane < 8:
+        raise ValueError("invalid feature-sharded lane")
+    return bank * 8 + lane + 64 * (channel % 2) + (64 if bank >= 8 else 0)
+
+
+def token_owner(head, token):
+    if not 0 <= head < 8 or not 0 <= token < PADDED_KV:
+        raise ValueError("invalid token")
+    return 2 * head + token % 2, token // 2
+
+
+def staging(fragment, token, rows):
+    return 4 * (fragment % 2), STAGING_BASE + (fragment // 2 * rows + token) * 32
+
+
+def key_offset(local_token, feature=False):
+    token = local_token // 2 if feature else local_token
+    if token < 484:
+        return K_PREFIX_BASE + token * 32
+    if token < 492:
+        return K_SUFFIX_BASE + (token - 484) * 32
+    return WORK_BASE + (24 + token - 492) * 32
+
+
+def score_location(token, packet):
+    # Two FP32 score bursts per token, on different bank groups.
+    if packet not in (0, 1):
+        raise ValueError("a score column has two 32-byte packets")
+    return packet * 4, SCORE_BASE + token * 32
+
+
+def gu_weight_location(reduction, output, projection=0):
+    channel, local = divmod(output, 256)
+    output_slot, bank = divmod(local, 16)
+    fragment, lane = divmod(reduction, 16)
+    return channel, bank, GU_BASE + ((fragment * 2 + projection) * 16 + output_slot) * 32 + lane * 2
+
+
+def down_weight_location(reduction, output):
+    channel, local = divmod(output, 64)
+    bank, output_slot = divmod(local, 4)
+    fragment, lane = divmod(reduction, 16)
+    return channel, bank, DOWN_BASE + (fragment * 4 + output_slot) * 32 + lane * 2
+
+
+def contract(layout):
+    if layout not in ("feature", "token"):
+        raise ValueError(layout)
+    return {
+        "shape": {"heads": 8, "head_dim": 256, "hidden": 1024, "ffn": 4096,
+                  "queries": 16, "prefix": 968, "valid_kv": 984, "padded_kv": 992},
+        "topology": {"channels": 16, "ranks": 2, "gpu_rank": 0, "pim_rank": 1,
+                     "bank_groups": 4, "banks_per_group": 4, "row_bytes": 2048},
+        "buffers": {"srf_bytes_per_bank": 1024, "output_bytes_per_bank": 2048,
+                    "rank_score_cache_bytes": 0, "rope_units_per_rank": 1,
+                    "rope_vector_views": "coefficient and two 32B inputs reuse SRF; two 32B outputs reuse output pool"},
+        "layout": layout,
+        "layer_stride_bytes_per_bank": LAYER_STRIDE_BYTES,
+        "layers": LAYERS,
+        "denoising_steps": STEPS,
+        "address_template": "row is relative to the current layer; physical row adds layer*512",
+        "ownership": "channel=2*head+token%2; local_token=token//2" if layout == "token" else
+                     "rank feature subsets [0:64,128:192] and [64:128,192:256]; all tokens",
+        "feature_lanes_by_channel": [
+            [[feature_from_lane(b, x) for x in range(16)] if layout == "token" else
+             [feature_shard_from_lane(c, b, x) for x in range(8)] for b in range(16)]
+            for c in range(16)],
+        "formats": {"inputs": "BF16", "weights": "BF16", "accumulators": "FP32",
+                    "scores": "FP32", "pv_o": "BF16", "ffn_exports": "FP32"},
+        "regions_per_bank": {
+            "k_prefix": [K_PREFIX_BASE, WORK_BASE], "q_k_coefficient_work": [WORK_BASE, WORK_BASE + 2048],
+            "qkv": [QKV_BASE, QKV_BASE + 96 * 1024], "v_cache": [V_BASE, V_BASE + 16384],
+            "gate_up_weights": [GU_BASE, DOWN_BASE], "down_weights": [DOWN_BASE, DOWN_BASE + 32768],
+            "q_import": [Q_IMPORT_BASE, Q_IMPORT_BASE + 2048],
+            "input_staging_bank0_bank4": [STAGING_BASE, STAGING_BASE + 65536],
+            "score_bank0_bank4": [SCORE_BASE, SCORE_BASE + 16384],
+            "wo_full_resident": [O_BASE, O_BASE + 256 * 1024]},
+        "coefficient_source": "BF16 sin/cos generated offline from actual model position IDs",
+        "operator_shapes": operator_shapes(layout),
+        "numeric_execution": False,
+    }
+
+
+def operator_shapes(layout):
+    token = layout == "token"
+    queries, features, kv = (8, 256, 496) if token else (16, 128, 992)
+    return {
+        "qkv": {"input_per_rank": [queries, 1024], "weight_per_rank": [1024, 3 * features],
+                "output_per_rank": [queries, 3 * features], "active_weight_bytes_per_bank": 98304 if token else 49152,
+                "scalar_macs_all_channels": 100663296},
+        "qkt": {"q_per_rank": [16, features], "k_per_rank": [kv, features], "score_per_rank": [16, kv],
+                "score_semantics": "complete score; disjoint KV tokens" if token else "partial score; GPU sums the feature ranks",
+                "scalar_macs_all_channels": 32505856},
+        "pv": {"p_per_rank": [16, kv], "v_per_rank": [kv, features], "output_per_rank": [16, features],
+               "output_semantics": "partial over KV parity" if token else "complete for owned features",
+               "scalar_macs_all_channels": 32505856},
+        "o": {"input_per_rank": [16, features], "active_weight_per_rank": [features, 1024],
+              "resident_weight_per_rank": [2048, 1024], "output_per_rank": [16, 1024],
+              "resident_order": "[rotated_head_slot8][tile2][fragment16][column32][lane16]" if token else
+                                "[rotated_feature_shard_slot16][tile2][fragment8][column32][lane16]",
+              "active_weight_bytes_per_bank": 32768 if token else 16384,
+              "scalar_macs_all_channels": 67108864 if token else 33554432,
+              "gpu_reduction_operands": 16},
+        "gate_up": {"input_per_rank": [16, 1024], "weight_per_rank": [1024, 512],
+                    "output_per_rank": [16, 512], "scalar_macs_all_channels": 134217728,
+                    "output_feature_formula": "projection=column//16; feature=channel*256+(column%16)*16+bank"},
+        "down": {"input_per_rank": [16, 4096], "weight_per_rank": [4096, 64],
+                 "output_per_rank": [16, 64], "scalar_macs_all_channels": 67108864,
+                 "output_feature_formula": "feature=channel*64+bank*4+column"},
+    }

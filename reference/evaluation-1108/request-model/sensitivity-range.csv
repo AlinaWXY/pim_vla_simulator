@@ -1,6 +1,0 @@
-variant,central_ms,min_ms,max_ms,min_profile,max_profile
-feature_gpu_before,160.0911438881875,160.000051844125,168.08593972656251,central_read_only,high_q8
-token_gpu_before,157.7043927274375,157.529893773125,164.3035843548125,central_read_only,high_q8
-token_local_before,145.9519212664375,145.8416466555625,152.9795115091875,central_read_only,high_q8
-token_gpu_after,157.5856592724375,157.45556566975,160.0965036650625,central_read_only,high_dispatch1us
-token_local_after,145.889315851125,145.796074065625,148.2989983625,central_read_only,high_dispatch1us

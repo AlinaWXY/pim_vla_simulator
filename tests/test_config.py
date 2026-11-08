@@ -1,0 +1,168 @@
+"""Acceptance contracts for design switches and measured frontend inputs."""
+from __future__ import annotations
+
+import itertools
+import json
+from pathlib import Path
+import sys
+import unittest
+from unittest import mock
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from experiments.config import CASES, case_config, validate_calibration, validate_config, variant_name
+from experiments.prepare_inputs import ae_schedule, normalize_vlm
+from calib.calibrate_vlm import assess
+from experiments.native import runtime_libraries, library_hashes
+from analysis.report import summarize
+
+
+class ConfigurationTests(unittest.TestCase):
+    def test_matrix(self):
+        self.assertEqual(len(CASES), 9)
+        self.assertEqual(len({variant_name(c) for c in CASES.values()}), 5)
+        for case in CASES:
+            validate_config(case_config(case))
+
+    def test_only_five_structural_combinations(self):
+        accepted = []
+        for layout, rope, dataflow in itertools.product(("feature", "token"), ("gpu", "local"), ("streaming", "fused")):
+            c = dict(layout=layout, rope=rope, dataflow=dataflow, mode="serial")
+            try:
+                validate_config(c)
+                accepted.append((layout, rope, dataflow))
+            except ValueError:
+                pass
+        self.assertEqual(len(accepted), 5)
+
+    def test_arbitration_presence_is_strict(self):
+        for case in ("b", "f", "g"):
+            for value in (None, "frfcfs", "pim_head"):
+                with self.assertRaises(ValueError):
+                    validate_config(dict(case_config(case), arbitration=value))
+        for case in ("c", "d", "e"):
+            c = case_config(case)
+            del c["arbitration"]
+            with self.assertRaises(ValueError):
+                validate_config(c)
+
+    def test_retired_switches_rejected(self):
+        for retired in ("pim_data_path", "pim_whole_srf", "shift", "constant_offset", "dq_latency"):
+            with self.assertRaises(ValueError):
+                validate_config(dict(case_config("b"), **{retired: 0}))
+
+    def test_hardware_multiplier(self):
+        for k in (1, 2, 4):
+            validate_config(case_config("g", mac_freq_mult=k))
+        for k in (0, 3, 8, True):
+            with self.assertRaises(ValueError):
+                validate_config(case_config("g", mac_freq_mult=k))
+
+    def test_watermark_validation(self):
+        good = dict(alpha=0.2, window=64, write_low=16, write_high=48)
+        validate_calibration(good)
+        for key, value in (("alpha", -0.1), ("alpha", 0), ("alpha", 0.049), ("alpha", 1.1), ("alpha", float("nan")),
+                           ("write_high", 65), ("write_low", 48), ("window", True)):
+            with self.assertRaises(ValueError):
+                validate_calibration(dict(good, **{key: value}))
+
+
+class RuntimeProvenanceTests(unittest.TestCase):
+    def test_loaded_library_hash_tracks_content_not_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "libramulator.so"
+            path.write_bytes(b"first library")
+            line = f"libramulator.so => {path} (0x0000000123450000)\n"
+            with mock.patch("experiments.native.subprocess.check_output", return_value=line):
+                first = runtime_libraries(Path(temporary) / "simulator")
+                path.write_bytes(b"changed library")
+                second = runtime_libraries(Path(temporary) / "simulator")
+            self.assertNotEqual(library_hashes({"runtime_libraries": first}), library_hashes({"runtime_libraries": second}))
+
+    def test_missing_runtime_is_rejected(self):
+        with mock.patch("experiments.native.subprocess.check_output", return_value="libramulator.so => not found\n"):
+            with self.assertRaises(RuntimeError):
+                runtime_libraries("simulator")
+        with self.assertRaises(ValueError):
+            library_hashes({"binary_sha256": "executable alone is insufficient"})
+
+
+class ReportingTests(unittest.TestCase):
+    def test_compatibility_uses_native_completion_and_keeps_negative_interference(self):
+        stage = dict(stage_id=0, name="qkv", step=0, layer=0, start_us=0, end_us=10, duration_us=10)
+        solo = dict(metrics={"total_us": 20}, stages=[stage])
+        vlm = dict(metrics={"total_us": 15}, kernels=[
+            dict(ordinal=0, start_us=0, end_us=5), dict(ordinal=1, start_us=5, end_us=15)])
+        counters = {name: index for index, name in enumerate(("GPU_act1", "GPU_act2", "GPU_prepb", "GPU_preab",
+                    "GPU_reads", "GPU_writes", "GPU_row_hits", "GPU_row_misses"))}
+        combined = dict(metrics=dict(total_us=25, AE_elapsed_us=18, AE_GPU_wait_us=0,
+                                    VLM_remaining_us=7, **counters),
+                        stages=[dict(stage, end_us=8, duration_us=8)], bus=[],
+                        kernels=[dict(ordinal=0, start_us=0, end_us=5), dict(ordinal=1, start_us=5, end_us=25)])
+        with tempfile.TemporaryDirectory() as temporary:
+            row = summarize("c", combined, solo, vlm, temporary)
+        self.assertEqual(row["PIM_interference_ms"], -0.002)
+        self.assertEqual(row["completed_units"], 1)
+        self.assertEqual(row["VLM_completed_model_ms"], 0.005)
+        self.assertEqual(row["VLM_remaining_model_ms"], 0.007)
+        self.assertEqual(row["AE_native_schedule_ms"], row["AE_solo_ms"])
+        self.assertEqual(row["net_overlap_ms"], 0.01)
+        self.assertEqual(row["GPU_row_misses"], counters["GPU_row_misses"])
+
+
+class InputTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.data = ROOT / "input-data"
+        cls.vlm = json.loads((cls.data / "vlm.json").read_text(encoding="utf-8"))
+
+    def test_complete_vlm_preserves_measurements(self):
+        units = self.vlm["units"]
+        self.assertEqual(len(units), 2357)
+        self.assertEqual(sum(u["kind"] == "kernel" for u in units), 2353)
+        self.assertAlmostEqual(sum(u["us"] for u in units), 105220.5782, places=5)
+        self.assertAlmostEqual(self.vlm["target_us"], 104950.49603462219, places=5)
+        self.assertEqual(sum(u["read_sectors"] for u in units) * 32, 11804375072)
+        self.assertTrue(all(u["write_is_proxy"] == (u["kind"] == "kernel") for u in units))
+
+    def test_logical_tensor_regions_and_physical_ring_capacity(self):
+        units = self.vlm["units"]
+        for left, right in zip(units, units[1:]):
+            self.assertLessEqual(left["base_sector"] + left["read_sectors"] + left["write_sectors"], right["base_sector"])
+            self.assertEqual(right["base_sector"] % 1024, 0)
+        capacity = self.vlm["physical_rank0_capacity_bytes"]
+        self.assertEqual(capacity, 16 * 1024**3)
+        self.assertTrue(all((u["read_sectors"] + u["write_sectors"] + 16) * 32 <= capacity for u in units))
+
+    def test_ae_stage_coverage_and_rope_boundary(self):
+        for path in self.data.glob("ae-*.json"):
+            schedule = json.loads(path.read_text(encoding="utf-8"))
+            self.assertTrue(all(n == 180 for n in schedule["stage_occurrences"].values()))
+            events = schedule["events"]
+            for step in range(10):
+                for layer in range(18):
+                    subset = [e for e in events if e["step"] == step and e["layer"] == layer]
+                    stages = [e["stage"] for e in subset if e["kind"] == "pim"]
+                    self.assertEqual(stages[0], "qkv")
+                    self.assertEqual(stages[-1], "down")
+                    if "_gpu_" in schedule["variant"]:
+                        a = next(i for i, e in enumerate(subset) if e.get("stage") == "rope_export")
+                        b = next(i for i, e in enumerate(subset) if e.get("stage") == "rope_import")
+                        self.assertEqual(sum(e.get("name") == "rope_apply" for e in subset[a:b]), 10)
+                    else:
+                        self.assertFalse(any(e.get("name") == "rope_apply" for e in subset))
+
+    def test_calibration_cannot_accept_partial_or_shortened_kernel(self):
+        with self.assertRaises(ValueError):
+            assess({"kernels": [], "metrics": {"total_us": self.vlm["target_us"]}}, self.vlm)
+        rows = [dict(ordinal=u["ordinal"], start_us=0, end_us=u["us"], duration_us=u["us"]) for u in self.vlm["units"]]
+        raw = {"kernels": rows, "metrics": {"total_us": sum(u["us"] for u in self.vlm["units"])}}
+        self.assertTrue(assess(raw, self.vlm)["passed"])
+        rows[0]["duration_us"] = 0
+        with self.assertRaises(ValueError):
+            assess(raw, self.vlm)
+
+
+if __name__ == "__main__":
+    unittest.main()

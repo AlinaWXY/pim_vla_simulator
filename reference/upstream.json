@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/CMU-SAFARI/ramulator2",
+  "commit": "7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da",
+  "unchanged_files": 460,
+  "modified_upstream_files": [
+    {
+      "path": "python/ramulator/dram/__init__.py",
+      "upstream_sha256": "a925fedf92724a4adeea96bc3bdc28b6a5c4c401aa6b938c3725cd67bfe257be",
+      "current_sha256": "8e90ceed176e06947d3a551dbc62dd1bdd84b86fa9990c578027c74ed2cd1410"
+    },
+    {
+      "path": "src/ramulator/base/config.cpp",
+      "upstream_sha256": "801f152b836072815583366c8ee562a9fe7ec31d7c8f8ecc746bba93c9d14f8c",
+      "current_sha256": "1ac872dab01f672e49d46d5e21268a6a911b727bbf6e14bafed032f218fe1a03"
+    },
+    {
+      "path": "src/ramulator/dram/CMakeLists.txt",
+      "upstream_sha256": "e3589ea26935c7c63d665c762ed89dab7cf8587566b95611877533a2c1b31968",
+      "current_sha256": "20f7237d60c3057793a7f6980ec5d04a7a65fdca752277c15a5af6d763cd81d6"
+    }
+  ],
+  "missing_upstream_files": [],
+  "method": "SHA256 of tracked upstream files; added PIM files are tracked in the new branch"
+}

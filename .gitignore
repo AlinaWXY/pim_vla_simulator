@@ -1,8 +1,11 @@
 __pycache__/
-*.py[cod]
+*.pyc
+/build/
+/results/
+/programs/generated/
+/ramulator2/ext/
 *.so
-*.pyd
-build*/
-results/
-outputs/
+*.log
+*.tgz
+*.tar
 .venv/

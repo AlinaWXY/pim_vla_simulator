@@ -1,1 +1,0 @@
-{"case": "O_missing_rewind", "passed": false, "expected_message": "Whole SRF batch order mismatch", "exception_type": "RuntimeError", "message": "duplicate staging load"}

@@ -1,0 +1,197 @@
+#include "ramulator/controller/impl/pim_model.h"
+#include "ramulator/frontend/impl/json_input.h"
+#include <cmath>
+#include <filesystem>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
+namespace PimVla {
+std::string json_string(const std::string& value) {
+  std::ostringstream out;out<<'"';
+  for(unsigned char c:value) {
+    if(c=='"'||c=='\\')out<<'\\'<<c;
+    else if(c=='\n')out<<"\\n";
+    else if(c=='\r')out<<"\\r";
+    else if(c=='\t')out<<"\\t";
+    else if(c<32)out<<"\\u"<<std::hex<<std::setw(4)<<std::setfill('0')<<int(c)<<std::dec;
+    else out<<c;
+  }
+  out<<'"';return out.str();
+}
+struct Event {std::string kind,name;double us=0;int step=0,layer=0;};
+struct StageResult {int id,step,layer;std::string name;Clock start,end,wait=0;};
+
+int run(const std::string& config_file,const std::string& output) {
+  auto cfg=Config::parse_config_file(config_file);
+  std::filesystem::create_directories(output);
+  ConfigNode specification=cfg["spec"];
+  if(!specification)specification=Config::parse_config_file(cfg["spec_path"].as<std::string>());
+  if(specification.is_scalar())specification=Config::parse_config_file(specification.as<std::string>());
+  double tick_us=specification["clock_ps"].as<double>(938.0)/1000000.0;
+  auto cycles=[&](double us){return static_cast<Clock>(std::ceil(us/tick_us-1e-10));};
+  auto us=[&](Clock c){return c*tick_us;};
+  std::string kind=cfg["run_kind"].as<std::string>("combined");
+  require(kind=="combined"||kind=="ae_solo"||kind=="vlm_solo","invalid run_kind");
+  bool do_ae=kind!="vlm_solo",do_vlm=kind!="ae_solo";
+  bool serial=cfg["mode"].as<std::string>("concurrent")=="serial";
+  bool fused=cfg["dataflow"].as<std::string>("streaming")=="fused";
+  std::string policy=cfg["arbitration"].as<std::string>("frfcfs");
+  if(policy.empty())policy="frfcfs";
+  std::string layout=cfg["layout"].as<std::string>("feature"),rope=cfg["rope"].as<std::string>("gpu");
+  require(layout=="feature"||layout=="token","invalid layout");
+  require(rope=="gpu"||rope=="local","invalid RoPE location");
+  require(layout!="feature"||(!fused&&rope=="gpu"),"feature layout requires streaming and GPU RoPE");
+  bool arbitration_present=bool(cfg["arbitration"])&&!cfg["arbitration"].as<std::string>("").empty();
+  require(arbitration_present==(!serial&&!fused),"arbitration is required only for concurrent streaming");
+  require(policy=="frfcfs"||policy=="pim_head"||policy=="pim_lookahead"||policy=="gap_batch","invalid arbitration");
+  auto calib=cfg["calibration"];
+  double alpha=calib["alpha"].as<double>(1);
+  require(alpha>=0.05&&alpha<=1,"alpha outside registered calibration range [0.05,1]");
+  std::array<std::unique_ptr<PIMController>,16> channels;
+  for(int c=0;c<16;c++) {
+    channels[c]=std::make_unique<PIMController>(c,specification,specification["metadata"]);
+    auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;
+    mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);
+    require(mc.window>0&&mc.write_low>=0&&mc.write_low<mc.write_high&&mc.write_high<=mc.window,"invalid write watermarks/window");
+    mc.refresh_kind=cfg["refresh_allbank"].as<bool>(false);
+    if(mc.refresh_kind)mc.refresh_due.fill(mc.device.m_spec->get_timing_value("nREFI"));
+  }
+  std::map<std::string,ProgramStage> programs;
+  int layer_stride_rows=512;
+  std::vector<Event> events;
+  if(do_ae) {
+    int layer_stride_bytes=0;
+    programs=read_program_json(cfg["program_path"].as<std::string>(),&layer_stride_bytes);
+    require(layer_stride_bytes>0&&layer_stride_bytes%2048==0,"layer stride must contain complete DRAM rows");
+    layer_stride_rows=layer_stride_bytes/2048;
+    auto schedule=Config::parse_config_file(cfg["ae_schedule_path"].as<std::string>());
+    const auto schedule_events=schedule["events"];
+    for(const auto& e:schedule_events.seq()) {
+      Event v;v.kind=e["kind"].as<std::string>();v.name=e[v.kind=="pim"?"stage":"name"].as<std::string>();
+      v.us=e["us"].as<double>(0);v.step=e["step"].as<int>(0);v.layer=e["layer"].as<int>(0);
+      require(v.kind=="gpu"||programs.count(v.name),"AE stage has no PIM program: "+v.name);
+      events.push_back(v);
+    }
+  }
+  std::vector<Kernel> kernels;
+  if(do_vlm) {
+    auto input=Config::parse_config_file(cfg["vlm_path"].as<std::string>());
+    const auto input_units=input["units"];
+    for(const auto& x:input_units.seq()) {
+      Kernel k;k.ordinal=x["ordinal"].as<int>();k.name=x["name"].as<std::string>();k.kind=x["kind"].as<std::string>();k.us=x["us"].as<double>();
+      k.reads=x["read_sectors"].as<uint64_t>();k.proxy=x["write_is_proxy"].as<bool>(true);
+      k.writes=x["write_sectors"].as<uint64_t>();if(k.proxy)k.writes=static_cast<uint64_t>(std::ceil(alpha*k.writes));
+      k.base=x["base_sector"].as<uint64_t>();require(k.base%16==0,"kernel base must be channel aligned");
+      k.nominal=cycles(k.us);kernels.push_back(k);
+    }
+  }
+  std::vector<StageResult> results;
+  Clock now=0,ae_end=0,ae_gpu_end=NEVER,wait_since=-1,wait_total=0;
+  bool pim_active=false,ae_gpu_active=false,ae_recorded=!do_ae,serial_epoch_reset=false;
+  size_t ae_index=0,vlm_index=0;
+  int active_kernel=-1;
+  Clock stage_start=0;
+  std::array<Clock,16> next_tick{};
+  uint64_t iterations=0;
+  auto all=[&](auto predicate){for(const auto& mc:channels)if(!predicate(*mc))return false;return true;};
+  for(;;) {
+    bool state_changed=true;
+    while(state_changed) {
+      state_changed=false;
+      if(active_kernel>=0&&now>=kernels[active_kernel].start+kernels[active_kernel].nominal&&all([](const auto& mc){return mc.kernel_finished();})) {
+        kernels[active_kernel].end=now;for(auto& mc:channels)mc->end_kernel();
+        active_kernel=-1;state_changed=true;
+      }
+      if(ae_gpu_active&&now>=ae_gpu_end) {ae_gpu_active=false;ae_gpu_end=NEVER;++ae_index;state_changed=true;}
+      if(pim_active&&all([&](const auto& mc){return mc.stage_finished(now);})) {
+        const auto& e=events[ae_index];
+        results.push_back({static_cast<int>(results.size()),e.step,e.layer,e.name,stage_start,now,0});
+        pim_active=false;++ae_index;for(auto& mc:channels){mc->checker.set_stage(now,-1);mc->stage=-1;}state_changed=true;
+      }
+      if(!ae_gpu_active&&!pim_active&&ae_index<events.size()) {
+        const auto& e=events[ae_index];
+        if(e.kind=="gpu") {
+          if(active_kernel<0) {
+            if(wait_since>=0) {
+              Clock wait=now-wait_since;wait_total+=wait;
+              if(!results.empty())results.back().wait+=wait;
+              wait_since=-1;
+            }
+            ae_gpu_active=true;ae_gpu_end=now+cycles(e.us);state_changed=true;
+          } else if(wait_since<0)wait_since=now;
+        } else {
+          stage_start=now;pim_active=true;
+          for(int c=0;c<16;c++){channels[c]->row_offset=std::max(0,e.layer)*layer_stride_rows;channels[c]->set_stage(programs.at(e.name).channels[c],results.size(),now,e.name);next_tick[c]=now;}
+          state_changed=true;
+        }
+      }
+      if(ae_index==events.size()&&!pim_active&&!ae_gpu_active&&!ae_recorded) {ae_end=now;ae_recorded=true;state_changed=true;}
+      bool pending_ae_gpu=ae_index<events.size()&&!pim_active&&events[ae_index].kind=="gpu";
+      if(active_kernel<0&&vlm_index<kernels.size()&&!ae_gpu_active&&!pending_ae_gpu&&(!serial||ae_recorded)) {
+        if(serial&&do_ae&&do_vlm&&!serial_epoch_reset) {
+          for(auto& mc:channels)mc->reset_serial_epoch(now);
+          serial_epoch_reset=true;
+        }
+        active_kernel=vlm_index++;kernels[active_kernel].start=now;
+        for(int c=0;c<16;c++){channels[c]->begin_kernel(&kernels[active_kernel],now);next_tick[c]=now;}
+        state_changed=true;
+      }
+    }
+    if(ae_recorded&&active_kernel<0&&vlm_index==kernels.size())break;
+    // Only controllers whose event is due run. Their next event is obtained
+    // from native ready clocks, completion queues and release timestamps.
+    bool permit_gpu=active_kernel>=0;
+    for(int c=0;c<16;c++)if(next_tick[c]<=now)next_tick[c]=channels[c]->step(now,permit_gpu);
+    Clock next=*std::min_element(next_tick.begin(),next_tick.end());
+    next=std::min(next,ae_gpu_end);
+    if(active_kernel>=0) {
+      Clock nominal=kernels[active_kernel].start+kernels[active_kernel].nominal;
+      if(nominal>now)next=std::min(next,nominal);
+    }
+    require(next>=now&&next<NEVER,"frontend event deadlock");
+    if(++iterations%10000000==0)std::cerr<<"progress ck="<<now<<" kernels="<<vlm_index<<" stages="<<results.size()<<"\n";
+    now=next;
+    require(now<cycles(5000000),"simulation exceeded 5 seconds of model time");
+  }
+  uint64_t gr=0,gw=0,pr=0,pw=0,checks=0;
+  for(const auto& mc:channels){mc->checker.advance(now);gr+=mc->gpu_read_bytes;gw+=mc->gpu_write_bytes;pr+=mc->pim_read_bytes;pw+=mc->pim_write_bytes;checks+=mc->checker.checked;}
+  std::ofstream out(output+"/raw.json");out<<std::setprecision(15);
+  out<<"{\n\"schema_version\":1,\"clock_ps\":"<<tick_us*1000000<<",\"metrics\":{";
+  out<<"\"AE_elapsed_us\":"<<us(ae_end)<<",\"AE_GPU_wait_us\":"<<us(wait_total)<<",\"VLM_remaining_us\":"<<us(do_ae?now-ae_end:now)<<",\"total_us\":"<<us(now);
+  out<<",\"gpu_read_bytes\":"<<gr<<",\"gpu_write_bytes\":"<<gw<<",\"pim_read_bytes\":"<<pr<<",\"pim_write_bytes\":"<<pw<<",\"checked_commands\":"<<checks<<",\"serial_epoch_reset\":"<<(serial_epoch_reset?"true":"false");
+  for(const auto& pair:std::vector<std::pair<std::string,std::string>>{{"ACT1","GPU_act1"},{"ACT2","GPU_act2"},{"PREpb","GPU_prepb"},{"PREab","GPU_preab"},{"RD","GPU_reads"},{"WR","GPU_writes"}}) {
+    uint64_t count=0;for(const auto& mc:channels)count+=mc->gpu_command_counts[mc->device.m_spec->get_command_id(pair.first)];
+    out<<",\""<<pair.second<<"\":"<<count;
+  }
+  uint64_t hits=0,misses=0;for(const auto& mc:channels){hits+=mc->gpu_row_hits;misses+=mc->gpu_row_misses;}
+  out<<",\"GPU_row_hits\":"<<hits<<",\"GPU_row_misses\":"<<misses<<"},\n\"stages\":[";
+  for(size_t i=0;i<results.size();i++){const auto& r=results[i];if(i)out<<',';
+    out<<"{\"stage_id\":"<<r.id<<",\"name\":"<<json_string(r.name)<<",\"step\":"<<r.step<<",\"layer\":"<<r.layer<<",\"start_us\":"<<us(r.start)<<",\"end_us\":"<<us(r.end)<<",\"duration_us\":"<<us(r.end-r.start)<<",\"gpu_wait_us\":"<<us(r.wait)<<"}";}
+  out<<"],\n\"kernels\":[";
+  for(size_t i=0;i<kernels.size();i++){const auto& k=kernels[i];if(i)out<<',';
+    out<<"{\"ordinal\":"<<k.ordinal<<",\"start_us\":"<<us(k.start)<<",\"end_us\":"<<us(k.end)<<",\"duration_us\":"<<us(k.end-k.start)<<",\"read_bytes\":"<<k.reads*32<<",\"write_bytes\":"<<k.writes*32<<"}";}
+  Clock background_duration=now;
+  for(const auto& r:results)background_duration-=r.end-r.start;
+  out<<"],\n\"bus\":[";bool comma=false;
+  for(int c=0;c<16;c++)for(const auto& [sid,s]:channels[c]->checker.stats){if(comma)out<<',';comma=true;
+    Clock duration=sid<0?background_duration:results.at(sid).end-results.at(sid).start;
+    out<<"{\"channel\":"<<c<<",\"stage_id\":"<<sid<<",\"ca_cycles\":"<<s.ca<<",\"dq_cycles\":"<<s.dq<<",\"read_bytes\":"<<s.read<<",\"write_bytes\":"<<s.write<<",\"gpu_read_bytes\":"<<s.gpu_read<<",\"gpu_write_bytes\":"<<s.gpu_write<<",\"pim_read_bytes\":"<<s.pim_read<<",\"pim_write_bytes\":"<<s.pim_write<<",\"duration_cycles\":"<<duration<<"}";}
+  out<<"]\n}\n";out.close();
+  std::cout<<"completed "<<kind<<" total_us="<<us(now)<<" commands="<<checks<<"\n";
+  return 0;
+}
+}
+int main(int argc,char** argv) {
+  try {
+    std::string config,output;
+    for(int i=1;i<argc;i++) {
+      std::string a=argv[i];
+      if(a=="--config"&&i+1<argc)config=argv[++i];
+      else if(a=="--output"&&i+1<argc)output=argv[++i];
+      else throw std::runtime_error("usage: pim_vla_sim --config file.json --output directory");
+    }
+    PimVla::require(!config.empty()&&!output.empty(),"--config and --output required");
+    return PimVla::run(config,output);
+  }catch(const std::exception& e){std::cerr<<"ERROR: "<<e.what()<<"\n";return 1;}
+}

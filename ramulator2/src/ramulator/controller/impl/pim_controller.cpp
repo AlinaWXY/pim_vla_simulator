@@ -1,0 +1,423 @@
+#include "ramulator/controller/impl/pim_model.h"
+#include <cmath>
+#include <limits>
+
+namespace PimVla {
+namespace {
+Clock node_ready(const DRAMNode* n,int cmd,const AddrVec_t& a) {
+  Clock result=n->m_cmd_ready_clk[cmd];
+  if(n->m_child_nodes.empty()) return result;
+  int child=a[n->m_level+1];
+  if(child>=0) return std::max(result,node_ready(n->m_child_nodes.at(child).get(),cmd,a));
+  for(const auto& c:n->m_child_nodes) result=std::max(result,node_ready(c.get(),cmd,a));
+  return result;
+}
+bool starts(const std::string& s,const std::string& p) {return s.rfind(p,0)==0;}
+bool is_mac(const std::string& n) {return starts(n,"MACAB")||starts(n,"MACQK");}
+}
+
+std::vector<Operation> parse_operations(const ConfigNode& node) {
+  std::vector<Operation> result; result.reserve(node.size());
+  for(const auto& x:node.seq()) {
+    Operation o; o.name=x["op"].as<std::string>();o.id=x["id"].as<int>(result.size());
+    require(o.id==static_cast<int>(result.size()),"program IDs must be contiguous");
+    const auto address=x["addr"];
+    for(const auto& a:address.seq()) o.addr.push_back(a.as<int>());
+    require(o.addr.size()==6,"physical address must have 6 levels");
+    require(o.addr[1]==1,"PIM may only access rank1");
+    o.slot=x["slot"].as<int>(0); o.result_slot=x["result_slot"].as<int>(0);
+    o.rows=x["rows"].as<int>(1);o.pairs=x["pairs"].as<int>(1);
+    o.epoch=x["epoch"].as<std::string>("");
+    o.dest_slot=x["dest_slot"].as<int>(-1);o.source_bank=x["source_bank"].as<int>(0);
+    o.tensor_fragment=x["tensor_fragment"].as<int>(-1);o.output_columns=x["output_columns"].as<int>(1);
+    o.output_column=x["output_column"].as<int>(0);o.fragment=x["fragment"].as<int>(0);
+    o.output_tile=x["output_tile"].as<int>(0);o.kv_token=x["kv_token"].as<int>(0);
+    o.lanes=x["lanes"].as<int>(16);o.elements=x["elements"].as<int>(16);
+    o.bytes=x["bytes"].as<int>(32);o.token=x["token"].as<int>(0);
+    o.release_result=x["release_result"].as<bool>(false);
+    o.dest=x["dest"].as<std::string>("");o.source=x["source"].as<std::string>("");
+    const auto regions=x["source_regions"];
+    if(regions)for(const auto& r:regions.seq())o.source_regions.push_back({r["bank"].as<int>(),r["byte_offset"].as<int>(),r["bytes"].as<int>()});
+    require(o.slot>=0&&o.slot<32,"SRF capacity exceeded");
+    require(o.result_slot>=0&&o.result_slot<64,"output pool capacity exceeded");
+    const auto deps=x["deps"];
+    if(deps) for(const auto& d:deps.seq()) {
+      int i=d.as<int>(); require(i>=0&&i<o.id,"dependency must point to previous request");o.deps.push_back(i);
+    }
+    if(x["children"]) o.children=parse_operations(x["children"]);
+    result.push_back(std::move(o));
+  }
+  return result;
+}
+
+PIMController::PIMController(int ch,const ConfigNode& spec_cfg,const ConfigNode& metadata):channel(ch) {
+  ConfigNode cfg=spec_cfg["dram"]?spec_cfg:ConfigNode(ConfigNode::Map{{"dram",spec_cfg}});
+  std::string impl=cfg["dram"]["impl"].as<std::string>("LPDDR5XPIM");
+  device.init(DRAMSpec::create(impl,cfg));device.set_channel_id(ch);
+  info.resize(device.m_spec->command_count);
+  gpu_command_counts.resize(device.m_spec->command_count,0);
+  for(int cmd=0;cmd<device.m_spec->command_count;cmd++) {
+    const auto& name=device.m_spec->command_names[cmd];auto m=metadata["commands"][name];
+    require(static_cast<bool>(m),"spec metadata missing command "+name);
+    auto& v=info[cmd];v.latency=m["latency"].as<int>(0);v.burst=m["burst"].as<int>(0);
+    v.completion=m["completion"].as<int>(1);v.external_ca=m["external_ca"].as<int>(1);
+    v.private_ca=m["private_ca"].as<int>(0);auto dir=m["direction"].as<std::string>("");
+    v.direction=dir.empty()?0:dir[0];
+  }
+  checker.spec=device.m_spec;checker.info=&info;
+  lookahead=std::make_unique<NativeLookahead>(ch,spec_cfg);
+  refresh_due.fill(device.m_spec->get_timing_value("nREFIpb"));
+}
+Clock PIMController::ready_at(int cmd,const AddrVec_t& addr) const {
+  Clock at=node_ready(device.m_root.get(),cmd,addr);
+  if(device.m_spec->bank_targets[cmd]==BankTarget::Pair)
+    at=std::max(at,node_ready(device.m_root.get(),cmd,device.partner_addr_vec(cmd,addr)));
+  return std::max<Clock>(0,at);
+}
+Clock PIMController::spacing(int pre,const AddrVec_t& a,int following,const AddrVec_t& b) const {
+  // Query the spec's own pair constraints, including rank siblings and BG
+  // broadcasts. This is a policy prediction, never an alternative legality test.
+  Clock answer=0;
+  bool ancestors_same=true;
+  for(int level=0;level<=device.m_bank_level && ancestors_same;level++) {
+    bool same=(a[level]==b[level]||a[level]<0||b[level]<0);
+    for(const auto& t:device.m_spec->timing_cons[level][pre]) {
+      if(t.cmd==following && t.window==1 && t.sibling!=same) answer=std::max<Clock>(answer,t.val);
+    }
+    ancestors_same=same;
+  }
+  return answer;
+}
+int PIMController::command(const Operation& op,bool local) const {
+  std::string name=op.name;
+  if(is_mac(name)) name+="_M"+std::to_string(op.rows);
+  if(local && (is_mac(name)||name=="ACT1"||name=="ACT2"||name=="PREpb"||name=="PREab")) name+="_LOCAL";
+  return device.m_spec->get_command_id(name);
+}
+void PIMController::set_stage(const std::vector<Operation>& ops,int stage_id,Clock clk,const std::string& name) {
+  require(stage_finished(clk),"replacing a live PIM stage");
+  stage=stage_id;top.reset(&ops,clk);inner.reset(nullptr,clk);descriptor_index=-1;epoch_owned=false;pim_arrival=clk;
+  checker.set_stage(clk,stage_id);
+  resources.start_stage(name,clk);
+  forecast_dirty=true;
+}
+void PIMController::begin_kernel(const Kernel* k,Clock clk) {
+  require(!kernel && queued_gpu==0&&gpu_outstanding==0,"overlapping VLM kernels");
+  kernel=k;kernel_reads=(k->reads+15-channel)/16;kernel_writes=(k->writes+15-channel)/16;
+  kernel_total=kernel_reads+kernel_writes;kernel_next=issued_reads=issued_writes=0;now=clk;
+}
+void PIMController::end_kernel() {require(kernel_finished(),"kernel still has requests");kernel=nullptr;}
+void PIMController::reset_serial_epoch(Clock origin) {
+  // Case b is defined as the concatenation of independently initialized solo
+  // measurements. Reset device state at the epoch boundary, never elapsed
+  // time or measured durations. Concurrent cases never take this path.
+  require(!kernel&&gpu_outstanding==0&&stage_finished(origin),"serial epoch reset has live work");
+  checker.advance(origin);checker.bursts.clear();
+  checker.external_start=checker.external_end=checker.private_end=origin;
+  device.m_bank_nodes.clear();
+  device.m_root=std::make_unique<DRAMNode>(device.m_spec,nullptr,0,channel);
+  device.m_root->for_each_at_level(device.m_bank_level,[&](DRAMNode* b){device.m_bank_nodes.push_back(b);});
+  refresh_due.fill(origin+device.m_spec->get_timing_value(refresh_kind?"nREFI":"nREFIpb"));
+  refresh_bank.fill(0);pending_act={PendingAct{},PendingAct{}};
+  external_free=private_free=gpu_dq_end=pim_dq_end=origin;
+  forecast_dirty=true;gap_write_phase=false;write_drain=false;
+}
+bool PIMController::kernel_finished() const {return !kernel || (kernel_next>=kernel_total&&gpu_outstanding==0);}
+bool PIMController::stage_finished(Clock clk) const {
+  return top.issued()&&inner.issued()&&descriptor_index<0&&top.tail<=clk;
+}
+void PIMController::retire_and_fill(Clock clk,bool permit_gpu) {
+  while(!completions.empty()&&completions.top().at<=clk) {
+    if(completions.top().gpu) --gpu_outstanding;
+    completions.pop();
+  }
+  checker.retire(clk);
+  if(!kernel||!permit_gpu) return;
+  while(kernel_next<kernel_total&&gpu_outstanding<window) {
+    Clock release=kernel->start+static_cast<Clock>((static_cast<long double>(kernel_next)*kernel->nominal)/kernel_total);
+    if(release>clk) break;
+    uint64_t i=kernel_next;
+    bool wr=(static_cast<__uint128_t>(i+1)*kernel_writes/kernel_total)>(static_cast<__uint128_t>(i)*kernel_writes/kernel_total);
+    uint64_t physical=kernel->base+channel+16*(wr?issued_writes++:issued_reads++);
+    if(wr)physical+=(kernel->reads+15)/16*16;
+    require(physical%16==static_cast<uint64_t>(channel),"GPU address/channel mismatch");
+    uint64_t intra=physical/16;int col=intra%64;uint64_t b=intra/64;
+    int bank=b%16;int row=(b/16)%device.m_spec->organization.level_sizes[4];
+    AddrVec_t a={channel,0,bank/4,bank%4,row,col};
+    int cmd=device.m_spec->get_command_id(wr?"WR":"RD");
+    gpu_queues[bank*2+wr].push_back({a,cmd,i,release});++queued_gpu;++gpu_outstanding;++kernel_next;if(wr)++queued_writes;
+  }
+}
+Clock PIMController::dependencies(const Operation& op,const Cursor& cursor) const {
+  Clock at=0;for(int d:op.deps) at=std::max(at,cursor.done.at(d));return at;
+}
+Candidate PIMController::make_candidate(int final,const AddrVec_t& addr,Candidate::Source src,Clock earliest,bool local) {
+  Candidate c;c.source=src;c.local=local;
+  int cmd=device.get_preq_command(final,addr,std::max(now,earliest));
+  c.addr=device.preq_addr_vec(final,cmd,addr,std::max(now,earliest));
+  if(local) {
+    const auto& n=device.m_spec->command_names[cmd];
+    if((n=="ACT1"||n=="ACT2"||n=="PREpb"||n=="PREab")&&device.m_spec->has_command(n+"_LOCAL")) cmd=device.m_spec->get_command_id(n+"_LOCAL");
+  }
+  c.cmd=cmd;c.final=cmd==final;c.rowhit=c.final;
+  c.at=std::max({now,earliest,ready_at(cmd,c.addr)});
+  if(starts(device.m_spec->command_names[cmd],"ACT1")) {
+    int cmd2=device.m_spec->get_command_id(local?"ACT2_LOCAL":"ACT2");
+    c.at=std::max(c.at,ready_at(cmd2,c.addr)-device.m_spec->get_timing_value("nAAD"));
+  }
+  const auto& m=info[cmd];
+  if(m.external_ca)c.at=std::max(c.at,external_free);
+  if(m.private_ca)c.at=std::max(c.at,private_free);
+  // ACT-2 is owned by the request that issued ACT-1; reserve its deadline.
+  for(const auto& p:pending_act) if(p.cmd>=0) {
+    bool shared=(m.external_ca&&info[p.cmd].external_ca)||(m.private_ca&&info[p.cmd].private_ca);
+    if(shared && cmd!=p.cmd && c.at<p.deadline && c.at+std::max(m.external_ca,m.private_ca)>p.deadline)
+      c.at=p.deadline+1;
+    // An external PRE/REF may interfere with a privately activated bank too.
+    if(cmd!=p.cmd&&c.at+spacing(cmd,c.addr,p.cmd,p.addr)>p.deadline)c.at=std::max(c.at,p.deadline+1);
+  }
+  return c;
+}
+Candidate PIMController::next_pim(Clock clk) {
+  // One descriptor is resident; its internal FIFO exposes at most 32 decoded
+  // entries. Dependencies are completion edges; request order is issue order.
+  if(descriptor_index>=0 && inner.issued() && inner.tail<=clk) {
+    top.done[descriptor_index]=inner.tail;top.tail=std::max(top.tail,inner.tail);
+    descriptor_index=-1;inner.reset(nullptr,clk);
+  }
+  Cursor& cursor=descriptor_index>=0?inner:top;
+  if(cursor.issued()) return {};
+  require(cursor.next<cursor.decoded_until&&cursor.decoded_until-cursor.next<=32,"instruction FIFO capacity exceeded");
+  const Operation& op=cursor.ops->at(cursor.next);
+  Clock at=dependencies(op,cursor);
+  if(descriptor_index>=0) at=std::max(at,descriptor_ready);
+  if(op.name=="BARRIER") {
+    at=std::max(at,cursor.tail);
+    if(at<=clk) {cursor.done[cursor.next]=clk;cursor.advance();forecast_dirty=true;return next_pim(clk);}
+    Candidate c;c.source=Candidate::PIM;c.at=at;return c;
+  }
+  bool local=descriptor_index>=0;
+  int cmd=command(op,local);
+  try {at=std::max(at,resources.ready(op,clk));}
+  catch(const std::exception& e){throw std::runtime_error(std::string(e.what())+" op="+op.name+" id="+std::to_string(op.id)+" stage="+std::to_string(stage));}
+  AddrVec_t physical=op.addr;physical[4]+=row_offset;
+  require(physical[4]<device.m_spec->organization.level_sizes[4],"PIM layer address exceeds rank capacity");
+  Candidate c=make_candidate(cmd,physical,Candidate::PIM,at,local);
+  c.arrival=pim_arrival;c.dependency_ready=at<=clk;
+  c.index=cursor.next;
+  if(fused&&info[cmd].direction) {
+    // Ownership begins only after committed GPU returns have drained. It is
+    // retained across an explicitly named I/O epoch, including array preqs.
+    c.at=std::max(c.at,gpu_dq_end);
+  }
+  return c;
+}
+Candidate PIMController::next_gpu(Clock clk) {
+  if(!queued_gpu)return {};
+  if(external_free>clk){Candidate c;c.at=external_free;return c;}
+  Candidate best;int writes=queued_writes;
+  if(writes>=write_high)write_drain=true;
+  if(writes<=write_low)write_drain=false;
+  bool desired_write=write_drain;
+  if(policy=="gap_batch"&&!(top.issued()&&inner.issued())) {
+    if(!gap_write_phase&&queued_gpu==writes)gap_write_phase=true;
+    desired_write=gap_write_phase;
+    if(desired_write&&!writes)return {};
+  }
+  bool any_desired=desired_write?writes>0:queued_gpu>writes;
+  for(size_t i=0;i<gpu_queues.size();i++) {
+    if(gpu_queues[i].empty())continue;
+    const auto& q=gpu_queues[i].front();
+    if(refresh_due[0]<=clk && (refresh_kind || (q.addr[2]*4+q.addr[3])%8==refresh_bank[0]))continue;
+    if(any_desired&&((info[q.cmd].direction=='W')!=desired_write))continue;
+    int cmd=device.get_preq_command(q.cmd,q.addr,clk);
+    Clock at=std::max({clk,q.arrival,ready_at(cmd,q.addr),external_free});
+    if(device.m_spec->command_meta[cmd].is_opening && device.m_spec->command_names[cmd]=="ACT1")
+      at=std::max(at,ready_at(device.m_spec->get_command_id("ACT2"),q.addr)-device.m_spec->get_timing_value("nAAD"));
+    for(const auto& p:pending_act)if(p.cmd>=0&&cmd!=p.cmd && at+spacing(cmd,q.addr,p.cmd,p.addr)>p.deadline)at=std::max(at,p.deadline+1);
+    bool hit=(cmd==q.cmd),ready=at<=clk,best_ready=best.at<=clk;
+    if(best.cmd<0 || (ready&&!best_ready) || (ready&&best_ready&&(hit>best.rowhit || (hit==best.rowhit&&q.arrival<best.arrival))) || (!ready&&!best_ready&&at<best.at)) {
+      best.cmd=cmd;best.addr=q.addr;best.source=Candidate::GPU;best.index=i;best.arrival=q.arrival;
+      best.at=at;best.final=hit;best.rowhit=hit;
+    }
+  }
+  return best;
+}
+Candidate PIMController::next_refresh(Clock clk) {
+  Candidate best;
+  for(int rank=0;rank<2;rank++) if(refresh_due[rank]<=clk) {
+    int bank=refresh_bank[rank];AddrVec_t a={channel,rank,bank/4,bank%4,-1,-1};
+    int cmd=device.m_spec->get_command_id(refresh_kind?"REFab":"REFpb");
+    if(refresh_kind)a[2]=a[3]=-1;
+    auto c=make_candidate(cmd,a,Candidate::REFRESH,refresh_due[rank]);c.index=rank;
+    if(c.at<best.at)best=c;
+  }
+  return best;
+}
+bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk) {
+  if(g.cmd<0)return false;
+  if(policy=="pim_head")return p.cmd>=0&&p.dependency_ready&&clk+spacing(g.cmd,g.addr,p.cmd,p.addr)>p.at;
+  if(policy=="frfcfs")return false;
+  Clock horizon=device.m_spec->get_timing_value("nCL")+device.m_spec->get_timing_value("nBL_min")+device.m_spec->get_timing_value("nCS");
+  if(policy=="pim_lookahead") {
+    const Cursor& cur=descriptor_index>=0?inner:top;
+    if(!cur.ops||cur.issued())return false;
+    bool expired=forecast_time<0||clk>forecast_time+horizon||(!forecast.empty()&&forecast.front().at<clk);
+    if(forecast_dirty||expired) {
+      forecast=lookahead->predict(device,*cur.ops,cur.next,cur.done,clk,horizon,descriptor_index>=0,row_offset);
+      forecast_dirty=false;forecast_time=clk;
+    }
+    for(const auto& f:forecast)if(clk+spacing(g.cmd,g.addr,f.cmd,f.addr)>f.at)return true;
+    return false;
+  }
+  if(policy=="gap_batch") {
+    if(p.cmd<0)return false;
+    // A known dependency wait is a proven idle interval; summing future MAC
+    // completions would overstate it because column fetch and compute overlap.
+    if(info[p.cmd].direction)return true;
+    Clock gap=std::max<Clock>(0,p.at-clk);
+    int wrgb=device.m_spec->get_command_id("WRGB"),rdres=device.m_spec->get_command_id("RDRES");
+    Clock minimum=std::max(spacing(g.cmd,g.addr,wrgb,p.addr)+spacing(wrgb,p.addr,g.cmd,g.addr),
+                           spacing(g.cmd,g.addr,rdres,p.addr)+spacing(rdres,p.addr,g.cmd,g.addr));
+    return gap<minimum;
+  }
+  throw std::runtime_error("unknown arbitration "+policy);
+}
+void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage) {
+  require(device.check_timing(cmd,addr,clk),"scheduler bypassed native check_timing "+device.m_spec->command_names[cmd]+" at "+std::to_string(clk));
+  int preq=device.get_preq_command(cmd,addr,clk);
+  require(preq==cmd,"scheduler bypassed native prerequisite "+device.m_spec->command_names[cmd]+" requires "+device.m_spec->command_names[preq]+" at "+std::to_string(clk)+" rank="+std::to_string(addr[1])+" bg="+std::to_string(addr[2])+" bank="+std::to_string(addr[3])+" row="+std::to_string(addr[4]));
+  checker.observe(cmd,addr,clk,stat_stage);
+  device.issue_command(cmd,addr,clk);
+  if(addr[1]==0)++gpu_command_counts[cmd];
+  if(addr[1]==1)forecast_dirty=true;
+  const auto& m=info[cmd];
+  if(m.external_ca)external_free=clk+m.external_ca;
+  if(m.private_ca)private_free=clk+m.private_ca;
+  const auto& n=device.m_spec->command_names[cmd];
+  if(n=="ACT1"||n=="ACT1_LOCAL") {
+    int lane=m.private_ca?1:0;auto& p=pending_act[lane];
+    require(p.cmd<0,"ACT1 issued without ACT2 ownership capacity");
+    p.cmd=device.m_spec->get_command_id(n=="ACT1"?"ACT2":"ACT2_LOCAL");p.addr=addr;
+    p.deadline=clk+device.m_spec->get_timing_value("nAAD");
+  }
+  if(n=="ACT2"||n=="ACT2_LOCAL") {
+    int lane=m.private_ca?1:0;auto& p=pending_act[lane];
+    require(p.cmd==cmd&&p.addr==addr&&clk<=p.deadline,"ACT2 missing owner or late");
+    p.cmd=-1;p.deadline=NEVER;
+  }
+  last_progress=clk;
+}
+void PIMController::finish_pim(const Candidate& c,Clock clk) {
+  Cursor& cursor=descriptor_index>=0?inner:top;
+  const auto& op=cursor.ops->at(cursor.next);
+  if(!c.final)return;
+  int cmd=c.cmd;Clock complete=clk+info[cmd].completion;
+  if(op.name=="ROPE_EXEC")complete=clk+info[cmd].completion+(op.pairs-1)*device.m_spec->get_timing_value("nROPEII");
+  resources.issue(op,clk,complete);
+  cursor.done[cursor.next]=complete;cursor.tail=std::max(cursor.tail,complete);
+  if(info[cmd].direction) { (info[cmd].direction=='R'?pim_read_bytes:pim_write_bytes)+=32;
+    pim_dq_end=std::max(pim_dq_end,clk+info[cmd].latency+info[cmd].burst);gap_write_phase=false; }
+  size_t index=cursor.next;cursor.advance();
+  pim_arrival=clk;
+  if(!op.children.empty()) {
+    require(descriptor_index<0,"nested descriptors are unsupported");
+    descriptor_index=index;descriptor_ready=complete;inner.reset(&op.children,complete);
+    top.done[index]=NEVER;
+  }
+}
+Clock PIMController::step(Clock clk,bool permit_gpu) {
+  now=clk;int outstanding_before=gpu_outstanding;
+  retire_and_fill(clk,permit_gpu);
+  if(outstanding_before>0&&kernel_finished())return clk;
+  bool stage_was_done=stage_finished(clk);
+  Candidate pim=next_pim(clk);
+  if(!stage_was_done&&stage_finished(clk))return clk;
+  // An active fused I/O epoch blocks new GPU issue, but never cancels returns.
+  bool epoch=false;
+  if(fused) {
+    const Cursor& cur=descriptor_index>=0?inner:top;
+    if(cur.ops&&!cur.issued()) {
+      const auto& op=cur.ops->at(cur.next);
+      int cmd=op.name=="BARRIER"?-1:command(op,descriptor_index>=0);
+      epoch=(!op.epoch.empty()||(cmd>=0&&info[cmd].direction));
+    }
+  }
+  if(fused&&clk<pim_dq_end)epoch=true;
+  Candidate gpu=permit_gpu&&!epoch?next_gpu(clk):Candidate{};
+  Candidate refresh=next_refresh(clk),chosen;
+  // nAAD is a maximum ACT1-to-ACT2 distance. Issue the owned ACT2 at
+  // its earliest legal opportunity, and never later than its deadline.
+  for(int lane=0;lane<2;lane++) {
+    auto& a=pending_act[lane];
+    if(a.cmd>=0) {
+      require(clk<=a.deadline,"missed ACT2 deadline");
+      Clock bus_ready=info[a.cmd].private_ca?private_free:external_free;
+      if(bus_ready>clk||!device.check_timing(a.cmd,a.addr,clk)) {
+        require(clk<a.deadline,"ACT2 not legal at its reserved deadline");continue;
+      }
+      issue(a.cmd,a.addr,clk,stage);a.cmd=-1;a.deadline=NEVER;return clk;
+    }
+  }
+  auto can_issue=[&](const Candidate& c) {
+    if(c.cmd<0||c.at>clk)return false;
+    const auto& name=device.m_spec->command_names[c.cmd];
+    if(c.source==Candidate::PIM && refresh_due[1]<=clk) {
+      if(refresh_kind)return false;
+      auto targets=device.get_target_banks(c.cmd,c.addr);
+      for(int bank:targets)if(bank>=16&&bank%8==refresh_bank[1])return false;
+    }
+    if(starts(name,"ACT2"))return false; // only the owned deadline path issues ACT2
+    if(starts(name,"ACT1")) {
+      int lane=info[c.cmd].private_ca?1:0;if(pending_act[lane].cmd>=0)return false;
+      // Never start ACT1 if an earlier constraint would prevent ACT2 at nAAD.
+      std::string next=info[c.cmd].private_ca?"ACT2_LOCAL":"ACT2";
+      int cmd2=device.m_spec->get_command_id(next);
+      if(ready_at(cmd2,c.addr)>clk+device.m_spec->get_timing_value("nAAD"))return false;
+    }
+    return true;
+  };
+  if(can_issue(refresh))chosen=refresh;
+  else if(can_issue(pim)&& (fused||policy!="frfcfs"||!can_issue(gpu)||
+      (pim.rowhit&&!gpu.rowhit)||(pim.rowhit==gpu.rowhit&&pim.arrival<=gpu.arrival)))chosen=pim;
+  else if(can_issue(gpu)&&!protect_pim(gpu,pim,clk))chosen=gpu;
+  else if(can_issue(pim))chosen=pim;
+  if(chosen.cmd>=0) {
+    issue(chosen.cmd,chosen.addr,clk,stage);
+    if(chosen.source==Candidate::GPU&&chosen.final) {
+      if(gpu_queues[chosen.index].front().array_preq)++gpu_row_misses;
+      else ++gpu_row_hits;
+      const auto& m=info[chosen.cmd];Clock done=clk+m.completion;
+      completions.push({done,true});gpu_dq_end=std::max(gpu_dq_end,clk+m.latency+m.burst);
+      (m.direction=='R'?gpu_read_bytes:gpu_write_bytes)+=32;
+      if(m.direction=='W')--queued_writes;
+      gpu_queues[chosen.index].pop_front();--queued_gpu;
+    } else if(chosen.source==Candidate::GPU)gpu_queues[chosen.index].front().array_preq=true;
+    else if(chosen.source==Candidate::PIM)finish_pim(chosen,clk);
+    else if(chosen.source==Candidate::REFRESH&&chosen.final) {
+      int r=chosen.index;refresh_due[r]+=device.m_spec->get_timing_value(refresh_kind?"nREFI":"nREFIpb");
+      refresh_bank[r]=(refresh_bank[r]+1)%8;
+    }
+    // A private command and an external command can issue in the same CK.
+    return clk;
+  }
+  Clock next=NEVER;
+  for(const auto& c:{pim,gpu,refresh})if(c.at>clk)next=std::min(next,c.at);
+  if(!completions.empty())next=std::min(next,completions.top().at);
+  for(const auto& p:pending_act)if(p.cmd>=0) {
+    Clock bus_ready=info[p.cmd].private_ca?private_free:external_free;
+    next=std::min(next,std::max({clk+1,ready_at(p.cmd,p.addr),bus_ready}));
+    next=std::min(next,p.deadline);
+  }
+  for(auto due:refresh_due)if(due>clk)next=std::min(next,due);
+  if(top.issued()&&top.tail>clk)next=std::min(next,top.tail);
+  if(descriptor_index>=0&&inner.issued()&&inner.tail>clk)next=std::min(next,inner.tail);
+  if(fused&&pim_dq_end>clk)next=std::min(next,pim_dq_end);
+  if(kernel&&permit_gpu&&kernel_next<kernel_total&&gpu_outstanding<window)
+    next=std::min(next,kernel->start+static_cast<Clock>((static_cast<long double>(kernel_next)*kernel->nominal)/kernel_total));
+  // A candidate blocked by ownership can become issuable after the owned ACT2.
+  if(next<=clk)next=clk+1;
+  require(next<NEVER,"controller deadlock");
+  return next;
+}
+}
