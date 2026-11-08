@@ -146,5 +146,6 @@
   "validation/evaluation-1971246.log": "7e55114c8a2acf4be2fb2b673207786042796d1ae4a0a15c46a8d48543635fa1",
   "validation/native-guards.json": "07e9c09019449496195d0bcb098aae885c8e2bbd74392e50948a67c93b2a785f",
   "validation/slurm-jobs.txt": "980432859c7b055d4e067604a20ac6a443a8d5e4d86123968ffaa45763b1a5a5",
-  "validation/unit-tests.log": "92bcaa4f4e19e177511b9e986ef9789dcdfe487f37e9a0d4461aebcabbe33034"
+  "validation/unit-tests.log": "92bcaa4f4e19e177511b9e986ef9789dcdfe487f37e9a0d4461aebcabbe33034",
+  "validation/python-bindings.json": "6caa672142486a356ed007187b827b88eb1a7c4529fb4a5cf08890a880597f39"
 }
