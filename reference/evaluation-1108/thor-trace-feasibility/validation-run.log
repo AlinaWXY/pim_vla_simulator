@@ -1,0 +1,59 @@
+{
+  "status": "feasibility_probes_passed; Pi0.5 full capture and e/g replay not completed",
+  "platform": "NVIDIA Thor, sm_110, aarch64; native LPDDR target retained",
+  "CUDA_address_probe": {
+    "status": "passed",
+    "warp_memory_records": 6,
+    "lane_reads": 128,
+    "lane_writes": 64,
+    "exact_effective_addresses_and_lane_order_verified": true,
+    "scope": "Tiny correctness probe; GPU effective/virtual addresses, not physical DRAM requests."
+  },
+  "PyTorch_address_probe": {
+    "status": "passed",
+    "warp_memory_records": 6,
+    "lane_reads": 128,
+    "lane_writes": 64,
+    "exact_effective_addresses_and_lane_order_verified": true,
+    "scope": "Tiny correctness probe; GPU effective/virtual addresses, not physical DRAM requests."
+  },
+  "PM_L2": {
+    "status": "passed",
+    "metric": "lts__t_sectors.sum",
+    "retained_printed_samples": 49,
+    "first_sample_excluded_per_CUPTI_guidance": {
+      "begin_ns": 1793334856767048044,
+      "end_ns": 1794130907620278294,
+      "value": 20807285.0
+    },
+    "min_interval_ns": 6304,
+    "max_interval_ns": 6368,
+    "min_value": 17.0,
+    "max_value": 120920.0,
+    "scope": "Official CUPTI vector-add probe; printed sample subset, not a Pi0.5 or DRAM-address trace."
+  },
+  "PM_cycles": {
+    "status": "passed",
+    "metric": "gpc__cycles_elapsed.avg",
+    "retained_printed_samples": 49,
+    "first_sample_excluded_per_CUPTI_guidance": {
+      "begin_ns": 1793335826868567336,
+      "end_ns": 1794130858720009722,
+      "value": 1069721888.0
+    },
+    "min_interval_ns": 6304,
+    "max_interval_ns": 6368,
+    "min_value": 9993.0,
+    "max_value": 10008.667,
+    "scope": "Official CUPTI vector-add probe; printed sample subset, not a Pi0.5 or DRAM-address trace."
+  },
+  "exposed_dram_base_metrics": [],
+  "limitations": [
+    "NVBit instrumentation changes execution time; its recording order is not a native MC arrival trace.",
+    "Effective addresses are not physical addresses or rank/bank/row IDs.",
+    "L2 sector activity includes hits and does not identify individual DRAM reads or writebacks.",
+    "Only small CUDA and PyTorch addition probes have been validated; full Pi0.5 and TMA coverage remain unverified.",
+    "No calibrated Thor GPU timing model or physical-address mapping has been established.",
+    "No HBM GPU configuration was substituted for Thor/LPDDR; no new e/g latency was computed."
+  ]
+}

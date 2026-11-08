@@ -1,0 +1,2224 @@
+[
+  {
+    "block": 63,
+    "stage": "gate_up_gpu_all",
+    "original_gap_CK": 2.0,
+    "actual_gap_CK": 7.0,
+    "previous": {
+      "issue": 103705749,
+      "native_issue": 90228565,
+      "shift": 13477184,
+      "ca": 15008,
+      "dq_a": 103705749,
+      "dq_b": 103735765,
+      "rank": 1,
+      "type": 2,
+      "gpu": 0,
+      "cursor": 513
+    },
+    "next": {
+      "issue": 103840821,
+      "native_issue": 90288597,
+      "shift": 13552224,
+      "ca": 15008,
+      "dq_a": 103840821,
+      "dq_b": 103870837,
+      "rank": 1,
+      "type": 2,
+      "gpu": 0,
+      "cursor": 514
+    },
+    "gpu": [
+      {
+        "issue": 103435605,
+        "native_issue": -1,
+        "shift": 13462176,
+        "ca": 15008,
+        "dq_a": 103780789,
+        "dq_b": 103810805,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 508
+      }
+    ],
+    "origin_ticks": 103435605,
+    "original_gap_commands": {},
+    "relative_CK": {
+      "previous_DQ": [
+        18.0,
+        20.0
+      ],
+      "original_next_DQ": [
+        22.0,
+        24.0
+      ],
+      "actual_next_DQ": [
+        27.0,
+        29.0
+      ],
+      "GPU": [
+        {
+          "command": "RD",
+          "issue": 0.0,
+          "DQ": [
+            23.0,
+            25.0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "block": 63,
+    "stage": "gate_up_gpu_all",
+    "original_gap_CK": 513.0,
+    "actual_gap_CK": 513.0,
+    "previous": {
+      "issue": 86911797,
+      "native_issue": 73884853,
+      "shift": 13026944,
+      "ca": 15008,
+      "dq_a": 86911797,
+      "dq_b": 86941813,
+      "rank": 1,
+      "type": 2,
+      "gpu": 0,
+      "cursor": 426
+    },
+    "next": {
+      "issue": 94640917,
+      "native_issue": 81613973,
+      "shift": 13026944,
+      "ca": 15008,
+      "dq_a": 94640917,
+      "dq_b": 94670933,
+      "rank": 1,
+      "type": 2,
+      "gpu": 0,
+      "cursor": 460
+    },
+    "gpu": [
+      {
+        "issue": 86821749,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87001845,
+        "dq_b": 87031861,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 425
+      },
+      {
+        "issue": 86881781,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87061877,
+        "dq_b": 87091893,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 426
+      },
+      {
+        "issue": 86956821,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87136917,
+        "dq_b": 87166933,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 428
+      },
+      {
+        "issue": 87016853,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87196949,
+        "dq_b": 87226965,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 428
+      },
+      {
+        "issue": 87076885,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87256981,
+        "dq_b": 87286997,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 428
+      },
+      {
+        "issue": 87136917,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87317013,
+        "dq_b": 87347029,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 428
+      },
+      {
+        "issue": 87196949,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87377045,
+        "dq_b": 87407061,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 429
+      },
+      {
+        "issue": 87256981,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87437077,
+        "dq_b": 87467093,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 429
+      },
+      {
+        "issue": 87317013,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87497109,
+        "dq_b": 87527125,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 429
+      },
+      {
+        "issue": 87377045,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87557141,
+        "dq_b": 87587157,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 429
+      },
+      {
+        "issue": 87437077,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87617173,
+        "dq_b": 87647189,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 430
+      },
+      {
+        "issue": 87497109,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87677205,
+        "dq_b": 87707221,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 430
+      },
+      {
+        "issue": 87557141,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87737237,
+        "dq_b": 87767253,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 430
+      },
+      {
+        "issue": 87617173,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87797269,
+        "dq_b": 87827285,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 430
+      },
+      {
+        "issue": 87782261,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 87962357,
+        "dq_b": 87992373,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 431
+      },
+      {
+        "issue": 87842293,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88022389,
+        "dq_b": 88052405,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 431
+      },
+      {
+        "issue": 87917333,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88097429,
+        "dq_b": 88127445,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 432
+      },
+      {
+        "issue": 87977365,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88157461,
+        "dq_b": 88187477,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 432
+      },
+      {
+        "issue": 88037397,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88217493,
+        "dq_b": 88247509,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 432
+      },
+      {
+        "issue": 88097429,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88277525,
+        "dq_b": 88307541,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 432
+      },
+      {
+        "issue": 88157461,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88337557,
+        "dq_b": 88367573,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 433
+      },
+      {
+        "issue": 88217493,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88397589,
+        "dq_b": 88427605,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 433
+      },
+      {
+        "issue": 88277525,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88457621,
+        "dq_b": 88487637,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 433
+      },
+      {
+        "issue": 88337557,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88517653,
+        "dq_b": 88547669,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 433
+      },
+      {
+        "issue": 88397589,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88577685,
+        "dq_b": 88607701,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 434
+      },
+      {
+        "issue": 88457621,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88637717,
+        "dq_b": 88667733,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 434
+      },
+      {
+        "issue": 88517653,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88697749,
+        "dq_b": 88727765,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 434
+      },
+      {
+        "issue": 88577685,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88757781,
+        "dq_b": 88787797,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 434
+      },
+      {
+        "issue": 88637717,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88817813,
+        "dq_b": 88847829,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 435
+      },
+      {
+        "issue": 88697749,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88877845,
+        "dq_b": 88907861,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 435
+      },
+      {
+        "issue": 88757781,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88937877,
+        "dq_b": 88967893,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 435
+      },
+      {
+        "issue": 88817813,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 88997909,
+        "dq_b": 89027925,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 435
+      },
+      {
+        "issue": 88877845,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89057941,
+        "dq_b": 89087957,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 436
+      },
+      {
+        "issue": 88937877,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89117973,
+        "dq_b": 89147989,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 436
+      },
+      {
+        "issue": 88997909,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89178005,
+        "dq_b": 89208021,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 436
+      },
+      {
+        "issue": 89057941,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89238037,
+        "dq_b": 89268053,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 436
+      },
+      {
+        "issue": 89117973,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89298069,
+        "dq_b": 89328085,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 437
+      },
+      {
+        "issue": 89178005,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89358101,
+        "dq_b": 89388117,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 437
+      },
+      {
+        "issue": 89238037,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89418133,
+        "dq_b": 89448149,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 437
+      },
+      {
+        "issue": 89298069,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89478165,
+        "dq_b": 89508181,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 437
+      },
+      {
+        "issue": 89358101,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89538197,
+        "dq_b": 89568213,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 438
+      },
+      {
+        "issue": 89418133,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89598229,
+        "dq_b": 89628245,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 438
+      },
+      {
+        "issue": 89478165,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89658261,
+        "dq_b": 89688277,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 438
+      },
+      {
+        "issue": 89538197,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89718293,
+        "dq_b": 89748309,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 438
+      },
+      {
+        "issue": 89598229,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89778325,
+        "dq_b": 89808341,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 439
+      },
+      {
+        "issue": 89658261,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89838357,
+        "dq_b": 89868373,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 439
+      },
+      {
+        "issue": 89718293,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89898389,
+        "dq_b": 89928405,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 439
+      },
+      {
+        "issue": 89778325,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 89958421,
+        "dq_b": 89988437,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 439
+      },
+      {
+        "issue": 89838357,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90018453,
+        "dq_b": 90048469,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 440
+      },
+      {
+        "issue": 89898389,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90078485,
+        "dq_b": 90108501,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 440
+      },
+      {
+        "issue": 89958421,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90138517,
+        "dq_b": 90168533,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 440
+      },
+      {
+        "issue": 90018453,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90198549,
+        "dq_b": 90228565,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 440
+      },
+      {
+        "issue": 90078485,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90258581,
+        "dq_b": 90288597,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 441
+      },
+      {
+        "issue": 90138517,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90318613,
+        "dq_b": 90348629,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 441
+      },
+      {
+        "issue": 90198549,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90378645,
+        "dq_b": 90408661,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 441
+      },
+      {
+        "issue": 90258581,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90438677,
+        "dq_b": 90468693,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 441
+      },
+      {
+        "issue": 90318613,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90498709,
+        "dq_b": 90528725,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 442
+      },
+      {
+        "issue": 90378645,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90558741,
+        "dq_b": 90588757,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 442
+      },
+      {
+        "issue": 90438677,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90618773,
+        "dq_b": 90648789,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 442
+      },
+      {
+        "issue": 90498709,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90678805,
+        "dq_b": 90708821,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 442
+      },
+      {
+        "issue": 90558741,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90738837,
+        "dq_b": 90768853,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 443
+      },
+      {
+        "issue": 90618773,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90798869,
+        "dq_b": 90828885,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 443
+      },
+      {
+        "issue": 90678805,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90858901,
+        "dq_b": 90888917,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 443
+      },
+      {
+        "issue": 90738837,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90918933,
+        "dq_b": 90948949,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 443
+      },
+      {
+        "issue": 90798869,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 90978965,
+        "dq_b": 91008981,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 444
+      },
+      {
+        "issue": 90858901,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91038997,
+        "dq_b": 91069013,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 444
+      },
+      {
+        "issue": 90918933,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91099029,
+        "dq_b": 91129045,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 444
+      },
+      {
+        "issue": 90978965,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91159061,
+        "dq_b": 91189077,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 444
+      },
+      {
+        "issue": 91038997,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91219093,
+        "dq_b": 91249109,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 445
+      },
+      {
+        "issue": 91099029,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91279125,
+        "dq_b": 91309141,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 445
+      },
+      {
+        "issue": 91159061,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91339157,
+        "dq_b": 91369173,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 445
+      },
+      {
+        "issue": 91219093,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91399189,
+        "dq_b": 91429205,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 445
+      },
+      {
+        "issue": 91279125,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91459221,
+        "dq_b": 91489237,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 446
+      },
+      {
+        "issue": 91339157,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91519253,
+        "dq_b": 91549269,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 446
+      },
+      {
+        "issue": 91399189,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91579285,
+        "dq_b": 91609301,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 446
+      },
+      {
+        "issue": 91459221,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91639317,
+        "dq_b": 91669333,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 446
+      },
+      {
+        "issue": 91519253,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91699349,
+        "dq_b": 91729365,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 447
+      },
+      {
+        "issue": 91579285,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91759381,
+        "dq_b": 91789397,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 447
+      },
+      {
+        "issue": 91759381,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91939477,
+        "dq_b": 91969493,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 448
+      },
+      {
+        "issue": 91819413,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 91999509,
+        "dq_b": 92029525,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 448
+      },
+      {
+        "issue": 91879445,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92059541,
+        "dq_b": 92089557,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 448
+      },
+      {
+        "issue": 91939477,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92119573,
+        "dq_b": 92149589,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 448
+      },
+      {
+        "issue": 91999509,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92179605,
+        "dq_b": 92209621,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 449
+      },
+      {
+        "issue": 92059541,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92239637,
+        "dq_b": 92269653,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 449
+      },
+      {
+        "issue": 92119573,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92299669,
+        "dq_b": 92329685,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 449
+      },
+      {
+        "issue": 92179605,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92359701,
+        "dq_b": 92389717,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 449
+      },
+      {
+        "issue": 92239637,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92419733,
+        "dq_b": 92449749,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 450
+      },
+      {
+        "issue": 92299669,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92479765,
+        "dq_b": 92509781,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 450
+      },
+      {
+        "issue": 92359701,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92539797,
+        "dq_b": 92569813,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 450
+      },
+      {
+        "issue": 92419733,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92599829,
+        "dq_b": 92629845,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 450
+      },
+      {
+        "issue": 92479765,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92659861,
+        "dq_b": 92689877,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 451
+      },
+      {
+        "issue": 92539797,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92719893,
+        "dq_b": 92749909,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 451
+      },
+      {
+        "issue": 92599829,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92779925,
+        "dq_b": 92809941,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 451
+      },
+      {
+        "issue": 92659861,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92839957,
+        "dq_b": 92869973,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 451
+      },
+      {
+        "issue": 92719893,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92899989,
+        "dq_b": 92930005,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 452
+      },
+      {
+        "issue": 92779925,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 92960021,
+        "dq_b": 92990037,
+        "rank": 0,
+        "type": 1,
+        "gpu": 1,
+        "cursor": 452
+      },
+      {
+        "issue": 93215157,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93560341,
+        "dq_b": 93590357,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 454
+      },
+      {
+        "issue": 93275189,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93620373,
+        "dq_b": 93650389,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 454
+      },
+      {
+        "issue": 93335221,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93680405,
+        "dq_b": 93710421,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 454
+      },
+      {
+        "issue": 93395253,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93740437,
+        "dq_b": 93770453,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 454
+      },
+      {
+        "issue": 93455285,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93800469,
+        "dq_b": 93830485,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 455
+      },
+      {
+        "issue": 93515317,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93860501,
+        "dq_b": 93890517,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 455
+      },
+      {
+        "issue": 93575349,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93920533,
+        "dq_b": 93950549,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 455
+      },
+      {
+        "issue": 93635381,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 93980565,
+        "dq_b": 94010581,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 455
+      },
+      {
+        "issue": 93695413,
+        "native_issue": -1,
+        "shift": 13026944,
+        "ca": 15008,
+        "dq_a": 94040597,
+        "dq_b": 94070613,
+        "rank": 0,
+        "type": 0,
+        "gpu": 1,
+        "cursor": 456
+      }
+    ],
+    "origin_ticks": 86941813,
+    "original_gap_commands": {
+      "MACAB": 33
+    },
+    "relative_CK": {
+      "previous_DQ": [
+        -2.0,
+        0.0
+      ],
+      "original_next_DQ": [
+        513.0,
+        515.0
+      ],
+      "actual_next_DQ": [
+        513.0,
+        515.0
+      ],
+      "GPU": [
+        {
+          "command": "WR",
+          "issue": -8.0,
+          "DQ": [
+            4.0,
+            6.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": -4.0,
+          "DQ": [
+            8.0,
+            10.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 1.0,
+          "DQ": [
+            13.0,
+            15.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 5.0,
+          "DQ": [
+            17.0,
+            19.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 9.0,
+          "DQ": [
+            21.0,
+            23.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 13.0,
+          "DQ": [
+            25.0,
+            27.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 17.0,
+          "DQ": [
+            29.0,
+            31.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 21.0,
+          "DQ": [
+            33.0,
+            35.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 25.0,
+          "DQ": [
+            37.0,
+            39.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 29.0,
+          "DQ": [
+            41.0,
+            43.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 33.0,
+          "DQ": [
+            45.0,
+            47.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 37.0,
+          "DQ": [
+            49.0,
+            51.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 41.0,
+          "DQ": [
+            53.0,
+            55.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 45.0,
+          "DQ": [
+            57.0,
+            59.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 56.0,
+          "DQ": [
+            68.0,
+            70.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 60.0,
+          "DQ": [
+            72.0,
+            74.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 65.0,
+          "DQ": [
+            77.0,
+            79.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 69.0,
+          "DQ": [
+            81.0,
+            83.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 73.0,
+          "DQ": [
+            85.0,
+            87.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 77.0,
+          "DQ": [
+            89.0,
+            91.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 81.0,
+          "DQ": [
+            93.0,
+            95.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 85.0,
+          "DQ": [
+            97.0,
+            99.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 89.0,
+          "DQ": [
+            101.0,
+            103.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 93.0,
+          "DQ": [
+            105.0,
+            107.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 97.0,
+          "DQ": [
+            109.0,
+            111.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 101.0,
+          "DQ": [
+            113.0,
+            115.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 105.0,
+          "DQ": [
+            117.0,
+            119.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 109.0,
+          "DQ": [
+            121.0,
+            123.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 113.0,
+          "DQ": [
+            125.0,
+            127.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 117.0,
+          "DQ": [
+            129.0,
+            131.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 121.0,
+          "DQ": [
+            133.0,
+            135.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 125.0,
+          "DQ": [
+            137.0,
+            139.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 129.0,
+          "DQ": [
+            141.0,
+            143.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 133.0,
+          "DQ": [
+            145.0,
+            147.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 137.0,
+          "DQ": [
+            149.0,
+            151.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 141.0,
+          "DQ": [
+            153.0,
+            155.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 145.0,
+          "DQ": [
+            157.0,
+            159.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 149.0,
+          "DQ": [
+            161.0,
+            163.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 153.0,
+          "DQ": [
+            165.0,
+            167.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 157.0,
+          "DQ": [
+            169.0,
+            171.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 161.0,
+          "DQ": [
+            173.0,
+            175.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 165.0,
+          "DQ": [
+            177.0,
+            179.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 169.0,
+          "DQ": [
+            181.0,
+            183.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 173.0,
+          "DQ": [
+            185.0,
+            187.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 177.0,
+          "DQ": [
+            189.0,
+            191.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 181.0,
+          "DQ": [
+            193.0,
+            195.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 185.0,
+          "DQ": [
+            197.0,
+            199.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 189.0,
+          "DQ": [
+            201.0,
+            203.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 193.0,
+          "DQ": [
+            205.0,
+            207.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 197.0,
+          "DQ": [
+            209.0,
+            211.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 201.0,
+          "DQ": [
+            213.0,
+            215.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 205.0,
+          "DQ": [
+            217.0,
+            219.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 209.0,
+          "DQ": [
+            221.0,
+            223.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 213.0,
+          "DQ": [
+            225.0,
+            227.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 217.0,
+          "DQ": [
+            229.0,
+            231.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 221.0,
+          "DQ": [
+            233.0,
+            235.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 225.0,
+          "DQ": [
+            237.0,
+            239.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 229.0,
+          "DQ": [
+            241.0,
+            243.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 233.0,
+          "DQ": [
+            245.0,
+            247.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 237.0,
+          "DQ": [
+            249.0,
+            251.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 241.0,
+          "DQ": [
+            253.0,
+            255.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 245.0,
+          "DQ": [
+            257.0,
+            259.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 249.0,
+          "DQ": [
+            261.0,
+            263.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 253.0,
+          "DQ": [
+            265.0,
+            267.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 257.0,
+          "DQ": [
+            269.0,
+            271.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 261.0,
+          "DQ": [
+            273.0,
+            275.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 265.0,
+          "DQ": [
+            277.0,
+            279.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 269.0,
+          "DQ": [
+            281.0,
+            283.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 273.0,
+          "DQ": [
+            285.0,
+            287.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 277.0,
+          "DQ": [
+            289.0,
+            291.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 281.0,
+          "DQ": [
+            293.0,
+            295.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 285.0,
+          "DQ": [
+            297.0,
+            299.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 289.0,
+          "DQ": [
+            301.0,
+            303.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 293.0,
+          "DQ": [
+            305.0,
+            307.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 297.0,
+          "DQ": [
+            309.0,
+            311.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 301.0,
+          "DQ": [
+            313.0,
+            315.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 305.0,
+          "DQ": [
+            317.0,
+            319.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 309.0,
+          "DQ": [
+            321.0,
+            323.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 321.0,
+          "DQ": [
+            333.0,
+            335.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 325.0,
+          "DQ": [
+            337.0,
+            339.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 329.0,
+          "DQ": [
+            341.0,
+            343.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 333.0,
+          "DQ": [
+            345.0,
+            347.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 337.0,
+          "DQ": [
+            349.0,
+            351.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 341.0,
+          "DQ": [
+            353.0,
+            355.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 345.0,
+          "DQ": [
+            357.0,
+            359.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 349.0,
+          "DQ": [
+            361.0,
+            363.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 353.0,
+          "DQ": [
+            365.0,
+            367.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 357.0,
+          "DQ": [
+            369.0,
+            371.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 361.0,
+          "DQ": [
+            373.0,
+            375.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 365.0,
+          "DQ": [
+            377.0,
+            379.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 369.0,
+          "DQ": [
+            381.0,
+            383.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 373.0,
+          "DQ": [
+            385.0,
+            387.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 377.0,
+          "DQ": [
+            389.0,
+            391.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 381.0,
+          "DQ": [
+            393.0,
+            395.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 385.0,
+          "DQ": [
+            397.0,
+            399.0
+          ]
+        },
+        {
+          "command": "WR",
+          "issue": 389.0,
+          "DQ": [
+            401.0,
+            403.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 418.0,
+          "DQ": [
+            441.0,
+            443.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 422.0,
+          "DQ": [
+            445.0,
+            447.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 426.0,
+          "DQ": [
+            449.0,
+            451.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 430.0,
+          "DQ": [
+            453.0,
+            455.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 434.0,
+          "DQ": [
+            457.0,
+            459.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 438.0,
+          "DQ": [
+            461.0,
+            463.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 442.0,
+          "DQ": [
+            465.0,
+            467.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 446.0,
+          "DQ": [
+            469.0,
+            471.0
+          ]
+        },
+        {
+          "command": "RD",
+          "issue": 450.0,
+          "DQ": [
+            473.0,
+            475.0
+          ]
+        }
+      ]
+    }
+  }
+]

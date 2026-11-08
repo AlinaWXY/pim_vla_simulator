@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-08",
+  "target": "Thor GPU + existing LPDDR/PIM architecture; do not substitute A100/H100 default HBM results",
+  "completed": [
+    "Validated 128 lane reads and 64 lane writes against exact expected effective addresses in a small CUDA probe, including strided reads.",
+    "Validated 128 lane reads and 64 lane writes in one real PyTorch addition kernel.",
+    "Collected timestamped L2-sector PM samples on Thor using the official CUPTI vector-add sample.",
+    "Enumerated exposed PM metrics; no dram__ base metrics were returned."
+  ],
+  "not_completed": [
+    "Full Pi0.5 VLM instruction/address capture, including all asynchronous and TMA accesses.",
+    "Real physical-address to channel/rank/bank/row mapping.",
+    "An independently calibrated Thor GPU issue/cache/dependency timing model.",
+    "A closed-loop GPU/native-LPDDR co-simulation that propagates request backpressure to subsequent GPU execution.",
+    "New e/g latency with ACT/PRE and measured burst structure."
+  ],
+  "method_constraints": [
+    "NVBit effective addresses are evidence of program accesses, not the list of L2 misses arriving at the memory controller.",
+    "Instrumentation timestamps or recording order cannot be used as undisturbed MC arrival timing.",
+    "PM sampling measures interval-level L2 activity, not per-request DRAM addresses, ACT/PRE, or writebacks.",
+    "Full address-aware replay should generate ACT/PRE from documented target mapping and evolving row state, not assign a guessed row-hit ratio.",
+    "A fixed pre-recorded request-arrival stream cannot alone capture how PIM stalls change subsequent GPU request arrivals.",
+    "Model parameters must come from the specified LPDDR design, documented hardware properties, or calibration evidence; unknown values remain unknown."
+  ],
+  "sources": {
+    "NVBit": "https://github.com/NVlabs/NVBit",
+    "NVBit_1_8_1": "https://github.com/NVlabs/NVBit/releases/tag/v1.8.1",
+    "CUPTI_PM_sampling": "https://docs.nvidia.com/cupti/main/main.html#cupti-pm-sampling-api",
+    "AccelSim_architecture_support": "https://github.com/accel-sim/accel-sim-framework"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "scope": "Audit of retained native traces and GPU ledger, no new hardware measurement or latency rerun.",
+  "configs_differ_only_in": "pim_gpu_rope",
+  "kernel_order_and_CADQ_model_unchanged": true,
+  "GPU_RoPE": {
+    "kernels_per_layer_step": 10,
+    "layers": 18,
+    "steps": 10,
+    "retained_repeats": 3,
+    "kernels_per_step": 180,
+    "total_kernels_AE": 1800,
+    "total_device_ms_AE": 11.656213333333332,
+    "operators_per_Q_or_K": [
+      "mul",
+      "neg",
+      "cat",
+      "mul",
+      "add"
+    ],
+    "source": "cold-ae-kernel-ledger.json",
+    "rope_generation": "retained in both d and e",
+    "mean_kernel_us": 6.475674074074074,
+    "per_layer_step_us": 64.75674074074072
+  },
+  "cases": {
+    "d": {
+      "AE_GPU_ms": 53.34133333333343,
+      "AE_PIM_ms": 27.21869639999988,
+      "total_ms": 167.37523931430968,
+      "AE_solo_ms": 80.56002972750001,
+      "VLM_memory_stall_ms": 9.0834099521875,
+      "saving_vs_serial_ms": 18.1352864478125
+    },
+    "e": {
+      "AE_GPU_ms": 41.68512000000004,
+      "AE_PIM_ms": 27.916343279999907,
+      "total_ms": 155.5020774904347,
+      "AE_solo_ms": 69.60146327937501,
+      "VLM_memory_stall_ms": 8.8664614564375,
+      "saving_vs_serial_ms": 19.0498818235625
+    }
+  },
+  "difference_d_minus_e_ms": {
+    "AE_GPU_ms": 11.65621333333339,
+    "AE_PIM_ms": -0.6976468800000255,
+    "total_ms": 11.873161823874995,
+    "AE_solo_ms": 10.958566448124998,
+    "VLM_memory_stall_ms": 0.21694849574999964,
+    "saving_vs_serial_ms": -0.9145953757500003
+  },
+  "linear_CA_channel0_phase_percent": {
+    "token_gpu_before": {
+      "QKV": 12.682453011271397,
+      "PV": 10.075690553425735,
+      "O": 8.322942643391523,
+      "Gate_Up": 8.32792671216879,
+      "Down": 16.10727874532125
+    },
+    "token_local_before": {
+      "QKV": 12.682453011271397,
+      "PV": 10.044096031357178,
+      "O": 8.322942643391523,
+      "Gate_Up": 8.32792671216879,
+      "Down": 16.10727874532125
+    }
+  },
+  "sha256": {
+    "reference/evaluation-1108/gpu/cold-ae-kernel-ledger.json": "104db7f448506cadcc588e7b91e65e8ee4e5f244b6fd818ce039888c8aff90f8",
+    "reference/evaluation-1108/uniform-transactions/stream-reference/evaluation-b-g.csv": "50b5537c78bddd52e4d0b8652c09efb41354065baa0a89b5fa9e04e2c2425d19",
+    "reference/evaluation-1108/uniform-transactions/d-e-rope-audit/linear-ca.csv": "53d3a9da6163af2a2ecd9cae386a2b2afb111e132ddd4eba9689a6dff86c783c"
+  }
+}

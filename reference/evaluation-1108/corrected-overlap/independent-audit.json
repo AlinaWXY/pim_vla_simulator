@@ -1,0 +1,97 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "variant": "feature_gpu_before",
+      "accounting": "explicit_native_io",
+      "status": "passed",
+      "VLM_units_verified": 1943,
+      "AE_wait_events_verified": 1080,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "accounting": "explicit_native_io",
+      "status": "passed",
+      "VLM_units_verified": 1913,
+      "AE_wait_events_verified": 1080,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_local_before",
+      "accounting": "explicit_native_io",
+      "status": "passed",
+      "VLM_units_verified": 1853,
+      "AE_wait_events_verified": 900,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "accounting": "explicit_native_io",
+      "status": "passed",
+      "VLM_units_verified": 2122,
+      "AE_wait_events_verified": 900,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_local_after",
+      "accounting": "explicit_native_io",
+      "status": "passed",
+      "VLM_units_verified": 1996,
+      "AE_wait_events_verified": 720,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "feature_gpu_before",
+      "accounting": "shared_tensor_io_dedup",
+      "status": "passed",
+      "VLM_units_verified": 1943,
+      "AE_wait_events_verified": 1080,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_gpu_before",
+      "accounting": "shared_tensor_io_dedup",
+      "status": "passed",
+      "VLM_units_verified": 1913,
+      "AE_wait_events_verified": 1080,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_local_before",
+      "accounting": "shared_tensor_io_dedup",
+      "status": "passed",
+      "VLM_units_verified": 1853,
+      "AE_wait_events_verified": 900,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_gpu_after",
+      "accounting": "shared_tensor_io_dedup",
+      "status": "passed",
+      "VLM_units_verified": 2107,
+      "AE_wait_events_verified": 900,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    },
+    {
+      "variant": "token_local_after",
+      "accounting": "shared_tensor_io_dedup",
+      "status": "passed",
+      "VLM_units_verified": 1984,
+      "AE_wait_events_verified": 720,
+      "raw_idle_interval_integrals_match": true,
+      "no_AE_GPU_VLM_overlap": true
+    }
+  ],
+  "source_hashes_verified": 7,
+  "validation_scope": "Numerical conservation and scheduling consistency only; does not validate memory transactions or physical GPU progress. Parallel estimates withdrawn."
+}

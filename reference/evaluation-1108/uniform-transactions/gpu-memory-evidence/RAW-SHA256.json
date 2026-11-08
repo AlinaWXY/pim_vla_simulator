@@ -1,0 +1,14 @@
+{
+  "read-full.csv": {
+    "sha256": "6722c57a03e8d9318e19d26fdd4175d865aec844b526061b27f2db888d581a97",
+    "uncompressed_bytes": 4756999
+  },
+  "write-full.csv": {
+    "sha256": "c9001fbc22b047cf5f7fac4992f435a46efe0aa5200fd8a6639c46313f709b03",
+    "uncompressed_bytes": 4759652
+  },
+  "prefix-trace.json": {
+    "sha256": "6b647fec3e77cc420d9d5e13654754d8b1d5fcf3220ef60f569e43f71af95c6c",
+    "uncompressed_bytes": 8869022
+  }
+}

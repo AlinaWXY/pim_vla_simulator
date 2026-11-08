@@ -36,6 +36,8 @@ def main():
         lines.append(f"| {op} | {e['busy_percent']:.4f}% | {edq['busy_percent']:.4f}% | {g['busy_percent']:.5f}% | {gdq['busy_percent']:.4f}% |")
     text=f'''# xinyao_1108：无 rank controller 的融合前基线修正
 
+后续已补测显式 PV→O GPU 重排，并按用户确认的跨窗口规则重算 b–g，见[延迟重算报告](../corrected-overlap/REPORT.zh-CN.md)。以下保留本次原生基线修正的记录；“尚未测量/未计算”描述的是本报告阶段。
+
 **用户定义：融合前没有 rank controller。PIM 计算需要持续从 GPU 分批广播补充输入，占外部 DQ 和 CA；融合后才采用 DRAM 暂存、本地读取、rank controller 与粗命令。** 本次据此纠正三个 before 配置，并撤回此前误配置得到的 before DQ/CA 及 e/g 并行延迟结论。
 
 最终原生作业 **1971385**，分析作业 **1971386**、最终检查作业 **1971396**。共5种配置×5个case；a与已有VLM测量没有重跑。本报告仅给出原生时序和流量，不使用ρ、GPU在途数或读写比例，不计算新的c–g并行延迟。

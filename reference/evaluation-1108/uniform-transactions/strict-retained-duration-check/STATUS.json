@@ -1,0 +1,5 @@
+{
+  "status": "traffic proxy incompatible with retained times",
+  "failures": 262,
+  "action": "No bytes trimmed, no parallel latency published"
+}

@@ -1,10 +1,32 @@
 # xinyao_1108：布局、RoPE 与空闲窗口 Evaluation
 
+本分支已汇总仿真结果、冻结输入和复现代码。当前入口及模型边界见[仲裁器复现说明](experiments/pi05-unified-gemv/ARBITRATOR.zh-CN.md)，逐 burst 插入位置见[e 的 DQ 插入审计](reference/evaluation-1108/e-dq-insertion-audit/REPORT.zh-CN.md)。Linux 下使用 Python 3.10+、g++（C++20），从仓库根目录执行：
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install pyyaml
+python experiments/pi05-unified-gemv/run_arbitrator.py --output outputs/arbitrator --audit-e
+python experiments/pi05-unified-gemv/verify_arbitrator.py --results outputs/arbitrator/with-rows --audit outputs/arbitrator/e-dq-insertion-audit
+```
+
+上述入口会编译、运行 51 项事务测试、重算 b–g 并核对逐阶段/逐 kernel 结果及 e 的全通道插入统计；无需原 SSH 服务器上的绝对路径或再次采集 GPU。原生 PIM 与 GPU 采集脚本、历史结果和撤回说明继续保留。完整发布文件按 [SHA256 清单](reference/arbitrator-publication/SHA256SUMS.json)核验；历史运行清单中的二进制由本机重新编译，不随 Git 分发。
+
 **融合前基线已按用户定义修正：无 rank controller、无输入 DRAM 暂存，线性算子计算期间持续由 GPU 通过 WRGB 广播输入，占用外部 DQ 与共享 CA。融合后才使用 rank controller、DRAM 暂存与粗命令。**
 
 此前 job1971246 的 before 错误地保留 rank controller 和 PV→O 本地输入路径，其 before DQ/CA 表、e/g 比较及受影响的串行/并行 latency 均撤回，旧文件只作误配置归档。ρ、在途数和读写比的合成假设也不再用于 Evaluation。
 
-新的原生数据、配置检查和逐算子 CA/DQ 分析见[修正基线报告](reference/evaluation-1108/direct-before-corrected/REPORT.zh-CN.md)。并行 Evaluation 仍须保持 kernel 依赖顺序、允许跨窗口推进并计入后续 AE GPU 算子的干扰；不恢复整 kernel 单窗口限制。
+新的原生数据、配置检查和逐算子 CA/DQ 分析见[修正基线报告](reference/evaluation-1108/direct-before-corrected/REPORT.zh-CN.md)。**随后“任何正长 joint idle 都按原速推进 GPU”的 c–g 并行 latency 与 overlap 点值也撤回，不再作为有效 Evaluation。** 该近似没有关联 RD 命令发射与 CL 之后的 DQ 返回预留；kernel 顺序与 AE 等待的数值对账不能证明访存可执行。原生 PIM/DQ/CA 数据及串行 b 的已有计费结果不因这一缺陷失效。[历史算法报告与撤回原因](reference/evaluation-1108/corrected-overlap/REPORT.zh-CN.md)保留旧输出；[延迟返回冲突诊断](reference/evaluation-1108/delayed-read-audit/audit.json)只检查单次假想 row-hit RD 的必要条件，不生成 GPU 流量或新的 latency。
+
+按后续授权的**均匀访存假设**，已补采全部 2353 个 VLM kernel 的独立单 pass 读/写计数，不使用人为的 ρ、在途上限或读写比。[当前因果总线模型与 b–g 表](reference/evaluation-1108/online-arbitration-preparation/REPORT.zh-CN.md)区分两类机制：c–e 在线检查 CA 发射、延迟 DQ 返回、读写切换与 refresh，已提交 GPU 返回不可撤销，未发射 PIM 请求优先；f/g 的本地细命令与外部 CA 隔离，整个外部输入/输出阶段采用所有权交接。保留 kernel 顺序、跨窗口执行和后续 AE GPU 等待，并计入 GPU 对 PIM 的反压。独立 GPU 参考也使用同一个因果仲裁器核对。
+
+本轮 AE 原 GPU 算子改用已有自然缓存 trace，替换此前逐 kernel 清缓存的计时，仍是未融合的 OpenPI eager、带 profiler 的设备时长。**结果属于条件模型估计，未接入原生控制器，也不是 Thor 硬件端到端实测。** L2 写代理、row-hit/均匀映射、请求检查点和命令间隔重放的局限随报告列出。[此前的固定未来日历模型](reference/evaluation-1108/uniform-transactions/REPORT.zh-CN.md)及其 CA/DQ 消融只保留历史溯源；它使用固定 PIM 时间线和旧 AE 冷缓存计时，不再作为当前主表。
+
+后续已要求替换均匀/全 row-hit 假设。Thor 上的 NVBit 地址采集和 CUPTI L2 时间序列小测试已通过：[逐地址验证](reference/evaluation-1108/thor-trace-feasibility/validation.json)、[已完成与缺失项](reference/evaluation-1108/thor-trace-feasibility/scope.json)。**这不等于已取得 Pi0.5 全量 MC trace。** 目标仍是 Thor＋LPDDR，未改用 A100/H100 的 HBM 数据。
+
+已按现有 LPDDR5X 配置补入连续地址下的 GPU ACT1/ACT2、PREpb、refresh 前 PREab 和 bank/row 时序，并完成 b–g 与相同地址映射的 row-hit 对照：[ACT/PRE 修正报告](reference/evaluation-1108/sequential-rows/REPORT.zh-CN.md)。43 项测试和 81 项文件哈希核验通过。**独立 VLM 模型为 196.457 ms，明显偏离已有 104.950 ms 计时；新增表仍是模型诊断，不能作为真实 Thor 延迟或 e/g 排序结论。** 时间到达仍为均匀近似，写侧仍是 L2 write sectors 代理；尚未恢复实际 GPU 访存突发。
+
+最新仲裁时序修正已通过 job `1974571` 重跑 c–g：[修正前后数值](reference/evaluation-1108/native-timing-fix/comparison.csv)、[原生时序核对与模型边界](reference/evaluation-1108/native-timing-fix/comparison.json)。修复了只检查延迟 DQ 返回、遗漏独立命令发射约束的问题：WRGB→RD 跨 rank 至少 2 CK，普通跨 rank RD→WR 至少 15 CK，并把这些约束纳入已就绪 PIM 的优先保护。51 项测试、144 种命令对/层级关系的原生表对照通过；三个新增回归在旧库上均复现失败。c 的 PIM 等待由 7.764477 增至 8.088888 ms，总延迟由 140.380266 增至 140.682225 ms；d/e 总延迟分别增至 137.063866/131.639969 ms；f/g 保留整段外部 I/O 独占策略，结果未变。4,680 个 PIM 阶段的独立时长与 VLM 参考偏差不变。混合 WRGB/RDRES 与普通访存的额外 DQ 保护间隔仍是保守扩展；GPU 搬运 kernel/SM 竞争和输入 cache 驻留尚未建模。旧表保留作对照，当前结果仍限于上述模型诊断口径。复跑入口为 `experiments/pi05-unified-gemv/native-timing-fix.sbatch`。
 
 ## xinyao_1107 历史记录：MAC_RUN / ROPE_RUN 粗细命令
 

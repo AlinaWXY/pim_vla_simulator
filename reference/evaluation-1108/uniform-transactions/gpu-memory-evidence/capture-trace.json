@@ -1,0 +1,1202 @@
+{
+  "source_sha256": {
+    "/var/tmp/xinyao-1108-transaction-evidence/Physical-Intelligence-openpi-215abfb/src/openpi/models_pytorch/pi0_pytorch.py": "dcd7b6f508808ce4b7170a1720a4c62c6da04edae3652d16c94a469dca924e16",
+    "/var/tmp/xinyao-1108-transaction-evidence/Physical-Intelligence-openpi-215abfb/src/openpi/models_pytorch/gemma_pytorch.py": "225092e06509da0ae37bb9dca55c00d2804255bb1496f7c8700304b4c52a95eb",
+    "/dev/shm/xinyao-1108-evidence/pydeps/transformers/models/gemma/modeling_gemma.py": "17eeb54e277939e58cd6f8a92719a275e36baf0c9f463b2754227d42f87aedde"
+  },
+  "checkpoint": "/var/tmp/hf-cache/hub/models--lerobot--pi05_base/snapshots/b211f3d44c36b6acfcf7ae94a64e8e96f75a64ba/model.safetensors",
+  "weights": {
+    "source_tensors": 812,
+    "target_names": 813,
+    "aliases": {
+      "paligemma_with_expert.paligemma.model.language_model.embed_tokens.weight": "paligemma_with_expert.paligemma.lm_head.weight"
+    },
+    "missing": [],
+    "renamed": {},
+    "loader": "sequential_readinto",
+    "seconds": 3.5509448510129005,
+    "bytes_read": 14467030080
+  },
+  "conversion": {
+    "kind": "synthetic_physical_MHA8",
+    "query_heads": 8,
+    "kv_heads": 8,
+    "head_dim": 256,
+    "attention_width": 2048,
+    "q_o_unchanged": true,
+    "non_kv_parameters_unchanged": true,
+    "changes": [
+      {
+        "family": "vlm",
+        "layer": 0,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 0,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 1,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 1,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 2,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 2,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 3,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 3,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 4,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 4,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 5,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 5,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 6,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 6,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 7,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 7,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 8,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 8,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 9,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 9,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 10,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 10,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 11,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 11,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 12,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 12,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 13,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 13,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 14,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 14,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 15,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 15,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 16,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 16,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 17,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "vlm",
+        "layer": 17,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          2048
+        ],
+        "new_shape": [
+          2048,
+          2048
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 8388608
+      },
+      {
+        "family": "expert",
+        "layer": 0,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 0,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 1,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 1,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 2,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 2,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 3,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 3,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 4,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 4,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 5,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 5,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 6,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 6,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 7,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 7,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 8,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 8,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 9,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 9,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 10,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 10,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 11,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 11,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 12,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 12,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 13,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 13,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 14,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 14,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 15,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 15,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 16,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 16,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 17,
+        "projection": "k_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      },
+      {
+        "family": "expert",
+        "layer": 17,
+        "projection": "v_proj",
+        "old_shape": [
+          256,
+          1024
+        ],
+        "new_shape": [
+          2048,
+          1024
+        ],
+        "dtype": "torch.bfloat16",
+        "contiguous": true,
+        "physical_storage_bytes": 4194304
+      }
+    ],
+    "note": "Only K/V weights are tiled into eight physically stored heads. Original Q/O, residual widths, FFNs and ViT are unchanged. Not a trained MHA8 policy."
+  },
+  "mode": "trace",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.53.2",
+  "pid": 2623381,
+  "policy": "Memory evidence only; retained baseline durations remain unchanged",
+  "input": {
+    "batch": 1,
+    "cameras": 3,
+    "image_hw": [
+      224,
+      224
+    ],
+    "prompt_tokens": 200,
+    "query_heads": 8,
+    "kv_heads": 8,
+    "H": 16,
+    "seed": 17
+  }
+}

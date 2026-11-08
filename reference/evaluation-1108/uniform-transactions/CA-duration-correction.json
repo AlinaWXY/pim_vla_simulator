@@ -1,0 +1,126 @@
+{
+  "correction": "Use native ready_at for CA end; previous exporter truncated two-CK ACTAB and 21-CK MAC_RUN/ROPE_RUN commands to one CK.",
+  "invariant": "All event starts, types, ranks, groups, DQ and refresh reservations unchanged; only multi-CK CA commands regain their missing cycles.",
+  "templates": [
+    {
+      "template": "feature_gpu_before/chain",
+      "extended_CA_events": 752,
+      "two_CK": 752,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "feature_gpu_before/pv",
+      "extended_CA_events": 320,
+      "two_CK": 320,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "feature_gpu_before/gate_up_gpu",
+      "extended_CA_events": 656,
+      "two_CK": 656,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "feature_gpu_before/down_gpu_input",
+      "extended_CA_events": 368,
+      "two_CK": 368,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_gpu_before/chain",
+      "extended_CA_events": 1072,
+      "two_CK": 1072,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_gpu_before/pv",
+      "extended_CA_events": 480,
+      "two_CK": 480,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_gpu_before/gate_up_gpu",
+      "extended_CA_events": 656,
+      "two_CK": 656,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_gpu_before/down_gpu_input",
+      "extended_CA_events": 368,
+      "two_CK": 368,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_local_before/chain",
+      "extended_CA_events": 1072,
+      "two_CK": 1072,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_local_before/pv",
+      "extended_CA_events": 480,
+      "two_CK": 480,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_local_before/gate_up_gpu",
+      "extended_CA_events": 656,
+      "two_CK": 656,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_local_before/down_gpu_input",
+      "extended_CA_events": 368,
+      "two_CK": 368,
+      "twenty_one_CK": 0
+    },
+    {
+      "template": "token_gpu_after/chain",
+      "extended_CA_events": 32,
+      "two_CK": 0,
+      "twenty_one_CK": 32
+    },
+    {
+      "template": "token_gpu_after/pv",
+      "extended_CA_events": 32,
+      "two_CK": 0,
+      "twenty_one_CK": 32
+    },
+    {
+      "template": "token_gpu_after/gate_up_gpu",
+      "extended_CA_events": 16,
+      "two_CK": 0,
+      "twenty_one_CK": 16
+    },
+    {
+      "template": "token_gpu_after/down_gpu_input",
+      "extended_CA_events": 16,
+      "two_CK": 0,
+      "twenty_one_CK": 16
+    },
+    {
+      "template": "token_local_after/chain",
+      "extended_CA_events": 48,
+      "two_CK": 0,
+      "twenty_one_CK": 48
+    },
+    {
+      "template": "token_local_after/pv",
+      "extended_CA_events": 32,
+      "two_CK": 0,
+      "twenty_one_CK": 32
+    },
+    {
+      "template": "token_local_after/gate_up_gpu",
+      "extended_CA_events": 16,
+      "two_CK": 0,
+      "twenty_one_CK": 16
+    },
+    {
+      "template": "token_local_after/down_gpu_input",
+      "extended_CA_events": 16,
+      "two_CK": 0,
+      "twenty_one_CK": 16
+    }
+  ]
+}

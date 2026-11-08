@@ -1,0 +1,62 @@
+{
+  "status": "passed",
+  "job": "1972166",
+  "native_source_files_sha256_verified": 768,
+  "native_DQ_events_exactly_preserved": 843264,
+  "after_IO_epoch_counts": {
+    "token_gpu_after/chain": 80,
+    "token_gpu_after/pv": 48,
+    "token_gpu_after/gate_up_gpu": 32,
+    "token_gpu_after/down_gpu_input": 32,
+    "token_local_after/chain": 64,
+    "token_local_after/pv": 48,
+    "token_local_after/gate_up_gpu": 32,
+    "token_local_after/down_gpu_input": 32
+  },
+  "every_after_DQ_burst_inside_an_exclusive_IO_epoch": true,
+  "before_flags_and_broadcast_MAC_commands_verified": true,
+  "ordered_kernel_prefixes_bytes_stalls_waits_and_latency_equations_verified": true,
+  "observed_latency_decomposition": {
+    "c": {
+      "AE_GPU_work_ms": 27.064630599999965,
+      "isolated_PIM_ms": 27.94825404000003,
+      "VLM_memory_stall_ms": 8.2874681761875,
+      "every_PIM_stage_covered_by_an_active_VLM_kernel": true
+    },
+    "d": {
+      "AE_GPU_work_ms": 24.70015059999985,
+      "isolated_PIM_ms": 27.220553640000148,
+      "VLM_memory_stall_ms": 7.2839629461875,
+      "every_PIM_stage_covered_by_an_active_VLM_kernel": true
+    },
+    "e": {
+      "AE_GPU_work_ms": 19.171625800000097,
+      "isolated_PIM_ms": 27.9176939999999,
+      "VLM_memory_stall_ms": 7.0806539084375,
+      "every_PIM_stage_covered_by_an_active_VLM_kernel": true
+    },
+    "f": {
+      "AE_GPU_work_ms": 23.801590599999876,
+      "isolated_PIM_ms": 37.16184228750012,
+      "VLM_memory_stall_ms": 8.2214710824375,
+      "every_PIM_stage_covered_by_an_active_VLM_kernel": true
+    },
+    "g": {
+      "AE_GPU_work_ms": 18.273065799999912,
+      "isolated_PIM_ms": 37.815764883750084,
+      "VLM_memory_stall_ms": 8.6575441166875,
+      "every_PIM_stage_covered_by_an_active_VLM_kernel": true
+    }
+  },
+  "unit_tests": 31,
+  "natural_cache_input_validation": {
+    "ordered_kernel_names_match_cold_ledger": true,
+    "samples": 50,
+    "kernels_per_step": 1033,
+    "RoPE_raw_duration_sum_ms_AE": 5.528524799999999,
+    "RoPE_reported_exclusive_activity_ms_AE": 5.528524800000001,
+    "overlapping_adjacent_kernel_pairs": 2525,
+    "maximum_adjacent_overlap_ns": 15808
+  },
+  "scope": "Internal model consistency; not native-controller or hardware validation."
+}

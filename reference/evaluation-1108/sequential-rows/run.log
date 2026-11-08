@@ -1,0 +1,112 @@
+BEGIN c
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 216
+BLOCK 2000 VLM 432
+BLOCK 3000 VLM 651
+BLOCK 4000 VLM 865
+BLOCK 5000 VLM 1085
+BLOCK 6000 VLM 1299
+BLOCK 7000 VLM 1529
+BLOCK 8000 VLM 1665
+BLOCK 9000 VLM 1803
+RESULT {"case": "c", "variant": "feature_gpu_before", "AE_solo_ms": 55.012884639999996, "AE_native_schedule_ms": 55.011533920000005, "PIM_interference_ms": 8.114406314, "AE_GPU_wait_ms": 86.2836345805, "VLM_memory_stall_ms": 8.808028160187499, "VLM_completed_model_ms": 113.5382667743125, "VLM_remaining_model_ms": 71.58788623299999, "raw_model_total_ms": 220.9988117675, "net_overlap_ms": 19.1402258798125, "completed_units": 1941, "GPU_act1": 0, "GPU_act2": 0, "GPU_prepb": 0, "GPU_preab": 0, "GPU_reads": 0, "GPU_writes": 0, "GPU_row_hits": 0, "GPU_row_misses": 0, "total_ms": 140.82315479480968}
+BEGIN d
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 219
+BLOCK 2000 VLM 437
+BLOCK 3000 VLM 660
+BLOCK 4000 VLM 881
+BLOCK 5000 VLM 1104
+BLOCK 6000 VLM 1323
+BLOCK 7000 VLM 1544
+BLOCK 8000 VLM 1685
+BLOCK 9000 VLM 1829
+RESULT {"case": "d", "variant": "token_gpu_before", "AE_solo_ms": 51.92070424, "AE_native_schedule_ms": 51.918847, "PIM_interference_ms": 6.4612141439999995, "AE_GPU_wait_ms": 86.8610814505, "VLM_memory_stall_ms": 6.8272057221875, "VLM_completed_model_ms": 113.7156435123125, "VLM_remaining_model_ms": 71.410509495, "raw_model_total_ms": 216.6535093295, "net_overlap_ms": 20.393347917812502, "completed_units": 1944, "GPU_act1": 0, "GPU_act2": 0, "GPU_prepb": 0, "GPU_preab": 0, "GPU_reads": 0, "GPU_writes": 0, "GPU_row_hits": 0, "GPU_row_misses": 0, "total_ms": 136.4778523568097}
+BEGIN e
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 273
+BLOCK 2000 VLM 552
+BLOCK 3000 VLM 824
+BLOCK 4000 VLM 1089
+BLOCK 5000 VLM 1371
+BLOCK 6000 VLM 1588
+BLOCK 7000 VLM 1744
+RESULT {"case": "e", "variant": "token_local_before", "AE_solo_ms": 47.0893198, "AE_native_schedule_ms": 47.08796908, "PIM_interference_ms": 6.618168746, "AE_GPU_wait_ms": 72.05301017075, "VLM_memory_stall_ms": 6.839900262437499, "VLM_completed_model_ms": 99.7489726543125, "VLM_remaining_model_ms": 85.377180353, "raw_model_total_ms": 211.13767906975002, "net_overlap_ms": 21.0777937375625, "completed_units": 1864, "GPU_act1": 0, "GPU_act2": 0, "GPU_prepb": 0, "GPU_preab": 0, "GPU_reads": 0, "GPU_writes": 0, "GPU_row_hits": 0, "GPU_row_misses": 0, "total_ms": 130.96202209705973}
+BEGIN f
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 218
+BLOCK 2000 VLM 441
+BLOCK 3000 VLM 666
+BLOCK 4000 VLM 894
+BLOCK 5000 VLM 1119
+BLOCK 6000 VLM 1350
+BLOCK 7000 VLM 1558
+BLOCK 8000 VLM 1682
+BLOCK 9000 VLM 1810
+RESULT {"case": "f", "variant": "token_gpu_after", "AE_solo_ms": 60.9634328875, "AE_native_schedule_ms": 60.96091084, "PIM_interference_ms": 0.120904448, "AE_GPU_wait_ms": 70.87210967725001, "VLM_memory_stall_ms": 8.405883758437499, "VLM_completed_model_ms": 99.7489726543125, "VLM_remaining_model_ms": 85.377180353, "raw_model_total_ms": 217.33362736575, "net_overlap_ms": 28.7559585290625, "completed_units": 1864, "GPU_act1": 0, "GPU_act2": 0, "GPU_prepb": 0, "GPU_preab": 0, "GPU_reads": 0, "GPU_writes": 0, "GPU_row_hits": 0, "GPU_row_misses": 0, "total_ms": 137.1579703930597}
+BEGIN g
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 257
+BLOCK 2000 VLM 524
+BLOCK 3000 VLM 783
+BLOCK 4000 VLM 1043
+BLOCK 5000 VLM 1311
+BLOCK 6000 VLM 1545
+BLOCK 7000 VLM 1684
+RESULT {"case": "g", "variant": "token_local_after", "AE_solo_ms": 56.08883068375, "AE_native_schedule_ms": 56.086809880000004, "PIM_interference_ms": 0.14561043, "AE_GPU_wait_ms": 52.26447839725, "VLM_memory_stall_ms": 8.9189937946875, "VLM_completed_model_ms": 81.3068599163125, "VLM_remaining_model_ms": 103.819293091, "raw_model_total_ms": 212.31821260200002, "net_overlap_ms": 28.896771089062497, "completed_units": 1754, "GPU_act1": 0, "GPU_act2": 0, "GPU_prepb": 0, "GPU_preab": 0, "GPU_reads": 0, "GPU_writes": 0, "GPU_row_hits": 0, "GPU_row_misses": 0, "total_ms": 132.1425556293097}
+BEGIN c
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 215
+BLOCK 2000 VLM 431
+BLOCK 3000 VLM 649
+BLOCK 4000 VLM 860
+BLOCK 5000 VLM 1071
+BLOCK 6000 VLM 1286
+BLOCK 7000 VLM 1510
+BLOCK 8000 VLM 1649
+BLOCK 9000 VLM 1787
+RESULT {"case": "c", "variant": "feature_gpu_before", "AE_solo_ms": 55.012884639999996, "AE_native_schedule_ms": 55.011533920000005, "PIM_interference_ms": 7.764476972000001, "AE_GPU_wait_ms": 89.65693677850001, "VLM_memory_stall_ms": 8.3651392661875, "VLM_completed_model_ms": 117.00452852431249, "VLM_remaining_model_ms": 79.452767663, "raw_model_total_ms": 231.88706605349998, "net_overlap_ms": 19.5831147738125, "completed_units": 1925, "GPU_act1": 6088790, "GPU_act2": 6088790, "GPU_prepb": 21381, "GPU_preab": 507659, "GPU_reads": 216094230, "GPU_writes": 142371155, "GPU_row_hits": 352383233, "GPU_row_misses": 6082152, "total_ms": 140.38026590080966}
+BEGIN d
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 219
+BLOCK 2000 VLM 437
+BLOCK 3000 VLM 660
+BLOCK 4000 VLM 881
+BLOCK 5000 VLM 1098
+BLOCK 6000 VLM 1313
+BLOCK 7000 VLM 1538
+BLOCK 8000 VLM 1679
+BLOCK 9000 VLM 1819
+RESULT {"case": "d", "variant": "token_gpu_before", "AE_solo_ms": 51.92070424, "AE_native_schedule_ms": 51.918847, "PIM_interference_ms": 6.345897362, "AE_GPU_wait_ms": 93.4410604645, "VLM_memory_stall_ms": 7.1518597161875, "VLM_completed_model_ms": 119.8556517503125, "VLM_remaining_model_ms": 76.60164443699999, "raw_model_total_ms": 228.3093065035, "net_overlap_ms": 20.0686939238125, "completed_units": 1937, "GPU_act1": 6251372, "GPU_act2": 6251372, "GPU_prepb": 25577, "GPU_preab": 515695, "GPU_reads": 223716789, "GPU_writes": 144731071, "GPU_row_hits": 362203552, "GPU_row_misses": 6244308, "total_ms": 136.80250635080972}
+BEGIN e
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 261
+BLOCK 2000 VLM 539
+BLOCK 3000 VLM 806
+BLOCK 4000 VLM 1059
+BLOCK 5000 VLM 1329
+BLOCK 6000 VLM 1571
+BLOCK 7000 VLM 1724
+RESULT {"case": "e", "variant": "token_local_before", "AE_solo_ms": 47.0893198, "AE_native_schedule_ms": 47.08796908, "PIM_interference_ms": 6.592487244, "AE_GPU_wait_ms": 75.85525038875001, "VLM_memory_stall_ms": 7.1901485244375, "VLM_completed_model_ms": 103.1752831083125, "VLM_remaining_model_ms": 93.282013079, "raw_model_total_ms": 222.81907051175, "net_overlap_ms": 20.7275454755625, "completed_units": 1847, "GPU_act1": 5328418, "GPU_act2": 5328418, "GPU_prepb": 28953, "GPU_preab": 447312, "GPU_reads": 192062141, "GPU_writes": 121394716, "GPU_row_hits": 308133990, "GPU_row_misses": 5322867, "total_ms": 131.3122703590597}
+BEGIN f
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 205
+BLOCK 2000 VLM 417
+BLOCK 3000 VLM 626
+BLOCK 4000 VLM 845
+BLOCK 5000 VLM 1060
+BLOCK 6000 VLM 1265
+BLOCK 7000 VLM 1479
+BLOCK 8000 VLM 1630
+BLOCK 9000 VLM 1757
+RESULT {"case": "f", "variant": "token_gpu_after", "AE_solo_ms": 60.9634328875, "AE_native_schedule_ms": 60.96091084, "PIM_interference_ms": 0.111282444, "AE_GPU_wait_ms": 66.70386092125, "VLM_memory_stall_ms": 8.6141469604375, "VLM_completed_model_ms": 95.36283869231251, "VLM_remaining_model_ms": 101.094457495, "raw_model_total_ms": 228.87303374775001, "net_overlap_ms": 28.547695327062502, "completed_units": 1812, "GPU_act1": 4887584, "GPU_act2": 4887584, "GPU_prepb": 31197, "GPU_preab": 414224, "GPU_reads": 176314409, "GPU_writes": 110840739, "GPU_row_hits": 282273730, "GPU_row_misses": 4881418, "total_ms": 137.36623359505973}
+BEGIN g
+BLOCK 0 VLM 0
+BLOCK 1000 VLM 252
+BLOCK 2000 VLM 522
+BLOCK 3000 VLM 775
+BLOCK 4000 VLM 1036
+BLOCK 5000 VLM 1299
+BLOCK 6000 VLM 1541
+BLOCK 7000 VLM 1676
+RESULT {"case": "g", "variant": "token_local_after", "AE_solo_ms": 56.08883068375, "AE_native_schedule_ms": 56.086809880000004, "PIM_interference_ms": 0.139953352, "AE_GPU_wait_ms": 51.83964975525, "VLM_memory_stall_ms": 9.0925012826875, "VLM_completed_model_ms": 80.7028667083125, "VLM_remaining_model_ms": 115.754429479, "raw_model_total_ms": 223.82286327, "net_overlap_ms": 28.7232636010625, "completed_units": 1737, "GPU_act1": 4074596, "GPU_act2": 4074596, "GPU_prepb": 34537, "GPU_preab": 356128, "GPU_reads": 146502123, "GPU_writes": 92080073, "GPU_row_hits": 234512511, "GPU_row_misses": 4069685, "total_ms": 132.31606311730968}

@@ -1,0 +1,70 @@
+{
+  "case": "down_gpu_input",
+  "variant": "token_local_before",
+  "segments": [
+    {
+      "name": "down_local_input_and_compute",
+      "start": 0,
+      "end": 1,
+      "line_start": 2,
+      "line_end": 81922,
+      "kind": "local_compute"
+    },
+    {
+      "name": "down_local_input_and_compute_gemv_release",
+      "start": 1,
+      "end": 2,
+      "line_start": 81923,
+      "line_end": 81955,
+      "kind": "gemv_release"
+    },
+    {
+      "name": "down_result_export",
+      "start": 2,
+      "end": 3,
+      "line_start": 81956,
+      "line_end": 84004,
+      "kind": "export"
+    }
+  ],
+  "counts": {
+    "BARRIER": 4,
+    "PIM_WR_GB": 65536,
+    "PIM_MAC_AB": 16384,
+    "PIM_GEMV_RELEASE": 32,
+    "PIM_RD_RES": 2048
+  },
+  "expected_dq_bytes": {
+    "dram_read": 0,
+    "dram_write": 0,
+    "pim_input_write": 2097152,
+    "pim_result_read": 65536,
+    "score_export": 0,
+    "q_export": 0,
+    "q_remote": 0,
+    "total": 2162688
+  },
+  "configuration": {
+    "feature": false,
+    "gpu_rope": false,
+    "after": false
+  },
+  "numerical_compute": false,
+  "input_control_contract": {
+    "rank_controller": false,
+    "input_path": "GPU WRGB supplied throughout each operator, including O",
+    "ca_path": "flat shared external CA; no rank controller"
+  },
+  "dimensions": {
+    "H": 16,
+    "heads": 8,
+    "head_dim": 256,
+    "hidden": 1024,
+    "FFN": 4096,
+    "valid_KV": 984,
+    "padded_KV": 992
+  },
+  "source_generator": "flat-controller GPU-broadcast inputs including PV-to-O round trip",
+  "coarse_commands": false,
+  "feature_geometry": null
+}

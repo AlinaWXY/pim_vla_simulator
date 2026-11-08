@@ -1,0 +1,4 @@
+make: Entering directory '/var/tmp/xinyao-1108-trace-feasibility/pm_sampling'
+"/usr/local/cuda/bin/nvcc"   -gencode arch=compute_110,code=sm_110 -lineinfo  -c -I"/usr/local/cuda/include" -I/usr/local/cuda/extras/CUPTI/include -I/usr/local/cuda/extras/CUPTI/samples/common pm_sampling.cu
+"/usr/local/cuda/bin/nvcc"   -o pm_sampling pm_sampling.o -L /usr/local/cuda/extras/CUPTI/lib64 -lcuda -L /usr/local/cuda/lib64 -lcupti
+make: Leaving directory '/var/tmp/xinyao-1108-trace-feasibility/pm_sampling'

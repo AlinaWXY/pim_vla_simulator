@@ -1,0 +1,13 @@
+test_consecutive_PIM_blocks_do_not_drain_kernel (test_idle_service.IdleServiceTests.test_consecutive_PIM_blocks_do_not_drain_kernel) ... ok
+test_final_PIM_tail_does_not_delay_already_finished_AE (test_idle_service.IdleServiceTests.test_final_PIM_tail_does_not_delay_already_finished_AE) ... ok
+test_finished_VLM_leaves_later_windows_unused (test_idle_service.IdleServiceTests.test_finished_VLM_leaves_later_windows_unused) ... ok
+test_full_availability_does_not_restore_whole_kernel_fitting (test_idle_service.IdleServiceTests.test_full_availability_does_not_restore_whole_kernel_fitting) ... ok
+test_kernel_larger_than_every_window_crosses_then_delays_AE (test_idle_service.IdleServiceTests.test_kernel_larger_than_every_window_crosses_then_delays_AE) ... ok
+test_no_idle_means_no_launch_and_no_AE_wait (test_idle_service.IdleServiceTests.test_no_idle_means_no_launch_and_no_AE_wait) ... ok
+test_order_prevents_short_kernel_overtaking_long_one (test_idle_service.IdleServiceTests.test_order_prevents_short_kernel_overtaking_long_one) ... ok
+test_sub_microsecond_windows_are_usable (test_idle_service.IdleServiceTests.test_sub_microsecond_windows_are_usable) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK

@@ -1,0 +1,43 @@
+{
+  "host": {
+    "argv": [
+      "hostname"
+    ],
+    "returncode": 0,
+    "stdout": "fact-thor\n",
+    "stderr": ""
+  },
+  "architecture": {
+    "argv": [
+      "uname",
+      "-m"
+    ],
+    "returncode": 0,
+    "stdout": "aarch64\n",
+    "stderr": ""
+  },
+  "gpu": {
+    "argv": [
+      "nvidia-smi",
+      "--query-gpu=name,compute_cap,driver_version",
+      "--format=csv,noheader"
+    ],
+    "returncode": 0,
+    "stdout": "NVIDIA Thor, 11.0, 595.78\n",
+    "stderr": ""
+  },
+  "compiler": {
+    "argv": [
+      "/usr/local/cuda/bin/nvcc",
+      "--version"
+    ],
+    "returncode": 0,
+    "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2026 NVIDIA Corporation\nBuilt on Fri_May_08_10:52:52_AM_PDT_2026\nCuda compilation tools, release 13.2, V13.2.86\nBuild cuda_13.2.r13.2/compiler.37953736_0\n",
+    "stderr": ""
+  },
+  "tools": {
+    "/var/tmp/xinyao-1108-transaction-evidence/build-memtrace/mem_trace.so": "2449d975df41526abdac05508fb334395fa37bb18feef77af0c02c159d7a770e",
+    "/var/tmp/xinyao-1108-transaction-evidence/nvbit-Linux-aarch64-1.8.1.tar.bz2": "d1701e1fdcb1a9661b561accf8da817d911f6123977eacfd903f704f29b0ab0f"
+  },
+  "scope": "Read-only capability inventory and tiny probes; no HBM platform substituted, no new e/g latency."
+}
