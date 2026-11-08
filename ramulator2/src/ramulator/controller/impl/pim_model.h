@@ -19,6 +19,7 @@ using namespace Ramulator;
 using Clock = int64_t;
 constexpr Clock NEVER = INT64_MAX / 4;
 inline void require(bool ok, const std::string& why) { if (!ok) throw std::runtime_error(why); }
+inline void require(bool ok, const char* why) { if (!ok) throw std::runtime_error(why); }
 struct CommandInfo { int latency=0, burst=0, completion=1, external_ca=1, private_ca=0; char direction=0; };
 struct Operation {
   std::string name, epoch;

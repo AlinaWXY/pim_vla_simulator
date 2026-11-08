@@ -52,7 +52,7 @@
 | §8.3 指标直接来自时间戳，无 offset | `analysis/report.py`；AE identity / serial sum / kernel coverage | 合成报表测试通过；完整原生结果与检查文件 pending |
 | §9.1 五旋钮严格校验、k=1/2/4 硬件参数 | `experiments/config.py`；禁止历史开关 | `tests/test_config.py` 通过；完整矩阵共用参数由 runner 校验 |
 | §9.2 b–g + e-frfcfs/e-lookahead/e-gap | `experiments/run.py` 九 case；a 保留实测 | 配置准备与单层程序已完成；**九 case 完整消融 pending** |
-| §9.3 CSV、逐 stage/kernel/bus、provenance | `analysis/report.py`、`experiments/native.py`；源码/输入/二进制/运行库哈希 | 产物写出与保护已实现；完整 CSV 及旧列名兼容最终验收 pending |
+| §9.3 CSV、逐 stage/kernel/bus、provenance | `analysis/report.py`、`experiments/native.py`；源码/输入/二进制/运行库哈希 | 旧表前21列名称/顺序已保留并通过兼容测试，追加 canonical 列；完整实验 CSV 仍 pending |
 | §11.2 迁移绘图用途，同时移除旧 trace 依赖 | `analysis/plot.py` 只消费新 evaluation CSV；PNG/SVG/PDF、输入哈希与 accounting manifest | 已用真实 c/d/e/f 单层输出生成并视觉检查；正/负/零干扰、错误总时间拒绝已验证；正式完整图 pending |
 | §10.6 两次 byte-identical、DQ 字节守恒 | runner 比较 raw 输出；report 核对 PIM×180、GPU alpha/精确 memcpy 与总线界限 | synthetic 重复与单层 DQ 通过；**完整两次复现 pending** |
 
@@ -74,8 +74,22 @@
 3. **保留 layout 不代表算术量相等。** token O 在两个 KV parity rank 分别投影再 GPU 相加，标量 MAC 数是 feature O 的两倍。特征/偶奇映射、V tail RMW、完整 W_O 驻留和各层地址分离均列入契约；模型不执行 BF16/FP32 数值精度验证。
 4. **§6.4/§8.3 serial 定义。** 为精确比较两个独立 solo，case b 在同一模拟器内重置 AE→VLM 边界的 DRAM 行状态/刷新相位，保留全局时间与统计。真实保留内存状态的 serial handoff 不在本基准定义内。
 5. **§11.1 文件组织。** policy 与 descriptor/private issue 集成在 `pim_controller.cpp`，未机械建立 `policies/` 和 `rank_controller.cpp`；lookahead 与资源检查独立为文件。运行语义由原生共同状态维持。
-6. **§11.2 迁入范围。** 张量/descriptor/Thor 测量已迁入；原外部时序、trace 后处理、延迟修正与历史开关未迁入。新的 `analysis/report.py` 只读原生时间戳；`analysis/plot.py` 延续旧 `plot_comparison.py` 的横向分解展示，改为只读新版 CSV，保留负干扰且不重建时间线。旧 trace 插入位置图没有合法的新输入，未把它迁成重放器。旧 CSV 的21列已逐项审计，列兼容更新仍在交付验收中。
+6. **§11.2 迁入范围。** 张量/descriptor/Thor 测量已迁入；原外部时序、trace 后处理、延迟修正与历史开关未迁入。新的 `analysis/report.py` 只读原生时间戳；`analysis/plot.py` 延续旧 `plot_comparison.py` 的横向分解展示，改为只读新版 CSV，保留负干扰且不重建时间线。旧 trace 插入位置图没有合法的新输入，未把它迁成重放器。旧 CSV 的前21列名称/顺序已保留并验证，新增 canonical 列在其后；下表列出不应按旧重放语义解释的兼容字段。
 7. **模型固定边界。** 不计 WRGB transport SM 或额外交接时间；AE GPU/VLM 不同时执行；无窗口适配；GPU 地址采用有限物理容量内合成顺序区域；uniform arrivals 与 alpha 写回为模型假设。完整 VLM 校准未通过前不可宣称预测精度达标。
 8. **lookahead 是最早时间预测。** 最多32条，clone 原生状态与依赖，忽略未来 GPU/刷新及资源争用；真实 issue 仍核验 live native device。它不是额外时序引擎或对未来完成时间的保证。
+
+| 兼容字段 | 新版准确语义 |
+|---|---|
+| `variant` | case 对应的五种实际 PIM 程序名 |
+| `AE_native_schedule_ms` | `AE_solo_ms` 的别名；不存在另一套外部调度时间 |
+| `net_overlap_ms` | `AE_solo_ms + VLM_solo_ms - total_ms`，保留符号 |
+| `VLM_completed_model_ms` | AE 结束时已经完成的 VLM 单元，在 native solo 运行中的时长之和 |
+| `completed_units` | 上述集合的单元数，不是全部2357个单元 |
+| `VLM_remaining_model_ms` | `VLM_remaining_ms` 的别名；实际 native tail，包含可能尚未完成的单元尾部 |
+| `raw_model_total_ms` | `total_ms` 的别名，未减去任何 bias |
+| `GPU_act1/act2/prepb/preab/reads/writes` | rank0 实际发射命令计数 |
+| `GPU_row_hits/row_misses` | 请求服务过程中是否需要 array prerequisite，命中与缺失之和等于完成 GPU RD/WR 请求数 |
+
+`tests/test_config.py::ReportingTests` 覆盖负 PIM 干扰、AE 结束时的 completed 集合、实际 tail、兼容别名与原生命令计数。保留字段名不保留旧常数修正，也不把 completed 与 remaining 强行构造成 solo 总和。
 
 旧仓库 tag、备份目录与三个完整归档 SHA-256 见 [legacy-backup.json](legacy-backup.json)。干净上游为 `7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`。最终实验 provenance 必须绑定实际运行的源提交、spec、程序、校准和二进制，不能用备份提交替代新版实验来源。

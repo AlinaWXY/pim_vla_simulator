@@ -202,8 +202,8 @@ class PimResources {
   uint64_t epoch_=0;
   Time rope_busy_=0;
 
-  static void ensure(bool ok,const std::string& message) {
-    if(!ok) throw std::runtime_error("PIM resource violation: "+message);
+  static void ensure(bool ok,const char* message) {
+    if(!ok) throw std::runtime_error(std::string("PIM resource violation: ")+message);
   }
   template<class Op> static int bank(const Op& o) {
     ensure(o.addr.size()==6 && o.addr[2]>=0 && o.addr[2]<4 && o.addr[3]>=0 && o.addr[3]<4,

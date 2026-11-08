@@ -19,12 +19,12 @@ if [[ "$action" == prepare ]]; then
   git -C "$source_root" archive "$source_commit" | tar -x -C "$run_dir/frozen/source"
   cp -p -- "$source_root/build/pim_vla_sim" "$run_dir/frozen/bin/pim_vla_sim"
   cp -p -- "$source_root/ramulator2/libramulator.so" "$run_dir/frozen/lib/libramulator.so"
-  mkdir -p "$run_dir/frozen/source/programs/generated"
-  cp -p -- "$source_root/programs/generated/"*.json "$run_dir/frozen/source/programs/generated/"
   printf '%s\n' "$source_commit" > "$run_dir/frozen/SOURCE_COMMIT"
   printf '%s\n' "$python_exec" > "$run_dir/python-path"
   printf '%s\n' "$partition" > "$run_dir/partition"
   export PYTHONDONTWRITEBYTECODE=1 PIM_VLA_SOURCE_COMMIT="$source_commit"
+  "$python_exec" "$run_dir/frozen/source/programs/gen_pim_program.py" --output "$run_dir/frozen/source/programs/generated" --compact
+  "$python_exec" "$run_dir/frozen/source/tools/verify_input_provenance.py" --root "$run_dir/frozen/source"
   "$python_exec" "$run_dir/frozen/source/experiments/run.py" --output "$run_dir" --prepare-only --mac-freq-mult "${PIM_MAC_FREQ_MULT:-4}"
   (cd "$run_dir" && sha256sum frozen/bin/pim_vla_sim frozen/lib/libramulator.so > frozen/runtime-SHA256SUMS)
   (cd "$run_dir/frozen/source" && find . -type f ! -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum > ../source-SHA256SUMS)

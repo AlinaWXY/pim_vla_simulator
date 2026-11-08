@@ -65,9 +65,11 @@ byte-identical native repetitions. Resume and standalone reuse also check the
 loaded library, so replacing a shared library invalidates prior calibration.
 
 For the full server campaign, commit the tested source and use the prepared
-Slurm workflow. The first command freezes the source, all five generated PIM
-programs, binary and shared library; it creates the nine configurations before
-any parallel job can write them. `prepare` performs no simulation:
+Slurm workflow. The first command freezes the source, binary and shared
+library, then regenerates all five PIM programs using the archived source.
+It verifies all input provenance and program source bindings, then creates
+the nine configurations before any parallel job can write them. `prepare`
+performs no simulation and rejects stale source/data hashes:
 
 ```bash
 RUN=/fact_data/xinyaowang/pim_vla_sim2_20261109/results/full-k4
@@ -98,6 +100,12 @@ manifests before execution. The binary comes from `$RUN/frozen/bin` and
 `LD_LIBRARY_PATH` starts with `$RUN/frozen/lib`; the source commit is bound to
 the archive rather than a later mutable checkout. Output provenance includes
 the embedded spec's canonical JSON hash as well as input and raw-result hashes.
+If a checkout's Git newline conversion has invalidated recorded byte hashes,
+`tools/verify_input_provenance.py --rebind-line-endings` can update provenance
+only after proving that the previous hash matches the same bytes with LF/CRLF
+conversion. It records both hashes and leaves all data files untouched. Commit
+that metadata repair before preparing the campaign; ordinary content changes
+are rejected.
 
 The complete AE event schedule has 18 layers × 10 denoising steps. It retains
 per-step natural-cache GPU kernel durations and replaces only the offloaded

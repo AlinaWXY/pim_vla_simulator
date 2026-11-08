@@ -87,6 +87,8 @@ Case a 沿用实测，不由本模型仿真。只有 concurrent + streaming 接�
 
 这些完整产物目前仍待实验结束后验收，文件格式的实现不等于已有结果。
 
+`evaluation-b-g.csv` 的前21列保留旧 publication 表的列名与顺序，后面追加新版 canonical 列；兼容性测试已通过。`AE_native_schedule_ms` 等于 `AE_solo_ms`，`raw_model_total_ms` 等于未经修正的 `total_ms`。`completed_units` 统计 AE 完成时已结束的 VLM 单元，`VLM_completed_model_ms` 累加这些单元的 native solo 时长；`VLM_remaining_model_ms` 是实际尾部时间，可能包含尚在运行的单元，因此不要求它与 completed 列加总为 VLM solo。GPU 命令/行命中列来自 rank0 原生计数。完整映射写入运行后的 `summary.json`。
+
 ## 采用的模型边界与文档冲突处理
 
 详细依据见 [时序来源与决定](docs/timing-source-and-decisions.md)、[程序与张量契约](docs/program-design.md)、[原生执行模型](docs/native-model.md)。以下会影响结果解释：

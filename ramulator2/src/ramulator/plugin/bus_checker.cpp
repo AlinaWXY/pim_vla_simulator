@@ -17,7 +17,7 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
   const auto& m=info->at(cmd);
   auto& s=stats[stage]; ++s.commands; ++checked;
   if(m.external_ca) {
-    require(now>=external_end,"CA overlap at CK "+std::to_string(now));
+    if(now<external_end)throw std::runtime_error("CA overlap at CK "+std::to_string(now));
     external_start=now;external_end=now+m.external_ca;
   }
   if(m.private_ca) {
@@ -29,7 +29,7 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
   // Assertion only: never consulted by the scheduler. DQ ordering is causal.
   if(!bursts.empty()) {
     const auto& old=bursts.back();
-    require(b.start>=old.end,"DQ overlap or return reordering at CK "+std::to_string(now)+" "+spec->command_names[old.command]+" -> "+spec->command_names[cmd]);
+    if(b.start<old.end)throw std::runtime_error("DQ overlap or return reordering at CK "+std::to_string(now)+" "+spec->command_names[old.command]+" -> "+spec->command_names[cmd]);
     // Physical interface minima are properties of the direction, not a
     // second command timing table. Values come from the exported spec.
     Clock gap=0;
@@ -37,7 +37,7 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
     if(old.direction=='W' && b.direction=='R') gap=spec->get_timing_value("nDQ_WTR");
     if(old.direction==b.direction && old.rank!=b.rank)
       gap=old.direction=='R'?spec->get_timing_value("nCS"):spec->get_timing_value("nDQ_RANK_WTW");
-    require(b.start-old.end>=gap,"DQ turnaround violation at CK "+std::to_string(now));
+    if(b.start-old.end<gap)throw std::runtime_error("DQ turnaround violation at CK "+std::to_string(now));
   }
   bursts.push_back(b);
   (m.direction=='R'?s.read:s.write)+=32;

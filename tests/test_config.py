@@ -8,6 +8,7 @@ import sys
 import unittest
 from unittest import mock
 import tempfile
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -16,6 +17,7 @@ from experiments.prepare_inputs import ae_schedule, normalize_vlm
 from calib.calibrate_vlm import assess
 from experiments.native import runtime_libraries, library_hashes
 from analysis.report import summarize
+from tools.verify_input_provenance import verify_inputs
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -86,6 +88,27 @@ class RuntimeProvenanceTests(unittest.TestCase):
                 runtime_libraries("simulator")
         with self.assertRaises(ValueError):
             library_hashes({"binary_sha256": "executable alone is insufficient"})
+
+    def test_line_ending_rebind_proves_byte_equivalence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            directory = root / "input-data"
+            directory.mkdir()
+            payload = b'{"duration_us": 3}\n'
+            original = hashlib.sha256(payload.replace(b"\n", b"\r\n")).hexdigest()
+            data_path = directory / "vlm.json"
+            data_path.write_bytes(payload)
+            provenance = directory / "provenance.json"
+            provenance.write_text(json.dumps(dict(sources={}, generated={"vlm.json": original})), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                verify_inputs(root, check_programs=False)
+            result = verify_inputs(root, rebind_line_endings=True, check_programs=False)
+            self.assertEqual(len(result["line_ending_rebindings"]), 1)
+            self.assertEqual(data_path.read_bytes(), payload)
+            verify_inputs(root, check_programs=False)
+            data_path.write_bytes(b'{"duration_us": 4}\n')
+            with self.assertRaises(ValueError):
+                verify_inputs(root, rebind_line_endings=True, check_programs=False)
 
 
 class ReportingTests(unittest.TestCase):

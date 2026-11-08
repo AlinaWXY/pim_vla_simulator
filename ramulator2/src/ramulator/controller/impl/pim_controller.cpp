@@ -284,9 +284,9 @@ bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk)
   throw std::runtime_error("unknown arbitration "+policy);
 }
 void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage) {
-  require(device.check_timing(cmd,addr,clk),"scheduler bypassed native check_timing "+device.m_spec->command_names[cmd]+" at "+std::to_string(clk));
+  if(!device.check_timing(cmd,addr,clk))throw std::runtime_error("scheduler bypassed native check_timing "+device.m_spec->command_names[cmd]+" at "+std::to_string(clk));
   int preq=device.get_preq_command(cmd,addr,clk);
-  require(preq==cmd,"scheduler bypassed native prerequisite "+device.m_spec->command_names[cmd]+" requires "+device.m_spec->command_names[preq]+" at "+std::to_string(clk)+" rank="+std::to_string(addr[1])+" bg="+std::to_string(addr[2])+" bank="+std::to_string(addr[3])+" row="+std::to_string(addr[4]));
+  if(preq!=cmd)throw std::runtime_error("scheduler bypassed native prerequisite "+device.m_spec->command_names[cmd]+" requires "+device.m_spec->command_names[preq]+" at "+std::to_string(clk)+" rank="+std::to_string(addr[1])+" bg="+std::to_string(addr[2])+" bank="+std::to_string(addr[3])+" row="+std::to_string(addr[4]));
   checker.observe(cmd,addr,clk,stat_stage);
   device.issue_command(cmd,addr,clk);
   if(addr[1]==0)++gpu_command_counts[cmd];

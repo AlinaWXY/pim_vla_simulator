@@ -1,24 +1,161 @@
 {
   "repository": "https://github.com/CMU-SAFARI/ramulator2",
   "commit": "7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da",
-  "unchanged_files": 460,
+  "unchanged_files": 433,
   "modified_upstream_files": [
     {
       "path": "python/ramulator/dram/__init__.py",
-      "upstream_sha256": "a925fedf92724a4adeea96bc3bdc28b6a5c4c401aa6b938c3725cd67bfe257be",
-      "current_sha256": "8e90ceed176e06947d3a551dbc62dd1bdd84b86fa9990c578027c74ed2cd1410"
+      "upstream_sha256": "927e5e7e210da9af0fb1e7ec7d427a327270b55d001754aaf2879f69c63c8483",
+      "current_sha256": "f71041eae3493fa925150b943dade1d92ffc6d62e97865a8c7da4e166796c952"
     },
     {
       "path": "src/ramulator/base/config.cpp",
       "upstream_sha256": "801f152b836072815583366c8ee562a9fe7ec31d7c8f8ecc746bba93c9d14f8c",
-      "current_sha256": "1ac872dab01f672e49d46d5e21268a6a911b727bbf6e14bafed032f218fe1a03"
+      "current_sha256": "61d416dc2e89924645c568a24bc0db9671d63056e6ffae61241e10c9de0a7550"
     },
     {
       "path": "src/ramulator/dram/CMakeLists.txt",
-      "upstream_sha256": "e3589ea26935c7c63d665c762ed89dab7cf8587566b95611877533a2c1b31968",
-      "current_sha256": "20f7237d60c3057793a7f6980ec5d04a7a65fdca752277c15a5af6d763cd81d6"
+      "upstream_sha256": "3a9225814fbf3f3bf135247e814a1be4fbd503ebd50f7c60652378d74aaddad6",
+      "current_sha256": "4084bbcf95559b8dacefff74ec4f347feec5ea87dc9ae999d7c0806b9570f769"
+    }
+  ],
+  "line_ending_only_files": [
+    {
+      "path": "python/ramulator/dram/gddr6.py",
+      "upstream_sha256": "91e9b4f1376fbca129433f69ed2ac33becff46a56377d8ae39a28858bce35a9d",
+      "current_sha256": "749a5fe6f72374ac4554dbccfdf4337c5d0988594f26241fac5953781ccbe19f"
+    },
+    {
+      "path": "src/ramulator/CMakeLists.txt",
+      "upstream_sha256": "a9905a19a15071a0ea59685f73c18c6d2008e707a29f1d5bb61524787b340d37",
+      "current_sha256": "b85a7a3cb60993d59b2868361d419ac8d37308bbecc2b1856bc0c65420900c74"
+    },
+    {
+      "path": "src/ramulator/base/CMakeLists.txt",
+      "upstream_sha256": "f682ce60d1f1e196d3bf8b4edbd9fc954f5f2e2413b6896859fc382e2f0077fa",
+      "current_sha256": "122c744d450751399b7ab87d0d8ec3d1d9402904c76a89ad9e419b3f0cd74bd5"
+    },
+    {
+      "path": "src/ramulator/base/base.h",
+      "upstream_sha256": "aa32d2e3a091231099cf7206c4860a50a635c1c5acae365a291c4a5f035f1b3f",
+      "current_sha256": "28f3e720edae0742b1367c1dc426d85c14a4b189b0c77846dc14a7f8277c5ec6"
+    },
+    {
+      "path": "src/ramulator/base/config.h",
+      "upstream_sha256": "7a87b85a442525004b24bae26042e9ccefd8eaca63e16eaa84fb33978f35cace",
+      "current_sha256": "bd1e8f6ea57bd98ff9270d8515ed47b05560f4a0c8a691aa3227a5e281362a22"
+    },
+    {
+      "path": "src/ramulator/base/debug.h",
+      "upstream_sha256": "b40c58d27c91162c7d181037263638bf0a0e4aec1ddf95e71e37e3d20b68ed17",
+      "current_sha256": "3782fea1c60cab336da96c123d9a94fc3cff01e70238095720ab6ee3bff6ab56"
+    },
+    {
+      "path": "src/ramulator/base/factory.cpp",
+      "upstream_sha256": "8138ff10ab8fac1a1afdc38e741d38eaba4214ce8968f4599d4bfe386408e762",
+      "current_sha256": "f9598229837ef20ef57e840728a91dea380deecb932c0d4517682befd29a2571"
+    },
+    {
+      "path": "src/ramulator/base/factory.h",
+      "upstream_sha256": "d70258d3fc131a4364874c27258d7458d3ef5ed6054460085ae885fdb8214ea9",
+      "current_sha256": "acbca3916f72cfb9fd3d3266b17c6792d40e87a6aa84e315b971267c699241f4"
+    },
+    {
+      "path": "src/ramulator/base/param.h",
+      "upstream_sha256": "c46d37cc7f14b03ea017db6c32603a7cfcbea5a61595ca8b2afdc3f3d9152c42",
+      "current_sha256": "555aa2966ff632cc5c8ca6d2359ea95a8af11eae0cc6301e23af542055a466df"
+    },
+    {
+      "path": "src/ramulator/base/request.cpp",
+      "upstream_sha256": "e62d4f1b7da03dad8dfd432f1bb78ecfee912d7c6cc14e8bf05041cfb920e279",
+      "current_sha256": "1bc6ac73ed43ba356f09ca8f02b2e569eca2e6048c6a034f69be3c5d155db1d4"
+    },
+    {
+      "path": "src/ramulator/base/request.h",
+      "upstream_sha256": "8e1d3dad3be19571eb7c50f23e6502919c137ee34d67564e1e77202f3eea272b",
+      "current_sha256": "ecd2bc4331db5e43636fdb7a015cb4fd0f32b75b4a503ff058283707b1b9ee6d"
+    },
+    {
+      "path": "src/ramulator/base/stats.h",
+      "upstream_sha256": "1f5f0240cae7d46645c2454680d0d2213d75cfac47f157d63b6944086b7a3757",
+      "current_sha256": "86c4b1b4bad3b87b1012de1c5b0180ab757bee7ce3ce1e839235f9ad04bcbba2"
+    },
+    {
+      "path": "src/ramulator/base/type.h",
+      "upstream_sha256": "bfb003c3192ef65d6f083d199289624617cfc26d1d092d99fa198d32039882a3",
+      "current_sha256": "b2db84113cad33586ffdde412a87d0a528e5c7c4ede0cbbde36a7f44321caa70"
+    },
+    {
+      "path": "src/ramulator/base/utils.cpp",
+      "upstream_sha256": "421cc29548e9e238940fbb9fe51be456084032c6478c4236675354f578b2457e",
+      "current_sha256": "602904e67466434a8d8791903c58831bb241a2eca4c76234fb36e09312f3079a"
+    },
+    {
+      "path": "src/ramulator/base/utils.h",
+      "upstream_sha256": "5fcd9c2b2b94651bfa65aa3cf5d8624cdc319785dfb1936132453d19328e8a43",
+      "current_sha256": "de9770556e25439f9f903be66fbb1fc3d6668ade1e6c1842223f9b2902a46411"
+    },
+    {
+      "path": "src/ramulator/frontend/i_frontend.h",
+      "upstream_sha256": "cc2faf4d2cc5c8ffe4433de16d9e6ef005c2a31ae3404a1de4531d91818eed79",
+      "current_sha256": "59b8981b9a518c96592288ff019adf020f3cb368e809b090c40bad6a20f0c208"
+    },
+    {
+      "path": "src/ramulator/frontend/impl/memory_trace/loadstore_trace.cpp",
+      "upstream_sha256": "c12ea11ea8de7dd2b9c627185c934196d49047b970d2b6557c6e0a586074afa3",
+      "current_sha256": "90d0c859f765a2d3812b576a70617a2315c223025c0c88742b8fb604e783294b"
+    },
+    {
+      "path": "src/ramulator/frontend/impl/processor/simpleO3/core.cpp",
+      "upstream_sha256": "5a72adc90ff424b72be9696e9d012faddbad896492465667260b9a58d547b89e",
+      "current_sha256": "3fc9bf61caad1e0b8c152b200ec7ae0f3d9237a8c5923661ea80fb7751eb4489"
+    },
+    {
+      "path": "src/ramulator/frontend/impl/processor/simpleO3/core.h",
+      "upstream_sha256": "e368c72ef1858c57f87956d5a4b2cd1773c4004caddcc7efe2bce3e5cebd23f0",
+      "current_sha256": "538580cf0ed817975ae342f02908ed02318861c2a17f092a83fecbd1a539e3f8"
+    },
+    {
+      "path": "src/ramulator/frontend/impl/processor/simpleO3/llc.cpp",
+      "upstream_sha256": "13b23567399bc497c434a010cc729b1c85b14df1c3ccd1f5432d018d1770ad54",
+      "current_sha256": "2883db975f1b3f2fec36bdc9505d0e397536cde09c023d042d325c9a231eeb86"
+    },
+    {
+      "path": "src/ramulator/frontend/impl/processor/simpleO3/llc.h",
+      "upstream_sha256": "d87823d2ec7b6b32373943ebaecc7dfda8a86bca97168d9b2a661bcde44caa61",
+      "current_sha256": "411786af03c4499ac7280526bf96e7b57332523c11cef21787a7d282ae303607"
+    },
+    {
+      "path": "src/ramulator/frontend/impl/processor/simpleO3/simpleO3.cpp",
+      "upstream_sha256": "cb671e9bee99a64addb6082a0b4197aab338a76e36312c360fd88e72edcf6451",
+      "current_sha256": "36213fd08c1bda5137b17dda7e0ad80a57a5e9e0ac9e62baaf998fc52b2745f5"
+    },
+    {
+      "path": "src/ramulator/memory_system/CMakeLists.txt",
+      "upstream_sha256": "682b75dde0e52684c4d4405fc3aa5ccd44f89956840b7c737b052c5850bcfe08",
+      "current_sha256": "1135990eb0816db5ccf534c30d6c6bf2d6cdf866421cba15b1d834ec6740bc50"
+    },
+    {
+      "path": "src/ramulator/memory_system/i_memory_system.h",
+      "upstream_sha256": "76c099f2730df09b34d9952f2ff4c34318194d50beabd3b167aa27972b07537f",
+      "current_sha256": "7581c6a2972b92baad30af15e7420cbe014321db82d34be5e9657503f6ec1f9f"
+    },
+    {
+      "path": "src/ramulator/translation/CMakeLists.txt",
+      "upstream_sha256": "381418e5bcd422574b9de910a1175f9c442ca6dae7d0e0735a45914d9c2457df",
+      "current_sha256": "107e48dfdb8283941d3432f5137439c822dfeb2c3505b162f9a3da13a4f25fc1"
+    },
+    {
+      "path": "src/ramulator/translation/i_translation.h",
+      "upstream_sha256": "e58fc454b858ff614eee16d9d7f39d338caf671d5d22ea33c4481033667ed969",
+      "current_sha256": "9d2f2911fc584ddf49060ee165c8e524f35f3f0a12dc475bfcb568be7260fbfc"
+    },
+    {
+      "path": "src/ramulator/translation/impl/no_translation.cpp",
+      "upstream_sha256": "f1e496e65547e9ac4ffd9ee32c2407202ac9542df39b2b53907c0354ab56119e",
+      "current_sha256": "7f83a72e29711438720265f952ec4ac372aad96d77df1d172ad5b645b0c05515"
     }
   ],
   "missing_upstream_files": [],
-  "method": "SHA256 of tracked upstream files; added PIM files are tracked in the new branch"
+  "method": "SHA256 of Git archive bytes (core.autocrlf=false); pure LF/CRLF changes classified separately; added PIM files are tracked in the new branch"
 }
