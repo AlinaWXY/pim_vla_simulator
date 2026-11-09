@@ -15,11 +15,16 @@ CASES = ("b", "e", "e-lookahead", "e-frfcfs", "e-gap", "g")
 DEFAULT_OUTPUT = ROOT / "results/ablation-scaled-w128"
 
 
-def run_case(binary, output, case, program_dir, *, resume=False):
+def run_case(binary, output, case, program_dir, *, resume=False, allow_unit_errors_sha256=None):
     path = output / "calibration-scaled.json"
     ledger = read_json(path)
-    if ledger.get("calibration_model") != "scaled_ablation" or not ledger["validation"]["passed"]:
-        raise ValueError("ablation requires a scaled solo that passed both 1% gates")
+    allow_unit_errors = allow_unit_errors_sha256 is not None
+    if allow_unit_errors and allow_unit_errors_sha256 != sha256(path):
+        raise ValueError("the per-unit waiver is pinned to a different calibration file")
+    v = ledger["validation"]
+    if (ledger.get("calibration_model") != "scaled_ablation" or abs(v["relative_error"]) > .01 or
+        (not v["passed"] and not allow_unit_errors)):
+        raise ValueError("scaled solo failed a required timing gate")
     if (ledger["w_max"], ledger["write_high"], ledger["write_low"], ledger["alpha"]) != (128, 96, 32, 1):
         raise ValueError("scaled ablation hardware parameters differ")
     destination = output / "cases" / case
@@ -27,7 +32,8 @@ def run_case(binary, output, case, program_dir, *, resume=False):
     scaled = ledger["provenance"]["inputs"]["vlm"]["path"]
     for config in configs.values():
         config["vlm_path"] = scaled
-    run_closed_loop(binary, configs, destination, path, [case], resume=resume)
+    run_closed_loop(binary, configs, destination, path, [case], resume=resume,
+                    allow_scaled_unit_errors=allow_unit_errors)
 
 
 def report(output):
@@ -51,7 +57,8 @@ def report(output):
                             ae_gpu_wait_ms=row["AE_GPU_wait_ms"], vlm_tail_ms=row["VLM_remaining_ms"],
                             identity_error_us=row["total_identity_residual_us"],
                             vlm_slowdown_ms=row["VLM_memory_stall_ms"],
-                            raw_sha256=row["raw_sha256"]))
+                            raw_sha256=row["raw_sha256"],
+                            allowed_unit_errors=saved.get("allow_scaled_unit_errors", False)))
     complete = {r["case"]: r for r in results if r["status"] == "已完成"}
     for row in complete.values():
         row["speedup_over_b"] = complete["b"]["total_ms"] / row["total_ms"] if "b" in complete else None
@@ -84,6 +91,8 @@ def report(output):
         slow = sum(row["classification"] == SLOW for row in over)
         lines.append(f"**逐单元验收未通过。** {len(over)} 个单元超出 1%，其中 {slow} 个属于允许缩放的 874 个单元，"
                      f"{len(over)-slow} 个沿用原流量和窗口。")
+        if any(r.get("allowed_unit_errors") for r in results):
+            lines.append("本轮按授权豁免逐单元启动门槛，复用原校准文件和流量输入。")
         lines.extend(["", "| ordinal | 分类 | W_k | s_k | profile（μs） | solo（μs） | 偏差 |",
                       "|---:|---|---:|---:|---:|---:|---:|"])
         for row in over:
@@ -115,11 +124,14 @@ def main():
     case.add_argument("--binary", type=Path, default=ROOT / "build/pim_vla_sim")
     case.add_argument("--program-dir", type=Path)
     case.add_argument("--resume", action="store_true")
+    case.add_argument("--allow-unit-errors-sha256",
+                      help="allow per-unit errors only for the scaled ledger with this SHA-256")
     for command in (case, commands.add_parser("report")):
         command.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     if args.command == "case":
-        run_case(args.binary.resolve(), args.output.resolve(), args.case, args.program_dir, resume=args.resume)
+        run_case(args.binary.resolve(), args.output.resolve(), args.case, args.program_dir,
+                 resume=args.resume, allow_unit_errors_sha256=args.allow_unit_errors_sha256)
     else:
         report(args.output.resolve())
 

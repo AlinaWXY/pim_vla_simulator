@@ -12,9 +12,12 @@ from experiments.config import variant_name
 from experiments.native import execute, library_hashes, runtime_libraries
 
 
-def load_calibration(binary, config, path):
+def load_calibration(binary, config, path, *, allow_scaled_unit_errors=False):
     ledger = read_json(path)
-    if ledger.get("kind") != "kernel_mlp" or not ledger["validation"]["passed"]:
+    scaled = ledger.get("calibration_model") == "scaled_ablation"
+    if ledger.get("kind") != "kernel_mlp" or not (
+        ledger["validation"]["passed"] or (scaled and allow_scaled_unit_errors)
+    ):
         raise ValueError("closed-loop MLP calibration has not passed")
     provenance = ledger["provenance"]
     if (provenance["binary_sha256"] != sha256(binary) or
@@ -26,11 +29,12 @@ def load_calibration(binary, config, path):
     if sha256(spec_file["path"]) != spec_file["sha256"] or read_json(spec_file["path"]) != config["spec"]:
         raise ValueError("spec differs from closed-loop calibration")
     validation = ledger["validation"]
-    if ledger.get("calibration_model") == "scaled_ablation":
+    if scaled:
         [first] = validation["raw_paths"]
-        if ([sha256(first)] != validation["raw_sha256"] or validation["unit_violations"] or
+        if ([sha256(first)] != validation["raw_sha256"] or
+            (validation["unit_violations"] and not allow_scaled_unit_errors) or
             abs(validation["relative_error"]) > .01):
-            raise ValueError("scaled solo failed its per-unit or total validation")
+            raise ValueError("scaled solo provenance or required timing validation failed")
     else:
         first, second = validation["raw_paths"]
         hashes = [sha256(p) for p in (first, second)]
@@ -80,10 +84,12 @@ def phase_utilization(raw):
     }
 
 
-def run_closed_loop(binary, configs, output, calibration_path, cases, *, resume=False):
+def run_closed_loop(binary, configs, output, calibration_path, cases, *, resume=False,
+                    allow_scaled_unit_errors=False):
     output = Path(output)
     calibration_path = Path(calibration_path).resolve()
-    ledger, solo = load_calibration(binary, configs["b"], calibration_path)
+    ledger, solo = load_calibration(binary, configs["b"], calibration_path,
+                                    allow_scaled_unit_errors=allow_scaled_unit_errors)
     historical = {r["case"]: r for r in read_json(
         ROOT / "reference/e2e-gio-bcast-20261109/data/completed-cases.json")["evaluation"]}
     solo_kernels = {k["ordinal"]: k for k in solo["kernels"]}
@@ -131,6 +137,7 @@ def run_closed_loop(binary, configs, output, calibration_path, cases, *, resume=
         write_json(output / "closed-loop-summary.json", {
             "execution_model": "native_dram_requests", "vlm_release": "closed_loop",
             "mlp_sha256": sha256(calibration_path), "evaluation": results,
+            "allow_scaled_unit_errors": allow_scaled_unit_errors,
         })
         write_csv(output / "closed-loop-evaluation.csv", results)
     return results
