@@ -55,7 +55,7 @@ MAC output geometry is `rows * output_columns * 4` bytes per bank. QKV uses
 next batch depends on the last MAC's completion. O's second tile cannot fill
 its input or overwrite output until all 512 first-tile exports complete.
 
-`MAC_RUN`/`ROPE_RUN` carries eight retained version-2 wire words and CRC16,
+`MAC_RUN`/`ROPE_RUN` carries eight version-2 wire words and CRC16,
 plus a timing-free expansion. The controller must feed these children through
 its finite 32-entry internal FIFO and complete the descriptor after all
 children finish. Dependency-ready younger instructions and their ACT/PRE
@@ -72,6 +72,41 @@ RDRES operations between O tiles still use external CA/DQ and their named
 I/O epoch. A local-RoPE fused layer has six MAC descriptors plus one RoPE
 descriptor (147 CA CK under the spec); GPU-RoPE has six (126 CA CK). Decode
 latency and CA occupancy are defined exclusively by the DRAM spec.
+
+## Down co-resident input and weight rows
+
+The requested Down layout uses twelve fragments per 2KiB bank row. Fragment f
+occupies weight columns `5*(f%12)+0..3` and input column `5*(f%12)+4`, in row
+`DOWN_BASE/2048 + f//12`. Query q's 32B input is in bank q; LOCALRD loads that
+bank's SRF slot `(f%2)*16+q`, then BCAST supplies the same slot in all sixteen
+banks. This preserves the two-fragment/1KiB SRF batch and all tensor ownership.
+
+All 256 fragments reserve 22 rows per bank: 32KiB weights, 8KiB inputs and
+4KiB total unused space (including the partial last row), or 44KiB in
+`[0x50000,0x5B000)`. Full rows use columns 0..59; the final four-fragment row
+uses 0..19. Both streaming and fused read this identical weight mapping.
+Streaming still imports directly with WRGB and leaves the array input columns
+unused. Fused still executes 4096 ordinary WR, 4096 LOCALRD, 4096 BCAST, 1024
+MACAB_M16 and 128 RDRES per channel; input/output DQ remains 128KiB/4KiB.
+
+Each of the 22 fused row groups begins with an explicit ACTAB request after
+all MACs from the previous row complete. Native prerequisites perform PREab
+when required. First-batch LOCALRD instructions depend on ACTAB **issue**, not
+its 68CK completion, so the native 20/36/52/68CK bank readiness remains visible.
+Later batches preserve SRF data dependencies. Refresh can require additional
+native reactivation; 22 is the explicit program count, not a promised count of
+all dynamically issued activation commands. No timing constant is subtracted
+or encoded into the program to realize the layout benefit.
+
+The Down descriptor uses previously reserved word-0 bit 29 for row-colocated
+addressing. Its A base is `0x50080`, B base `0x50000`, both fragment strides are
+160B, the row period (`split`) is 12 and padding (`jump`) is 128B. In this mode
+the offset is `base + f*stride + floor(f/split)*jump`; A selects bank=query,
+and B adds output-column*32B. Descriptor length and native CA/decode cost stay
+unchanged. Other operators retain their wire words. The simulator executes
+the explicitly expanded children, rather than decoding binary words at runtime;
+an independent wire-field test verifies that the Down words describe those
+physical requests.
 
 The Q exchange has two global stages, `q_exchange_export` and
 `q_exchange_import`. The old bank-addressed Q_REMOTE behavior cannot be

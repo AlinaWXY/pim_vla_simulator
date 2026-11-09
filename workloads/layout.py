@@ -1,7 +1,8 @@
 """Physical tensor ownership; no DRAM timing or old simulator imports.
 
 Addresses use [channel, rank, bank_group, bank, row, 32-byte-column].
-The original branch's byte-address formulas are retained explicitly.
+The original branch's ownership formulas are retained. Down uses the requested
+co-resident weight/input rows; other operator address formulas are unchanged.
 """
 CHANNELS = 16
 BANKS = 16
@@ -18,6 +19,12 @@ Q_BASE, K_SUFFIX_BASE, COEF_BASE = 0x14100, 0x14200, 0x14000
 Q_IMPORT_BASE = 0x15000
 STAGING_BASE, SCORE_BASE, O_BASE = 0x80000, 0xA0000, 0xC0000
 GU_BASE, DOWN_BASE = 0x40000, 0x50000
+DOWN_FRAGMENTS = 256
+DOWN_WEIGHT_COLUMNS = 4
+DOWN_COLUMNS_PER_FRAGMENT = DOWN_WEIGHT_COLUMNS + 1
+DOWN_FRAGMENTS_PER_ROW = 12
+DOWN_ROWS = (DOWN_FRAGMENTS + DOWN_FRAGMENTS_PER_ROW - 1) // DOWN_FRAGMENTS_PER_ROW
+DOWN_REGION_BYTES = DOWN_ROWS * ROW_BYTES
 
 
 def address(channel, offset, bank=0, rank=1):
@@ -92,10 +99,32 @@ def gu_weight_location(reduction, output, projection=0):
 
 
 def down_weight_location(reduction, output):
+    if not 0 <= reduction < 4096 or not 0 <= output < 1024:
+        raise ValueError("invalid Down reduction/output coordinate")
     channel, local = divmod(output, 64)
     bank, output_slot = divmod(local, 4)
     fragment, lane = divmod(reduction, 16)
-    return channel, bank, DOWN_BASE + (fragment * 4 + output_slot) * 32 + lane * 2
+    return channel, bank, down_weight_offset(fragment, output_slot) + lane * 2
+
+
+def down_weight_offset(fragment, output_slot):
+    """32B weight column in a 12-fragment [W0,W1,W2,W3,input] row."""
+    if not 0 <= fragment < DOWN_FRAGMENTS or not 0 <= output_slot < DOWN_WEIGHT_COLUMNS:
+        raise ValueError("invalid Down fragment/output slot")
+    row, within = divmod(fragment, DOWN_FRAGMENTS_PER_ROW)
+    return DOWN_BASE + row * ROW_BYTES + (within * DOWN_COLUMNS_PER_FRAGMENT + output_slot) * BURST_BYTES
+
+
+def down_input_location(fragment, query):
+    """Query q's input is in bank q, adjacent to the fragment's four weights.
+
+    One input burst per bank is read into that bank's SRF and broadcast to the
+    corresponding query slot in every bank. No input write addresses a weight.
+    """
+    if not 0 <= fragment < DOWN_FRAGMENTS or not 0 <= query < QUERIES:
+        raise ValueError("invalid Down fragment/query")
+    offset = down_weight_offset(fragment, 0) + DOWN_WEIGHT_COLUMNS * BURST_BYTES
+    return query, offset
 
 
 def contract(layout):
@@ -125,11 +154,26 @@ def contract(layout):
         "regions_per_bank": {
             "k_prefix": [K_PREFIX_BASE, WORK_BASE], "q_k_coefficient_work": [WORK_BASE, WORK_BASE + 2048],
             "qkv": [QKV_BASE, QKV_BASE + 96 * 1024], "v_cache": [V_BASE, V_BASE + 16384],
-            "gate_up_weights": [GU_BASE, DOWN_BASE], "down_weights": [DOWN_BASE, DOWN_BASE + 32768],
+            "gate_up_weights": [GU_BASE, DOWN_BASE],
+            "down_weights_and_inputs": [DOWN_BASE, DOWN_BASE + DOWN_REGION_BYTES],
             "q_import": [Q_IMPORT_BASE, Q_IMPORT_BASE + 2048],
             "input_staging_bank0_bank4": [STAGING_BASE, STAGING_BASE + 65536],
             "score_bank0_bank4": [SCORE_BASE, SCORE_BASE + 16384],
             "wo_full_resident": [O_BASE, O_BASE + 256 * 1024]},
+        "down_row_layout": {
+            "base_byte_offset": DOWN_BASE, "rows_per_bank": DOWN_ROWS,
+            "reserved_bytes_per_bank": DOWN_REGION_BYTES, "columns_per_row": ROW_BYTES // BURST_BYTES,
+            "fragments": DOWN_FRAGMENTS, "fragments_per_row": DOWN_FRAGMENTS_PER_ROW,
+            "columns_per_fragment": DOWN_COLUMNS_PER_FRAGMENT,
+            "weight_columns_within_fragment": list(range(DOWN_WEIGHT_COLUMNS)),
+            "input_column_within_fragment": DOWN_WEIGHT_COLUMNS,
+            "input_bank": "query (0..15)", "fused_fragments_per_srf_batch": 2,
+            "weight_bytes_per_bank": DOWN_FRAGMENTS * DOWN_WEIGHT_COLUMNS * BURST_BYTES,
+            "input_bytes_per_bank": DOWN_FRAGMENTS * BURST_BYTES,
+            "unused_columns_full_row": 4, "fragments_last_row": DOWN_FRAGMENTS % DOWN_FRAGMENTS_PER_ROW,
+            "streaming": "same weight mapping; WRGB supplies SRF directly and does not write array input columns",
+            "fused": "ordinary WR scatters inputs by query bank; LOCALRD plus BCAST reads the co-resident row",
+            "fused_row_activation": "one explicit ACTAB per row after prior-row MAC completion; first-batch LOCALRD waits for issue, then native per-bank RCD"},
         "coefficient_source": "BF16 sin/cos generated offline from actual model position IDs",
         "operator_shapes": operator_shapes(layout),
         "numeric_execution": False,

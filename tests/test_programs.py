@@ -1,5 +1,7 @@
 """Tensor coverage, real traffic and bounded storage tests (no timing oracle)."""
 import copy
+from collections import Counter, defaultdict
+import hashlib
 import json
 import unittest
 from programs.gen_pim_program import (VARIANTS, EXTERNAL, Builder, attach_hazard_dependencies,
@@ -15,6 +17,127 @@ def completion_ancestors(ops, index):
             seen.add(current)
             pending.extend(ops[current]["deps"])
     return seen
+
+
+def completion_masks(ops):
+    """Compact transitive completion graph; issue-only edges cannot prove RAW."""
+    masks = []
+    for index, op in enumerate(ops):
+        mask = 0
+        for dependency in op["deps"]:
+            if not isinstance(dependency, int) or not 0 <= dependency < index:
+                raise ValueError("invalid completion dependency")
+            mask |= masks[dependency] | (1 << dependency)
+        masks.append(mask)
+    return masks
+
+
+def audit_down_fused(outer):
+    """Recover tensor coordinates from physical columns, then audit producers.
+
+    This does not call the generator's address or dependency helpers. A valid
+    command count alone cannot detect duplicated scatter or a wrong SRF view.
+    """
+    def check(condition, message):
+        if not condition:
+            raise ValueError(message)
+
+    def input_coordinate(op):
+        address = op["addr"]
+        bank = address[2] * 4 + address[3]
+        row, column = address[4] - 160, address[5]
+        fragment = row * 12 + column // 5
+        check(0 <= bank < 16 and 0 <= fragment < 256 and column % 5 == 4 and column < 60,
+              "input write/read is not an input-only Down column")
+        check(op["tensor_fragment"] == fragment and op["tensor_row"] == bank,
+              "scatter/read tensor label differs from physical input")
+        return fragment, bank
+
+    descriptors = [op for op in outer if op["op"] == "MAC_RUN"]
+    check(len(descriptors) == 1, "one Down descriptor required")
+    descriptor = descriptors[0]
+    outer_masks = completion_masks(outer)
+    writes = [op for op in outer if op["op"] == "WR"]
+    write_by_input = {}
+    for op in writes:
+        coordinate = input_coordinate(op)
+        check(coordinate not in write_by_input, "duplicate scatter input")
+        write_by_input[coordinate] = op
+        check(outer_masks[descriptor["id"]] & (1 << op["id"]), "descriptor missing scatter completion dependency")
+    expected = {(fragment, query) for fragment in range(256) for query in range(16)}
+    check(set(write_by_input) == expected, "incomplete scatter coverage")
+    ops = descriptor["children"]
+    masks = completion_masks(ops)
+    reads = [op for op in ops if op["op"] == "LOCALRD"]
+    read_by_input = {}
+    for op in reads:
+        coordinate = input_coordinate(op)
+        check(coordinate not in read_by_input, "duplicate input read")
+        check(op["addr"] == write_by_input[coordinate]["addr"], "read has no matching scatter producer")
+        fragment, query = coordinate
+        check(op["dest_slot"] == (fragment % 2) * 16 + query, "read uses wrong SRF query/fragment slot")
+        read_by_input[coordinate] = op
+    check(set(read_by_input) == expected, "incomplete input reads")
+    broadcasts = {}
+    for op in ops:
+        if op["op"] != "BCAST":
+            continue
+        coordinate = op["tensor_fragment"], op["source_bank"]
+        check(coordinate in read_by_input and coordinate not in broadcasts, "invalid broadcast coverage")
+        fragment, query = coordinate
+        check(op["slot"] == (fragment % 2) * 16 + query, "broadcast uses wrong SRF slot")
+        check(masks[op["id"]] & (1 << read_by_input[coordinate]["id"]), "broadcast missing LOCALRD completion")
+        broadcasts[coordinate] = op
+    check(set(broadcasts) == expected, "incomplete input broadcasts")
+    macs = [op for op in ops if op["op"] == "MACAB"]
+    check(Counter((op["fragment"], op["output_column"]) for op in macs)
+          == Counter({(f, c): 1 for f in range(256) for c in range(4)}), "Down MAC coverage")
+    for op in macs:
+        address = op["addr"]
+        fragment = (address[4] - 160) * 12 + address[5] // 5
+        check(address[2:4] == [-1, -1] and address[5] % 5 < 4 and address[5] < 60,
+              "MAC reads an input/padding column")
+        check((fragment, address[5] % 5) == (op["fragment"], op["output_column"]), "MAC weight coordinates")
+        check(op["rows"] == 16 and op["slot"] == (fragment % 2) * 16, "MAC uses wrong SRF view")
+        for query in range(16):
+            check(masks[op["id"]] & (1 << broadcasts[fragment, query]["id"]), "MAC missing input producer dependency")
+    acts = [op for op in ops if op["op"] == "ACTAB"]
+    check([op["addr"][4] for op in acts] == list(range(160, 182)), "Down must activate exactly 22 shared rows")
+    for act in acts:
+        check(act["addr"][2:4] == [-1, -1], "Down activation must cover all banks")
+        row = act["addr"][4]
+        first = (row - 160) * 12
+        for fragment in (first, first + 1):
+            for query in range(16):
+                read = read_by_input[fragment, query]
+                check(act["id"] in read["issue_deps"], "new-row load missing ACTAB issue dependency")
+                check(not masks[read["id"]] & (1 << act["id"]), "ACTAB incorrectly adds a full-row completion barrier")
+        if first:
+            previous = [op for op in macs if first - 12 <= op["fragment"] < first]
+            check(len(previous) == 48, "previous complete weight row MAC coverage")
+            for op in previous:
+                check(masks[act["id"]] & (1 << op["id"]), "new-row ACTAB can evict unfinished older weights")
+    # Ignore row ACTABs when counting the 32 read/broadcast pairs + eight MACs
+    # in each two-fragment batch. The final row still contains two full batches.
+    work = [op for op in ops if op["op"] != "ACTAB"]
+    check(len(work) == 128 * 72, "unexpected two-fragment batch work")
+    previous_macs = []
+    for batch in range(128):
+        chunk = work[batch * 72:(batch + 1) * 72]
+        check(Counter(op["op"] for op in chunk) == {"LOCALRD": 32, "BCAST": 32, "MACAB": 8}, "batch shape")
+        loads = [op for op in chunk if op["op"] == "LOCALRD"]
+        bcasts = [op for op in chunk if op["op"] == "BCAST"]
+        computations = [op for op in chunk if op["op"] == "MACAB"]
+        check({op["fragment"] for op in computations} == {batch * 2, batch * 2 + 1}, "batch fragments")
+        check(len({op["addr"][4] for op in loads + computations}) == 1, "two-fragment batch crosses a row")
+        check(max(op["id"] for op in bcasts) < min(op["id"] for op in computations), "batch not fully loaded before MACs")
+        for op in bcasts:
+            check(masks[computations[0]["id"]] & (1 << op["id"]), "first MAC missing complete batch input")
+        for op in loads:
+            for previous in previous_macs:
+                if previous["fragment"] % 2 == op["tensor_fragment"] % 2:
+                    check(masks[op["id"]] & (1 << previous["id"]), "SRF view reused before prior MAC completion")
+        previous_macs = computations
 
 
 def audit_transient_array_producers(program):
@@ -108,6 +231,134 @@ class ProgramTests(unittest.TestCase):
             a = L.layer_address([0, 1, 0, 0, 511, 63], layer)
             self.assertEqual(a[4], layer * 512 + 511)
             self.assertLess(a[4], 32768)
+
+    def test_down_physical_tensor_is_bijective_with_input_holes_and_row_padding(self):
+        self.assertEqual(L.DOWN_BASE, 0x50000)
+        occupied = defaultdict(set)
+        weight_bursts, input_bursts = set(), set()
+        for fragment in range(256):
+            weights = [L.down_weight_offset(fragment, slot) for slot in range(4)]
+            self.assertEqual(weights, list(range(weights[0], weights[0] + 128, 32)))
+            self.assertEqual(len({offset // 2048 for offset in weights}), 1)
+            for offset in weights:
+                self.assertNotIn(offset, weight_bursts)
+                weight_bursts.add(offset)
+                occupied[offset // 2048].add(offset % 2048 // 32)
+            for query in range(16):
+                bank, offset = L.down_input_location(fragment, query)
+                self.assertEqual(bank, query)
+                self.assertEqual(offset, weights[-1] + 32)
+                self.assertNotIn((bank, offset), input_bursts)
+                input_bursts.add((bank, offset))
+                occupied[offset // 2048].add(offset % 2048 // 32)
+            # Actual scalar addresses cover every BF16 lane exactly once in
+            # each four-column packet group, without spilling into input.
+            for slot in range(4):
+                lanes = [L.down_weight_location(fragment * 16 + lane, slot) for lane in range(16)]
+                self.assertEqual(lanes, [(0, 0, weights[slot] + 2 * lane) for lane in range(16)])
+        self.assertEqual(len(weight_bursts), 1024)
+        self.assertEqual(len(input_bursts), 4096)
+        self.assertFalse(weight_bursts & {offset for bank, offset in input_bursts})
+        self.assertEqual(set(occupied), set(range(160, 182)))
+        for row in range(160, 181):
+            self.assertEqual(occupied[row], set(range(60)))
+            self.assertEqual(set(range(64)) - occupied[row], {60, 61, 62, 63})
+        self.assertEqual(occupied[181], set(range(20)))
+        self.assertEqual(L.down_weight_offset(255, 3), 181 * 2048 + 18 * 32)
+        self.assertEqual(L.down_input_location(255, 15), (15, 181 * 2048 + 19 * 32))
+        # Global output ownership is injective across channels/banks, even
+        # though every bank reuses the same local byte offsets.
+        for channel in range(16):
+            physical = set()
+            for output in range(channel * 64, (channel + 1) * 64):
+                for fragment in range(256):
+                    c, bank, offset = L.down_weight_location(fragment * 16, output)
+                    self.assertEqual(c, channel)
+                    self.assertEqual(c * 64 + bank * 4 + offset % 2048 // 32 % 5, output)
+                    self.assertNotIn((bank, offset), physical)
+                    physical.add((bank, offset))
+            self.assertEqual(len(physical), 16 * 1024)
+        region = L.contract("token")["regions_per_bank"]["down_weights_and_inputs"]
+        self.assertEqual(region, [0x50000, 0x5B000])
+        self.assertLessEqual(max(weight_bursts) + 32, region[1])
+        self.assertLessEqual(max(offset for bank, offset in input_bursts) + 32, region[1])
+        self.assertLess(region[1], L.QKV_BASE)
+        for layer in range(18):
+            last = L.layer_address(L.address(15, region[1] - 32, 15), layer)
+            end = last[4] * 2048 + last[5] * 32 + 32
+            self.assertLess(end, (layer + 1) * 1024 * 1024)
+
+    def test_down_fused_scatter_srf_lifetimes_and_row_activation(self):
+        for variant in ("token_gpu_after", "token_local_after"):
+            audit_down_fused(self.stage(variant, "down"))
+        original = self.stage("token_local_after", "down")
+        # Same byte and command counts, but duplicated scatter and wrong SRF
+        # slots must fail independently of the generator's own validator.
+        broken = copy.deepcopy(original)
+        writes = [op for op in broken if op["op"] == "WR"]
+        writes[1]["addr"] = list(writes[0]["addr"])
+        with self.assertRaisesRegex(ValueError, "physical input"):
+            audit_down_fused(broken)
+        broken = copy.deepcopy(original)
+        children = next(op for op in broken if op["op"] == "MAC_RUN")["children"]
+        next(op for op in children if op["op"] == "LOCALRD")["dest_slot"] = 31
+        with self.assertRaisesRegex(ValueError, "SRF"):
+            audit_down_fused(broken)
+        broken = copy.deepcopy(original)
+        descriptor = next(op for op in broken if op["op"] == "MAC_RUN")
+        descriptor["deps"] = []
+        with self.assertRaisesRegex(ValueError, "scatter completion"):
+            audit_down_fused(broken)
+        broken = copy.deepcopy(original)
+        children = next(op for op in broken if op["op"] == "MAC_RUN")["children"]
+        next(op for op in children if op["op"] == "BCAST")["deps"] = []
+        with self.assertRaisesRegex(ValueError, "LOCALRD completion"):
+            audit_down_fused(broken)
+        broken = copy.deepcopy(original)
+        children = next(op for op in broken if op["op"] == "MAC_RUN")["children"]
+        next(op for op in children if op["op"] == "LOCALRD")["issue_deps"] = []
+        with self.assertRaisesRegex(ValueError, "ACTAB issue"):
+            audit_down_fused(broken)
+        broken = copy.deepcopy(original)
+        children = next(op for op in broken if op["op"] == "MAC_RUN")["children"]
+        [op for op in children if op["op"] == "ACTAB"][1]["deps"] = []
+        with self.assertRaisesRegex(ValueError, "unfinished older weights"):
+            audit_down_fused(broken)
+
+    def test_down_streaming_uses_same_weights_without_array_staging(self):
+        fused = self.stage("token_local_after", "down")
+        reference = [(o["fragment"], o["output_column"], o["addr"], o["rows"], o["slot"])
+                     for o in walk(fused) if o["op"] == "MACAB"]
+        for variant in list(VARIANTS)[:3]:
+            ops = self.stage(variant, "down")
+            self.assertFalse(any(o["op"] in {"MAC_RUN", "WR", "LOCALRD", "LOCALWR", "BCAST", "ACTAB"} for o in ops))
+            self.assertEqual([(o["fragment"], o["output_column"], o["addr"], o["rows"], o["slot"])
+                              for o in ops if o["op"] == "MACAB"], reference)
+            inputs = [o for o in ops if o["op"] == "WRGB"]
+            self.assertEqual(Counter((o["tensor_fragment"], o["tensor_row"]) for o in inputs),
+                             Counter({(f, q): 1 for f in range(256) for q in range(16)}))
+            for o in inputs:
+                self.assertEqual(o["slot"], (o["tensor_fragment"] % 2) * 16 + o["tensor_row"])
+        for variant in VARIANTS:
+            ops = list(walk(self.stage(variant, "down")))
+            self.assertEqual(sum(o["op"] in {"WR", "WRGB"} for o in ops), 4096)
+            self.assertEqual(sum(o["op"] == "RDRES" for o in ops), 128)
+            self.assertEqual(sum(o["rows"] * 16 * 16 for o in ops if o["op"] == "MACAB") * 16, 67108864)
+
+    def test_down_relayout_keeps_gate_up_and_all_other_stage_programs_unchanged(self):
+        # Frozen immediately before the Down-only change: complete semantic
+        # stage objects, excluding source hashes and the changed Down stage.
+        expected = {
+            "feature_gpu_before": "f60dcf6ded5fda2994c28ef2465357d6958ee92920b57e6c1baffed217192730",
+            "token_gpu_before": "2b7da4b80110ff49f4996a1f9a82e85c1ca518a8bd714e77fb8a94c389c043c2",
+            "token_local_before": "637facbf9c414c884cf9521359c06a17d08fbd267df47eba88a793764431e40b",
+            "token_gpu_after": "facb3fcf49aa111e8f6ddb47d65b7bfa999407a04702ad6d7baf8cd5e453930c",
+            "token_local_after": "913971028380b026b7ef3d27f23aecaea22b44f00771b6b61f4545c0735a062f",
+        }
+        for variant, program in self.programs.items():
+            unchanged = [stage for stage in program["stages"] if stage["name"] != "down"]
+            digest = hashlib.sha256(json.dumps(unchanged, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            self.assertEqual(digest, expected[variant], variant)
 
     def test_transient_arrays_have_complete_current_producers(self):
         for p in self.programs.values():

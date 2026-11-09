@@ -48,31 +48,45 @@ class Builder:
                          operator=name, children=children.ops)
 
 
-def staged_input(b, rows, fragments):
+def staged_input(b, rows, fragments, *, input_location=None):
+    input_location = input_location or (lambda f, row: L.staging(f, row, rows))
     writes = []
     for f0 in range(0, fragments, 2):
         for row in range(rows):
             for f in range(f0, min(f0 + 2, fragments)):
-                bank, offset = L.staging(f, row, rows)
+                bank, offset = input_location(f, row)
                 writes.append(b.emit("WR", offset, bank, epoch=b.group + "_input",
                                      tensor_fragment=f, tensor_row=row))
     return b.fence(writes)
 
 
 def gemm(b, *, rows, fragments, columns, base, fused, views, output_tile=0,
-         tile_stride=0, initial=()):
+         tile_stride=0, initial=(), input_location=None, weight_offset=None,
+         row_activation_fragments=0):
     """Whole 1KiB input batches; weight columns pipeline through bank PEs."""
+    input_location = input_location or (lambda f, row: L.staging(f, row, rows))
+    weight_offset = weight_offset or (lambda f, col: base + output_tile * tile_stride + (f * columns + col) * 32)
     previous = list(initial)
     last_mac = None
+    row_macs = []
     for first in range(0, fragments, views):
+        activation = None
+        if fused and row_activation_fragments and first % row_activation_fragments == 0:
+            # Prepare every bank uniformly before the row's first scattered
+            # LOCALRD. Drain all previous-row MAC completions, including any
+            # reordered columns. The native ACTAB preq supplies PREab.
+            activation = b.emit("ACTAB", weight_offset(first, 0), -1,
+                                deps=row_macs or previous)
+            row_macs = []
         loads = []
         for f in range(first, min(first + views, fragments)):
             slot = (f % views) * rows
             for row in range(rows):
                 if fused:
-                    bank, offset = L.staging(f, row, rows)
+                    bank, offset = input_location(f, row)
                     rd = b.emit("LOCALRD", offset, bank, deps=previous,
-                                dest_slot=slot + row, tensor_fragment=f, tensor_row=row)
+                                dest_slot=slot + row, tensor_fragment=f, tensor_row=row,
+                                **({"issue_deps": [activation]} if activation is not None else {}))
                     loads.append(b.emit("BCAST", deps=[rd], bank=-1, slot=slot + row,
                                         source_bank=bank, tensor_fragment=f))
                 else:
@@ -82,11 +96,13 @@ def gemm(b, *, rows, fragments, columns, base, fused, views, output_tile=0,
         first_mac = True
         for f in range(first, min(first + views, fragments)):
             for col in range(columns):
-                last_mac = b.emit("MACAB", base + output_tile * tile_stride + (f * columns + col) * 32,
+                last_mac = b.emit("MACAB", weight_offset(f, col),
                                   -1, deps=loads if first_mac else (), slot=(f % views) * rows,
                                   rows=rows, output_columns=columns, output_column=col,
                                   fragment=f, output_tile=output_tile,
                                   output_bytes_per_bank=rows * columns * 4)
+                if row_activation_fragments:
+                    row_macs.append(last_mac)
                 first_mac = False
         # Reuse is gated by the end of the entire current batch, not its issue.
         previous = [last_mac]
@@ -361,9 +377,17 @@ def ffn(channel, name, fused):
     outer, b = Builder(channel, name), Builder(channel, name)
     fragments, columns, base, packets = ((64, 32, L.GU_BASE, 1024) if name == "gate_up"
                                         else (256, 4, L.DOWN_BASE, 128))
-    seal = staged_input(outer, 16, fragments) if fused else None
+    # Down's two-fragment batches divide its 12-fragment physical row evenly.
+    # Every query input is scattered to its own bank's input-only column;
+    # its LOCALRD -> BCAST fills the same (fragment parity, query) SRF slot as
+    # streaming WRGB. Both dataflows read identical weight columns. Gate/Up
+    # retains the existing two-bank staging and contiguous weight mapping.
+    input_location = L.down_input_location if name == "down" else None
+    weight_offset = L.down_weight_offset if name == "down" else None
+    seal = staged_input(outer, 16, fragments, input_location=input_location) if fused else None
     last = gemm(b, rows=16, fragments=fragments, columns=columns, base=base,
-                fused=fused, views=2)
+                fused=fused, views=2, input_location=input_location, weight_offset=weight_offset,
+                row_activation_fragments=L.DOWN_FRAGMENTS_PER_ROW if name == "down" else 0)
     if fused:
         run = outer.descriptor(name, b, [seal])
         export_results(outer, packets, [run], features_per_bank=columns,
@@ -476,7 +500,7 @@ def validate_ops(ops, channel):
         ch, rank, bg, bank, row, col = op["addr"]
         if ch != channel or rank != 1 or row < 0 or not 0 <= col < 64:
             raise ValueError("invalid physical address")
-        if op["op"] in ("MACAB", "MACQK", "WRGB", "RDRES") and (bg, bank) != (-1, -1):
+        if op["op"] in ("MACAB", "MACQK", "WRGB", "RDRES", "ACTAB") and (bg, bank) != (-1, -1):
             raise ValueError("all-bank/buffer command must target the whole rank")
         if not 0 <= op.get("slot", 0) < 32 or not 0 <= op.get("dest_slot", 0) < 32:
             raise ValueError("SRF capacity exceeded")
