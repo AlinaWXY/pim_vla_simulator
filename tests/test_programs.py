@@ -366,13 +366,13 @@ class ProgramTests(unittest.TestCase):
             self.assertEqual(sum(o["op"] == "RDRES" for o in ops), 128)
             self.assertEqual(sum(o["rows"] * 16 * 16 for o in ops if o["op"] == "MACAB") * 16, 67108864)
 
-    def test_down_relayout_keeps_gate_up_and_all_other_stage_programs_unchanged(self):
-        # Frozen immediately before the Down-only change: complete semantic
-        # stage objects, excluding source hashes and the changed Down stage.
+    def test_non_down_stages_match_frozen_programs(self):
+        # Streaming pins include the alternating-half schedule. Fused pins
+        # retain the reference taken before the Down-only layout change.
         expected = {
-            "feature_gpu_before": "f60dcf6ded5fda2994c28ef2465357d6958ee92920b57e6c1baffed217192730",
-            "token_gpu_before": "2b7da4b80110ff49f4996a1f9a82e85c1ca518a8bd714e77fb8a94c389c043c2",
-            "token_local_before": "637facbf9c414c884cf9521359c06a17d08fbd267df47eba88a793764431e40b",
+            "feature_gpu_before": "beb2976ce8e7e2ff06eb7903d082ad702b544fb825927232a7f93f916be0127d",
+            "token_gpu_before": "e3d813bff5d1db19ed35f3e6ddd76050a7e75e9a27c363393c76cf90eeccb2d6",
+            "token_local_before": "fa429f142d3c444c655304d6341263f4b367ce7bbe7f0d1047fdd49a20121918",
             "token_gpu_after": "facb3fcf49aa111e8f6ddb47d65b7bfa999407a04702ad6d7baf8cd5e453930c",
             "token_local_after": "913971028380b026b7ef3d27f23aecaea22b44f00771b6b61f4545c0735a062f",
         }
@@ -418,6 +418,25 @@ class ProgramTests(unittest.TestCase):
                 self.assertFalse(any(o["op"] in ("MAC_RUN", "ROPE_RUN", "BCAST") for o in ops))
                 self.assertFalse(any(o["op"] == "WR" and o.get("epoch", "").endswith("_input") for o in ops))
         self.assertEqual(sum(o["op"] == "WRGB" for o in self.stage("token_local_before", "o")), 512)
+
+    def test_streaming_fills_alternate_srf_half_during_mac_batch(self):
+        for name, views in (("qkv", 2), ("down", 1)):
+            ops = self.stage("token_local_before", name)
+            writes = [o for o in ops if o["op"] == "WRGB"]
+            macs = [o for o in ops if o["op"] == "MACAB"]
+            for batch in range(3):
+                current = [o for o in macs if o["fragment"] // views == batch]
+                loads = [o for o in writes if o["tensor_fragment"] // views == batch]
+                self.assertEqual({o["slot"] // 16 for o in current + loads}, {batch % 2})
+                self.assertTrue({o["id"] for o in loads}.issubset(current[0]["deps"]))
+                if batch:
+                    previous = [o for o in macs if o["fragment"] // views == batch - 1]
+                    self.assertLess(previous[0]["id"], loads[0]["id"])
+                    self.assertLess(loads[0]["id"], previous[-1]["id"])
+                    self.assertNotIn(previous[-1]["id"], loads[0]["deps"])
+                if batch == 2:
+                    prior_use = max(o["id"] for o in macs if o["fragment"] < views)
+                    self.assertTrue(all(prior_use in o["deps"] for o in loads))
 
     def test_fused_has_six_mac_descriptors_and_optional_rope(self):
         for v in list(VARIANTS)[3:]:
