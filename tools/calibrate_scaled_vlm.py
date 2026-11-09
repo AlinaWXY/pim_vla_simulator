@@ -43,7 +43,6 @@ class ScaleSearch:
     high: int
     low: int = 0
     memory_ck: int = 0
-    probes: int = 0
 
     def query(self):
         candidate = (self.low + self.high) // 2
@@ -63,7 +62,6 @@ class ScaleSearch:
             self.memory_ck = cycles
         else:
             self.high = max(self.low + 1, max(starts))
-        self.probes += 1
 
 
 def probe_requests(binary, directory, requests):
