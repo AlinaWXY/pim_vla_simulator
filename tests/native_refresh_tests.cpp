@@ -87,6 +87,11 @@ int main(int argc,char** argv) {
         const int cmd=c.device.m_spec->get_command_id(name); AddrVec_t all={0,1,-1,-1,0,0};
         require(!c.device.check_timing(cmd,all,now+recovery-1),"REFab failed to pause full-rank PIM command");
         require(c.device.check_timing(cmd,all,now+recovery),"REFab full-rank command blocked beyond nRFC");
+        if(name=="MACAB_M16" || name=="MACAB_M16_LOCAL") {
+          const int activation=c.device.m_spec->get_command_id(name.ends_with("_LOCAL")?"ACTAB_LOCAL":"ACTAB");
+          require(c.device.get_preq_command(cmd,all,now+recovery)==activation,
+                  "REFab recovery incorrectly allowed MAC without reopening all banks");
+        }
       }
       require(c.device.check_timing(c.device.m_spec->get_command_id("RD"),address(0,0),now+1),
               "rank1 REFab globally blocked rank0 after its CA slot");
