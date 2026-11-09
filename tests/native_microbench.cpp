@@ -29,17 +29,65 @@ static Clock run(PIMController& c,bool gpu=false) {
 static Clock issued(const PIMController& c,int index,int cmd) {
   return c.top.done.at(index)-c.info.at(cmd).completion;
 }
+static void gap_wrgb_wait(const ConfigNode& spec) {
+  PIMController c(0,spec,spec["metadata"]);warm_rows(c);c.policy="gap_batch";
+  auto mac=op("MACAB",0),write=op("WRGB",1);
+  mac.addr[2]=mac.addr[3]=-1;mac.rows=32;write.slot=0;
+  const std::vector<Operation> program={mac,write};
+  c.set_stage(program,0,0);
+  // Seed the 32 input slots, then issue the real MAC. Its SRF lock delays
+  // the following WRGB, whose dependency list alone would show no wait.
+  for(int slot=0;slot<32;++slot) {
+    auto fill=op("WRGB",slot);fill.tensor_fragment=0;
+    c.resources.issue(fill,0,0);
+  }
+  require(c.step(0,false)==0&&c.top.next==1&&c.top.done[0]>1,"fixture did not issue a live MAC");
+  // Rank0 PRE is legal and fits inside the known WRGB wait.
+  Kernel k;k.start=1;k.reads=16;k.base=16*64*16;
+  c.begin_kernel(&k,1);
+  const auto pre=c.device.m_spec->get_command_id("PREpb");
+  require(c.step(1,true)==1&&c.gpu_command_counts[pre]==1&&c.top.next==1,
+          "gap_batch blocked GPU issue during a WRGB head's MAC wait");
+}
+
+static void gap_write_drain(const ConfigNode& spec) {
+  PIMController c(0,spec,spec["metadata"]);warm_rows(c);c.policy="gap_batch";
+  const std::vector<Operation> program={op("BARRIER",0)};
+  c.set_stage(program,0,0);c.top.tail=500;
+  Kernel write;write.writes=16;
+  c.begin_kernel(&write,0);
+  Clock now=0;
+  while(!c.kernel_finished()&&now<100)now=c.step(now,true);
+  require(c.kernel_finished()&&c.gpu_write_bytes==32&&c.gap_write_phase,
+          "fixture did not drain its write batch");
+  c.end_kernel();
+  Kernel read;read.reads=16;read.start=now;
+  c.begin_kernel(&read,now);
+  while(!c.gpu_read_bytes&&now<100)now=c.step(now,true);
+  require(c.gpu_read_bytes==32&&now<100&&!c.gap_write_phase,
+          "gap_batch starved reads after draining the write batch");
+}
+
 int main(int argc,char** argv) {
   try {
     require(argc>=2,"usage: native_microbench spec.json [--fault-case]");
     const auto spec=Config::parse_config_file(argv[1]);
     const auto metadata=spec["metadata"];
+    if(argc==3&&std::string(argv[2])=="--gap-wrgb-wait") {
+      gap_wrgb_wait(spec);return 0;
+    }
+    if(argc==3&&std::string(argv[2])=="--gap-write-drain") {
+      gap_write_drain(spec);return 0;
+    }
     if(argc==3 && std::string(argv[2])=="--fault-case") {
       PIMController c(0,spec,metadata);warm_rows(c);
       c.issue(c.device.m_spec->get_command_id("RD"),{0,0,0,0,0,0},100,0);
       c.issue(c.device.m_spec->get_command_id("WRGB"),{0,1,-1,-1,0,0},101,0);
       std::cerr<<"FAULT NOT DETECTED\n";return 2;
     }
+    gap_wrgb_wait(spec);
+    gap_write_drain(spec);
+    std::cout<<"{\"microbench\":\"gap_batch_regressions\",\"status\":\"passed\"}\n";
     constexpr int n=64;
     {
       PIMController c(0,spec,metadata);warm_rows(c);

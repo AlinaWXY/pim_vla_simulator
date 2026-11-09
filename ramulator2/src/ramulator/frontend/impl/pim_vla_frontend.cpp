@@ -132,7 +132,7 @@ int run(const std::string& config_file,const std::string& output) {
   std::array<std::unique_ptr<PIMController>,16> channels;
   for(int c=0;c<16;c++) {
     channels[c]=std::make_unique<PIMController>(c,specification,specification["metadata"]);
-    auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;
+    auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;mc.legacy_gap_batch=!closed;
     if(closed)set_watermarks(mc,w_max);
     else {
       mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);

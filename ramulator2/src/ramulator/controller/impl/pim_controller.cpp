@@ -239,7 +239,11 @@ Candidate PIMController::next_pim(Clock clk) {
   }
   // Wait only for this head's dependencies (or an explicit completion barrier),
   // not for the tail of every previously issued independent operation.
-  if(at>clk) {Candidate wait;wait.source=Candidate::PIM;wait.at=at;return wait;}
+  if(at>clk) {
+    Candidate wait;wait.source=Candidate::PIM;wait.at=at;
+    if(policy=="gap_batch"&&!legacy_gap_batch)wait.addr=op.addr;
+    return wait;
+  }
   int cmd=command(op,local);
   try {at=std::max(at,resources.ready(op,clk));}
   catch(const std::exception& e){throw std::runtime_error(std::string(e.what())+" op="+op.name+" id="+std::to_string(op.id)+" stage="+std::to_string(stage));}
@@ -267,6 +271,7 @@ Candidate PIMController::next_gpu(Clock clk) {
   if(writes<=write_low)write_drain=false;
   bool desired_write=write_drain;
   if(policy=="gap_batch"&&!(top.issued()&&inner.issued())) {
+    if(!legacy_gap_batch&&!writes)gap_write_phase=false;
     if(!gap_write_phase&&queued_gpu==writes)gap_write_phase=true;
     desired_write=gap_write_phase;
     if(desired_write&&!writes)return {};
@@ -326,10 +331,13 @@ bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk)
     return false;
   }
   if(policy=="gap_batch") {
-    if(p.cmd<0)return false;
+    if(legacy_gap_batch) {
+      if(p.cmd<0)return false;
+      if(info[p.cmd].direction)return true;
+    }
+    if(p.at==NEVER)return false;
     // A known dependency wait is a proven idle interval; summing future MAC
     // completions would overstate it because column fetch and compute overlap.
-    if(info[p.cmd].direction)return true;
     Clock gap=std::max<Clock>(0,p.at-clk);
     int wrgb=device.m_spec->get_command_id("WRGB"),rdres=device.m_spec->get_command_id("RDRES");
     Clock minimum=std::max(spacing(g.cmd,g.addr,wrgb,p.addr)+spacing(wrgb,p.addr,g.cmd,g.addr),

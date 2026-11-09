@@ -98,6 +98,7 @@ class PIMController {
   Clock forecast_time=-1;
   int channel=0,stage=-1,window=64,write_high=48,write_low=16;
   bool fused=false,write_drain=false,epoch_owned=false,gap_write_phase=false;
+  bool legacy_gap_batch=false; // Keep uniform replays byte-identical.
   int row_offset=0;
   std::string policy="frfcfs";
   Clock now=0,private_free=0,external_free=0,gpu_dq_end=0,pim_dq_end=0,last_progress=0,pim_arrival=0;
