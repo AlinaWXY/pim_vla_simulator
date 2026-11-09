@@ -20,7 +20,7 @@ def main():
             read_sectors=2048,write_sectors=2048,write_is_proxy=True,base_sector=i*8192) for i in range(3)]))
         ae=save('ae.json',dict(events=[dict(kind='gpu',name='nonlinear',us=0.2),dict(kind='pim',stage='broadcast'),dict(kind='gpu',name='tail',us=0.2)]))
         base=dict(spec=build_spec(),program_path=programs,vlm_path=vlm,ae_schedule_path=ae,
-                  mode='concurrent',dataflow='streaming',arbitration='pim_head',calibration=dict(alpha=1,window=64,write_high=48,write_low=16))
+                  mode='concurrent',dataflow='streaming',arbitration='pim_head')
         raws={}
         for kind in ('ae_solo','vlm_solo','combined'):
             cfg=save(kind+'.json',dict(base,run_kind=kind));out=d/kind
@@ -35,6 +35,9 @@ def main():
             assert raw['metrics']['GPU_writes']==3*2048
             assert raw['metrics']['GPU_row_hits']+raw['metrics']['GPU_row_misses']==3*4096
             assert all(k['duration_us']>=2 for k in raw['kernels'])
+            assert raw['vlm_release']=='closed_loop' and raw['w_max']==128
+            for k in raw['kernels']:
+                assert round(k['duration_us']*1e6/raw['clock_ps'])==max(k['floor_ck'],k['memory_ck'])
             per_channel=[sum(x['gpu_write_bytes'] for x in raw['bus'] if x['channel']==c) for c in range(16)]
             assert len(set(per_channel))==1
         for kind in ('ae_solo','combined'):
@@ -53,5 +56,14 @@ def main():
             subprocess.run([str(binary),'--config',cfg,'--output',str(out)],check=True)
             raw=json.loads((out/'raw.json').read_text())
             assert raw['metrics']['gpu_read_bytes']==3*2048*32
+        if len(sys.argv)>1:
+            # Run exactly the same fixed input against the two binaries. The
+            # legacy frontend ignores the new release selector.
+            cfg=save('uniform.json',dict(base,vlm_release='uniform',run_kind='combined',
+                                        calibration=dict(alpha=1,window=64,write_high=48,write_low=16)))
+            for name,exe in (('baseline',sys.argv[1]),('uniform',binary)):
+                subprocess.run([str(exe),'--config',cfg,'--output',str(d/name)],check=True)
+            assert (d/'baseline/raw.json').read_bytes()==(d/'uniform/raw.json').read_bytes()
+            print('uniform raw.json matches baseline byte-for-byte')
         print('native frontend smoke: byte conservation, per-channel mix, causal kernels, bus bounds passed')
 if __name__=='__main__':main()

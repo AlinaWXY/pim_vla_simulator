@@ -33,7 +33,7 @@ def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None
         c.update(spec=deepcopy(spec), program_path=str(program_dir / f"{variant}.json"),
                  vlm_path=str(input_dir / "vlm.json"),
                  ae_schedule_path=str(input_dir / f"ae-{variant}.json"),
-                 calibration=dict(alpha=1.0, window=64, write_high=48, write_low=16))
+                 vlm_release="uniform", calibration=dict(alpha=1.0, window=64, write_high=48, write_low=16))
         for key in ("program_path", "vlm_path", "ae_schedule_path"):
             if not Path(c[key]).is_file():
                 raise FileNotFoundError(c[key])

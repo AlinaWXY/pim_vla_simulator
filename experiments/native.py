@@ -54,7 +54,7 @@ def execute(binary, config, output, *, resume=False):
             raise ValueError(f"resume binary or result hash differs in {output}")
         if library_hashes(provenance) != library_hashes({"runtime_libraries": libraries}):
             raise ValueError(f"resume runtime library differs in {output}")
-        for key in ("program_path", "vlm_path", "ae_schedule_path", "calibrated_vlm_path"):
+        for key in ("program_path", "vlm_path", "ae_schedule_path", "calibrated_vlm_path", "mlp_path"):
             if config.get(key) and provenance["inputs"][key]["sha256"] != sha256(config[key]):
                 raise ValueError(f"resume input {key} differs in {output}")
         return read_json(output / "raw.json")
@@ -67,7 +67,7 @@ def execute(binary, config, output, *, resume=False):
     if sha256(binary) != binary_hash or runtime_libraries(binary) != libraries:
         raise ValueError("native executable or runtime library changed during execution")
     inputs = {}
-    for key in ("program_path", "vlm_path", "ae_schedule_path", "calibrated_vlm_path"):
+    for key in ("program_path", "vlm_path", "ae_schedule_path", "calibrated_vlm_path", "mlp_path"):
         if config.get(key):
             inputs[key] = {"name": Path(config[key]).name, "sha256": sha256(config[key])}
     spec = config.get("spec")

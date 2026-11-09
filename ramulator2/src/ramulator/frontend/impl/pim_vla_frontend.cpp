@@ -23,6 +23,78 @@ std::string json_string(const std::string& value) {
 struct Event {std::string kind,name;double us=0;int step=0,layer=0;};
 struct StageResult {int id,step,layer;std::string name;Clock start,end,wait=0;};
 
+namespace {
+ConfigNode load_spec(const ConfigNode& cfg) {
+  auto spec=cfg["spec"];
+  if(!spec)spec=cfg["spec_path"];
+  if(spec.is_scalar())spec=Config::parse_config_file(spec.as<std::string>());
+  return spec;
+}
+
+int hardware_window(const ConfigNode& cfg) {
+  const int w=cfg["w_max"].as<int>(128);
+  require(w==128||w==256,"w_max must be 128 or 256");
+  return w;
+}
+
+void set_watermarks(PIMController& mc,int w_max) {
+  mc.write_high=3*w_max/4;
+  mc.write_low=w_max/4;
+}
+
+Kernel read_kernel(const ConfigNode& x,double alpha,double tick_us) {
+  Kernel k;k.ordinal=x["ordinal"].as<int>();k.name=x["name"].as<std::string>();k.kind=x["kind"].as<std::string>();k.us=x["us"].as<double>();
+  k.reads=x["read_sectors"].as<uint64_t>();k.proxy=x["write_is_proxy"].as<bool>(true);
+  k.writes=x["write_sectors"].as<uint64_t>();if(k.proxy)k.writes=static_cast<uint64_t>(std::ceil(alpha*k.writes));
+  k.base=x["base_sector"].as<uint64_t>();require(k.base%16==0,"kernel base must be channel aligned");
+  k.nominal=static_cast<Clock>(std::ceil(k.us/tick_us-1e-10));
+  return k;
+}
+
+Clock isolated_memory(const ConfigNode& spec, const Kernel& k, int w_max) {
+  Clock last=0;
+  // A fresh controller's schedule is invariant to channel ID for the same
+  // request counts. The remainder of the striped reads or writes is the
+  // only reason to simulate another channel in an isolated probe.
+  std::array<bool,4> seen{};
+  for(int c=0;c<16;++c) {
+    const int stripe=2*(c<k.reads%16)+(c<k.writes%16);
+    if(seen[stripe])continue;
+    seen[stripe]=true;
+    PIMController mc(c,spec,spec["metadata"]);
+    set_watermarks(mc,w_max);
+    mc.begin_kernel(&k,0);
+    Clock now=0;
+    while(!mc.kernel_finished())now=mc.step(now,true);
+    last=std::max(last,mc.kernel_memory_done);
+  }
+  return last;
+}
+
+int probe_mlp(const std::string& config_file) {
+  const auto cfg=Config::parse_config_file(config_file);
+  const auto spec=load_spec(cfg);
+  const int w_max=hardware_window(cfg);
+  const double tick_us=spec["clock_ps"].as<double>(938.0)/1000000.0;
+  const auto vlm=Config::parse_config_file(cfg["vlm_path"].as<std::string>());
+  const auto units=vlm["units"];
+  std::map<int,Kernel> kernels;
+  for(const auto& x:units.seq()) {
+    auto k=read_kernel(x,1.0,tick_us);
+    require(kernels.emplace(k.ordinal,std::move(k)).second,"duplicate VLM ordinal");
+  }
+  int ordinal=0,w=0;
+  while(std::cin>>ordinal>>w) {
+    require(w>=1&&w<=w_max,"probe window outside hardware limits");
+    auto k=kernels.at(ordinal);
+    k.mlp=w;
+    std::cout<<isolated_memory(spec,k,w)<<std::endl;
+  }
+  require(std::cin.eof(),"invalid probe request");
+  return 0;
+}
+}
+
 int run(const std::string& config_file,const std::string& output) {
   auto cfg=Config::parse_config_file(config_file);
   auto execution=cfg["execution_model"].as<std::string>("native_dram_requests");
@@ -30,9 +102,7 @@ int run(const std::string& config_file,const std::string& output) {
   require(execution=="native_dram_requests","unknown execution_model");
   require(cfg.is_map()&&!cfg.map().count("refresh_allbank"),"refresh_allbank is retired: rank0 uses REFpb and rank1 uses REFab");
   std::filesystem::create_directories(output);
-  ConfigNode specification=cfg["spec"];
-  if(!specification)specification=Config::parse_config_file(cfg["spec_path"].as<std::string>());
-  if(specification.is_scalar())specification=Config::parse_config_file(specification.as<std::string>());
+  ConfigNode specification=load_spec(cfg);
   double tick_us=specification["clock_ps"].as<double>(938.0)/1000000.0;
   auto cycles=[&](double us){return static_cast<Clock>(std::ceil(us/tick_us-1e-10));};
   auto us=[&](Clock c){return c*tick_us;};
@@ -51,14 +121,23 @@ int run(const std::string& config_file,const std::string& output) {
   require(arbitration_present==(!serial&&!fused),"arbitration is required only for concurrent streaming");
   require(policy=="frfcfs"||policy=="pim_head"||policy=="pim_lookahead"||policy=="gap_batch","invalid arbitration");
   auto calib=cfg["calibration"];
-  double alpha=calib["alpha"].as<double>(1);
+  const auto release=cfg["vlm_release"].as<std::string>("closed_loop");
+  require(release=="closed_loop"||release=="uniform","invalid vlm_release");
+  const bool closed=release=="closed_loop";
+  require(closed ? !calib : (!cfg["w_max"]&&!cfg["mlp_path"]),
+          "legacy calibration and closed-loop settings cannot be combined");
+  const int w_max=closed?hardware_window(cfg):0;
+  double alpha=closed?1.0:calib["alpha"].as<double>(1);
   require(alpha>=0.05&&alpha<=1,"alpha outside registered calibration range [0.05,1]");
   std::array<std::unique_ptr<PIMController>,16> channels;
   for(int c=0;c<16;c++) {
     channels[c]=std::make_unique<PIMController>(c,specification,specification["metadata"]);
     auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;
-    mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);
-    require(mc.window>0&&mc.write_low>=0&&mc.write_low<mc.write_high&&mc.write_high<=mc.window,"invalid write watermarks/window");
+    if(closed)set_watermarks(mc,w_max);
+    else {
+      mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);
+      require(mc.window>0&&mc.write_low>=0&&mc.write_low<mc.write_high&&mc.write_high<=mc.window,"invalid write watermarks/window");
+    }
   }
   std::map<std::string,ProgramStage> programs;
   int layer_stride_rows=512;
@@ -81,12 +160,24 @@ int run(const std::string& config_file,const std::string& output) {
   if(do_vlm) {
     auto input=Config::parse_config_file(cfg["vlm_path"].as<std::string>());
     const auto input_units=input["units"];
+    ConfigNode mlp_units;
+    if(cfg["mlp_path"]) {
+      const auto mlp=Config::parse_config_file(cfg["mlp_path"].as<std::string>());
+      require(mlp["kind"].as<std::string>()=="kernel_mlp"&&mlp["w_max"].as<int>()==w_max,
+              "MLP ledger model or hardware window differs");
+      mlp_units=mlp["units"];
+      require(mlp_units.size()==input_units.size(),"MLP ledger must cover all VLM units");
+    }
     for(const auto& x:input_units.seq()) {
-      Kernel k;k.ordinal=x["ordinal"].as<int>();k.name=x["name"].as<std::string>();k.kind=x["kind"].as<std::string>();k.us=x["us"].as<double>();
-      k.reads=x["read_sectors"].as<uint64_t>();k.proxy=x["write_is_proxy"].as<bool>(true);
-      k.writes=x["write_sectors"].as<uint64_t>();if(k.proxy)k.writes=static_cast<uint64_t>(std::ceil(alpha*k.writes));
-      k.base=x["base_sector"].as<uint64_t>();require(k.base%16==0,"kernel base must be channel aligned");
-      k.nominal=cycles(k.us);kernels.push_back(k);
+      Kernel k=read_kernel(x,alpha,tick_us);
+      k.mlp=w_max;
+      if(mlp_units) {
+        const auto& row=mlp_units.seq().at(kernels.size());
+        require(row["ordinal"].as<int>()==k.ordinal,"MLP ledger ordinal differs from VLM input");
+        k.mlp=row["w_k"].as<int>();
+        require(k.mlp>=1&&k.mlp<=w_max,"MLP ledger window outside hardware limits");
+      }
+      kernels.push_back(k);
     }
   }
   std::vector<StageResult> results;
@@ -103,7 +194,13 @@ int run(const std::string& config_file,const std::string& output) {
     while(state_changed) {
       state_changed=false;
       if(active_kernel>=0&&now>=kernels[active_kernel].start+kernels[active_kernel].nominal&&all([](const auto& mc){return mc.kernel_finished();})) {
-        kernels[active_kernel].end=now;for(auto& mc:channels)mc->end_kernel();
+        auto& k=kernels[active_kernel];
+        k.end=now;
+        for(auto& mc:channels) {
+          k.memory_done=std::max(k.memory_done,mc->kernel_memory_done);
+          mc->end_kernel();
+        }
+        if(closed)require(k.end==std::max(k.start+k.nominal,k.memory_done),"closed-loop kernel completion was not causal");
         active_kernel=-1;state_changed=true;
       }
       if(ae_gpu_active&&now>=ae_gpu_end) {ae_gpu_active=false;ae_gpu_end=NEVER;++ae_index;state_changed=true;}
@@ -161,6 +258,7 @@ int run(const std::string& config_file,const std::string& output) {
   for(const auto& mc:channels){mc->checker.advance(now);gr+=mc->gpu_read_bytes;gw+=mc->gpu_write_bytes;pr+=mc->pim_read_bytes;pw+=mc->pim_write_bytes;checks+=mc->checker.checked;}
   std::ofstream out(output+"/raw.json");out<<std::setprecision(15);
   out<<"{\n\"schema_version\":1,\"clock_ps\":"<<tick_us*1000000;
+  if(closed)out<<",\"execution_model\":\"native_dram_requests\",\"vlm_release\":\"closed_loop\",\"w_max\":"<<w_max;
   out<<",\"refresh_policy\":{\"rank0\":\"REFpb\",\"rank1\":\"REFab\"},\"refresh_commands\":{";
   for(int rank=0;rank<2;++rank) {
     uint64_t pb=0,ab=0;for(const auto& mc:channels){pb+=mc->refresh_counts[rank][0];ab+=mc->refresh_counts[rank][1];}
@@ -182,7 +280,9 @@ int run(const std::string& config_file,const std::string& output) {
     out<<"{\"stage_id\":"<<r.id<<",\"name\":"<<json_string(r.name)<<",\"step\":"<<r.step<<",\"layer\":"<<r.layer<<",\"start_us\":"<<us(r.start)<<",\"end_us\":"<<us(r.end)<<",\"duration_us\":"<<us(r.end-r.start)<<",\"gpu_wait_us\":"<<us(r.wait)<<"}";}
   out<<"],\n\"kernels\":[";
   for(size_t i=0;i<kernels.size();i++){const auto& k=kernels[i];if(i)out<<',';
-    out<<"{\"ordinal\":"<<k.ordinal<<",\"start_us\":"<<us(k.start)<<",\"end_us\":"<<us(k.end)<<",\"duration_us\":"<<us(k.end-k.start)<<",\"read_bytes\":"<<k.reads*32<<",\"write_bytes\":"<<k.writes*32<<"}";}
+    out<<"{\"ordinal\":"<<k.ordinal<<",\"start_us\":"<<us(k.start)<<",\"end_us\":"<<us(k.end)<<",\"duration_us\":"<<us(k.end-k.start)<<",\"read_bytes\":"<<k.reads*32<<",\"write_bytes\":"<<k.writes*32;
+    if(closed)out<<",\"w_k\":"<<k.mlp<<",\"floor_ck\":"<<k.nominal<<",\"memory_ck\":"<<k.memory_done-k.start;
+    out<<"}";}
   Clock background_duration=now;
   for(const auto& r:results)background_duration-=r.end-r.start;
   out<<"],\n\"bus\":[";bool comma=false;
@@ -196,6 +296,7 @@ int run(const std::string& config_file,const std::string& output) {
 }
 int main(int argc,char** argv) {
   try {
+    if(argc==3&&std::string(argv[1])=="--probe-mlp")return PimVla::probe_mlp(argv[2]);
     std::string config,output;
     for(int i=1;i<argc;i++) {
       std::string a=argv[i];

@@ -55,7 +55,7 @@ def evaluate_candidate(binary, base_config, output, index, *, resume=False, para
     vlm = read_json(base_config["vlm_path"])
     if len(vlm["units"]) != 2357:
         raise ValueError("calibration requires the full captured VLM workload")
-    cfg = dict(base_config, run_kind="vlm_solo", calibration=parameters)
+    cfg = dict(base_config, run_kind="vlm_solo", vlm_release="uniform", calibration=parameters)
     print(f"CALIBRATION {index}: {parameters}", flush=True)
     raw = execute(binary, cfg, output / f"candidate-{index:02d}", resume=resume)
     result = assess(raw, vlm)
@@ -107,7 +107,7 @@ def collect_candidates(binary, base_config, output):
         directory = output / f"candidate-{index:02d}"
         if not (directory / "assessment.json").is_file():
             continue
-        expected_config = dict(base_config, run_kind="vlm_solo", calibration=parameters)
+        expected_config = dict(base_config, run_kind="vlm_solo", vlm_release="uniform", calibration=parameters)
         if read_json(directory / "input-config.json") != expected_config:
             raise ValueError(f"candidate {index} configuration is stale")
         provenance = read_json(directory / "provenance.json")

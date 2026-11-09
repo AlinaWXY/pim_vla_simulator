@@ -164,6 +164,31 @@ void gpu_owned_act_bypass(const ConfigNode& spec,bool alternative) {
   std::cout<<"{\"sequencer\":\"gpu_owned_act_"<<(alternative?"ready_bank_bypass":"wakeup")
            <<"\",\"status\":\"passed\",\"end_ck\":"<<now<<"}\n";
 }
+
+void closed_loop_refills_on_retirement(const ConfigNode& spec) {
+  PIMController c(0,spec,spec["metadata"]);
+  warm_row_zero(c);
+  c.write_high=96;c.write_low=32;
+  Kernel kernel;
+  kernel.writes=16*12;kernel.nominal=100000;kernel.mlp=2;
+  c.begin_kernel(&kernel,0);
+  require(c.step(0,true)==0,"closed-loop writes below the high watermark could not issue");
+  require(c.kernel_next==2&&c.gpu_outstanding==2&&c.gpu_write_bytes==32,
+          "closed-loop did not fill the window at kernel start");
+  Clock now=0;
+  while(!c.kernel_finished()) {
+    const auto before=c.kernel_next;
+    const Clock event=now;
+    now=c.step(event,true);
+    require(c.gpu_outstanding<=kernel.mlp,"closed-loop exceeded the per-channel window");
+    require(c.kernel_next==before||c.kernel_memory_done==event,"closed-loop did not refill at retirement");
+    require(now<1000,"closed-loop writes failed to drain below the high watermark");
+  }
+  require(c.gpu_write_bytes==kernel.writes*32/16&&now==c.kernel_memory_done,
+          "closed-loop write conservation or completion clock differs");
+  c.end_kernel();
+  std::cout<<"{\"sequencer\":\"closed_loop_refills_on_retirement\",\"status\":\"passed\"}\n";
+}
 }
 
 int main(int argc,char** argv) {
@@ -172,6 +197,7 @@ int main(int argc,char** argv) {
     const auto spec=Config::parse_config_file(argv[1]);
     gpu_owned_act_bypass(spec,true);
     gpu_owned_act_bypass(spec,false);
+    closed_loop_refills_on_retirement(spec);
     cursor_rejects_non_head();
     {
       const auto result=execute(spec,{operation("RD",0,0),operation("RD",1,1)});

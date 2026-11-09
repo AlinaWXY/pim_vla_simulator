@@ -51,6 +51,16 @@ def validate_config(config):
             raise ValueError("fused_kernel_windows requires calibrated_vlm_path")
     elif "calibrated_vlm_path" in config:
         raise ValueError("calibrated_vlm_path is only valid for fused_kernel_windows")
+    if execution == "native_dram_requests":
+        release = config.get("vlm_release", "closed_loop")
+        if release not in {"closed_loop", "uniform"}:
+            raise ValueError("unknown vlm_release")
+        if release == "closed_loop":
+            w_max = config.get("w_max", 128)
+            if "calibration" in config or type(w_max) is not int or w_max not in (128, 256):
+                raise ValueError("closed_loop uses w_max 128 or 256 and fixed write watermarks")
+        elif "w_max" in config or "mlp_path" in config:
+            raise ValueError("uniform does not accept closed-loop settings")
     if "refresh_allbank" in config:
         raise ValueError("refresh_allbank is forbidden: rank0 uses REFpb and rank1 uses REFab as a fixed hardware rule")
     for name, options in (("layout", {"feature", "token"}), ("rope", {"gpu", "local"}),

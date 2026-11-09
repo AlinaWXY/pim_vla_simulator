@@ -114,6 +114,7 @@ void PIMController::begin_kernel(const Kernel* k,Clock clk) {
   require(!kernel && queued_gpu==0&&gpu_outstanding==0,"overlapping VLM kernels");
   kernel=k;kernel_reads=(k->reads+15-channel)/16;kernel_writes=(k->writes+15-channel)/16;
   kernel_total=kernel_reads+kernel_writes;kernel_next=issued_reads=issued_writes=0;now=clk;
+  kernel_memory_done=clk;
 }
 void PIMController::end_kernel() {require(kernel_finished(),"kernel still has requests");kernel=nullptr;}
 void PIMController::reset_serial_epoch(Clock origin) {
@@ -155,13 +156,19 @@ void PIMController::settle_coarse(Clock clk) {
 }
 void PIMController::retire_and_fill(Clock clk,bool permit_gpu) {
   while(!completions.empty()&&completions.top().at<=clk) {
-    if(completions.top().gpu) --gpu_outstanding;
+    if(completions.top().gpu) {
+      --gpu_outstanding;
+      kernel_memory_done=completions.top().at;
+    }
     completions.pop();
   }
   checker.retire(clk);
   if(!kernel||!permit_gpu) return;
-  while(kernel_next<kernel_total&&gpu_outstanding<window) {
-    Clock release=kernel->start+static_cast<Clock>((static_cast<long double>(kernel_next)*kernel->nominal)/kernel_total);
+  const int limit=kernel->mlp ? kernel->mlp : window;
+  while(kernel_next<kernel_total&&gpu_outstanding<limit) {
+    Clock release=clk;
+    if(!kernel->mlp)
+      release=kernel->start+static_cast<Clock>((static_cast<long double>(kernel_next)*kernel->nominal)/kernel_total);
     if(release>clk) break;
     uint64_t i=kernel_next;
     bool wr=(static_cast<__uint128_t>(i+1)*kernel_writes/kernel_total)>(static_cast<__uint128_t>(i)*kernel_writes/kernel_total);
@@ -457,7 +464,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu) {
   if(top.issued()&&top.tail>clk)next=std::min(next,top.tail);
   if(descriptor_index>=0&&inner.issued()&&inner.tail>clk)next=std::min(next,inner.tail);
   if(fused&&pim_dq_end>clk)next=std::min(next,pim_dq_end);
-  if(kernel&&permit_gpu&&kernel_next<kernel_total&&gpu_outstanding<window)
+  if(kernel&&!kernel->mlp&&permit_gpu&&kernel_next<kernel_total&&gpu_outstanding<window)
     next=std::min(next,kernel->start+static_cast<Clock>((static_cast<long double>(kernel_next)*kernel->nominal)/kernel_total));
   // A candidate blocked by ownership can become issuable after the owned ACT2.
   if(next<=clk)next=clk+1;
