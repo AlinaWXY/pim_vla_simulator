@@ -69,9 +69,11 @@ struct Cursor {
   Clock tail=0;
   void reset(const std::vector<Operation>* p,Clock now) {ops=p;next=0;decoded_until=p?std::min<size_t>(32,p->size()):0;done.assign(p?p->size():0,NEVER);dispatched.assign(p?p->size():0,0);tail=now;}
   void mark(size_t index,Clock complete) {
-    require(index>=next&&index<decoded_until&&!dispatched[index],"instruction FIFO invalid dispatch");
+    require(index==next&&index<decoded_until&&!dispatched[index],"instruction FIFO requires head-only dispatch");
     dispatched[index]=1;done[index]=complete;tail=std::max(tail,complete);
-    while(next<ops->size()&&dispatched[next])++next;
+    // Retire the queue entry on issue, not completion: dependencies and native
+    // resource/timing readiness govern overlap with the following instruction.
+    ++next;
     decoded_until=std::min(ops->size(),next+32);
   }
   bool issued() const {return !ops || next==ops->size();}

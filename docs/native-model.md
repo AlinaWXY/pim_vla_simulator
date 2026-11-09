@@ -17,8 +17,15 @@ dependencies. Each layer has a separate 1 MiB region per bank; denoising steps
 reuse the corresponding layer. Descriptor children are the statically expanded
 instruction program. One descriptor is resident at a time; its children issue
 through the private command path. The stored program is not a
-hardware FIFO. Version2 admits at most 32 descriptor children into the hardware
-issue window and allows dependency-safe out-of-order issue within that window.
+hardware FIFO. This branch admits at most 32 descriptor children into an
+in-order FIFO. Only its head may issue, including the head's native ACT/PRE
+prerequisites; younger children cannot bypass a stalled head or preopen a row.
+Dispatch advances the FIFO immediately and records the completion timestamp.
+It does not wait for every dispatched child to complete: independent operations
+can overlap subject to native timings, resource readiness and explicit
+dependencies. A completion barrier and the descriptor's final completion wait
+for the outstanding tails. This supersedes the Version2 out-of-order window
+introduced in `292cfbc`; archived measurements retain their original semantics.
 The streaming lookahead policy can inspect at most the next 32 instructions.
 SRF and output pools are checked by a separate bounded data-lifetime scoreboard.
 

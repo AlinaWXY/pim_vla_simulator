@@ -4,9 +4,15 @@
 
 上游基线为 CMU-SAFARI/ramulator2 **`7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`**（2026-11-03，项目版本 2.1）。原任务保存在 [重写方案](docs/rewrite-plan.txt)，逐项交付状态见 [需求矩阵](docs/requirements-matrix.md)。
 
-## Version2 单层检查
+## 当前分支：FIFO32 按序发射
 
-当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**，固定 **GPU rank0 REFpb、PIM rank1 REFab**。VLM 校准、完整 AE 和端到端并发实验保持暂停。最新更新将Down权重与输入放在同一行：12 fragments/行、22行/44KiB每bank，输入按query散布16个bank，每行统一ACTAB，预写跨BG交错。最新结果及PIM/GPU breakdown见 [Down同排单层报告](docs/down-row-single-layer.md)；原生ACTAB、每bank RoPE、输出池、FIFO32与其他既有结构保留。
+本分支以 `6bcd57b` 的 gio-bcast 实现为对照，按用户 2026-11-09 的澄清，将 fused 描述符内部恢复为 **32 项缓冲、按程序顺序发射**。只检查队首的依赖、资源及 Ramulator 原生 prerequisite/timing；队首未发射时，后续子指令及其 ACT/PRE 不得提前发射。队首发射后立即推进 FIFO，不等待它全部完成；显式 completion 依赖、资源冲突和 barrier 仍须等待，因此保留合法流水重叠。
+
+本轮验证范围为 **第 0 层 × 第 0 个 denoising step 的 AE solo**，使用相同输入比较修改前后的模拟 latency 和 native 进程实际耗时。下述历史结果绑定各自的源码提交，不代表本分支的 FIFO32 结果；本轮不启动校准或完整端到端实验。
+
+## Version2 单层历史记录
+
+以下为此前 **第 0 层 × 第 0 个 denoising step 的 AE latency** 验证记录，固定 **GPU rank0 REFpb、PIM rank1 REFab**。该轮未运行 VLM 校准、完整 AE 或端到端并发实验。Down权重与输入放在同一行：12 fragments/行、22行/44KiB每bank，输入按query散布16个bank，每行统一ACTAB，预写跨BG交错。结果及PIM/GPU breakdown见 [Down同排单层报告](docs/down-row-single-layer.md)；该历史版本的 fused 描述符仍使用 32 项窗口内有限乱序，不能将其数值作为当前按序 FIFO32 的结果。
 
 五种单层总延迟依次为 **345.013 / 316.757 / 287.631 / 318.337 / 289.798 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `5fcd84b`、作业 `1981031`；52项Python、224项原生时序检查与5组刷新回归通过，五配置均两次逐字节一致。Token/GPU fused Down由61.918降到45.000 μs（−27.32%），整层仍比同布局streaming慢约0.50%；bank RoPE组合约0.75%。[独立暂存布局基线及VLM比较](docs/rank-refresh-single-layer.md)和更早的[双REFpb结果](docs/version2-single-layer.md)均作为历史对照保留。
 

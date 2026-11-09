@@ -1,6 +1,8 @@
 # 重写方案需求与验收映射
 
-> 本页是Version1 / 源码 `1e0b73b` 的历史验收记录，下述完整AE数字不能作为Version2的验证。当前只进行单层、单个denoising step检查，固定GPU rank0 REFpb、PIM rank1 REFab，并采用Down权重/输入同排布局，见 [最新单层报告](down-row-single-layer.md)；校准与端到端实验保持暂停。
+> 本页下述验收表是 Version1 / 源码 `1e0b73b` 的历史记录；完整 AE 数字不能作为 Version2 或当前 FIFO32 分支的验证。[Down 同排单层报告](down-row-single-layer.md) 同样绑定其历史源码，采用的是有限乱序版本。
+
+当前分支落实用户 2026-11-09 的最新澄清：fused 描述符内部 **FIFO32 仅表示缓冲容量，必须按程序顺序发射**。只允许队首及其原生前置命令发射，不允许后续指令绕过队首或提前预开行；队首发射后推进而非等待完成，保留显式依赖、资源占用和 Ramulator 原生时序所允许的流水重叠。该要求替代 Version2 的“32 项窗口内有限前瞻”条款；原始需求附件保留为历史证据。当前验证范围为单层、单个 denoising step 的 AE solo，以 `6bcd57b` 为修改前对照，同时比较模拟 latency 与 native 运行耗时。验收需确认 FIFO 顺序、流水重叠、刷新和 barrier、两版相同输入、字节守恒及 streaming 对照不变；本轮不启动校准或完整端到端实验。
 
 依据 [2026-11-09 任务文档](rewrite-plan.txt)。本次上传已完成：**38 项 Python 测试、132 项 native 检查、5 个微基准（含 lookahead barrier）、5 种 PIM 单层、8 种并发单层配置，以及 5 种完整 18 层 × 10 步 AE solo**。证据见 [Python 测试](../reference/validation/python-tests.txt)、[原生构建与测试](../reference/validation/native-build-and-tests.txt)、[PIM 单层](../reference/validation/pim-single-layer.txt) 与 [并发单层](../reference/validation/concurrency-smoke.txt)。
 

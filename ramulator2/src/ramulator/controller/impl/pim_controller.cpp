@@ -188,8 +188,9 @@ Candidate PIMController::make_candidate(int final,const AddrVec_t& addr,Candidat
   return c;
 }
 Candidate PIMController::next_pim(Clock clk) {
-  // Outer requests remain ordered. One resident descriptor exposes at most
-  // 32 children, with completion dependencies and barriers bounding reordering.
+  // FIFO32 is decoded storage, not an out-of-order issue window. Only the
+  // head may issue, including its native ACT/PRE prerequisites. Advancing on
+  // issue still permits independent operations to overlap their completions.
   if(descriptor_index>=0 && inner.issued() && inner.tail<=clk) {
     top.done[descriptor_index]=inner.tail;top.tail=std::max(top.tail,inner.tail);
     descriptor_index=-1;inner.reset(nullptr,clk);
@@ -198,63 +199,27 @@ Candidate PIMController::next_pim(Clock clk) {
   if(cursor.issued()) return {};
   require(cursor.next<cursor.decoded_until&&cursor.decoded_until-cursor.next<=32,"instruction FIFO capacity exceeded");
   bool local=descriptor_index>=0;
-  Candidate best;best.source=Candidate::PIM;
-  Clock wake=NEVER;
-  const size_t limit=local?cursor.decoded_until:cursor.next+1;
-  const auto& head_epoch=cursor.ops->at(cursor.next).epoch;
-  for(size_t i=cursor.next;i<limit;++i) {
-    if(cursor.dispatched[i])continue;
-    const Operation& op=cursor.ops->at(i);
-    // Named I/O epochs are fences even if their data dependencies allow more.
-    if(op.epoch!=head_epoch)break;
-    Clock at=dependencies(op,cursor);
-    for(int d:op.issue_deps)if(!cursor.dispatched.at(d))at=NEVER;
-    if(local)at=std::max(at,descriptor_ready);
-    if(op.name=="BARRIER") {
-      at=std::max(at,cursor.tail);
-      if(i==cursor.next&&at<=clk) {cursor.mark(i,clk);forecast_dirty=true;return next_pim(clk);}
-      if(at>clk)wake=std::min(wake,at);
-      break;
-    }
-    // An unissued producer has no resource identity yet. Only interrogate the
-    // scoreboard once all explicit dependencies have actually completed.
-    if(at>clk) {wake=std::min(wake,at);continue;}
-    int cmd=command(op,local);
-    try {at=std::max(at,resources.ready(op,clk));}
-    catch(const std::exception& e){throw std::runtime_error(std::string(e.what())+" op="+op.name+" id="+std::to_string(op.id)+" stage="+std::to_string(stage));}
-    AddrVec_t physical=op.addr;physical[4]+=row_offset;
-    require(physical[4]<device.m_spec->organization.level_sizes[4],"PIM layer address exceeds rank capacity");
-    Candidate c=make_candidate(cmd,physical,Candidate::PIM,at,local);
-    c.arrival=pim_arrival;c.dependency_ready=at<=clk;c.index=i;
-    if(fused&&info[cmd].direction)c.at=std::max(c.at,gpu_dq_end);
-    if(blocked_by_owner(c,clk))continue;
-    if(!c.final&&i>cursor.next) {
-      // Do not preopen a younger row by closing/replacing a row still needed
-      // by an older array operation. This prevents destructive prefetch loops.
-      const auto targets=device.get_target_banks(c.cmd,c.addr);
-      bool conflicts=false;
-      for(size_t j=cursor.next;j<i&&!conflicts;++j) {
-        if(cursor.dispatched[j])continue;
-        const auto& older=cursor.ops->at(j);
-        const bool array=is_mac(older.name)||older.name=="LOCALRD"||older.name=="LOCALWR"||older.name=="RD"||older.name=="WR";
-        if(!array||older.addr[4]==op.addr[4])continue;
-        auto a=older.addr;a[4]+=row_offset;
-        const auto prior=device.get_target_banks(command(older,local),a);
-        for(int b:targets)if(std::find(prior.begin(),prior.end(),b)!=prior.end()) {conflicts=true;break;}
-      }
-      if(conflicts)continue;
-    }
-    // Iteration is oldest-first and ready final operations have top priority;
-    // no younger candidate can outrank this one. Avoid rescanning 31 resource
-    // scoreboards after an already decisive selection.
-    if(c.at<=clk&&c.final)return c;
-    const bool ready=c.at<=clk,best_ready=best.cmd>=0&&best.at<=clk;
-    if(best.cmd<0||(ready&&!best_ready)||(ready&&best_ready&&c.final&&!best.final)||
-       (!ready&&!best_ready&&c.at<best.at))best=std::move(c);
+  const Operation& op=cursor.ops->at(cursor.next);
+  Clock at=dependencies(op,cursor);
+  for(int d:op.issue_deps)if(!cursor.dispatched.at(d))at=NEVER;
+  if(local)at=std::max(at,descriptor_ready);
+  if(op.name=="BARRIER") {
+    at=std::max(at,cursor.tail);
+    if(at<=clk) {cursor.mark(cursor.next,clk);forecast_dirty=true;return next_pim(clk);}
   }
-  if(best.cmd<0)best.at=wake;
-  else if(best.at>clk&&wake<best.at) {best.cmd=-1;best.at=wake;}
-  return best;
+  // Wait only for this head's dependencies (or an explicit completion barrier),
+  // not for the tail of every previously issued independent operation.
+  if(at>clk) {Candidate wait;wait.source=Candidate::PIM;wait.at=at;return wait;}
+  int cmd=command(op,local);
+  try {at=std::max(at,resources.ready(op,clk));}
+  catch(const std::exception& e){throw std::runtime_error(std::string(e.what())+" op="+op.name+" id="+std::to_string(op.id)+" stage="+std::to_string(stage));}
+  AddrVec_t physical=op.addr;physical[4]+=row_offset;
+  require(physical[4]<device.m_spec->organization.level_sizes[4],"PIM layer address exceeds rank capacity");
+  Candidate c=make_candidate(cmd,physical,Candidate::PIM,at,local);
+  c.arrival=pim_arrival;c.dependency_ready=at<=clk;c.index=cursor.next;
+  if(fused&&info[cmd].direction)c.at=std::max(c.at,gpu_dq_end);
+  if(blocked_by_owner(c,clk))return {};
+  return c;
 }
 bool PIMController::blocked_by_owner(const Candidate& c,Clock clk) const {
   if(c.cmd<0)return true;
@@ -373,14 +338,14 @@ void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage
 }
 void PIMController::finish_pim(const Candidate& c,Clock clk) {
   Cursor& cursor=descriptor_index>=0?inner:top;
+  require(c.index==cursor.next,"PIM command bypassed FIFO head");
   const auto& op=cursor.ops->at(c.index);
-  if(!c.final) {if(c.index>cursor.next)++prefetched_prerequisites;return;}
+  if(!c.final)return;
   int cmd=c.cmd;Clock complete=clk+info[cmd].completion;
   if(op.name=="ROPE_EXEC")complete=clk+info[cmd].completion+(op.pairs-1)*device.m_spec->get_timing_value("nROPEII");
   resources.issue(op,clk,complete);
   if(info[cmd].direction) { (info[cmd].direction=='R'?pim_read_bytes:pim_write_bytes)+=32;
     pim_dq_end=std::max(pim_dq_end,clk+info[cmd].latency+info[cmd].burst);gap_write_phase=false; }
-  if(c.index>cursor.next)++out_of_order_issues;
   size_t index=c.index;cursor.mark(index,complete);
   pim_arrival=clk;
   if(!op.children.empty()) {
