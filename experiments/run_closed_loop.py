@@ -9,7 +9,7 @@ from pathlib import Path
 from analysis.report import duration, summarize
 from experiments.common import ROOT, read_json, sha256, write_csv, write_json
 from experiments.config import variant_name
-from experiments.native import execute, library_hashes, runtime_libraries
+from experiments.native import execute, library_hashes, runtime_libraries, total_us
 
 
 def load_calibration(binary, config, path, *, allow_scaled_unit_errors=False):
