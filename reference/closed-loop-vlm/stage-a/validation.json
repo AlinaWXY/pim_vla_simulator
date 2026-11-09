@@ -1,0 +1,49 @@
+{
+  "source_commit": "a042bebefc44d9bfbe77edd81467a62ac43aae4a",
+  "source_archive_sha256": "da62f7154a21c92f8788accd5a174aa83384f45bc3ac556d724a565f17d8ab91",
+  "binary_sha256": "370a81f04c3ca689135fc19fbcdfe16d96ccc3bd491c3d62137fbe43aecdb5cc",
+  "baseline_commit": "79b4d84b9bfdca1593e26f35bf1642b323a4fa58",
+  "baseline_binary_sha256": "4c593a4e781cde36d240aee246c1cb02d3ea65ffd7ad276c2023a003ff567985",
+  "calibration_mlp_sha256": "8f3d057f131eb310a3ad075309979ce25850132f16c52a66610da96ba287e7bc",
+  "stage_a": {
+    "job_id": 1983536,
+    "node": "einstein",
+    "elapsed": "00:41:50",
+    "gate_passed": false,
+    "exit_code": 2,
+    "raw_files_cmp_identical": true,
+    "raw_sha256": "b16c27376059cb8cb6ef2bc86d39db5b035513d6ed36939d29c458de0aae83e0",
+    "server_artifacts": "dev0:/fact_data/xinyaowang/pim_vla_closed_loop_20261109/results/stage-a-w128-1983536",
+    "remaining_stages": {"B": "not_run", "C": "not_run", "D": "not_run"}
+  },
+  "tests": {
+    "server_logs": "dev0:/fact_data/xinyaowang/pim_vla_closed_loop_20261109/results/validation-1983536",
+    "python_tests_passed": 103,
+    "native_spec_checks_passed": 224,
+    "microbench": "passed",
+    "lookahead": "passed",
+    "sequencer": "passed",
+    "refresh": "passed",
+    "resources": "passed",
+    "fault_injection": "passed",
+    "native_frontend_smoke": "passed",
+    "historical_fused_window_frontend_fixtures_passed": 24,
+    "uniform_fixed_input_cmp_identical": true,
+    "closed_loop_immediate_release_and_outstanding_bound": "passed",
+    "closed_loop_floor_and_completion": "passed",
+    "closed_loop_sub_watermark_writes": "passed",
+    "synthetic_native_mlp_monotonicity": "passed",
+    "gap_regression_baseline_controller_harness_sha256": "6b7a5028555b61611b25ba7d6ffd5e095f25e3c9a49bcbe7d136a96d3bedeba0",
+    "gap_wrgb_wait": {"baseline_controller": "failed", "fixed_controller": "passed"},
+    "gap_write_drain": {"baseline_controller": "failed", "fixed_controller": "passed"}
+  },
+  "layer_smoke": {
+    "job_id": 1983658,
+    "node": "einstein",
+    "elapsed": "00:05:22",
+    "server_logs": "dev0:/fact_data/xinyaowang/pim_vla_closed_loop_20261109/results/layer-validation-1983658",
+    "ae_solo_variants_passed": 5,
+    "concurrent_cases_passed": ["c", "d", "e", "f", "g", "e-frfcfs", "e-lookahead", "e-gap"],
+    "rank_and_phase_ca_dq_accounting": "passed"
+  }
+}
