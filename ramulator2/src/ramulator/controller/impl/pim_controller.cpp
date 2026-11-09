@@ -283,14 +283,22 @@ Candidate PIMController::next_gpu(Clock clk) {
     if(refresh_due[0]<=clk && (q.addr[2]*4+q.addr[3])%8==refresh_bank[0])continue;
     if(any_desired&&((info[q.cmd].direction=='W')!=desired_write))continue;
     int cmd=device.get_preq_command(q.cmd,q.addr,clk);
+    Candidate candidate;
+    candidate.cmd=cmd;candidate.addr=q.addr;candidate.source=Candidate::GPU;
+    candidate.index=i;candidate.arrival=q.arrival;
+    // Filter ownership before ranking bank heads. Otherwise an older ACT1
+    // can win while the external ACT2 lane is occupied, then be rejected by
+    // can_issue without considering another bank's ready PRE/RD/WR. ACT2 is
+    // exclusively served by the owned path, which also supplies its wakeup.
+    if(blocked_by_owner(candidate,clk))continue;
     Clock at=std::max({clk,q.arrival,ready_at(cmd,q.addr),external_free});
     if(device.m_spec->command_meta[cmd].is_opening && device.m_spec->command_names[cmd]=="ACT1")
       at=std::max(at,ready_at(device.m_spec->get_command_id("ACT2"),q.addr)-device.m_spec->get_timing_value("nAAD"));
     for(const auto& p:pending_act)if(p.cmd>=0&&cmd!=p.cmd && at+spacing(cmd,q.addr,p.cmd,p.addr)>p.deadline)at=std::max(at,p.deadline+1);
     bool hit=(cmd==q.cmd),ready=at<=clk,best_ready=best.at<=clk;
     if(best.cmd<0 || (ready&&!best_ready) || (ready&&best_ready&&(hit>best.rowhit || (hit==best.rowhit&&q.arrival<best.arrival))) || (!ready&&!best_ready&&at<best.at)) {
-      best.cmd=cmd;best.addr=q.addr;best.source=Candidate::GPU;best.index=i;best.arrival=q.arrival;
-      best.at=at;best.final=hit;best.rowhit=hit;
+      candidate.at=at;candidate.final=hit;candidate.rowhit=hit;
+      best=std::move(candidate);
     }
   }
   return best;

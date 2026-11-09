@@ -82,12 +82,71 @@ void report(const std::string& name,const Observation& observation) {
            <<",\"out_of_order_issues\":"<<observation.out_of_order
            <<",\"prefetched_prerequisites\":"<<observation.prefetched<<"}\n";
 }
+
+void gpu_owned_act_bypass(const ConfigNode& spec,bool alternative) {
+  PIMController c(0,spec,spec["metadata"]);
+  warm_row_zero(c);
+  const int act1=c.device.m_spec->get_command_id("ACT1");
+  const int act2=c.device.m_spec->get_command_id("ACT2");
+  const int pre=c.device.m_spec->get_command_id("PREpb");
+  const int rd=c.device.m_spec->get_command_id("RD");
+  const auto closed=c.device.m_spec->states.at("Closed");
+  auto close_bank=[&](int bank) {
+    c.device.m_bank_nodes.at(bank)->m_state=closed;
+    c.device.m_bank_nodes.at(bank)->m_row_state.clear();
+  };
+  close_bank(0);
+  close_bank(16+4);
+  // Native ready-clock fixture: rank1 ACT1 owns the external lane until its
+  // ACT2 becomes legal at CK104, within the CK108 nAAD deadline. Rank0 has
+  // an older closed-bank read (ACT1) and optionally a younger row conflict
+  // (PREpb), which may legally use the otherwise idle external CA at CK101.
+  constexpr Clock start=100,probe=101,owner_ready=104;
+  AddrVec_t owner={0,1,1,0,0,0};
+  c.device.m_bank_nodes.at(16+4)->m_cmd_ready_clk[act2]=owner_ready;
+  c.issue(act1,owner,start,-1);
+  Kernel kernel;
+  kernel.reads=(alternative?2:1)*16;kernel.start=start;kernel.nominal=1;
+  c.begin_kernel(&kernel,start);
+  c.gpu_queues[0].push_back({{0,0,0,0,1,0},rd,0,start});
+  if(alternative)c.gpu_queues[2].push_back({{0,0,0,1,1,0},rd,1,probe});
+  c.queued_gpu=c.gpu_outstanding=alternative?2:1;
+  c.kernel_next=c.kernel_total;c.issued_reads=c.kernel_reads;
+  const Clock next=c.step(probe,true);
+  if(alternative) {
+    require(c.gpu_command_counts[pre]==1 && next==probe,
+            "GPU owner-blocked ACT1 hid another bank's ready PREpb");
+    require(c.pending_act[0].cmd==act2 && c.gpu_command_counts[act1]==0,
+            "GPU bypass stole the occupied ACT2 lane");
+  } else {
+    require(next==owner_ready && c.gpu_command_counts[act1]==0,
+            "ownership-only GPU stall lost its ACT2 wakeup");
+  }
+  Clock now=next;
+  size_t iterations=0;
+  while(!c.kernel_finished()) {
+    require(++iterations<1000,"GPU ownership regression failed to drain");
+    now=c.step(now,true);
+    require(now>=probe && now<1000,"GPU ownership regression lost bounded progress");
+  }
+  c.end_kernel();
+  c.checker.advance(now);
+  require(c.pending_act[0].cmd<0,"GPU ownership regression left an ACT2 owner");
+  require(c.gpu_read_bytes==(alternative?64u:32u) && c.gpu_write_bytes==0,
+          "GPU ownership bypass lost or duplicated read traffic");
+  require(c.gpu_row_misses==(alternative?2u:1u) && c.gpu_row_hits==0,
+          "GPU prerequisite bypass corrupted row-hit accounting");
+  std::cout<<"{\"sequencer\":\"gpu_owned_act_"<<(alternative?"ready_bank_bypass":"wakeup")
+           <<"\",\"status\":\"passed\",\"end_ck\":"<<now<<"}\n";
+}
 }
 
 int main(int argc,char** argv) {
   try {
     require(argc==2,"usage: native_sequencer_tests spec.json");
     const auto spec=Config::parse_config_file(argv[1]);
+    gpu_owned_act_bypass(spec,true);
+    gpu_owned_act_bypass(spec,false);
     {
       auto producer=operation("RD",0,0),head=operation("RD",1,1),ready=operation("RD",2,2);
       head.deps={0};
