@@ -30,7 +30,13 @@ def load_calibration(binary, config, path):
     hashes = [sha256(p) for p in (first, second)]
     if hashes != validation["raw_sha256"] or len(set(hashes)) != 1:
         raise ValueError("calibrated solo repetitions differ")
-    return ledger, read_json(first)
+    solo = read_json(first)
+    if (solo["vlm_release"] != "closed_loop" or solo["w_max"] != ledger["w_max"] or
+        total_us(solo) != validation["total_us"] or
+        [(k["ordinal"], k["w_k"]) for k in solo["kernels"]] !=
+        [(k["ordinal"], k["w_k"]) for k in ledger["units"]]):
+        raise ValueError("MLP ledger windows or timing differ from the repeated solo")
+    return ledger, solo
 
 
 def repeat(binary, config, output, *, resume):
