@@ -39,6 +39,7 @@ struct ProgramStage { std::string name; std::array<std::vector<Operation>,16> ch
 struct Kernel {
   int ordinal=0; std::string name,kind;
   double us=0; uint64_t reads=0,writes=0,base=0; bool proxy=true;
+  uint64_t read_address_extent_sectors=0;
   Clock start=0,nominal=0,end=0;
   int mlp=0; // Zero selects the historical uniform release path.
   Clock memory_done=0;
@@ -124,6 +125,7 @@ class PIMController {
   int gpu_outstanding=0,queued_writes=0,queued_gpu=0;
   const Kernel* kernel=nullptr;
   Clock kernel_memory_done=0;
+  uint64_t kernel_write_base=0;
   uint64_t kernel_total=0,kernel_next=0,kernel_reads=0,kernel_writes=0,issued_reads=0,issued_writes=0;
   Cursor top,inner;
   // -1 retains request-level scheduling; 0 uploads/launches, 1 computes

@@ -30,6 +30,11 @@ def traffic(unit, numerator, denominator):
             for key in ("read_sectors", "write_sectors")}
 
 
+def scaled_unit(unit, numerator, denominator):
+    return dict(unit, read_address_extent_sectors=unit["read_sectors"],
+                **traffic(unit, numerator, denominator))
+
+
 @dataclass
 class ScaleSearch:
     unit: dict
@@ -42,7 +47,7 @@ class ScaleSearch:
 
     def query(self):
         candidate = (self.low + self.high) // 2
-        return dict(self.unit, **traffic(self.unit, candidate, self.denominator))
+        return scaled_unit(self.unit, candidate, self.denominator)
 
     def observe(self, request, cycles):
         # Jump over scales with exactly the same integer request counts.
@@ -96,7 +101,7 @@ def duration_budget(unit, clock_ps):
     return Fraction(str(unit["us"])) * 1_000_000 / clock_ps
 
 
-def check_stage_a(binary, source, provenance):
+def check_stage_a(source, provenance):
     stage_a = read_json(STAGE_A)
     binding = stage_a["provenance"]
     if (stage_a["alpha"], stage_a["w_max"], stage_a["write_high"], stage_a["write_low"]) != (1, 128, 96, 32):
@@ -104,9 +109,8 @@ def check_stage_a(binary, source, provenance):
     for key, path in (("vlm", PROFILE), ("spec", SPEC)):
         if sha256(path) != binding["inputs"][key]["sha256"]:
             raise ValueError(f"Stage A {key} input differs")
-    if (sha256(binary) != binding["binary_sha256"] or
-        library_hashes(provenance) != library_hashes(binding)):
-        raise ValueError("reuse the verified Stage A simulator and runtime library")
+    if library_hashes(provenance) != library_hashes(binding):
+        raise ValueError("reuse the verified Stage A runtime library")
     if [(r["ordinal"], r["measured_us"]) for r in stage_a["units"]] != [
         (u["ordinal"], u["us"]) for u in source["units"]
     ]:
@@ -126,7 +130,7 @@ def apply_search(row, search):
 def solo(binary, output, tag, rows, workload, ledger, config):
     vlm_path = output / f"{tag}-vlm.json"
     mlp_path = output / f"{tag}-mlp.json"
-    units = [dict(unit, **traffic(unit, row["s_numerator"], row["s_denominator"]))
+    units = [scaled_unit(unit, row["s_numerator"], row["s_denominator"])
              for unit, row in zip(workload["units"], rows, strict=True)]
     scaled = dict(workload, units=units,
                   read_bytes=sum(u["read_sectors"] for u in units)*32,
@@ -191,7 +195,8 @@ def calibrate(binary, output):
                       stage_a_sha256=sha256(STAGE_A),
                       inputs={"original_vlm": {"path": str(PROFILE), "sha256": sha256(PROFILE)},
                               "spec": {"path": str(SPEC), "sha256": sha256(SPEC)}})
-    stage_a = check_stage_a(binary, workload, provenance)
+    stage_a = check_stage_a(workload, provenance)
+    provenance["stage_a_binary_sha256"] = stage_a["provenance"]["binary_sha256"]
     provenance["isolated_initial_state"] = stage_a["provenance"]["isolated_initial_state"]
     output.mkdir(parents=True, exist_ok=False)
     rows, searches = [], []

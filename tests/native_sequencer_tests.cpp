@@ -189,6 +189,20 @@ void closed_loop_refills_on_retirement(const ConfigNode& spec) {
   c.end_kernel();
   std::cout<<"{\"sequencer\":\"closed_loop_refills_on_retirement\",\"status\":\"passed\"}\n";
 }
+
+void scaled_traffic_retains_write_base(const ConfigNode& spec) {
+  PIMController c(0,spec,spec["metadata"]);
+  warm_row_zero(c);
+  Kernel k;
+  k.reads=16;k.writes=16;k.read_address_extent_sectors=16*64;k.mlp=2;
+  c.begin_kernel(&k,0);
+  c.step(0,true);
+  // The first read issues in bank0. The pending write still starts in
+  // bank1, following the original 64 columns in the read region.
+  require(c.gpu_read_bytes==32&&c.gpu_queues[3].size()==1&&
+          c.gpu_queues[3].front().addr==AddrVec_t{0,0,0,1,0,0},
+          "scaling shifted the original write address region");
+}
 }
 
 int main(int argc,char** argv) {
@@ -198,6 +212,7 @@ int main(int argc,char** argv) {
     gpu_owned_act_bypass(spec,true);
     gpu_owned_act_bypass(spec,false);
     closed_loop_refills_on_retirement(spec);
+    scaled_traffic_retains_write_base(spec);
     cursor_rejects_non_head();
     {
       const auto result=execute(spec,{operation("RD",0,0),operation("RD",1,1)});

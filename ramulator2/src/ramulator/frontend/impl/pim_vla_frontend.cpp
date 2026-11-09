@@ -47,6 +47,8 @@ Kernel read_kernel(const ConfigNode& x,double alpha,double tick_us) {
   k.reads=x["read_sectors"].as<uint64_t>();k.proxy=x["write_is_proxy"].as<bool>(true);
   k.writes=x["write_sectors"].as<uint64_t>();if(k.proxy)k.writes=static_cast<uint64_t>(std::ceil(alpha*k.writes));
   k.base=x["base_sector"].as<uint64_t>();require(k.base%16==0,"kernel base must be channel aligned");
+  k.read_address_extent_sectors=x["read_address_extent_sectors"].as<uint64_t>(k.reads);
+  require(k.read_address_extent_sectors>=k.reads,"read addresses exceed the original region");
   k.nominal=static_cast<Clock>(std::ceil(k.us/tick_us-1e-10));
   return k;
 }

@@ -114,6 +114,7 @@ void PIMController::begin_kernel(const Kernel* k,Clock clk) {
   require(!kernel && queued_gpu==0&&gpu_outstanding==0,"overlapping VLM kernels");
   kernel=k;kernel_reads=(k->reads+15-channel)/16;kernel_writes=(k->writes+15-channel)/16;
   kernel_total=kernel_reads+kernel_writes;kernel_next=issued_reads=issued_writes=0;now=clk;
+  kernel_write_base=k->base+(std::max(k->reads,k->read_address_extent_sectors)+15)/16*16;
   kernel_memory_done=clk;
 }
 void PIMController::end_kernel() {require(kernel_finished(),"kernel still has requests");kernel=nullptr;}
@@ -173,8 +174,8 @@ void PIMController::retire_and_fill(Clock clk,bool permit_gpu) {
     if(release>clk) break;
     uint64_t i=kernel_next;
     bool wr=(static_cast<__uint128_t>(i+1)*kernel_writes/kernel_total)>(static_cast<__uint128_t>(i)*kernel_writes/kernel_total);
-    uint64_t physical=kernel->base+channel+16*(wr?issued_writes++:issued_reads++);
-    if(wr)physical+=(kernel->reads+15)/16*16;
+    uint64_t physical=wr?kernel_write_base+channel+16*issued_writes++
+                        :kernel->base+channel+16*issued_reads++;
     require(physical%16==static_cast<uint64_t>(channel),"GPU address/channel mismatch");
     uint64_t intra=physical/16;int col=intra%64;uint64_t b=intra/64;
     int bank=b%16;int row=(b/16)%device.m_spec->organization.level_sizes[4];
