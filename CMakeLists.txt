@@ -8,6 +8,7 @@ add_executable(pim_vla_sim
   ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp
   ramulator2/src/ramulator/plugin/bus_checker.cpp
   ramulator2/src/ramulator/frontend/impl/json_input.cpp
+  ramulator2/src/ramulator/frontend/impl/fused_kernel_frontend.cpp
   ramulator2/src/ramulator/frontend/impl/pim_vla_frontend.cpp)
 target_include_directories(pim_vla_sim PRIVATE ramulator2/src)
 target_link_libraries(pim_vla_sim PRIVATE ramulator)

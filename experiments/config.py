@@ -41,6 +41,16 @@ def validate_calibration(params):
 
 
 def validate_config(config):
+    execution = config.get("execution_model", "native_dram_requests")
+    if execution not in {"native_dram_requests", "fused_kernel_windows"}:
+        raise ValueError("unknown execution_model")
+    if execution == "fused_kernel_windows":
+        if (config.get("mode"), config.get("dataflow"), config.get("run_kind", "combined")) != ("concurrent", "fused", "combined"):
+            raise ValueError("fused_kernel_windows requires concurrent fused combined execution")
+        if not config.get("calibrated_vlm_path"):
+            raise ValueError("fused_kernel_windows requires calibrated_vlm_path")
+    elif "calibrated_vlm_path" in config:
+        raise ValueError("calibrated_vlm_path is only valid for fused_kernel_windows")
     if "refresh_allbank" in config:
         raise ValueError("refresh_allbank is forbidden: rank0 uses REFpb and rank1 uses REFab as a fixed hardware rule")
     for name, options in (("layout", {"feature", "token"}), ("rope", {"gpu", "local"}),

@@ -24,6 +24,7 @@ VARIANTS = {
     "token_local_after": ("token", "local", "fused"),
 }
 EXPECTED_DQ = dict(zip(VARIANTS, (6096, 5352, 5160, 4968, 4776)))
+EXECUTION_MODELS = ("native_dram_requests", "fused_kernel_windows")
 EXTERNAL = {"RD", "WR", "WRGB", "RDRES"}
 QKT_BATCH_COLUMNS = (L.OUTPUT_BYTES // 4) - 16  # 16 temporary FP32 contributions per bank.
 
@@ -305,7 +306,8 @@ def qkt(channel, feature, fused):
     return b.ops
 
 
-def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0):
+def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0,
+                   store_to_dram=False, packet_base=0):
     last = []
     elements = 16 if bf16 else 8
     for packet in range(count):
@@ -329,10 +331,26 @@ def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0):
         if bf16:
             ready = b.emit("CAST", bank=bank, deps=[gather], elements=elements, output_bytes=32,
                            source_regions=regions, output_tile=tile)
-        last.append(b.emit("RDRES", packet * 32, -1, deps=[ready], result_bank=bank,
-                           result_slot=(query * features_per_bank + lane) // 8,
-                           source_regions=regions, output_tile=tile, release_result=True, epoch=epoch))
+        if store_to_dram:
+            target, offset = L.fused_result_location(packet_base + packet)
+            last.append(b.emit("LOCALWR", offset, target, deps=[ready], result_bank=bank,
+                               result_slot=(query * features_per_bank + lane) // 8,
+                               source_regions=regions, source="fused_result", source_bank=bank,
+                               output_tile=tile, result_packet=packet_base + packet,
+                               output_bytes=32, release_result=True))
+        else:
+            last.append(b.emit("RDRES", packet * 32, -1, deps=[ready], result_bank=bank,
+                               result_slot=(query * features_per_bank + lane) // 8,
+                               source_regions=regions, output_tile=tile, release_result=True, epoch=epoch))
     return b.fence(last)
+
+
+def read_spilled_results(b, count, descriptor):
+    """External array reads begin only after every descriptor store completes."""
+    for packet in range(count):
+        bank, offset = L.fused_result_location(packet)
+        b.emit("RD", offset, bank, deps=[descriptor], epoch=b.group + "_export",
+               tensor="fused_result", result_packet=packet)
 
 
 def pv(channel, feature, fused):
@@ -362,7 +380,7 @@ def pv(channel, feature, fused):
     return b.ops
 
 
-def output_projection(channel, feature, fused):
+def output_projection(channel, feature, fused, store_results=False):
     outer, b = Builder(channel, "o"), Builder(channel, "o")
     fragments = 8 if feature else 16
     previous = []
@@ -371,15 +389,18 @@ def output_projection(channel, feature, fused):
                     fused=fused, views=2, output_tile=tile, tile_stride=fragments * 32 * 32,
                     initial=previous)
         done = export_results(b, 512, [last], features_per_bank=32, bf16=True,
-                              epoch=f"o_tile{tile}_export", tile=tile)
+                              epoch=f"o_tile{tile}_export", tile=tile,
+                              store_to_dram=store_results, packet_base=tile * 512)
         previous = [done]
     if fused:
-        outer.descriptor("o", b)
+        run = outer.descriptor("o", b)
+        if store_results:
+            read_spilled_results(outer, 1024, run)
         return outer.ops
     return b.ops
 
 
-def ffn(channel, name, fused):
+def ffn(channel, name, fused, store_results=False):
     outer, b = Builder(channel, name), Builder(channel, name)
     fragments, columns, base, packets = ((64, 32, L.GU_BASE, 1024) if name == "gate_up"
                                         else (256, 4, L.DOWN_BASE, 128))
@@ -399,9 +420,15 @@ def ffn(channel, name, fused):
                 fused=fused, views=2, input_location=input_location, weight_offset=weight_offset,
                 row_activation_fragments=L.DOWN_FRAGMENTS_PER_ROW if name == "down" else 0)
     if fused:
+        if store_results:
+            export_results(b, packets, [last], features_per_bank=columns,
+                           bf16=False, epoch=name + "_export", store_to_dram=True)
         run = outer.descriptor(name, b, [seal])
-        export_results(outer, packets, [run], features_per_bank=columns,
-                       bf16=False, epoch=name + "_export")
+        if store_results:
+            read_spilled_results(outer, packets, run)
+        else:
+            export_results(outer, packets, [run], features_per_bank=columns,
+                           bf16=False, epoch=name + "_export")
         return outer.ops
     export_results(b, packets, [last], features_per_bank=columns,
                    bf16=False, epoch=name + "_export")
@@ -530,10 +557,45 @@ def validate_ops(ops, channel):
             validate_ops(op["children"], channel)
 
 
-def generate(variant, channel_count=16):
+def kernel_window_metadata(name, channels):
+    """Validate explicit native setup/compute/export boundaries for the frontend."""
+    if name in {"rope_export", "rope_import", "q_exchange_export", "q_exchange_import"}:
+        return {"mode": "exclusive_handoff"}
+    descriptors, exports = [], []
+    private_ops = {"BARRIER", "ACTAB", "LOCALRD", "LOCALWR", "BCAST", "MACAB", "MACQK",
+                   "GATHER", "CAST", "REDUCE", "ROPE_EXEC"}
+    for ops in channels:
+        runs = [o for o in ops if o["op"] in {"MAC_RUN", "ROPE_RUN"}]
+        if len(runs) != 1:
+            raise ValueError(f"{name}: kernel window requires exactly one descriptor")
+        run = runs[0]
+        index = run["id"]
+        if any(o["op"] not in {"WR", "BARRIER"} for o in ops[:index]):
+            raise ValueError(f"{name}: non-upload operation before descriptor")
+        children = run["children"]
+        if any(o["op"] not in private_ops or o.get("epoch") or o.get("children") for o in children):
+            raise ValueError(f"{name}: descriptor compute must contain only private operations")
+        stores = {tuple(o["addr"]) for o in children if o["op"] == "LOCALWR"}
+        for op in ops[index + 1:]:
+            if op["op"] != "RD" or index not in op["deps"] or tuple(op["addr"]) not in stores:
+                raise ValueError(f"{name}: export lacks a completed descriptor DRAM producer")
+        descriptors.append(index)
+        exports.append(index + 1)
+    return {"mode": "descriptor_compute", "descriptor_index_by_channel": descriptors,
+            "export_begin_by_channel": exports,
+            "launch_after": "descriptor_delivery_all_channels",
+            "join_before": "external_export_all_channels"}
+
+
+def generate(variant, channel_count=16, *, execution_model="native_dram_requests"):
     if variant not in VARIANTS or channel_count not in (1, 16):
         raise ValueError("unsupported variant/channel count")
     layout, rope_location, flow = VARIANTS[variant]
+    if execution_model not in EXECUTION_MODELS:
+        raise ValueError("unsupported execution model")
+    kernel_windows = execution_model == "fused_kernel_windows"
+    if kernel_windows and flow != "fused":
+        raise ValueError("fused_kernel_windows requires a fused f/g variant")
     feature, fused, gpu = layout == "feature", flow == "fused", rope_location == "gpu"
     factories = [("qkv", lambda c: qkv(c, feature, fused))]
     if gpu:
@@ -545,9 +607,9 @@ def generate(variant, channel_count=16):
                   ("q_exchange_import", lambda c: q_exchange(c, gpu, feature, False)),
                   ("qkt", lambda c: qkt(c, feature, fused)),
                   ("pv", lambda c: pv(c, feature, fused)),
-                  ("o", lambda c: output_projection(c, feature, fused)),
-                  ("gate_up", lambda c: ffn(c, "gate_up", fused)),
-                  ("down", lambda c: ffn(c, "down", fused))]
+                  ("o", lambda c: output_projection(c, feature, fused, kernel_windows)),
+                  ("gate_up", lambda c: ffn(c, "gate_up", fused, kernel_windows)),
+                  ("down", lambda c: ffn(c, "down", fused, kernel_windows))]
     stages, counts = [], {}
     for name, factory in factories:
         channels = [factory(c) for c in range(channel_count)]
@@ -557,18 +619,22 @@ def generate(variant, channel_count=16):
             for op in walk(ops):
                 counts[op["op"]] = counts.get(op["op"], 0) + 1
         stage_dq = sum(op["op"] in EXTERNAL for ops in channels for op in walk(ops)) * 32
-        stages.append(dict(name=name, gpu_before_us=0, expected_dq_bytes=stage_dq, channels=channels))
+        stage = dict(name=name, gpu_before_us=0, expected_dq_bytes=stage_dq, channels=channels)
+        if kernel_windows:
+            stage["kernel_window"] = kernel_window_metadata(name, channels)
+        stages.append(stage)
     dq = sum(counts.get(x, 0) for x in EXTERNAL) * 32
     expected = EXPECTED_DQ[variant] * 1024 * channel_count // 16
     if dq != expected:
         raise ValueError(f"DQ mismatch: {dq} != {expected}")
     sources = [Path(__file__), ROOT / "programs/descriptors.py", ROOT / "workloads/layout.py"]
-    contract = L.contract(layout)
+    contract = L.contract(layout, fused_kernel_windows=kernel_windows)
     contract["buffers"].update(rope_units_per_rank=16, rope_input_slots_per_bank=2,
                                 rope_output_fifo_entries_per_bank=2,
                                 qkt_scratch_words_per_bank=16,
                                 qkt_reduction_words_per_bank=QKT_BATCH_COLUMNS)
-    return dict(schema_version=1, architecture_version=2, variant=variant, channels=channel_count,
+    return dict(schema_version=1, architecture_version=2, execution_model=execution_model,
+                variant=variant, channels=channel_count,
                 layout=layout, rope=rope_location, dataflow=flow, repetitions=dict(layers=18, steps=10),
                 address_format=["channel", "rank", "bank_group", "bank", "row", "column_32B"],
                 slot_unit_bytes=32,
@@ -583,10 +649,13 @@ def main():
     parser.add_argument("--variant", choices=list(VARIANTS))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--compact", action="store_true", help="omit indentation in persisted JSON")
+    parser.add_argument("--execution-model", choices=EXECUTION_MODELS, default="native_dram_requests")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    for variant in ([args.variant] if args.variant else VARIANTS):
-        data = generate(variant)
+    variants = [args.variant] if args.variant else [v for v in VARIANTS
+               if args.execution_model != "fused_kernel_windows" or VARIANTS[v][2] == "fused"]
+    for variant in variants:
+        data = generate(variant, execution_model=args.execution_model)
         path = args.output / (variant + ".json")
         path.write_text(json.dumps(data, separators=(",", ":") if args.compact else None,
                                    indent=None if args.compact else 2) + "\n", encoding="utf-8")

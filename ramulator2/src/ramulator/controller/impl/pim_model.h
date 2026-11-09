@@ -113,6 +113,9 @@ class PIMController {
   const Kernel* kernel=nullptr;
   uint64_t kernel_total=0,kernel_next=0,kernel_reads=0,kernel_writes=0,issued_reads=0,issued_writes=0;
   Cursor top,inner;
+  // -1 retains request-level scheduling; 0 uploads/launches, 1 computes
+  // privately, and 2 exports after the current calibrated GPU kernel joins.
+  int coarse_phase=-1,coarse_descriptor=-1;
   int descriptor_index=-1;
   Clock descriptor_ready=0;
   uint64_t gpu_read_bytes=0,gpu_write_bytes=0,pim_read_bytes=0,pim_write_bytes=0;
@@ -126,6 +129,8 @@ class PIMController {
   void reset_serial_epoch(Clock origin);
   bool kernel_finished() const;
   bool stage_finished(Clock clk) const;
+  Clock coarse_upload_ready() const;
+  Clock coarse_result_ready() const;
   Clock step(Clock clk,bool permit_gpu);
   int command(const Operation& op,bool local) const;
   Clock ready_at(int cmd,const AddrVec_t& addr) const;

@@ -30,6 +30,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
   std::map<std::string, ProgramStage> programs;
   int schema_version=0;
   int layer_stride_bytes=1048576;
+  std::string execution_model;
   bool root_seen=false, stages_seen=false;
 
   bool null() override {return true;}
@@ -51,6 +52,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
   bool string(string_t& value) override {
     if(stack.empty())return false;
     auto& f=stack.back();
+    if(f.kind==Kind::Root && f.key=="execution_model")execution_model=value;
     if(f.kind==Kind::Stage && f.key=="name")f.stage->name=std::move(value);
     if(f.kind==Kind::Op) {
       if(f.key=="op")f.operation.name=std::move(value);
@@ -194,7 +196,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
 };
 }
 
-std::map<std::string,ProgramStage> read_program_json(const std::string& path,int* layer_stride_bytes_out) {
+std::map<std::string,ProgramStage> read_program_json(const std::string& path,int* layer_stride_bytes_out,std::string* execution_model_out) {
   std::ifstream stream(path,std::ios::binary);
   require(stream.good(),"cannot open PIM JSON program: "+path);
   ProgramSax sax;
@@ -202,6 +204,7 @@ std::map<std::string,ProgramStage> read_program_json(const std::string& path,int
   require(sax.schema_version==1,"unsupported PIM program version");
   require(sax.stages_seen&&!sax.programs.empty(),"PIM program has no stages");
   if(layer_stride_bytes_out)*layer_stride_bytes_out=sax.layer_stride_bytes;
+  if(execution_model_out)*execution_model_out=sax.execution_model;
   return std::move(sax.programs);
 }
 }

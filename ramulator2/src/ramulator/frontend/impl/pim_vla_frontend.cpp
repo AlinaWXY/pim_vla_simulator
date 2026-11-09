@@ -7,6 +7,7 @@
 #include <sstream>
 
 namespace PimVla {
+int run_fused_kernels(const std::string& config_file,const std::string& output);
 std::string json_string(const std::string& value) {
   std::ostringstream out;out<<'"';
   for(unsigned char c:value) {
@@ -24,6 +25,9 @@ struct StageResult {int id,step,layer;std::string name;Clock start,end,wait=0;};
 
 int run(const std::string& config_file,const std::string& output) {
   auto cfg=Config::parse_config_file(config_file);
+  auto execution=cfg["execution_model"].as<std::string>("native_dram_requests");
+  if(execution=="fused_kernel_windows")return run_fused_kernels(config_file,output);
+  require(execution=="native_dram_requests","unknown execution_model");
   require(cfg.is_map()&&!cfg.map().count("refresh_allbank"),"refresh_allbank is retired: rank0 uses REFpb and rank1 uses REFab");
   std::filesystem::create_directories(output);
   ConfigNode specification=cfg["spec"];

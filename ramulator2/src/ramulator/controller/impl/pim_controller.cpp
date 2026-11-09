@@ -135,6 +135,15 @@ bool PIMController::kernel_finished() const {return !kernel || (kernel_next>=ker
 bool PIMController::stage_finished(Clock clk) const {
   return top.issued()&&inner.issued()&&descriptor_index<0&&top.tail<=clk;
 }
+Clock PIMController::coarse_upload_ready() const {
+  if(coarse_descriptor<0||descriptor_index!=coarse_descriptor)return NEVER;
+  return std::max(descriptor_ready,pim_dq_end);
+}
+Clock PIMController::coarse_result_ready() const {
+  if(coarse_descriptor<0)return NEVER;
+  if(descriptor_index==coarse_descriptor&&inner.issued())return inner.tail;
+  return top.done.at(coarse_descriptor);
+}
 void PIMController::retire_and_fill(Clock clk,bool permit_gpu) {
   while(!completions.empty()&&completions.top().at<=clk) {
     if(completions.top().gpu) --gpu_outstanding;
@@ -195,6 +204,11 @@ Candidate PIMController::next_pim(Clock clk) {
     top.done[descriptor_index]=inner.tail;top.tail=std::max(top.tail,inner.tail);
     descriptor_index=-1;inner.reset(nullptr,clk);
   }
+  if(coarse_phase==0&&descriptor_index>=0) {
+    Candidate wait;wait.at=coarse_upload_ready()>clk?coarse_upload_ready():NEVER;
+    return wait;
+  }
+  if(coarse_phase==1&&descriptor_index<0)return {};
   Cursor& cursor=descriptor_index>=0?inner:top;
   if(cursor.issued()) return {};
   require(cursor.next<cursor.decoded_until&&cursor.decoded_until-cursor.next<=32,"instruction FIFO capacity exceeded");
