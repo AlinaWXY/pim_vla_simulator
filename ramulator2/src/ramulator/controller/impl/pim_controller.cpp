@@ -144,6 +144,15 @@ Clock PIMController::coarse_result_ready() const {
   if(descriptor_index==coarse_descriptor&&inner.issued())return inner.tail;
   return top.done.at(coarse_descriptor);
 }
+void PIMController::settle_coarse(Clock clk) {
+  // Completion-only work must precede the host's same-CK kernel admission.
+  // next_pim may consume satisfied zero-time barriers, but never issues a
+  // hardware command. Pending native commands still go through step/issue.
+  if(coarse_phase==1&&descriptor_index>=0&&
+     (inner.issued()||inner.ops->at(inner.next).name=="BARRIER")) {
+    now=clk;(void)next_pim(clk);
+  }
+}
 void PIMController::retire_and_fill(Clock clk,bool permit_gpu) {
   while(!completions.empty()&&completions.top().at<=clk) {
     if(completions.top().gpu) --gpu_outstanding;

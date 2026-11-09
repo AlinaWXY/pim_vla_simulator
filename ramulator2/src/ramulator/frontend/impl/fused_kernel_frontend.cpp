@@ -109,6 +109,7 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
       if(active_kernel>=0&&now>=kernels[active_kernel].start+kernels[active_kernel].duration) {
         kernels[active_kernel].end=now;active_kernel=-1;changed=true;
       }
+      if(phase==Phase::Compute)for(auto& mc:channels)mc->settle_coarse(now);
       if(ae_gpu_end!=NEVER&&now>=ae_gpu_end) {
         const auto& e=events[ae_index];ae_gpu.push_back({{"name",e.name},{"step",e.step},{"layer",e.layer},
             {"start_ck",ae_gpu_start},{"end_ck",now},{"start_us",us(ae_gpu_start)},{"end_us",us(now)}});

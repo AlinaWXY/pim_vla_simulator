@@ -131,6 +131,7 @@ class PIMController {
   bool stage_finished(Clock clk) const;
   Clock coarse_upload_ready() const;
   Clock coarse_result_ready() const;
+  void settle_coarse(Clock clk);
   Clock step(Clock clk,bool permit_gpu);
   int command(const Operation& op,bool local) const;
   Clock ready_at(int cmd,const AddrVec_t& addr) const;

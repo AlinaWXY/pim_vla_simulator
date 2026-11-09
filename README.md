@@ -6,6 +6,8 @@
 
 ## 当前分支：FIFO32 按序发射
 
+本分支新增用户 2026-11-09 指定的 **fused kernel 窗口模型**：输入上传和粗指令交付后，PIM 私有 FIFO32 计算与按校准时长推进的 VLM kernel 重叠；PIM 完整落盘后等当前 kernel 结束，再集中导出并执行 AE GPU 算子。每条粗指令分别交接，连续 PIM 算子也不合并窗口。PIM 仍使用原生时序，VLM 不再逐笔仿真访存。执行边界、校准来源及指标区别见 [模型说明](docs/fused-kernel-execution.md)。
+
 本分支以 `6bcd57b` 的 gio-bcast 实现为对照，按用户 2026-11-09 的澄清，将 fused 描述符内部恢复为 **32 项缓冲、按程序顺序发射**。只检查队首的依赖、资源及 Ramulator 原生 prerequisite/timing；队首未发射时，后续子指令及其 ACT/PRE 不得提前发射。队首发射后立即推进 FIFO，不等待它全部完成；显式 completion 依赖、资源冲突和 barrier 仍须等待，因此保留合法流水重叠。
 
 本轮验证范围为 **第 0 层 × 第 0 个 denoising step 的 AE solo**，使用相同输入比较修改前后的模拟 latency 和 native 进程实际耗时。下述历史结果绑定各自的源码提交，不代表本分支的 FIFO32 结果；本轮不启动校准或完整端到端实验。

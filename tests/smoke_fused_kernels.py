@@ -249,6 +249,25 @@ def main():
         assert tie["kernels"][1]["start_ck"] >= tie["ae_gpu"][0]["end_ck"]
         print("fused-kernel regression passed: ready_kernel_end_same_ck", flush=True)
 
+        # Real generated descriptors commonly end with a zero-cost completion
+        # barrier. Settle it before admitting a new kernel at the same CK as
+        # the final LOCALWR completion; inspecting only inner.issued() would
+        # leave Compute open until a later controller step and admit one more.
+        barrier_stages = deepcopy(stages)
+        for channel in barrier_stages[0]["channels"]:
+            descriptor = next(op for op in channel if op["op"] == "MAC_RUN")
+            children = descriptor["children"]
+            children.append(operation(children[0]["addr"][0], "BARRIER", len(children),
+                                      deps=[len(children) - 1]))
+        barrier_tie = runner.run("trailing_barrier_kernel_end_same_ck", barrier_stages, [span, 5])
+        compute = assert_private_start(barrier_tie)
+        assert compute["end_ck"] - compute["start_ck"] == span, "zero-cost barrier delayed native completion"
+        assert barrier_tie["kernels"][0]["end_ck"] == compute["end_ck"]
+        assert barrier_tie["kernels"][1]["start_ck"] >= barrier_tie["ae_gpu"][0]["end_ck"], \
+            "new kernel started while the terminal completion barrier was ready to retire"
+        assert barrier_tie["metrics"]["AE_VLM_join_us"] == 0
+        print("fused-kernel regression passed: trailing_barrier_kernel_end_same_ck", flush=True)
+
         skew_stages = [fused_stage(slow_upload_channel=15, slow_compute_channel=15)]
         skew = runner.run("all_channels_phase_barriers", skew_stages, [1] * 4)
         compute = assert_private_start(skew)
