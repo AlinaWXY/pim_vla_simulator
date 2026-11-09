@@ -1,0 +1,8 @@
+{
+  "archive": "down-row-single-layer.tar.gz",
+  "bytes": 166014,
+  "includes": "All ten native raw/config/provenance outputs, single-layer inputs, summaries, validation logs and frozen manifest/spec. Executable/library/program files stay in the server frozen directory.",
+  "sha256": "e525106d94321d01cb8ff12e3cba6f3d90450d54ed7da83ba6543e1b883abf61",
+  "slurm_job_id": 1981031,
+  "source_commit": "5fcd84be57f7411ec967107511aac65693070481"
+}

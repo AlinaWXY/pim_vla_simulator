@@ -1,0 +1,6 @@
+feature_gpu_before: total=345.013284 us PIM=206.315914 us GPU=138.697370 us
+token_gpu_before: total=316.756972 us PIM=191.196292 us GPU=125.560680 us
+token_local_before: total=287.631134 us PIM=189.965636 us GPU=97.665498 us
+token_gpu_after: total=318.336564 us PIM=197.767920 us GPU=120.568644 us
+token_local_after: total=289.797914 us PIM=197.124452 us GPU=92.673462 us
+results/down-row-single-layer-1981031

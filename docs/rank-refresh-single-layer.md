@@ -1,5 +1,7 @@
 # GPU REFpb / PIM REFab：单层结果与 latency breakdown
 
+> 本页是Down使用独立暂存区的冻结基线（作业1980912）。用户随后要求Down权重与输入同排；当前结果见 [Down同排单层报告](down-row-single-layer.md)。本页原始结果与分析保留用于控制变量对照。
+
 按用户 2026-11-09 的明确要求，固定 **rank0（GPU）使用 REFpb、rank1（PIM）使用 REFab**。本次只重跑 AE 的 **step 0 / layer 0**，五种结构各重复两次；未执行 VLM 校准、完整 AE、VLM 并发或端到端仿真。
 
 刷新修正后的结果改变了此前结论：token/GPU 的 fused PIM 比 streaming **慢 24.022 μs（12.60%）**，token/bank RoPE 也慢 **23.936 μs（12.63%）**。旧双 REFpb 结果中的“PIM 几乎不变”不能代表用户指定的硬件。主要差值来自 Down，超过 QKT 的收益。

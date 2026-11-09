@@ -1,0 +1,42 @@
+{
+  "baseline_run": "results/rank-refresh-single-layer-1980912",
+  "native_runtime_and_spec_identical": true,
+  "measured_gpu_inputs_unchanged": true,
+  "programs": [
+    {
+      "variant": "feature_gpu_before",
+      "non_down_stages_byte_semantics_unchanged": true,
+      "total_dq_bytes": 6242304,
+      "old_program_sha256": "db18451a314372d2e913f771bf5c7ddcac94652e80cc87ffa9ffb80fcbdae379",
+      "new_program_sha256": "cc219435b70995277a19988901689fa5f3a0dcf7bdd061d262626730a5284b0b"
+    },
+    {
+      "variant": "token_gpu_after",
+      "non_down_stages_byte_semantics_unchanged": true,
+      "total_dq_bytes": 5087232,
+      "old_program_sha256": "1bc24aeaa0049ed39396a7626eadd6a39c0cd45352d7ac6dba728531dd8dfc57",
+      "new_program_sha256": "f237e64cad5980a78f87b38016f1dbd0ec9c4500731601394c64c6be4e26d99f"
+    },
+    {
+      "variant": "token_gpu_before",
+      "non_down_stages_byte_semantics_unchanged": true,
+      "total_dq_bytes": 5480448,
+      "old_program_sha256": "5b5e9f044e589e1862e99267b1f7603ef3569be54f0d70f6a79b4ca26963c4c0",
+      "new_program_sha256": "18018e74c25a1ddb1720a5f1cf17ad3a611ef17693bd400e0c4bf29650e45c73"
+    },
+    {
+      "variant": "token_local_after",
+      "non_down_stages_byte_semantics_unchanged": true,
+      "total_dq_bytes": 4890624,
+      "old_program_sha256": "69c383d7e6021760e11acc819972be3b61282de557189ecc94a1ce8f22c2f986",
+      "new_program_sha256": "1fa8021d56ca3dd47398d68d5f32dc6f4db40950c908464958c294feb45212d4"
+    },
+    {
+      "variant": "token_local_before",
+      "non_down_stages_byte_semantics_unchanged": true,
+      "total_dq_bytes": 5283840,
+      "old_program_sha256": "c60a2abdb4883f373e848cb3a29293bc7b338e6ab16e3dc09551cc141d359dbc",
+      "new_program_sha256": "4345e4cb03acce56802cd72c233207c1d081dc7e860d33b45dc4ed2b5ba35977"
+    }
+  ]
+}

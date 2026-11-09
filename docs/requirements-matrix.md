@@ -1,6 +1,6 @@
 # 重写方案需求与验收映射
 
-> 本页是 Version1 / 源码 `1e0b73b` 的历史验收记录，下述完整 AE 数字不能作为 Version2 的验证。当前 Version2 只进行单层、单个 denoising step 检查，并固定 GPU rank0 REFpb、PIM rank1 REFab，见 [最新单层报告](rank-refresh-single-layer.md)；校准与端到端实验保持暂停。
+> 本页是Version1 / 源码 `1e0b73b` 的历史验收记录，下述完整AE数字不能作为Version2的验证。当前只进行单层、单个denoising step检查，固定GPU rank0 REFpb、PIM rank1 REFab，并采用Down权重/输入同排布局，见 [最新单层报告](down-row-single-layer.md)；校准与端到端实验保持暂停。
 
 依据 [2026-11-09 任务文档](rewrite-plan.txt)。本次上传已完成：**38 项 Python 测试、132 项 native 检查、5 个微基准（含 lookahead barrier）、5 种 PIM 单层、8 种并发单层配置，以及 5 种完整 18 层 × 10 步 AE solo**。证据见 [Python 测试](../reference/validation/python-tests.txt)、[原生构建与测试](../reference/validation/native-build-and-tests.txt)、[PIM 单层](../reference/validation/pim-single-layer.txt) 与 [并发单层](../reference/validation/concurrency-smoke.txt)。
 

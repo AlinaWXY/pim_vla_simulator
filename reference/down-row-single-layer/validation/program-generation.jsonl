@@ -1,0 +1,5 @@
+{"variant": "feature_gpu_before", "path": "results/down-row-single-layer-1981031/frozen/programs/feature_gpu_before.json", "dq_bytes": 6242304, "sha256": "cc219435b70995277a19988901689fa5f3a0dcf7bdd061d262626730a5284b0b"}
+{"variant": "token_gpu_before", "path": "results/down-row-single-layer-1981031/frozen/programs/token_gpu_before.json", "dq_bytes": 5480448, "sha256": "18018e74c25a1ddb1720a5f1cf17ad3a611ef17693bd400e0c4bf29650e45c73"}
+{"variant": "token_local_before", "path": "results/down-row-single-layer-1981031/frozen/programs/token_local_before.json", "dq_bytes": 5283840, "sha256": "4345e4cb03acce56802cd72c233207c1d081dc7e860d33b45dc4ed2b5ba35977"}
+{"variant": "token_gpu_after", "path": "results/down-row-single-layer-1981031/frozen/programs/token_gpu_after.json", "dq_bytes": 5087232, "sha256": "f237e64cad5980a78f87b38016f1dbd0ec9c4500731601394c64c6be4e26d99f"}
+{"variant": "token_local_after", "path": "results/down-row-single-layer-1981031/frozen/programs/token_local_after.json", "dq_bytes": 4890624, "sha256": "1fa8021d56ca3dd47398d68d5f32dc6f4db40950c908464958c294feb45212d4"}

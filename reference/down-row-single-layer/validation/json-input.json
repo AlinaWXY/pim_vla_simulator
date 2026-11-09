@@ -1,0 +1,16 @@
+{
+  "programs": [
+    {
+      "program": "token_local_after.json",
+      "sha256": "1fa8021d56ca3dd47398d68d5f32dc6f4db40950c908464958c294feb45212d4",
+      "fields_match": true,
+      "stages": 9,
+      "operations": 630960,
+      "layer_stride_bytes": 1048576,
+      "semantic_digest64": "dc2c53efcfea6340",
+      "parse_ms": 1493.15,
+      "peak_rss_KiB": 329528
+    }
+  ],
+  "malformed_inputs_rejected": 7
+}

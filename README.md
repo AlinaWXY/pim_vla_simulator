@@ -6,11 +6,11 @@
 
 ## Version2 单层检查
 
-当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**，固定 **GPU rank0 REFpb、PIM rank1 REFab**。VLM 校准、完整 AE 和端到端并发实验保持暂停。Version2 更新包括原生 ACTAB、每 bank RoPE、真实输出池归约暂存、描述符 FIFO32 有限乱序、Q 导入 epoch，以及 streaming PV→O 实测转置。最新结果、PIM/GPU 阶段 breakdown、fused 归因与 VLM 比较见 [刷新修正单层报告](docs/rank-refresh-single-layer.md)。
+当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**，固定 **GPU rank0 REFpb、PIM rank1 REFab**。VLM 校准、完整 AE 和端到端并发实验保持暂停。最新更新将Down权重与输入放在同一行：12 fragments/行、22行/44KiB每bank，输入按query散布16个bank，每行统一ACTAB，预写跨BG交错。最新结果及PIM/GPU breakdown见 [Down同排单层报告](docs/down-row-single-layer.md)；原生ACTAB、每bank RoPE、输出池、FIFO32与其他既有结构保留。
 
-五种单层总延迟依次为 **344.594 / 316.225 / 287.160 / 335.255 / 306.104 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `ea217ba`、作业 `1980912`；46 项 Python、224 项原生时序检查与5组刷新回归通过，五配置均两次逐字节一致。Token/GPU fused 的 PIM 时间比 streaming 增加 24.022 μs，主要由 Down 增量超过 QKT 收益造成。此前双 REFpb 的 [历史结果](docs/version2-single-layer.md) 保留，不再代表当前刷新策略。
+五种单层总延迟依次为 **345.013 / 316.757 / 287.631 / 318.337 / 289.798 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `5fcd84b`、作业 `1981031`；52项Python、224项原生时序检查与5组刷新回归通过，五配置均两次逐字节一致。Token/GPU fused Down由61.918降到45.000 μs（−27.32%），整层仍比同布局streaming慢约0.50%；bank RoPE组合约0.75%。[独立暂存布局基线及VLM比较](docs/rank-refresh-single-layer.md)和更早的[双REFpb结果](docs/version2-single-layer.md)均作为历史对照保留。
 
-独立入口为 `python experiments/run_single_layer.py --output results/rank-refresh-single-layer --repeats 2`；它仅构造五种单层 AE 配置，不加载 VLM，也不调用完整实验入口，并核对两个 rank 的实际刷新类型和计数。
+独立入口为 `python experiments/run_single_layer.py --output results/down-row-single-layer --repeats 2`；先用当前生成器重建五份程序。该入口仅构造五种单层AE配置，不加载VLM、不调用完整实验入口，并核对两个rank的实际刷新类型和计数。
 
 ## Version1 历史验收记录
 

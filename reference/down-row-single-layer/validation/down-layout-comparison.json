@@ -1,0 +1,128 @@
+{
+  "status": "passed",
+  "baseline_job": 1980912,
+  "new_job": 1981031,
+  "native_binary_and_library_identical": true,
+  "refresh_policy": {
+    "rank0": "REFpb",
+    "rank1": "REFab"
+  },
+  "results": [
+    {
+      "variant": "feature_gpu_before",
+      "old_down_us": 36.419726,
+      "new_down_us": 36.839012,
+      "down_change_us": 0.4192859999999996,
+      "down_reduction_percent": -1.1512607206325485,
+      "old_PIM_us": 205.89662800000002,
+      "new_PIM_us": 206.31591400000002,
+      "old_total_us": 344.593998,
+      "new_total_us": 345.013284,
+      "non_down_stage_timestamps_identical": true,
+      "GPU_and_DQ_unchanged": true,
+      "old_raw_sha256": "84a455065ad72a8d6caac7c9b7d543b95f05153dfee9b2e8add18537fe302bb8",
+      "new_raw_sha256": "2a2bf56eba4d18e3dc7784fdbe7cc3264e6b27a959eb6f5347e2db7531e366d9"
+    },
+    {
+      "variant": "token_gpu_before",
+      "old_down_us": 36.616706,
+      "new_down_us": 37.148552,
+      "down_change_us": 0.5318460000000016,
+      "down_reduction_percent": -1.452468171222178,
+      "old_PIM_us": 190.664446,
+      "new_PIM_us": 191.196292,
+      "old_total_us": 316.225126,
+      "new_total_us": 316.756972,
+      "non_down_stage_timestamps_identical": true,
+      "GPU_and_DQ_unchanged": true,
+      "old_raw_sha256": "fa11b93e4b93549acd6433fca1088c6bfb646797b799d1dc50b9909cadbf8b3d",
+      "new_raw_sha256": "9454eade8d2e9a06584e76d5384e091153c43d2bb6a94fc921e1e9dfbea80f01"
+    },
+    {
+      "variant": "token_local_before",
+      "old_down_us": 36.367198,
+      "new_down_us": 36.838074,
+      "down_change_us": 0.47087599999999696,
+      "down_reduction_percent": -1.2947821825591208,
+      "old_PIM_us": 189.49475999999999,
+      "new_PIM_us": 189.965636,
+      "old_total_us": 287.160258,
+      "new_total_us": 287.631134,
+      "non_down_stage_timestamps_identical": true,
+      "GPU_and_DQ_unchanged": true,
+      "old_raw_sha256": "a201a9cd9fd13c124cc249c803b3f57963771f5c73ebbee472220dcf7ebeeffc",
+      "new_raw_sha256": "eb95beab53e16d6be391277b38548c06bf6fc252f848c41baa039fc65329e28c"
+    },
+    {
+      "variant": "token_gpu_after",
+      "old_down_us": 61.918318,
+      "new_down_us": 44.999612,
+      "down_change_us": -16.918706,
+      "down_reduction_percent": 27.324233839814575,
+      "old_PIM_us": 214.686626,
+      "new_PIM_us": 197.76792,
+      "old_total_us": 335.25527,
+      "new_total_us": 318.336564,
+      "non_down_stage_timestamps_identical": true,
+      "GPU_and_DQ_unchanged": true,
+      "old_raw_sha256": "5dbcd89b0326ceb7ae42f484797cec6ff3ee7f87a602260882537398ef51ea6c",
+      "new_raw_sha256": "c0cf8fdaf1887cb7c04cd8ed15029e2f2d1cb1a5ff57ce426eaed4f02dae0e1b"
+    },
+    {
+      "variant": "token_local_after",
+      "old_down_us": 61.777618,
+      "new_down_us": 45.471426,
+      "down_change_us": -16.306191999999996,
+      "down_reduction_percent": 26.3949833740757,
+      "old_PIM_us": 213.43064399999997,
+      "new_PIM_us": 197.124452,
+      "old_total_us": 306.104106,
+      "new_total_us": 289.797914,
+      "non_down_stage_timestamps_identical": true,
+      "GPU_and_DQ_unchanged": true,
+      "old_raw_sha256": "1d405c8c3a71f362c647060ec8b92bb391c868076076107d939be9bf50de2ccd",
+      "new_raw_sha256": "1724287c5aa0b9cdf8388947c3f90bb62589a7faf5d55cd40825cb0b787d8d7e"
+    }
+  ],
+  "scatter_order_diagnostic": {
+    "job": 1980945,
+    "source_commit": "7f7b6af9d5aefba0f31d5cc42904b6c7a508126f",
+    "results": [
+      {
+        "variant": "feature_gpu_before",
+        "initial_colocation_down_us": 36.839012,
+        "final_down_us": 36.839012,
+        "write_order_gain_us": 0.0,
+        "only_input_WR_order_changed": true
+      },
+      {
+        "variant": "token_gpu_before",
+        "initial_colocation_down_us": 37.148552,
+        "final_down_us": 37.148552,
+        "write_order_gain_us": 0.0,
+        "only_input_WR_order_changed": true
+      },
+      {
+        "variant": "token_local_before",
+        "initial_colocation_down_us": 36.838074,
+        "final_down_us": 36.838074,
+        "write_order_gain_us": 0.0,
+        "only_input_WR_order_changed": true
+      },
+      {
+        "variant": "token_gpu_after",
+        "initial_colocation_down_us": 51.392082,
+        "final_down_us": 44.999612,
+        "write_order_gain_us": 6.392470000000003,
+        "only_input_WR_order_changed": true
+      },
+      {
+        "variant": "token_local_after",
+        "initial_colocation_down_us": 51.208234,
+        "final_down_us": 45.471426,
+        "write_order_gain_us": 5.736807999999996,
+        "only_input_WR_order_changed": true
+      }
+    ]
+  }
+}
