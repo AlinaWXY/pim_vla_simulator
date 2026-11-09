@@ -112,7 +112,23 @@ class SpecTests(unittest.TestCase):
         self.assertEqual(issue_gap(self.spec,"LOCALRD","LOCALRD","same_bg"),0)
         self.assertEqual(issue_gap(self.spec,"LOCALRD","BCAST","same_bg"),0)
         self.assertEqual(issue_gap(self.spec,"LOCALRD","WRGB","same_bg"),0)
-        self.assertEqual(issue_gap(self.spec,"BCAST","BCAST","same_bg"),2)
+        self.assertEqual(issue_gap(self.spec,"BCAST","BCAST","same_bg"),4)
+        self.assertEqual(c["BCAST"]["completion"],4)
+
+    def test_bcast_shares_rank_gio_with_io(self):
+        # No global buffer: BCAST, WRGB and RDRES share the rank GIO/LIO path.
+        t=self.spec["timings"]
+        for b in ("BCAST","BCAST_LOCAL"):
+            for w in ("WR","WRGB"):
+                self.assertEqual(issue_gap(self.spec,w,b,"same_bg"),t["nCWL"]+t["nBL_max"])
+                self.assertEqual(issue_gap(self.spec,b,w,"same_bg"),t["nBL_min"])
+            for r in ("RD","RDRES"):
+                self.assertEqual(issue_gap(self.spec,b,r,"same_bg"),t["nCCDL"]+t["nWTRL"])
+                self.assertEqual(issue_gap(self.spec,r,b,"same_bg"),t["nCL"]+t["nBL_min"])
+            # GIO is per rank: GPU rank0 traffic never waits on PIM rank1 BCAST.
+            for x in ("RD","WR","WRGB","RDRES"):
+                self.assertEqual(issue_gap(self.spec,x,b,"different_rank"),0)
+                self.assertEqual(issue_gap(self.spec,b,x,"different_rank"),0)
         self.assertEqual(issue_gap(self.spec,"REDUCE","REDUCE","same_bg"),4)
 
     def test_actab_native_expansion_and_ca(self):

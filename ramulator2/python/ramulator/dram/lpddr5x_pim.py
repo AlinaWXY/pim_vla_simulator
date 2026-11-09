@@ -85,6 +85,27 @@ def _constraints():
     result.append(TC("Rank", acts + ["REFpb"], ACT_ALL, "nFAW"))
     for cmd, timing in (("BCAST","nBCAST"),("GATHER","nGATHER"),("REDUCE","nREDUCE")):
         result.append(TC("Rank", [cmd], [cmd], timing))
+    # Shared per-rank GIO. There is no global buffer: WRGB drives DQ -> GIO ->
+    # every BG's LIO -> all bank SRFs, RDRES drives output pool -> LIO -> GIO
+    # -> DQ, and BCAST drives a source SRF -> GIO -> every other SRF. BCAST
+    # therefore shares GIO/LIO with ordinary and buffer IO. Its GIO transfer
+    # starts at issue (no CWL/CL offset), so the rules below shift the JEDEC
+    # same-BG interface rules by the IO command's data offset.
+    gio_writes = writes + ["WRGB"]
+    gio_reads = reads + ["RDRES"]
+    result += [
+        # Write data reaches GIO at CWL; it must pass every BG core cycle first.
+        TC("Rank", gio_writes, ["BCAST"], "nCWL+nBL_max"),
+        # BCAST occupies GIO for one BG core cycle from issue; WR data arrives
+        # CWL later, so only the minimum column spacing remains.
+        TC("Rank", ["BCAST"], gio_writes, "max(nBL_min,nCCDL+2-nCWL)"),
+        # Write-direction LIO -> read-direction turnaround, as tWTR_L after the
+        # broadcast data has passed all BGs.
+        TC("Rank", ["BCAST"], gio_reads, "nCCDL+nWTRL"),
+        # Read data must clear GIO/LIO before BCAST drives them; same
+        # convention as LOCALRD -> writes.
+        TC("Rank", gio_reads, ["BCAST"], "nCL+nBL_min"),
+    ]
     result.append(TC("Bank", ["CAST"], ["CAST"], "nCAST"))
     result.append(TC("Bank", ["ROPE_EXEC"], ["ROPE_EXEC"], "nROPEBatch"))
     # Refresh applies even to buffer IO; this is the requested conservative
@@ -133,8 +154,10 @@ class LPDDR5XPIM(LPDDR5):
             t[f"nMAC{r}"] = r
         # Inherited microarchitecture assumptions: local 32 B port, SRF
         # multicast, cast pipeline, two-level rank reduction and RoPE PE.
+        # BCAST writes every bank SRF through all BG LIOs, like WRGB, so it
+        # is bounded by the same BG core cycle (tCCD_L), not 2 CK.
         t.update(nDQ_RTW=2, nDQ_WTR=1, nDQ_RANK_WTW=1,
-                 nLOCALRD=4, nLOCALWR=4, nBCAST=2, nGATHER=2,
+                 nLOCALRD=4, nLOCALWR=4, nBCAST=t["nCCDL"], nGATHER=2,
                  nCAST=1, nREDUCE=4, nROPE=4, nROPEII=1, nROPEBatch=8, nDESCDecode=1)
 
     def resolve(self):
