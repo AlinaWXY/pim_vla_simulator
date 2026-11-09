@@ -48,15 +48,21 @@ class Builder:
                          operator=name, children=children.ops)
 
 
-def staged_input(b, rows, fragments, *, input_location=None):
+def staged_input(b, rows, fragments, *, input_location=None, query_order=None, fragment_major=False):
     input_location = input_location or (lambda f, row: L.staging(f, row, rows))
+    order = tuple(range(rows) if query_order is None else query_order)
+    if len(order) != rows or set(order) != set(range(rows)):
+        raise ValueError("staged input query order must cover every query exactly once")
+    if fragment_major:
+        requests = ((f, row) for f in range(fragments) for row in order)
+    else:
+        requests = ((f, row) for f0 in range(0, fragments, 2) for row in order
+                    for f in range(f0, min(f0 + 2, fragments)))
     writes = []
-    for f0 in range(0, fragments, 2):
-        for row in range(rows):
-            for f in range(f0, min(f0 + 2, fragments)):
-                bank, offset = input_location(f, row)
-                writes.append(b.emit("WR", offset, bank, epoch=b.group + "_input",
-                                     tensor_fragment=f, tensor_row=row))
+    for f, row in requests:
+        bank, offset = input_location(f, row)
+        writes.append(b.emit("WR", offset, bank, epoch=b.group + "_input",
+                             tensor_fragment=f, tensor_row=row))
     return b.fence(writes)
 
 
@@ -384,7 +390,11 @@ def ffn(channel, name, fused):
     # retains the existing two-bank staging and contiguous weight mapping.
     input_location = L.down_input_location if name == "down" else None
     weight_offset = L.down_weight_offset if name == "down" else None
-    seal = staged_input(outer, 16, fragments, input_location=input_location) if fused else None
+    # Co-resident Down inputs span all banks. Issue one fragment at a time,
+    # rotating across BGs, instead of the old two-bank staging interleave.
+    query_order = (0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15) if name == "down" else None
+    seal = staged_input(outer, 16, fragments, input_location=input_location,
+                        query_order=query_order, fragment_major=name == "down") if fused else None
     last = gemm(b, rows=16, fragments=fragments, columns=columns, base=base,
                 fused=fused, views=2, input_location=input_location, weight_offset=weight_offset,
                 row_activation_fragments=L.DOWN_FRAGMENTS_PER_ROW if name == "down" else 0)

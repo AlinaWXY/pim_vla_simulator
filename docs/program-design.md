@@ -88,6 +88,11 @@ uses 0..19. Both streaming and fused read this identical weight mapping.
 Streaming still imports directly with WRGB and leaves the array input columns
 unused. Fused still executes 4096 ordinary WR, 4096 LOCALRD, 4096 BCAST, 1024
 MACAB_M16 and 128 RDRES per channel; input/output DQ remains 128KiB/4KiB.
+The fused input WR epoch is fragment-major and visits query banks in the order
+`0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15`, so adjacent WR requests alternate bank
+groups. The old two-fragment/two-bank staging interleave would write the same
+bank twice under the new mapping. This reorders identical addressed payloads;
+the completion fence still covers every input write before descriptor execution.
 
 Each of the 22 fused row groups begins with an explicit ACTAB request after
 all MACs from the previous row complete. Native prerequisites perform PREab

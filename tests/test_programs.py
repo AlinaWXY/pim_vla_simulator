@@ -325,6 +325,27 @@ class ProgramTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unfinished older weights"):
             audit_down_fused(broken)
 
+    def test_down_scatter_is_fragment_major_and_alternates_bank_groups(self):
+        query_order = [0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15]
+        for variant in ("token_gpu_after", "token_local_after"):
+            writes = [op for op in self.stage(variant, "down") if op["op"] == "WR"]
+            self.assertEqual(len(writes), 4096)
+            self.assertEqual(len({tuple(op["addr"]) for op in writes}), 4096)
+            self.assertEqual({op["epoch"] for op in writes}, {"down_input"})
+            # Includes the boundary between successive fragments: the final
+            # query is in BG3 and the next fragment starts in BG0.
+            self.assertTrue(all(left["addr"][2] != right["addr"][2]
+                                for left, right in zip(writes, writes[1:])))
+            for fragment in range(256):
+                group = writes[fragment * 16:(fragment + 1) * 16]
+                self.assertEqual([op["tensor_fragment"] for op in group], [fragment] * 16)
+                self.assertEqual([op["tensor_row"] for op in group], query_order)
+                self.assertEqual([op["addr"][2] * 4 + op["addr"][3] for op in group], query_order)
+                self.assertEqual(len({tuple(op["addr"][4:]) for op in group}), 1)
+            # Independently recover all coordinates and producer dependencies
+            # after reordering; command counts alone cannot prove preservation.
+            audit_down_fused(self.stage(variant, "down"))
+
     def test_down_streaming_uses_same_weights_without_array_staging(self):
         fused = self.stage("token_local_after", "down")
         reference = [(o["fragment"], o["output_column"], o["addr"], o["rows"], o["slot"])
