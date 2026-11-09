@@ -114,11 +114,13 @@ def probe_units(binary, config_path, units, work):
 def source_sha256():
     if subprocess.check_output(["git", "diff", "HEAD", "--name-only"], cwd=ROOT).strip():
         raise ValueError("commit source changes before calibrating")
+    digest = hashlib.sha256()
     with subprocess.Popen(["git", "archive", "HEAD"], cwd=ROOT, stdout=subprocess.PIPE) as proc:
-        digest = hashlib.file_digest(proc.stdout, "sha256").hexdigest()
+        for block in iter(lambda: proc.stdout.read(1024 * 1024), b""):
+            digest.update(block)
         if proc.wait():
             raise RuntimeError("git archive failed")
-    return digest
+    return digest.hexdigest()
 
 
 def calibrate(binary, vlm_path, spec_path, output, w_max):
