@@ -100,7 +100,9 @@ class PIMController {
   std::array<Clock,2> refresh_due{};
   std::array<int,2> refresh_bank{};
   std::array<PendingAct,2> pending_act;
-  int refresh_kind=0;
+  // Fixed hardware policy: GPU rank0 uses paired REFpb; PIM rank1 uses REFab.
+  static constexpr std::array<bool,2> refresh_all_bank{false,true};
+  std::array<std::array<uint64_t,2>,2> refresh_counts{}; // [rank][REFpb,REFab]
   // Heads of per-bank/direction queues are sufficient for the monotonic
   // per-kernel tensor regions; request arrival order is retained within each.
   std::array<std::deque<GpuRequest>,32> gpu_queues;
@@ -126,6 +128,7 @@ class PIMController {
   int command(const Operation& op,bool local) const;
   Clock ready_at(int cmd,const AddrVec_t& addr) const;
   Clock spacing(int pre,const AddrVec_t& a,int following,const AddrVec_t& b) const;
+  Clock refresh_interval(int rank) const;
   void issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage);
  private:
   void retire_and_fill(Clock clk,bool permit_gpu);

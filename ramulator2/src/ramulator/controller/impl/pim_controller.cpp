@@ -72,7 +72,10 @@ PIMController::PIMController(int ch,const ConfigNode& spec_cfg,const ConfigNode&
   }
   checker.spec=device.m_spec;checker.info=&info;
   lookahead=std::make_unique<NativeLookahead>(ch,spec_cfg);
-  refresh_due.fill(device.m_spec->get_timing_value("nREFIpb"));
+  for(int rank=0;rank<2;++rank)refresh_due[rank]=refresh_interval(rank);
+}
+Clock PIMController::refresh_interval(int rank) const {
+  return device.m_spec->get_timing_value(refresh_all_bank.at(rank)?"nREFI":"nREFIpb");
 }
 Clock PIMController::ready_at(int cmd,const AddrVec_t& addr) const {
   Clock at=node_ready(device.m_root.get(),cmd,addr);
@@ -123,7 +126,7 @@ void PIMController::reset_serial_epoch(Clock origin) {
   device.m_bank_nodes.clear();
   device.m_root=std::make_unique<DRAMNode>(device.m_spec,nullptr,0,channel);
   device.m_root->for_each_at_level(device.m_bank_level,[&](DRAMNode* b){device.m_bank_nodes.push_back(b);});
-  refresh_due.fill(origin+device.m_spec->get_timing_value(refresh_kind?"nREFI":"nREFIpb"));
+  for(int rank=0;rank<2;++rank)refresh_due[rank]=origin+refresh_interval(rank);
   refresh_bank.fill(0);pending_act={PendingAct{},PendingAct{}};
   external_free=private_free=gpu_dq_end=pim_dq_end=origin;
   forecast_dirty=true;gap_write_phase=false;write_drain=false;
@@ -255,11 +258,7 @@ Candidate PIMController::next_pim(Clock clk) {
 }
 bool PIMController::blocked_by_owner(const Candidate& c,Clock clk) const {
   if(c.cmd<0)return true;
-  if(c.source==Candidate::PIM&&refresh_due[1]<=clk) {
-    if(refresh_kind)return true;
-    for(int bank:device.get_target_banks(c.cmd,c.addr))
-      if(bank>=16&&bank%8==refresh_bank[1])return true;
-  }
+  if(c.source==Candidate::PIM&&refresh_due[1]<=clk)return true;
   const auto& name=device.m_spec->command_names[c.cmd];
   if(starts(name,"ACT2"))return true; // issued only by the owned ACT2 path
   if(starts(name,"ACT1")&&pending_act[info[c.cmd].private_ca?1:0].cmd>=0)return true;
@@ -281,7 +280,7 @@ Candidate PIMController::next_gpu(Clock clk) {
   for(size_t i=0;i<gpu_queues.size();i++) {
     if(gpu_queues[i].empty())continue;
     const auto& q=gpu_queues[i].front();
-    if(refresh_due[0]<=clk && (refresh_kind || (q.addr[2]*4+q.addr[3])%8==refresh_bank[0]))continue;
+    if(refresh_due[0]<=clk && (q.addr[2]*4+q.addr[3])%8==refresh_bank[0])continue;
     if(any_desired&&((info[q.cmd].direction=='W')!=desired_write))continue;
     int cmd=device.get_preq_command(q.cmd,q.addr,clk);
     Clock at=std::max({clk,q.arrival,ready_at(cmd,q.addr),external_free});
@@ -300,8 +299,8 @@ Candidate PIMController::next_refresh(Clock clk) {
   Candidate best;
   for(int rank=0;rank<2;rank++) if(refresh_due[rank]<=clk) {
     int bank=refresh_bank[rank];AddrVec_t a={channel,rank,bank/4,bank%4,-1,-1};
-    int cmd=device.m_spec->get_command_id(refresh_kind?"REFab":"REFpb");
-    if(refresh_kind)a[2]=a[3]=-1;
+    int cmd=device.m_spec->get_command_id(refresh_all_bank[rank]?"REFab":"REFpb");
+    if(refresh_all_bank[rank])a[2]=a[3]=-1;
     auto c=make_candidate(cmd,a,Candidate::REFRESH,refresh_due[rank]);c.index=rank;
     if(c.at<best.at)best=c;
   }
@@ -337,17 +336,20 @@ bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk)
   throw std::runtime_error("unknown arbitration "+policy);
 }
 void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage) {
+  const auto& n=device.m_spec->command_names[cmd];
+  if(n=="REFpb"||n=="REFab")
+    require((n=="REFab")==refresh_all_bank.at(addr[1]),"refresh command violates fixed rank0 REFpb / rank1 REFab policy");
   if(!device.check_timing(cmd,addr,clk))throw std::runtime_error("scheduler bypassed native check_timing "+device.m_spec->command_names[cmd]+" at "+std::to_string(clk));
   int preq=device.get_preq_command(cmd,addr,clk);
   if(preq!=cmd)throw std::runtime_error("scheduler bypassed native prerequisite "+device.m_spec->command_names[cmd]+" requires "+device.m_spec->command_names[preq]+" at "+std::to_string(clk)+" rank="+std::to_string(addr[1])+" bg="+std::to_string(addr[2])+" bank="+std::to_string(addr[3])+" row="+std::to_string(addr[4]));
   checker.observe(cmd,addr,clk,stat_stage);
   device.issue_command(cmd,addr,clk);
+  if(n=="REFpb"||n=="REFab")++refresh_counts.at(addr[1])[n=="REFab"];
   if(addr[1]==0)++gpu_command_counts[cmd];
   if(addr[1]==1)forecast_dirty=true;
   const auto& m=info[cmd];
   if(m.external_ca)external_free=clk+m.external_ca;
   if(m.private_ca)private_free=clk+m.private_ca;
-  const auto& n=device.m_spec->command_names[cmd];
   if(n=="ACT1"||n=="ACT1_LOCAL") {
     int lane=m.private_ca?1:0;auto& p=pending_act[lane];
     require(p.cmd<0,"ACT1 issued without ACT2 ownership capacity");
@@ -441,8 +443,8 @@ Clock PIMController::step(Clock clk,bool permit_gpu) {
     } else if(chosen.source==Candidate::GPU)gpu_queues[chosen.index].front().array_preq=true;
     else if(chosen.source==Candidate::PIM)finish_pim(chosen,clk);
     else if(chosen.source==Candidate::REFRESH&&chosen.final) {
-      int r=chosen.index;refresh_due[r]+=device.m_spec->get_timing_value(refresh_kind?"nREFI":"nREFIpb");
-      refresh_bank[r]=(refresh_bank[r]+1)%8;
+      int r=chosen.index;refresh_due[r]+=refresh_interval(r);
+      if(!refresh_all_bank[r])refresh_bank[r]=(refresh_bank[r]+1)%8;
     }
     // A private command and an external command can issue in the same CK.
     return clk;

@@ -165,25 +165,24 @@ int main(int argc,char** argv) {
     }
     {
       auto blocked=operation("LOCALRD",0,0),ready=operation("LOCALRD",1,0);
-      ready.addr[3]=1; // Same BG, adjacent bank outside REFpb's 0/8 pair.
+      ready.addr[3]=1; // Rank1 REFab reserves both this and every other bank.
       constexpr Clock precharge_ready=100;
       const auto result=execute(spec,{blocked,ready},{},[&](PIMController& c) {
         const int descriptor=c.device.m_spec->get_command_id("MAC_RUN");
         c.refresh_due[1]=c.info[descriptor].completion;
         c.refresh_bank[1]=0;
-        // Fixture: the pair has an outstanding tRAS precharge restriction.
-        // Set native bank readiness directly rather than introducing a second
-        // timing rule or manufacturing a delay in the tested requests.
-        for(int bank:{16,24}) {
-          c.device.m_bank_nodes.at(bank)->m_cmd_ready_clk[c.device.m_spec->get_command_id("PREpb")]=precharge_ready;
-          c.device.m_bank_nodes.at(bank)->m_cmd_ready_clk[c.device.m_spec->get_command_id("PREpb_LOCAL")]=precharge_ready;
+        // Fixture: rank1 has an outstanding native tRAS restriction before
+        // PREab. No child may bypass the overdue all-bank refresh.
+        for(int bank=16;bank<32;++bank) {
+          c.device.m_bank_nodes.at(bank)->m_cmd_ready_clk[c.device.m_spec->get_command_id("PREab")]=precharge_ready;
+          c.device.m_bank_nodes.at(bank)->m_cmd_ready_clk[c.device.m_spec->get_command_id("PREab_LOCAL")]=precharge_ready;
         }
       });
-      require(result.issue[1]<precharge_ready,"refresh-ineligible head hid a ready request to another bank");
-      require(result.issue[0]>=precharge_ready,"head accessed the bank reserved for overdue refresh");
-      require(result.out_of_order>0,"refresh eligibility did not expose the younger ready request");
+      const Clock earliest=precharge_ready+spec["timings"]["nRPab"].as<int>()+spec["timings"]["nRFC"].as<int>();
+      require(result.issue[0]>=earliest && result.issue[1]>=earliest,
+              "a PIM bank accessed the rank before PREab/REFab recovery");
       require(result.read_bytes==0,"LOCALRD unexpectedly used the external DQ bus");
-      report("refresh_eligibility_before_selection",result);
+      report("rank1_all_bank_refresh_fence",result);
     }
     {
       // The producer must change row0 -> row1 through real PRE/ACT/tRCD.

@@ -49,6 +49,10 @@ offset. These choices are fixed operating conditions, not calibration knobs.
    all-BG interface alias algorithm; removing it would contradict that rule.
 4. REFpb is the LPDDR5 paired-bank command: bank n and n+8 are refreshed
    together. The upstream pair-target mechanism is retained.
+5. The user-specified controller policy is fixed: GPU rank0 uses REFpb;
+   PIM rank1 uses REFab. Both reuse the native intervals and recovery above.
+   Refresh consumes one external CA CK and no DQ; recovery remains rank/bank
+   scoped, so rank1 recovery does not freeze unrelated rank0 work.
 
 ## PIM resource assumptions
 
@@ -87,6 +91,10 @@ streaming reads to different banks have no rank-CA spacing, while the same bank 
 its 4 CK read-to-read constraint.
 Refresh blocks SRAM IO conservatively as required by the task, and waits
 for issued SRAM IO data bursts before entering refresh.
+The native multi-cycle descriptor convention measures reception at the last
+CA beat: after REFab, MAC_RUN/ROPE_RUN may begin at 204 CK, with their last beat
+at 224 CK and decode completion at 226 CK. Their execution children still obey
+the full native refresh recovery. This is not an early array operation.
 
 ## Version2 ACTAB (ACT4 x 4)
 

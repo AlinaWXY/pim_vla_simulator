@@ -34,3 +34,9 @@ add_executable(native_sequencer_tests tests/native_sequencer_tests.cpp
   ramulator2/src/ramulator/plugin/bus_checker.cpp)
 target_link_libraries(native_sequencer_tests PRIVATE ramulator)
 target_compile_options(native_sequencer_tests PRIVATE -Wall -Wextra -O3)
+add_executable(native_refresh_tests tests/native_refresh_tests.cpp
+  ramulator2/src/ramulator/controller/impl/pim_controller.cpp
+  ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp
+  ramulator2/src/ramulator/plugin/bus_checker.cpp)
+target_link_libraries(native_refresh_tests PRIVATE ramulator)
+target_compile_options(native_refresh_tests PRIVATE -Wall -Wextra -O3)

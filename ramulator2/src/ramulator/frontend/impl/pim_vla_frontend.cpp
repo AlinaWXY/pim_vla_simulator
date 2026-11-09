@@ -24,6 +24,7 @@ struct StageResult {int id,step,layer;std::string name;Clock start,end,wait=0;};
 
 int run(const std::string& config_file,const std::string& output) {
   auto cfg=Config::parse_config_file(config_file);
+  require(cfg.is_map()&&!cfg.map().count("refresh_allbank"),"refresh_allbank is retired: rank0 uses REFpb and rank1 uses REFab");
   std::filesystem::create_directories(output);
   ConfigNode specification=cfg["spec"];
   if(!specification)specification=Config::parse_config_file(cfg["spec_path"].as<std::string>());
@@ -54,8 +55,6 @@ int run(const std::string& config_file,const std::string& output) {
     auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;
     mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);
     require(mc.window>0&&mc.write_low>=0&&mc.write_low<mc.write_high&&mc.write_high<=mc.window,"invalid write watermarks/window");
-    mc.refresh_kind=cfg["refresh_allbank"].as<bool>(false);
-    if(mc.refresh_kind)mc.refresh_due.fill(mc.device.m_spec->get_timing_value("nREFI"));
   }
   std::map<std::string,ProgramStage> programs;
   int layer_stride_rows=512;
@@ -157,7 +156,14 @@ int run(const std::string& config_file,const std::string& output) {
   uint64_t gr=0,gw=0,pr=0,pw=0,checks=0;
   for(const auto& mc:channels){mc->checker.advance(now);gr+=mc->gpu_read_bytes;gw+=mc->gpu_write_bytes;pr+=mc->pim_read_bytes;pw+=mc->pim_write_bytes;checks+=mc->checker.checked;}
   std::ofstream out(output+"/raw.json");out<<std::setprecision(15);
-  out<<"{\n\"schema_version\":1,\"clock_ps\":"<<tick_us*1000000<<",\"metrics\":{";
+  out<<"{\n\"schema_version\":1,\"clock_ps\":"<<tick_us*1000000;
+  out<<",\"refresh_policy\":{\"rank0\":\"REFpb\",\"rank1\":\"REFab\"},\"refresh_commands\":{";
+  for(int rank=0;rank<2;++rank) {
+    uint64_t pb=0,ab=0;for(const auto& mc:channels){pb+=mc->refresh_counts[rank][0];ab+=mc->refresh_counts[rank][1];}
+    if(rank)out<<',';
+    out<<"\"rank"<<rank<<"\":{\"REFpb\":"<<pb<<",\"REFab\":"<<ab<<'}';
+  }
+  out<<"},\"metrics\":{";
   out<<"\"AE_elapsed_us\":"<<us(ae_end)<<",\"AE_GPU_wait_us\":"<<us(wait_total)<<",\"VLM_remaining_us\":"<<us(do_ae?now-ae_end:now)<<",\"total_us\":"<<us(now);
   out<<",\"gpu_read_bytes\":"<<gr<<",\"gpu_write_bytes\":"<<gw<<",\"pim_read_bytes\":"<<pr<<",\"pim_write_bytes\":"<<pw<<",\"checked_commands\":"<<checks<<",\"serial_epoch_reset\":"<<(serial_epoch_reset?"true":"false");
   for(const auto& pair:std::vector<std::pair<std::string,std::string>>{{"ACT1","GPU_act1"},{"ACT2","GPU_act2"},{"PREpb","GPU_prepb"},{"PREab","GPU_preab"},{"RD","GPU_reads"},{"WR","GPU_writes"}}) {

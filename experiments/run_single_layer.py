@@ -52,7 +52,29 @@ def walk(operations):
         yield from walk(op.get("children", []))
 
 
+def refresh_counts(raw):
+    policy = {"rank0": "REFpb", "rank1": "REFab"}
+    if raw.get("refresh_policy") != policy:
+        raise ValueError("single-layer refresh policy must be rank0 REFpb / rank1 REFab")
+    commands = raw.get("refresh_commands")
+    if not isinstance(commands, dict) or set(commands) != set(policy):
+        raise ValueError("single-layer refresh counters must cover both ranks")
+    result = {}
+    for rank, required in policy.items():
+        counts = commands[rank]
+        if not isinstance(counts, dict) or set(counts) != {"REFpb", "REFab"}:
+            raise ValueError(f"{rank} must report REFpb and REFab counters")
+        for command, count in counts.items():
+            if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+                raise ValueError(f"{rank} {command} count must be a nonnegative integer")
+            if (command == required and count == 0) or (command != required and count != 0):
+                raise ValueError(f"{rank} must issue {required} and no other refresh command in a complete single layer")
+            result[f"{rank}_{command}"] = count
+    return result
+
+
 def summarize(variant, raw, schedule, program, spec):
+    refresh = refresh_counts(raw)
     metrics, stages = raw["metrics"], raw["stages"]
     tick_us = raw["clock_ps"] / 1_000_000
     expected_names = [e["stage"] for e in schedule["events"] if e["kind"] == "pim"]
@@ -124,6 +146,7 @@ def summarize(variant, raw, schedule, program, spec):
                   checked_commands=metrics["checked_commands"], PIM_stages=len(stages), GPU_blocks=len(gpu_rows))
     result.update(PIM_out_of_order_issues=metrics["PIM_out_of_order_issues"],
                   PIM_prefetched_prerequisites=metrics["PIM_prefetched_prerequisites"])
+    result.update(refresh)
     return result, stage_rows, gpu_rows
 
 

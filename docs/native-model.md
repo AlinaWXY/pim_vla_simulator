@@ -17,7 +17,9 @@ dependencies. Each layer has a separate 1 MiB region per bank; denoising steps
 reuse the corresponding layer. Descriptor children are the statically expanded
 instruction program. One descriptor is resident at a time; instructions issue
 in program order through the private command path. The stored program is not a
-hardware FIFO. The lookahead policy can inspect at most the next 32 instructions.
+hardware FIFO. Version2 admits at most 32 descriptor children into the hardware
+issue window and allows dependency-safe out-of-order issue within that window.
+The streaming lookahead policy can inspect at most the next 32 instructions.
 SRF and output pools are checked by a separate bounded data-lifetime scoreboard.
 
 VLM requests are uniformly released within each measured kernel duration and
@@ -29,8 +31,15 @@ capacity. Requests are queued by bank and direction; the controller compares
 ready heads by row hit and arrival. This is equivalent to scanning the generated
 monotonic bank/direction streams, without scanning the entire outstanding window.
 
-Both refresh modes have native command semantics. Main experiments use paired
-per-bank refresh, with due banks draining before a refresh command. Split ACT
+Both refresh modes have native command semantics. The fixed policy is **rank0
+(GPU) REFpb and rank1 (PIM) REFab**. Rank0 rotates through eight paired-bank
+targets (n and n+8) every nREFIpb=520 CK; rank1 refreshes all sixteen banks every
+nREFI=4164 CK. Due targets drain through native precharge prerequisites before
+refresh. Native nRFCpb=128 CK and nRFC=224 CK control recovery; no controller
+delay is added. Rank1 all-bank operations must re-activate the closed banks.
+The former global `refresh_allbank` option is rejected even when false/null.
+Raw outputs record the policy and actual command counts separately for each rank.
+Split ACT
 commands have owned ACT2 requests: ACT2 issues as early as legal, with nAAD as
 an upper bound rather than an artificial mandatory wait.
 

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiments.config import CASES, case_config, validate_calibration, validate_config, variant_name
 from experiments.prepare_inputs import ae_schedule, normalize_vlm, layer_boundaries, single_layer_schedule, gpu_measurements
-from experiments.run_single_layer import prepare as prepare_single_layer, VARIANTS as SINGLE_LAYER_VARIANTS
+from experiments.run_single_layer import prepare as prepare_single_layer, VARIANTS as SINGLE_LAYER_VARIANTS, refresh_counts
 from calib.calibrate_vlm import assess
 from experiments.native import runtime_libraries, library_hashes
 from analysis.report import summarize
@@ -54,6 +54,11 @@ class ConfigurationTests(unittest.TestCase):
         for retired in ("pim_data_path", "pim_whole_srf", "shift", "constant_offset", "dq_latency"):
             with self.assertRaises(ValueError):
                 validate_config(dict(case_config("b"), **{retired: 0}))
+
+    def test_global_refresh_switch_is_rejected_even_when_false(self):
+        for value in (True, False, None, 0, 1):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "fixed hardware rule"):
+                validate_config(dict(case_config("b"), refresh_allbank=value))
 
     def test_hardware_multiplier(self):
         for k in (1, 2, 4):
@@ -113,6 +118,29 @@ class RuntimeProvenanceTests(unittest.TestCase):
 
 
 class ReportingTests(unittest.TestCase):
+    def test_single_layer_refresh_requires_both_fixed_policies_and_activity(self):
+        raw = dict(refresh_policy={"rank0": "REFpb", "rank1": "REFab"},
+                   refresh_commands={"rank0": {"REFpb": 128, "REFab": 0},
+                                     "rank1": {"REFpb": 0, "REFab": 16}})
+        self.assertEqual(refresh_counts(raw), dict(rank0_REFpb=128, rank0_REFab=0,
+                                                  rank1_REFpb=0, rank1_REFab=16))
+        for policy in (None, {"rank0": "REFpb", "rank1": "REFpb"},
+                       {"rank0": "REFab", "rank1": "REFab"}):
+            with self.subTest(policy=policy), self.assertRaises(ValueError):
+                refresh_counts(dict(raw, refresh_policy=policy))
+        for rank, command, value in (("rank0", "REFab", 1), ("rank1", "REFpb", 1),
+                                     ("rank0", "REFpb", 0), ("rank1", "REFab", 0),
+                                     ("rank0", "REFpb", True), ("rank1", "REFab", -1),
+                                     ("rank0", "REFpb", 1.5)):
+            invalid = json.loads(json.dumps(raw))
+            invalid["refresh_commands"][rank][command] = value
+            with self.subTest(rank=rank, command=command, value=value), self.assertRaises(ValueError):
+                refresh_counts(invalid)
+        for counters in (None, {"rank0": raw["refresh_commands"]["rank0"]},
+                         {"rank0": {"REFpb": 128}, "rank1": raw["refresh_commands"]["rank1"]}):
+            with self.subTest(counters=counters), self.assertRaises(ValueError):
+                refresh_counts(dict(raw, refresh_commands=counters))
+
     def test_compatibility_uses_native_completion_and_keeps_negative_interference(self):
         stage = dict(stage_id=0, name="qkv", step=0, layer=0, start_us=0, end_us=10, duration_us=10)
         solo = dict(metrics={"total_us": 20}, stages=[stage])

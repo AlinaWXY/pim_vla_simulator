@@ -8,6 +8,7 @@ build/native_spec_tests reference/spec/spec.json reference/spec/command-pair-mat
 build/native_microbench reference/spec/spec.json
 build/native_lookahead_tests reference/spec/spec.json
 build/native_sequencer_tests reference/spec/spec.json
+build/native_refresh_tests reference/spec/spec.json
 build/test_pim_resources
 "${PYTHON:-python3}" tests/test_fault_injection.py
 "${PYTHON:-python3}" tests/smoke_native.py

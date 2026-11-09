@@ -41,6 +41,8 @@ def validate_calibration(params):
 
 
 def validate_config(config):
+    if "refresh_allbank" in config:
+        raise ValueError("refresh_allbank is forbidden: rank0 uses REFpb and rank1 uses REFab as a fixed hardware rule")
     for name, options in (("layout", {"feature", "token"}), ("rope", {"gpu", "local"}),
                           ("dataflow", {"streaming", "fused"}), ("mode", {"serial", "concurrent"})):
         if config.get(name) not in options:
