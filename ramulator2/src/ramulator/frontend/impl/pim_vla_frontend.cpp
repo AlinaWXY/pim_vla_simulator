@@ -133,6 +133,7 @@ int run(const std::string& config_file,const std::string& output) {
   for(int c=0;c<16;c++) {
     channels[c]=std::make_unique<PIMController>(c,specification,specification["metadata"]);
     auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;mc.legacy_gap_batch=!closed;
+    mc.checker.split_traffic=closed&&do_ae&&do_vlm;
     if(closed)set_watermarks(mc,w_max);
     else {
       mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);
@@ -144,7 +145,9 @@ int run(const std::string& config_file,const std::string& output) {
   std::vector<Event> events;
   if(do_ae) {
     int layer_stride_bytes=0;
-    programs=read_program_json(cfg["program_path"].as<std::string>(),&layer_stride_bytes);
+    std::string program_model;
+    programs=read_program_json(cfg["program_path"].as<std::string>(),&layer_stride_bytes,&program_model);
+    require(!closed||program_model!="fused_kernel_windows","closed loop requires a native request program");
     require(layer_stride_bytes>0&&layer_stride_bytes%2048==0,"layer stride must contain complete DRAM rows");
     layer_stride_rows=layer_stride_bytes/2048;
     auto schedule=Config::parse_config_file(cfg["ae_schedule_path"].as<std::string>());
@@ -288,7 +291,19 @@ int run(const std::string& config_file,const std::string& output) {
   out<<"],\n\"bus\":[";bool comma=false;
   for(int c=0;c<16;c++)for(const auto& [sid,s]:channels[c]->checker.stats){if(comma)out<<',';comma=true;
     Clock duration=sid<0?background_duration:results.at(sid).end-results.at(sid).start;
-    out<<"{\"channel\":"<<c<<",\"stage_id\":"<<sid<<",\"ca_cycles\":"<<s.ca<<",\"dq_cycles\":"<<s.dq<<",\"read_bytes\":"<<s.read<<",\"write_bytes\":"<<s.write<<",\"gpu_read_bytes\":"<<s.gpu_read<<",\"gpu_write_bytes\":"<<s.gpu_write<<",\"pim_read_bytes\":"<<s.pim_read<<",\"pim_write_bytes\":"<<s.pim_write<<",\"duration_cycles\":"<<duration<<"}";}
+    out<<"{\"channel\":"<<c<<",\"stage_id\":"<<sid<<",\"ca_cycles\":"<<s.ca<<",\"dq_cycles\":"<<s.dq<<",\"read_bytes\":"<<s.read<<",\"write_bytes\":"<<s.write<<",\"gpu_read_bytes\":"<<s.gpu_read<<",\"gpu_write_bytes\":"<<s.gpu_write<<",\"pim_read_bytes\":"<<s.pim_read<<",\"pim_write_bytes\":"<<s.pim_write<<",\"duration_cycles\":"<<duration;
+    if(sid>=0&&channels[c]->checker.split_traffic) {
+      out<<",\"phase_cycles\":{";
+      auto phase=[&](const char* name,const BusUtilization& u) {
+        out<<json_string(name)<<":{\"duration\":"<<u.duration<<",\"gpu_ca\":"<<u.ca[0]
+           <<",\"pim_ca\":"<<u.ca[1]<<",\"pim_private_ca\":"<<u.private_ca
+           <<",\"gpu_dq\":"<<u.dq[0]<<",\"pim_dq\":"<<u.dq[1]<<"}";
+      };
+      phase(fused?"private":"streaming",s.phases[0]);
+      if(fused) {out<<',';phase("io_epoch",s.phases[1]);}
+      out<<'}';
+    }
+    out<<"}";}
   out<<"]\n}\n";out.close();
   std::cout<<"completed "<<kind<<" total_us="<<us(now)<<" commands="<<checks<<"\n";
   return 0;

@@ -43,7 +43,14 @@ struct Kernel {
   int mlp=0; // Zero selects the historical uniform release path.
   Clock memory_done=0;
 };
-struct BusStat { uint64_t ca=0,dq=0,read=0,write=0,commands=0,gpu_read=0,gpu_write=0,pim_read=0,pim_write=0; };
+struct BusUtilization {
+  uint64_t duration=0,private_ca=0;
+  std::array<uint64_t,2> ca{},dq{}; // GPU rank0 and PIM rank1.
+};
+struct BusStat {
+  uint64_t ca=0,dq=0,read=0,write=0,commands=0,gpu_read=0,gpu_write=0,pim_read=0,pim_write=0;
+  std::array<BusUtilization,2> phases{}; // Non-I/O and fused I/O.
+};
 struct Burst { Clock start,end; char direction; int rank,command,stage; };
 class BusChecker {
  public:
@@ -51,12 +58,14 @@ class BusChecker {
   const std::vector<CommandInfo>* info=nullptr;
   std::deque<Burst> bursts;
   Clock external_start=0,external_end=0,private_end=0,account_clock=0;
-  int account_stage=-1;
+  Clock private_start=0;
+  int account_stage=-1,external_rank=0;
+  bool split_traffic=false,io_epoch=false;
   uint64_t checked=0;
   std::map<int,BusStat> stats;
   void observe(int cmd,const AddrVec_t& addr,Clock now,int stage);
   void advance(Clock now);
-  void set_stage(Clock now,int stage) {advance(now);account_stage=stage;}
+  void set_stage(Clock now,int stage) {advance(now);account_stage=stage;io_epoch=false;}
   void retire(Clock now);
 };
 struct GpuRequest { AddrVec_t addr; int cmd; uint64_t sequence; Clock arrival; bool array_preq=false; };

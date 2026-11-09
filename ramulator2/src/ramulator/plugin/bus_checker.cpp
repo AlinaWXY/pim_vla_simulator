@@ -3,8 +3,20 @@ namespace PimVla {
 void BusChecker::advance(Clock now) {
   require(now>=account_clock,"bus checker clock went backward");
   auto overlap=[&](Clock start,Clock end){return std::max<Clock>(0,std::min(now,end)-std::max(account_clock,start));};
-  auto& s=stats[account_stage];s.ca+=overlap(external_start,external_end);
-  for(const auto& b:bursts)s.dq+=overlap(b.start,b.end);
+  auto& s=stats[account_stage];
+  const auto ca=overlap(external_start,external_end);
+  s.ca+=ca;
+  if(split_traffic&&account_stage>=0) {
+    auto& phase=s.phases[io_epoch];
+    phase.duration+=now-account_clock;
+    phase.ca[external_rank]+=ca;
+    phase.private_ca+=overlap(private_start,private_end);
+    for(const auto& b:bursts) {
+      const auto dq=overlap(b.start,b.end);
+      s.dq+=dq;
+      phase.dq[b.rank]+=dq;
+    }
+  } else for(const auto& b:bursts)s.dq+=overlap(b.start,b.end);
   account_clock=now;
 }
 void BusChecker::retire(Clock now) {
@@ -19,10 +31,12 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
   if(m.external_ca) {
     if(now<external_end)throw std::runtime_error("CA overlap at CK "+std::to_string(now));
     external_start=now;external_end=now+m.external_ca;
+    external_rank=addr[1];
   }
   if(m.private_ca) {
     require(now>=private_end,"rank private CA overlap");
     private_end=now+m.private_ca;
+    private_start=now;
   }
   if(!m.direction) return;
   Burst b{now+m.latency,now+m.latency+m.burst,m.direction,addr[1],cmd,stage};

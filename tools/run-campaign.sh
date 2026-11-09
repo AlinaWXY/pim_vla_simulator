@@ -25,7 +25,7 @@ if [[ "$action" == prepare ]]; then
   export PYTHONDONTWRITEBYTECODE=1 PIM_VLA_SOURCE_COMMIT="$source_commit"
   "$python_exec" "$run_dir/frozen/source/programs/gen_pim_program.py" --output "$run_dir/frozen/source/programs/generated" --compact
   "$python_exec" "$run_dir/frozen/source/tools/verify_input_provenance.py" --root "$run_dir/frozen/source"
-  "$python_exec" "$run_dir/frozen/source/experiments/run.py" --output "$run_dir" --prepare-only --mac-freq-mult "${PIM_MAC_FREQ_MULT:-4}"
+  "$python_exec" "$run_dir/frozen/source/experiments/run.py" --output "$run_dir" --prepare-only --vlm-release uniform --mac-freq-mult "${PIM_MAC_FREQ_MULT:-4}"
   (cd "$run_dir" && sha256sum frozen/bin/pim_vla_sim frozen/lib/libramulator.so > frozen/runtime-SHA256SUMS)
   (cd "$run_dir/frozen/source" && find . -type f ! -path '*/__pycache__/*' -print0 | sort -z | xargs -0 sha256sum > ../source-SHA256SUMS)
   (cd "$run_dir" && find configs -type f -print0 | sort -z | xargs -0 sha256sum > frozen/config-SHA256SUMS)

@@ -124,6 +124,7 @@ void PIMController::reset_serial_epoch(Clock origin) {
   require(!kernel&&gpu_outstanding==0&&stage_finished(origin),"serial epoch reset has live work");
   checker.advance(origin);checker.bursts.clear();
   checker.external_start=checker.external_end=checker.private_end=origin;
+  checker.private_start=origin;
   device.m_bank_nodes.clear();
   device.m_root=std::make_unique<DRAMNode>(device.m_spec,nullptr,0,channel);
   device.m_root->for_each_at_level(device.m_bank_level,[&](DRAMNode* b){device.m_bank_nodes.push_back(b);});
@@ -410,6 +411,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu) {
     }
   }
   if(fused&&clk<pim_dq_end)epoch=true;
+  checker.io_epoch=epoch;
   Candidate gpu=permit_gpu&&!epoch?next_gpu(clk):Candidate{};
   Candidate refresh=next_refresh(clk),chosen;
   // nAAD is a maximum ACT1-to-ACT2 distance. Issue the owned ACT2 at

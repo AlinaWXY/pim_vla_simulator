@@ -15,7 +15,8 @@ from experiments.config import CASES, case_config, variant_name
 from experiments.native import execute, runtime_libraries, library_hashes
 
 
-def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None, spec_path=None):
+def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None, spec_path=None,
+                    vlm_release="closed_loop"):
     program_dir = Path(program_dir or ROOT / "programs/generated").resolve()
     input_dir = Path(input_dir or ROOT / "input-data").resolve()
     if spec_path:
@@ -33,7 +34,9 @@ def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None
         c.update(spec=deepcopy(spec), program_path=str(program_dir / f"{variant}.json"),
                  vlm_path=str(input_dir / "vlm.json"),
                  ae_schedule_path=str(input_dir / f"ae-{variant}.json"),
-                 vlm_release="uniform", calibration=dict(alpha=1.0, window=64, write_high=48, write_low=16))
+                 execution_model="native_dram_requests", vlm_release=vlm_release)
+        if vlm_release == "uniform":
+            c["calibration"] = dict(alpha=1.0, window=64, write_high=48, write_low=16)
         for key in ("program_path", "vlm_path", "ae_schedule_path"):
             if not Path(c[key]).is_file():
                 raise FileNotFoundError(c[key])
@@ -187,6 +190,7 @@ def main():
     parser.add_argument("--calibration", type=Path)
     parser.add_argument("--cases", nargs="+", choices=list(CASES), default=list(CASES))
     parser.add_argument("--repeats", type=int, default=2)
+    parser.add_argument("--vlm-release", choices=("closed_loop", "uniform"), default="closed_loop")
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--solo-only", action="store_true", help="run the five AE standalone designs, then stop")
     parser.add_argument("--reuse-solos", type=Path, help="reuse verified standalone outputs under this directory/ae-solo")
@@ -197,11 +201,18 @@ def main():
         aggregate(args.aggregate_from, args.output, expected_cases=args.cases)
         return
     configs = prepare_configs(args.output / "configs", mac_freq_mult=args.mac_freq_mult,
-                              program_dir=args.program_dir, input_dir=args.input_dir, spec_path=args.spec)
+                              program_dir=args.program_dir, input_dir=args.input_dir, spec_path=args.spec,
+                              vlm_release=args.vlm_release)
     if args.prepare_only:
         return
     if args.solo_only:
         run_solos(args.binary, configs, args.output, resume=args.resume, reuse_solos=args.reuse_solos, cases=args.cases)
+        return
+    if args.vlm_release == "closed_loop":
+        from experiments.run_closed_loop import run_closed_loop
+        if args.calibration is None:
+            parser.error("closed_loop requires --calibration from tools/calibrate_kernel_mlp.py")
+        run_closed_loop(args.binary, configs, args.output, args.calibration, args.cases, resume=args.resume)
         return
     run_matrix(args.binary, configs, args.output, calibration_path=args.calibration,
                cases=args.cases, repeats=args.repeats, resume=args.resume, reuse_solos=args.reuse_solos)
