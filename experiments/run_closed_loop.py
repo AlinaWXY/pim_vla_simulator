@@ -26,10 +26,16 @@ def load_calibration(binary, config, path):
     if sha256(spec_file["path"]) != spec_file["sha256"] or read_json(spec_file["path"]) != config["spec"]:
         raise ValueError("spec differs from closed-loop calibration")
     validation = ledger["validation"]
-    first, second = validation["raw_paths"]
-    hashes = [sha256(p) for p in (first, second)]
-    if hashes != validation["raw_sha256"] or len(set(hashes)) != 1:
-        raise ValueError("calibrated solo repetitions differ")
+    if ledger.get("calibration_model") == "scaled_ablation":
+        [first] = validation["raw_paths"]
+        if ([sha256(first)] != validation["raw_sha256"] or validation["unit_violations"] or
+            abs(validation["relative_error"]) > .01):
+            raise ValueError("scaled solo failed its per-unit or total validation")
+    else:
+        first, second = validation["raw_paths"]
+        hashes = [sha256(p) for p in (first, second)]
+        if hashes != validation["raw_sha256"] or len(set(hashes)) != 1:
+            raise ValueError("calibrated solo repetitions differ")
     solo = read_json(first)
     if (solo["vlm_release"] != "closed_loop" or solo["w_max"] != ledger["w_max"] or
         total_us(solo) != validation["total_us"] or
@@ -43,10 +49,10 @@ def repeat(binary, config, output, *, resume):
     paths = [output / f"repeat-{i}" for i in range(2)]
     with ThreadPoolExecutor(max_workers=2) as pool:
         first, _ = pool.map(lambda path: execute(binary, config, path, resume=resume), paths)
-    hashes = [sha256(path / "raw.json") for path in paths]
-    if len(set(hashes)) != 1:
-        raise ValueError(f"repeated raw.json differs byte-for-byte in {output}: {hashes}")
-    return first, hashes[0]
+    raw_files = [path / "raw.json" for path in paths]
+    if raw_files[0].read_bytes() != raw_files[1].read_bytes():
+        raise ValueError(f"repeated raw.json differs byte-for-byte in {output}")
+    return first, sha256(raw_files[0])
 
 
 def phase_utilization(raw):
