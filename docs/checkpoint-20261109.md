@@ -1,6 +1,8 @@
 # 2026-11-09 上传与暂停记录
 
-最新范围：用户随后提供 Version2，并要求仅查看 **一层、一个 denoising step** 的 latency。当前实现冻结源码为 `f7c7af6eab0655b526773b9b15ed63e8e6f73add`，新版单层验证与结果见 [Version2 单层报告](version2-single-layer.md)。校准及端到端实验仍暂停。
+最新范围：用户随后提供 Version2，并要求仅查看 **一层、一个 denoising step** 的 latency；之后明确 **GPU rank0 REFpb、PIM rank1 REFab**。当前实现冻结源码为 `ea217bad2fce69c3c5773f690fde64d633041791`，刷新修正后的五组各两次单层运行及独立审计已通过（作业 `1980912`），见 [最新单层报告](rank-refresh-single-layer.md)。校准及端到端实验仍暂停。
+
+当前冻结目录为 `results/rank-refresh-single-layer-1980912/`。此前 `results/version2-single-layer-1977315/` 使用双 REFpb，继续作为历史对照保留；不能将旧 latency 或“fused PIM 几乎不变”的结论沿用到当前硬件策略。后续结果文档提交不改变这次运行的模型源码、二进制或输入。
 
 以下是 Version1 的历史交接记录。`results/full-k4-final` 的冻结文件保持原样，不能把它们的校准/恢复配置与 Version2 的二进制或程序混用。将来恢复完整实验须先处理 Version2 报告中的待办，并建立新的冻结目录。
 

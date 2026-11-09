@@ -1,0 +1,8 @@
+{"sequencer":"completion_dependency_bypass","status":"passed","end_ck":72,"out_of_order_issues":1,"prefetched_prerequisites":0}
+{"sequencer":"barrier_completion_fence","status":"passed","end_ck":97,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"sequencer":"epoch_dispatch_fence","status":"passed","end_ck":74,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"sequencer":"fifo32_window_boundary","status":"passed","end_ck":192,"out_of_order_issues":2,"prefetched_prerequisites":0}
+{"sequencer":"safe_next_bank_prefetch","status":"passed","end_ck":72,"out_of_order_issues":0,"prefetched_prerequisites":2}
+{"sequencer":"protect_older_required_row","status":"passed","end_ck":99,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"sequencer":"rank1_all_bank_refresh_fence","status":"passed","end_ck":376,"out_of_order_issues":0,"prefetched_prerequisites":1}
+{"sequencer":"issue_dependency_is_not_completion_dependency","status":"passed","end_ck":87,"out_of_order_issues":0,"prefetched_prerequisites":0}

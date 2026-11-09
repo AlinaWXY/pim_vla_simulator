@@ -15,8 +15,8 @@ and verifies that this observer detects the resulting DQ overlap.
 The PIM JSON contains a layer-relative physical program and explicit completion
 dependencies. Each layer has a separate 1 MiB region per bank; denoising steps
 reuse the corresponding layer. Descriptor children are the statically expanded
-instruction program. One descriptor is resident at a time; instructions issue
-in program order through the private command path. The stored program is not a
+instruction program. One descriptor is resident at a time; its children issue
+through the private command path. The stored program is not a
 hardware FIFO. Version2 admits at most 32 descriptor children into the hardware
 issue window and allows dependency-safe out-of-order issue within that window.
 The streaming lookahead policy can inspect at most the next 32 instructions.

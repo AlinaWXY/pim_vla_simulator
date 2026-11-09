@@ -1,0 +1,5 @@
+{"refresh_test":"rank_specific_initial_deadlines","status":"passed"}
+{"refresh_test":"rank0_paired_scope_rotation_and_period","status":"passed"}
+{"refresh_test":"rank1_all_bank_scope_recovery_and_period","status":"passed"}
+{"refresh_test":"independent_ranks_and_live_pim_pause","status":"passed"}
+{"refresh_test":"serial_origin_reset","status":"passed"}

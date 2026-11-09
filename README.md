@@ -6,11 +6,11 @@
 
 ## Version2 单层检查
 
-当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**。VLM 校准、完整 AE 和端到端并发实验保持暂停。Version2 更新包括原生 ACTAB、每 bank RoPE、真实输出池归约暂存、描述符 FIFO32 有限乱序、Q 导入 epoch，以及 streaming PV→O 实测转置。单层结果与验证记录见 [Version2 单层报告](docs/version2-single-layer.md)。
+当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**，固定 **GPU rank0 REFpb、PIM rank1 REFab**。VLM 校准、完整 AE 和端到端并发实验保持暂停。Version2 更新包括原生 ACTAB、每 bank RoPE、真实输出池归约暂存、描述符 FIFO32 有限乱序、Q 导入 epoch，以及 streaming PV→O 实测转置。最新结果、PIM/GPU 阶段 breakdown、fused 归因与 VLM 比较见 [刷新修正单层报告](docs/rank-refresh-single-layer.md)。
 
-五种单层总延迟依次为 **460.851 / 422.385 / 393.291 / 416.764 / 387.498 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `f7c7af6`、作业 `1977315`；44 项 Python、222 项原生时序检查通过，五配置均两次逐字节一致。
+五种单层总延迟依次为 **344.594 / 316.225 / 287.160 / 335.255 / 306.104 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `ea217ba`、作业 `1980912`；46 项 Python、224 项原生时序检查与5组刷新回归通过，五配置均两次逐字节一致。Token/GPU fused 的 PIM 时间比 streaming 增加 24.022 μs，主要由 Down 增量超过 QKT 收益造成。此前双 REFpb 的 [历史结果](docs/version2-single-layer.md) 保留，不再代表当前刷新策略。
 
-独立入口为 `python experiments/run_single_layer.py --output results/version2-single-layer --repeats 2`；它仅构造五种单层 AE 配置，不加载 VLM，也不调用完整实验入口。
+独立入口为 `python experiments/run_single_layer.py --output results/rank-refresh-single-layer --repeats 2`；它仅构造五种单层 AE 配置，不加载 VLM，也不调用完整实验入口，并核对两个 rank 的实际刷新类型和计数。
 
 ## Version1 历史验收记录
 

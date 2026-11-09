@@ -1,5 +1,9 @@
 # Version2：单层、单个 denoising step
 
+> 历史结果：本页作业 `1977315` 使用 rank0/rank1 均为 REFpb 的旧刷新策略。
+> 用户随后明确 GPU rank0 用 REFpb、PIM rank1 用 REFab。修正后的结果与阶段分析见
+> [按 rank 刷新的单层报告](rank-refresh-single-layer.md)；本页及归档保留用于对照，不代表当前模型。
+
 用户于 2026-11-09 要求先观察单层 latency，暂停校准和端到端仿真。本轮只运行 AE 的 step 0 / layer 0；不加载 VLM、不恢复旧校准作业、不运行 18 层 × 10 步或并发消融矩阵。Version2 文档中的完整实验要求不改变本轮范围。
 
 任务文档 SHA-256：`a8273123c0f306776eb09a8cc98269071b11d5e379e52398c1ae18f8a4c1fbfa`。原件保存在服务器 `results/task-documents/version2-rewrite.docx`；分支保存实现说明及来源哈希。

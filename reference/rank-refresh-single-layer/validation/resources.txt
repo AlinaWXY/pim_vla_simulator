@@ -1,0 +1,1 @@
+PimResources lifecycle tests passed

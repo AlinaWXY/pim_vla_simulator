@@ -1,0 +1,8 @@
+{
+  "archive": "rank-refresh-single-layer.tar.gz",
+  "bytes": 165551,
+  "includes": "All ten native raw/config/provenance outputs, single-layer inputs, summaries, validation logs and frozen manifest/spec. Executable/library/program files stay in the server frozen directory.",
+  "sha256": "2e36f97cb9d70b976ddbbe0c3ceb5f338780981520df5b073db6ebbb529cad77",
+  "slurm_job_id": 1980912,
+  "source_commit": "ea217bad2fce69c3c5773f690fde64d633041791"
+}

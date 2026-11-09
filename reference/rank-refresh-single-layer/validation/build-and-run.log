@@ -1,0 +1,184 @@
+Configuring pim_vla_sim2 ...
+-- Build type: Release
+Configuring yaml-cpp...
+Done configuring yaml-cpp.
+Configuring fmt...
+-- Version: 10.2.1
+-- Build type: Release
+Done configuring fmt.
+-- Configuring done (2.1s)
+-- Generating done (7.8s)
+-- Build files have been written to: /fact_data/xinyaowang/pim_vla_sim2_20261109/build
+[  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
+[  0%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o
+[  1%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/factory.cpp.o
+[  1%] Building CXX object ramulator2/src/ramulator/power/CMakeFiles/ramulator-power.dir/hbm/calculation.cpp.o
+[  2%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o
+[  3%] Building CXX object ramulator2/src/ramulator/power/CMakeFiles/ramulator-power.dir/ayna.cpp.o
+[  4%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o
+[  4%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o
+[  5%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/logger.cpp.o
+[  6%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o
+[  7%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/utils.cpp.o
+[  8%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o
+[  8%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/config.cpp.o
+[  8%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o
+[  9%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.o
+[  9%] Built target ramulator-power
+[ 10%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/external.cpp.o
+[ 11%] Linking CXX static library libfmt.a
+[ 12%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o
+[ 12%] Built target fmt
+[ 12%] Building CXX object ramulator2/src/ramulator/translation/CMakeFiles/ramulator-translation.dir/impl/no_translation.cpp.o
+[ 13%] Building CXX object ramulator2/src/ramulator/base/CMakeFiles/ramulator-base.dir/request.cpp.o
+[ 13%] Built target ramulator-base
+[ 14%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o
+[ 14%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/channel_mapper/impl/cache_line_interleave.cpp.o
+[ 15%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/loadstore_trace.cpp.o
+[ 15%] Built target ramulator-translation
+[ 16%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/node.cpp.o
+[ 17%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/channel_mapper/impl/gem5_port_interleave.cpp.o
+[ 18%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/device.cpp.o
+[ 18%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/readwrite_trace.cpp.o
+[ 18%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o
+[ 19%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o
+[ 19%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/dram_spec.cpp.o
+[ 20%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/fptostring.cpp.o
+[ 21%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/channel_mapper/impl/passthrough_channel_mapper.cpp.o
+[ 21%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o
+[ 22%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/latency_throughput_trace.cpp.o
+[ 23%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/node.cpp.o
+[ 23%] Building CXX object ramulator2/src/ramulator/memory_system/CMakeFiles/ramulator-memorysystem.dir/impl/generic_dram_system.cpp.o
+[ 24%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o
+[ 25%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR3.cpp.o
+[ 25%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o
+[ 26%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR4.cpp.o
+[ 27%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o
+[ 27%] Built target ramulator-memorysystem
+[ 28%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/controller_base.cpp.o
+[ 29%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/memory_trace/pum_trace.cpp.o
+[ 30%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/null.cpp.o
+[ 30%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o
+[ 30%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR4_PUM.cpp.o
+[ 31%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o
+[ 32%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o
+[ 33%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR4_VRR.cpp.o
+[ 33%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o
+[ 33%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/simpleO3/simpleO3.cpp.o
+[ 33%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/scheduler/impl/frfcfs.cpp.o
+[ 34%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR5.cpp.o
+[ 35%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o
+[ 36%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/scheduler/impl/frfcfs_rowhit.cpp.o
+[ 36%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/DDR5_VRR.cpp.o
+[ 37%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o
+[ 38%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/simpleO3/core.cpp.o
+[ 39%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM1.cpp.o
+[ 40%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/all_bank.cpp.o
+[ 40%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o
+[ 41%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/simpleO3/llc.cpp.o
+[ 42%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM2.cpp.o
+[ 43%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o
+[ 43%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/bhO3/bhO3.cpp.o
+[ 43%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM3.cpp.o
+[ 43%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/per_bank.cpp.o
+[ 44%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/HBM4.cpp.o
+[ 45%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o
+[ 46%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/hbm_per_bank_refresh.cpp.o
+[ 46%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o
+[ 48%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/LPDDR5.cpp.o
+[ 47%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/bhO3/bhcore.cpp.o
+[ 49%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o
+[ 50%] Building CXX object _deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o
+[ 50%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/LPDDR5XPIM.cpp.o
+[ 51%] Building CXX object ramulator2/src/ramulator/frontend/CMakeFiles/ramulator-frontend.dir/impl/processor/bhO3/bhllc.cpp.o
+[ 52%] Linking CXX static library libyaml-cpp.a
+[ 53%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/refresh/impl/no_refresh.cpp.o
+[ 53%] Built target yaml-cpp
+[ 54%] Building CXX object CMakeFiles/test_pim_resources.dir/tests/test_pim_resources.cpp.o
+[ 54%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/rowpolicy/impl/open.cpp.o
+[ 55%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/LPDDR6.cpp.o
+[ 55%] Built target ramulator-frontend
+[ 56%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/GDDR6.cpp.o
+[ 57%] Linking CXX executable test_pim_resources
+[ 57%] Built target test_pim_resources
+[ 57%] Building CXX object ramulator2/src/ramulator/dram/CMakeFiles/ramulator-dram.dir/impl/GDDR7.cpp.o
+[ 58%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/rowpolicy/impl/closed_cap.cpp.o
+[ 59%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/addr_mapper_base.cpp.o
+[ 59%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/ch_ra_ba_ro_co.cpp.o
+[ 59%] Built target ramulator-dram
+[ 60%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/ro_ba_ra_co_ch.cpp.o
+[ 61%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/mop4clxor.cpp.o
+[ 61%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/passthrough_addr_mapper.cpp.o
+[ 62%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/addr_mapper/impl/rit_addr_mapper.cpp.o
+[ 63%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/command_counter.cpp.o
+[ 63%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/cmd_trace_recorder.cpp.o
+[ 64%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/issued_command_validation_hook.cpp.o
+[ 65%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/rfm_manager.cpp.o
+[ 65%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/para.cpp.o
+[ 66%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/oracle_rh.cpp.o
+[ 67%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/twice.cpp.o
+[ 67%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/graphene.cpp.o
+[ 68%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/hydra.cpp.o
+[ 69%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/rrs.cpp.o
+[ 69%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/aqua.cpp.o
+[ 70%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/samsung_trr.cpp.o
+[ 71%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/hynix_trr.cpp.o
+[ 71%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/ideal_trr.cpp.o
+[ 72%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/bin_trace_recorder.cpp.o
+[ 73%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/plugin/impl/live_trace_streamer.cpp.o
+[ 73%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/generic_ddr_controller.cpp.o
+[ 74%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/pum_controller.cpp.o
+[ 75%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/lpddr_controller_base.cpp.o
+[ 75%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/lpddr5_controller.cpp.o
+[ 76%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/lpddr6_controller.cpp.o
+[ 77%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/hbm_controller_base.cpp.o
+[ 78%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/hbm12_controller.cpp.o
+[ 78%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/hbm34_controller.cpp.o
+[ 79%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/gddr7_controller.cpp.o
+[ 80%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/prac_controller.cpp.o
+[ 80%] Building CXX object ramulator2/src/ramulator/controller/CMakeFiles/ramulator-controller.dir/impl/blockhammer_controller.cpp.o
+[ 80%] Built target ramulator-controller
+[ 81%] Linking CXX shared library /fact_data/xinyaowang/pim_vla_sim2_20261109/ramulator2/libramulator.so
+[ 81%] Built target ramulator
+[ 82%] Building CXX object CMakeFiles/native_spec_tests.dir/tests/native_spec_tests.cpp.o
+[ 82%] Building CXX object CMakeFiles/native_lookahead_tests.dir/tests/native_lookahead_tests.cpp.o
+[ 82%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 82%] Building CXX object CMakeFiles/native_microbench.dir/tests/native_microbench.cpp.o
+[ 83%] Building CXX object CMakeFiles/native_lookahead_tests.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 84%] Linking CXX executable native_spec_tests
+[ 84%] Built target native_spec_tests
+[ 84%] Building CXX object CMakeFiles/benchmark_program_input.dir/tools/benchmark_program_input.cpp.o
+[ 85%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 85%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 86%] Building CXX object CMakeFiles/benchmark_program_input.dir/ramulator2/src/ramulator/frontend/impl/json_input.cpp.o
+[ 87%] Linking CXX executable native_lookahead_tests
+[ 87%] Built target native_lookahead_tests
+[ 88%] Building CXX object CMakeFiles/native_sequencer_tests.dir/tests/native_sequencer_tests.cpp.o
+[ 89%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 90%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[ 91%] Building CXX object CMakeFiles/native_sequencer_tests.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 92%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/frontend/impl/json_input.cpp.o
+[ 93%] Linking CXX executable benchmark_program_input
+[ 93%] Built target benchmark_program_input
+[ 94%] Building CXX object CMakeFiles/native_refresh_tests.dir/tests/native_refresh_tests.cpp.o
+[ 94%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[ 95%] Linking CXX executable native_microbench
+[ 95%] Built target native_microbench
+[ 95%] Building CXX object CMakeFiles/native_refresh_tests.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 96%] Building CXX object CMakeFiles/native_refresh_tests.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 96%] Building CXX object CMakeFiles/native_sequencer_tests.dir/ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp.o
+[ 96%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/frontend/impl/pim_vla_frontend.cpp.o
+[ 97%] Building CXX object CMakeFiles/native_refresh_tests.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[ 98%] Building CXX object CMakeFiles/native_sequencer_tests.dir/ramulator2/src/ramulator/plugin/bus_checker.cpp.o
+[ 99%] Linking CXX executable native_sequencer_tests
+[ 99%] Built target native_sequencer_tests
+[ 99%] Linking CXX executable native_refresh_tests
+[ 99%] Built target native_refresh_tests
+[100%] Linking CXX executable pim_vla_sim
+[100%] Built target pim_vla_sim
+feature_gpu_before: total=344.593998 us PIM=205.896628 us GPU=138.697370 us
+token_gpu_before: total=316.225126 us PIM=190.664446 us GPU=125.560680 us
+token_local_before: total=287.160258 us PIM=189.494760 us GPU=97.665498 us
+token_gpu_after: total=335.255270 us PIM=214.686626 us GPU=120.568644 us
+token_local_after: total=306.104106 us PIM=213.430644 us GPU=92.673462 us
+results/rank-refresh-single-layer-1980912

@@ -1,0 +1,9 @@
+{
+  "refresh_allbank_values_rejected": [
+    false,
+    true,
+    null,
+    0
+  ],
+  "checks_passed": true
+}

@@ -1,0 +1,1 @@
+{"native_lookahead":"passed","coverage":"future_DQ, native_preq, live_immutability, repeat, barrier, horizon, FIFO32"}
