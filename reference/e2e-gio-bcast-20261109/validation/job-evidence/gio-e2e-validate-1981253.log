@@ -1,0 +1,119 @@
+BASELINE_BUG_REPRODUCED: native_sequencer_tests: GPU owner-blocked ACT1 hid another bank's ready PREpb
+[  0%] Built target ramulator-translation
+[  6%] Built target fmt
+[  6%] Built target ramulator-power
+[  6%] Built target ramulator-memorysystem
+[ 12%] Built target ramulator-base
+[ 17%] Built target ramulator-frontend
+[ 38%] Built target yaml-cpp
+[ 43%] Built target test_pim_resources
+[ 52%] Built target ramulator-dram
+[ 80%] Built target ramulator-controller
+[ 81%] Built target ramulator
+[ 82%] Built target native_spec_tests
+[ 84%] Built target native_lookahead_tests
+[ 86%] Built target benchmark_program_input
+[ 87%] Building CXX object CMakeFiles/native_refresh_tests.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 88%] Building CXX object CMakeFiles/native_microbench.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 90%] Building CXX object CMakeFiles/native_sequencer_tests.dir/tests/native_sequencer_tests.cpp.o
+[ 90%] Building CXX object CMakeFiles/pim_vla_sim.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 90%] Building CXX object CMakeFiles/native_sequencer_tests.dir/ramulator2/src/ramulator/controller/impl/pim_controller.cpp.o
+[ 91%] Linking CXX executable native_sequencer_tests
+[ 91%] Linking CXX executable native_refresh_tests
+[ 94%] Built target native_refresh_tests
+[ 95%] Built target native_sequencer_tests
+[ 96%] Linking CXX executable native_microbench
+[ 97%] Linking CXX executable pim_vla_sim
+[ 98%] Built target native_microbench
+[100%] Built target pim_vla_sim
+test_arbitration_presence_is_strict (test_config.ConfigurationTests.test_arbitration_presence_is_strict) ... ok
+test_global_refresh_switch_is_rejected_even_when_false (test_config.ConfigurationTests.test_global_refresh_switch_is_rejected_even_when_false) ... ok
+test_hardware_multiplier (test_config.ConfigurationTests.test_hardware_multiplier) ... ok
+test_matrix (test_config.ConfigurationTests.test_matrix) ... ok
+test_only_five_structural_combinations (test_config.ConfigurationTests.test_only_five_structural_combinations) ... ok
+test_retired_switches_rejected (test_config.ConfigurationTests.test_retired_switches_rejected) ... ok
+test_watermark_validation (test_config.ConfigurationTests.test_watermark_validation) ... ok
+test_ae_stage_coverage_and_rope_boundary (test_config.InputTests.test_ae_stage_coverage_and_rope_boundary) ... ok
+test_calibration_cannot_accept_partial_or_shortened_kernel (test_config.InputTests.test_calibration_cannot_accept_partial_or_shortened_kernel) ... ok
+test_complete_vlm_preserves_measurements (test_config.InputTests.test_complete_vlm_preserves_measurements) ... ok
+test_logical_tensor_regions_and_physical_ring_capacity (test_config.InputTests.test_logical_tensor_regions_and_physical_ring_capacity) ... ok
+test_single_layer_has_both_residuals_and_excludes_global_work (test_config.InputTests.test_single_layer_has_both_residuals_and_excludes_global_work) ... ok
+test_single_layer_runner_prepares_only_ae_without_vlm_or_fit (test_config.InputTests.test_single_layer_runner_prepares_only_ae_without_vlm_or_fit) ... ok
+test_streaming_transpose_is_measured_once_between_pv_and_o (test_config.InputTests.test_streaming_transpose_is_measured_once_between_pv_and_o) ... ok
+test_compatibility_uses_native_completion_and_keeps_negative_interference (test_config.ReportingTests.test_compatibility_uses_native_completion_and_keeps_negative_interference) ... ok
+test_single_layer_refresh_requires_both_fixed_policies_and_activity (test_config.ReportingTests.test_single_layer_refresh_requires_both_fixed_policies_and_activity) ... ok
+test_line_ending_rebind_proves_byte_equivalence (test_config.RuntimeProvenanceTests.test_line_ending_rebind_proves_byte_equivalence) ... ok
+test_loaded_library_hash_tracks_content_not_path (test_config.RuntimeProvenanceTests.test_loaded_library_hash_tracks_content_not_path) ... ok
+test_missing_runtime_is_rejected (test_config.RuntimeProvenanceTests.test_missing_runtime_is_rejected) ... ok
+test_wire_addressing_matches_scatter_and_expanded_weight_requests (test_down_descriptor.DownDescriptorTests.test_wire_addressing_matches_scatter_and_expanded_weight_requests) ... ok
+test_bank_rope_double_schedule_fifo_and_exact_work (test_programs.ProgramTests.test_bank_rope_double_schedule_fifo_and_exact_work) ... ok
+test_disjoint_output_transfers_do_not_serialize_gather (test_programs.ProgramTests.test_disjoint_output_transfers_do_not_serialize_gather) ... ok
+test_down_fused_scatter_srf_lifetimes_and_row_activation (test_programs.ProgramTests.test_down_fused_scatter_srf_lifetimes_and_row_activation) ... ok
+test_down_physical_tensor_is_bijective_with_input_holes_and_row_padding (test_programs.ProgramTests.test_down_physical_tensor_is_bijective_with_input_holes_and_row_padding) ... ok
+test_down_relayout_keeps_gate_up_and_all_other_stage_programs_unchanged (test_programs.ProgramTests.test_down_relayout_keeps_gate_up_and_all_other_stage_programs_unchanged) ... ok
+test_down_scatter_is_fragment_major_and_alternates_bank_groups (test_programs.ProgramTests.test_down_scatter_is_fragment_major_and_alternates_bank_groups) ... ok
+test_down_streaming_uses_same_weights_without_array_staging (test_programs.ProgramTests.test_down_streaming_uses_same_weights_without_array_staging) ... ok
+test_dq_conservation_and_historical_tensor_contract (test_programs.ProgramTests.test_dq_conservation_and_historical_tensor_contract) ... ok
+test_eighteen_physical_layers_are_disjoint_and_in_bounds (test_programs.ProgramTests.test_eighteen_physical_layers_are_disjoint_and_in_bounds) ... ok
+test_feature_q_and_k_cover_both_packed_halves (test_programs.ProgramTests.test_feature_q_and_k_cover_both_packed_halves) ... ok
+test_fused_has_six_mac_descriptors_and_optional_rope (test_programs.ProgramTests.test_fused_has_six_mac_descriptors_and_optional_rope) ... ok
+test_generator_rejects_capacity_or_dependency_corruption (test_programs.ProgramTests.test_generator_rejects_capacity_or_dependency_corruption) ... ok
+test_operator_scalar_mac_coverage_matches_tensor_shapes (test_programs.ProgramTests.test_operator_scalar_mac_coverage_matches_tensor_shapes) ... ok
+test_output_pool_allocation_and_two_o_tile_lifetimes (test_programs.ProgramTests.test_output_pool_allocation_and_two_o_tile_lifetimes) ... ok
+test_program_is_deterministic_and_has_no_timing_fields (test_programs.ProgramTests.test_program_is_deterministic_and_has_no_timing_fields) ... ok
+test_q_exchange_is_addressed_memory_not_masked_broadcast (test_programs.ProgramTests.test_q_exchange_is_addressed_memory_not_masked_broadcast) ... ok
+test_rope_and_layout_are_single_variable_traffic_differences (test_programs.ProgramTests.test_rope_and_layout_are_single_variable_traffic_differences) ... ok
+test_score_uses_existing_pool_and_fused_flushes_full_batch (test_programs.ProgramTests.test_score_uses_existing_pool_and_fused_flushes_full_batch) ... ok
+test_streaming_has_no_descriptor_or_staging (test_programs.ProgramTests.test_streaming_has_no_descriptor_or_staging) ... ok
+test_tensor_partition_is_bijective (test_programs.ProgramTests.test_tensor_partition_is_bijective) ... ok
+test_transient_arrays_have_complete_current_producers (test_programs.ProgramTests.test_transient_arrays_have_complete_current_producers) ... ok
+test_actab_native_expansion_and_ca (test_spec.SpecTests.test_actab_native_expansion_and_ca) ... ok
+test_aliases_never_get_array_recovery (test_spec.SpecTests.test_aliases_never_get_array_recovery) ... ok
+test_all_48_interface_pairs (test_spec.SpecTests.test_all_48_interface_pairs) ... ok
+test_all_bg_is_broadcast (test_spec.SpecTests.test_all_bg_is_broadcast) ... ok
+test_bcast_shares_rank_gio_with_io (test_spec.SpecTests.test_bcast_shares_rank_gio_with_io) ... ok
+test_completion_and_ca_metadata (test_spec.SpecTests.test_completion_and_ca_metadata) ... ok
+test_fixed_organization_and_clock (test_spec.SpecTests.test_fixed_organization_and_clock) ... ok
+test_jedec_numerical_values (test_spec.SpecTests.test_jedec_numerical_values) ... ok
+test_mac_frequency_and_row_count (test_spec.SpecTests.test_mac_frequency_and_row_count) ... ok
+test_private_issue_path_is_separate_from_execution (test_spec.SpecTests.test_private_issue_path_is_separate_from_execution) ... ok
+test_refresh_covers_pim_and_buffers (test_spec.SpecTests.test_refresh_covers_pim_and_buffers) ... ok
+test_rope_bank_vector_pipeline (test_spec.SpecTests.test_rope_bank_vector_pipeline) ... ok
+
+----------------------------------------------------------------------
+Ran 53 tests in 16.976s
+
+OK
+{"native_spec_checks":224,"status":"passed"}
+{"microbench":"pure_rd","bursts":64,"end_ck":151}
+{"microbench":"alternating_batches","bursts":64,"end_ck":545}
+{"microbench":"pure_wrgb","bursts":64,"end_ck":266}
+{"microbench":"wrgb_gpu_rd","gpu_issue_ck":254,"end_ck":279}
+{"microbench":"lookahead_barrier","head_wrgb_ck":17,"lookahead_wrgb_ck":14,"lookahead_gpu_ck":16}
+{"native_lookahead":"passed","coverage":"future_DQ, native_preq, live_immutability, repeat, barrier, horizon, FIFO32"}
+{"sequencer":"gpu_owned_act_ready_bank_bypass","status":"passed","end_ck":166}
+{"sequencer":"gpu_owned_act_wakeup","status":"passed","end_ck":151}
+{"sequencer":"completion_dependency_bypass","status":"passed","end_ck":72,"out_of_order_issues":1,"prefetched_prerequisites":0}
+{"sequencer":"barrier_completion_fence","status":"passed","end_ck":97,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"sequencer":"epoch_dispatch_fence","status":"passed","end_ck":74,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"sequencer":"fifo32_window_boundary","status":"passed","end_ck":192,"out_of_order_issues":2,"prefetched_prerequisites":0}
+{"sequencer":"safe_next_bank_prefetch","status":"passed","end_ck":72,"out_of_order_issues":0,"prefetched_prerequisites":2}
+{"sequencer":"protect_older_required_row","status":"passed","end_ck":99,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"sequencer":"rank1_all_bank_refresh_fence","status":"passed","end_ck":376,"out_of_order_issues":0,"prefetched_prerequisites":1}
+{"sequencer":"issue_dependency_is_not_completion_dependency","status":"passed","end_ck":87,"out_of_order_issues":0,"prefetched_prerequisites":0}
+{"refresh_test":"rank_specific_initial_deadlines","status":"passed"}
+{"refresh_test":"rank0_paired_scope_rotation_and_period","status":"passed"}
+{"refresh_test":"rank1_all_bank_scope_recovery_and_period","status":"passed"}
+{"refresh_test":"independent_ranks_and_live_pim_pause","status":"passed"}
+{"refresh_test":"serial_origin_reset","status":"passed"}
+PimResources lifecycle tests passed
+{"diagnostic": "DQ overlap or return reordering at CK 101 RD -> WRGB", "fault_injection": "one_removed_RD_to_WRGB_sibling_rule", "status": "detected_by_passive_DQ_checker"}
+completed ae_solo total_us=0.470876 commands=256
+completed vlm_solo total_us=6.57163 commands=13264
+completed combined total_us=6.92338 commands=13536
+completed combined total_us=7.0425 commands=13520
+completed combined total_us=6.92338 commands=13536
+completed combined total_us=6.92338 commands=13536
+native frontend smoke: byte conservation, per-channel mix, causal kernels, bus bounds passed
+fixture failed to observe private and external commands in the same CK{"test":"native_gio_boundaries","checks":40,"passed":true}
+

@@ -1,0 +1,60 @@
+{"test":"native_gio_boundaries","checks":40,"passed":true}
+{"test":"staging_private_compute_export","passed":true,"staging_end_ck":14,"compute_end_ck":801,"export_issue_ck":824,"export_end_ck":849,"pim_end_ck":849,"e2e_end_ck":3508,"gpu_commands_during_compute":192,"private_external_same_ck":0,"checked_commands":1219}
+{"test":"two_ready_paths_same_ck","passed":true,"issue_ck":22,"drained_ck":47,"gpu_read_bytes":32}
+[codex/gio-bcast-e2e-20261109 6bcd57b] Skip owner-blocked GPU bank candidates before native arbitration
+ 2 files changed, 69 insertions(+), 2 deletions(-)
+{"variant": "feature_gpu_before", "path": "programs/generated/feature_gpu_before.json", "dq_bytes": 6242304, "sha256": "cc219435b70995277a19988901689fa5f3a0dcf7bdd061d262626730a5284b0b"}
+{"variant": "token_gpu_before", "path": "programs/generated/token_gpu_before.json", "dq_bytes": 5480448, "sha256": "18018e74c25a1ddb1720a5f1cf17ad3a611ef17693bd400e0c4bf29650e45c73"}
+{"variant": "token_local_before", "path": "programs/generated/token_local_before.json", "dq_bytes": 5283840, "sha256": "4345e4cb03acce56802cd72c233207c1d081dc7e860d33b45dc4ed2b5ba35977"}
+{"variant": "token_gpu_after", "path": "programs/generated/token_gpu_after.json", "dq_bytes": 5087232, "sha256": "f237e64cad5980a78f87b38016f1dbd0ec9c4500731601394c64c6be4e26d99f"}
+{"variant": "token_local_after", "path": "programs/generated/token_local_after.json", "dq_bytes": 4890624, "sha256": "1fa8021d56ca3dd47398d68d5f32dc6f4db40950c908464958c294feb45212d4"}
+PIM_SMOKE b
+completed ae_solo total_us=345.013 commands=424704
+PIM_SMOKE d
+completed ae_solo total_us=316.757 commands=422432
+PIM_SMOKE e
+completed ae_solo total_us=287.631 commands=428992
+PIM_SMOKE f
+completed ae_solo total_us=319.594 commands=673840
+PIM_SMOKE g
+completed ae_solo total_us=290.841 commands=680416
+all five actual PIM programs passed one layer
+CONCURRENCY_SMOKE c
+completed combined total_us=648.557 commands=970048
+CONCURRENCY_SMOKE d
+completed combined total_us=643.647 commands=968864
+CONCURRENCY_SMOKE e
+completed combined total_us=603.74 commands=976208
+CONCURRENCY_SMOKE f
+completed combined total_us=654.822 commands=1219392
+CONCURRENCY_SMOKE g
+completed combined total_us=588.03 commands=1226128
+CONCURRENCY_SMOKE e-frfcfs
+completed combined total_us=603.74 commands=976512
+CONCURRENCY_SMOKE e-lookahead
+completed combined total_us=603.74 commands=976016
+CONCURRENCY_SMOKE e-gap
+completed combined total_us=603.74 commands=976592
+all concurrent policies passed real-layer traffic and completion checks
+{"variant": "feature_gpu_before", "path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/programs/generated/feature_gpu_before.json", "dq_bytes": 6242304, "sha256": "cc219435b70995277a19988901689fa5f3a0dcf7bdd061d262626730a5284b0b"}
+{"variant": "token_gpu_before", "path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/programs/generated/token_gpu_before.json", "dq_bytes": 5480448, "sha256": "18018e74c25a1ddb1720a5f1cf17ad3a611ef17693bd400e0c4bf29650e45c73"}
+{"variant": "token_local_before", "path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/programs/generated/token_local_before.json", "dq_bytes": 5283840, "sha256": "4345e4cb03acce56802cd72c233207c1d081dc7e860d33b45dc4ed2b5ba35977"}
+{"variant": "token_gpu_after", "path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/programs/generated/token_gpu_after.json", "dq_bytes": 5087232, "sha256": "f237e64cad5980a78f87b38016f1dbd0ec9c4500731601394c64c6be4e26d99f"}
+{"variant": "token_local_after", "path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/programs/generated/token_local_after.json", "dq_bytes": 4890624, "sha256": "1fa8021d56ca3dd47398d68d5f32dc6f4db40950c908464958c294feb45212d4"}
+{
+  "verified_hashes": 26,
+  "programs": [
+    "feature_gpu_before.json",
+    "token_gpu_after.json",
+    "token_gpu_before.json",
+    "token_local_after.json",
+    "token_local_before.json"
+  ],
+  "line_ending_rebindings": []
+}
+Prepared immutable campaign: /fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated
+Source commit: 6bcd57b073e86674f5abec24eee56ecde8252f30
+FIX_VALIDATED_AND_CAMPAIGN_PREPARED
+AE_SOLOS=1981290
+VLM_CALIBRATION=1981291
+COLLECT=1981292

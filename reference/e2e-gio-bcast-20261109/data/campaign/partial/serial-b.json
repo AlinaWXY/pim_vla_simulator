@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "campaign": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated",
+  "cases": [
+    "b"
+  ],
+  "scope": "18 layers x 10 denoising steps; complete 2357-unit VLM; two raw repetitions per case",
+  "tolerance_us": 0.002,
+  "calibration": {
+    "sha256": "5a7c4a5b5010eb6774ed012163d4f9ac01ded736696a606314afc6c2e4755ae9",
+    "parameters": {
+      "alpha": 1.0,
+      "window": 1024,
+      "write_high": 768,
+      "write_low": 256
+    },
+    "validation": {
+      "kernel_count": 2353,
+      "kernel_relative_error_median": 0.0034336486486486895,
+      "kernel_relative_error_p90": 0.08648135840217555,
+      "passed": true,
+      "relative_error": 0.01851029972013599,
+      "target_us": 104950.49603462219,
+      "total_us": 106893.161172,
+      "work_units": 2357
+    }
+  },
+  "evaluation": [
+    {
+      "case": "b",
+      "variant": "feature_gpu_before",
+      "total_ms": 171.11517152800002,
+      "AE_solo_ms": 64.222010356,
+      "AE_elapsed_ms": 64.222010356,
+      "PIM_interference_ms": 0.0,
+      "AE_GPU_wait_ms": 0.0,
+      "VLM_tail_ms": 106.89316117199999,
+      "algebra_residual_us": 1.4551915228366852e-11,
+      "AE_residual_us": 0.0,
+      "GPU_DQ_bytes_issued_during_PIM_stages": 0,
+      "GPU_DQ_bytes_total": 19833306080,
+      "GPU_DQ_bytes_issued_during_PIM_stages_pct": 0.0,
+      "rank0_REFpb": 5613088,
+      "rank0_REFab": 0,
+      "rank1_REFab": 700944,
+      "rank1_REFpb": 0,
+      "raw_repeats_byte_identical": true,
+      "PIM_stage_count": 1800,
+      "VLM_units": 2357
+    }
+  ],
+  "evidence": {
+    "b": {
+      "variant": "feature_gpu_before",
+      "raw_sha256": [
+        "e0f565a7b526599eee342908612696c8813b1632b63addd8f501f22349a3aaff",
+        "e0f565a7b526599eee342908612696c8813b1632b63addd8f501f22349a3aaff"
+      ],
+      "raw_paths": [
+        "cases/b/native/b/repeat-0/raw.json",
+        "cases/b/native/b/repeat-1/raw.json"
+      ],
+      "AE_solo_raw_sha256": "12413d77d558a61867534c87363b2258f89b1aade702161592e68b6155094ba9",
+      "stage_coverage_each_repeat": [
+        {
+          "qkv": 180,
+          "rope_export": 180,
+          "rope_import": 180,
+          "q_exchange_export": 180,
+          "q_exchange_import": 180,
+          "qkt": 180,
+          "pv": 180,
+          "o": 180,
+          "gate_up": 180,
+          "down": 180
+        },
+        {
+          "qkv": 180,
+          "rope_export": 180,
+          "rope_import": 180,
+          "q_exchange_export": 180,
+          "q_exchange_import": 180,
+          "qkt": 180,
+          "pv": 180,
+          "o": 180,
+          "gate_up": 180,
+          "down": 180
+        }
+      ],
+      "refresh_each_repeat": [
+        {
+          "rank0": {
+            "REFpb": 5613088,
+            "REFab": 0
+          },
+          "rank1": {
+            "REFpb": 0,
+            "REFab": 700944
+          }
+        },
+        {
+          "rank0": {
+            "REFpb": 5613088,
+            "REFab": 0
+          },
+          "rank1": {
+            "REFpb": 0,
+            "REFab": 700944
+          }
+        }
+      ],
+      "AE_solo_refresh": {
+        "rank0": {
+          "REFpb": 2106672,
+          "REFab": 0
+        },
+        "rank1": {
+          "REFpb": 0,
+          "REFab": 263072
+        }
+      }
+    }
+  },
+  "notes": [
+    "All latency terms come directly from native timestamps; no offsets or overlap correction.",
+    "PIM interference is the sum of per-stage concurrent duration minus the matching AE solo duration.",
+    "GPU DQ byte share is attributed by command-issue stage. It is not a time-overlap ratio; DQ returns can cross stage boundaries.",
+    "This compact audit supplements, rather than replaces, full source/binary/input provenance acceptance."
+  ]
+}

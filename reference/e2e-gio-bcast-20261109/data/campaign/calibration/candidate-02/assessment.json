@@ -1,0 +1,15 @@
+{
+  "alpha": 0.5,
+  "candidate": 2,
+  "kernel_count": 2353,
+  "kernel_relative_error_median": 0.0003808405587668809,
+  "kernel_relative_error_p90": 0.08144653778760796,
+  "passed": true,
+  "relative_error": 0.014046218389396604,
+  "target_us": 104950.49603462219,
+  "total_us": 106424.653622,
+  "window": 1024,
+  "work_units": 2357,
+  "write_high": 768,
+  "write_low": 256
+}

@@ -1,0 +1,34 @@
+{
+  "source_commit": "6bcd57b073e86674f5abec24eee56ecde8252f30",
+  "binary_sha256": "8158a54eb739b625adbf6fdb57122ac666deba341e6f706375f5ea8cbd3dafdb",
+  "production_checks": {
+    "job": "1981253",
+    "python_tests_passed": 53,
+    "native_spec_checks_passed": 224,
+    "sequencer_regressions_passed": 10,
+    "refresh_regressions_passed": 5,
+    "other_passed": ["native_microbench", "native_lookahead", "resource_lifecycle", "fault_injection", "frontend_smoke"],
+    "baseline_regression": "New GPU ownership test fails on 98a6671 and passes with the candidate-selection fix"
+  },
+  "independent_window_fixture": {
+    "initial_job": "1981253",
+    "initial_failure": "The long traffic fixture did not naturally issue both paths in the same CK; GPU progress during private compute and staging/export fences had passed",
+    "correction": "Observe same-CK count in long traffic, and test simultaneous issue separately with two deterministically ready paths; no simulator source or timing changes",
+    "accepted_job": "1981261",
+    "native_gio_boundary_checks": 40,
+    "gpu_commands_during_private_compute": 192,
+    "same_ck_fixture_issue_ck": 22,
+    "same_ck_fixture_drained_ck": 47,
+    "all_checks_passed": true
+  },
+  "campaign_preparation": {
+    "job": "1981261",
+    "full_programs_generated": 5,
+    "real_program_single_layer_checks": 5,
+    "real_program_concurrency_checks": 8,
+    "source_binary_library_and_inputs_frozen": true
+  },
+  "diagnostic_only_steps": {
+    "1981710_8.2": "Read-only perf top sampling was stopped by timeout (exit 124). This is not a native simulation failure. The formal batch job continued unchanged."
+  }
+}

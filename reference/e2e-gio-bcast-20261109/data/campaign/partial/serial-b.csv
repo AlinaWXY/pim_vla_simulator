@@ -1,0 +1,2 @@
+﻿case,variant,total_ms,AE_solo_ms,AE_elapsed_ms,PIM_interference_ms,AE_GPU_wait_ms,VLM_tail_ms,algebra_residual_us,AE_residual_us,GPU_DQ_bytes_issued_during_PIM_stages,GPU_DQ_bytes_total,GPU_DQ_bytes_issued_during_PIM_stages_pct,rank0_REFpb,rank0_REFab,rank1_REFab,rank1_REFpb,raw_repeats_byte_identical,PIM_stage_count,VLM_units
+b,feature_gpu_before,171.11517152800002,64.222010356,64.222010356,0.0,0.0,106.89316117199999,1.4551915228366852e-11,0.0,0,19833306080,0.0,5613088,0,700944,0,True,1800,2357

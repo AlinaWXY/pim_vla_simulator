@@ -1,0 +1,82 @@
+{
+  "accounting_tolerance_ms": 2e-06,
+  "components": [
+    "AE_solo_ms",
+    "PIM_interference_ms",
+    "AE_GPU_wait_ms",
+    "VLM_remaining_ms"
+  ],
+  "figures": [
+    "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\e2e-gio-bcast-1109\\completed-summary\\completed-seven-breakdown.png",
+    "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\e2e-gio-bcast-1109\\completed-summary\\completed-seven-breakdown.svg"
+  ],
+  "negative_values_clamped": false,
+  "rows": [
+    {
+      "AE_GPU_wait_ms": 0.0,
+      "AE_solo_ms": 64.222010356,
+      "PIM_interference_ms": 0.0,
+      "VLM_remaining_ms": 106.89316117199999,
+      "accounting_error_ms": -2.842170943040401e-14,
+      "case": "b",
+      "total_ms": 171.11517152800002
+    },
+    {
+      "AE_GPU_wait_ms": 67.813364724,
+      "AE_solo_ms": 64.222010356,
+      "PIM_interference_ms": 0.486964576000146,
+      "VLM_remaining_ms": 3.140553444,
+      "accounting_error_ms": 1.4210854715202004e-13,
+      "case": "c",
+      "total_ms": 135.6628931
+    },
+    {
+      "AE_GPU_wait_ms": 64.23197379199999,
+      "AE_solo_ms": 59.147268082000004,
+      "PIM_interference_ms": 0.3421880280000436,
+      "VLM_remaining_ms": 9.14334729,
+      "accounting_error_ms": 2.842170943040401e-14,
+      "case": "d",
+      "total_ms": 132.86477719200002
+    },
+    {
+      "AE_GPU_wait_ms": 47.932290574,
+      "AE_solo_ms": 53.312743932,
+      "PIM_interference_ms": 0.3814967940000903,
+      "VLM_remaining_ms": 25.819905776,
+      "accounting_error_ms": 8.526512829121202e-14,
+      "case": "e",
+      "total_ms": 127.446437076
+    },
+    {
+      "AE_GPU_wait_ms": 22.003604938,
+      "AE_solo_ms": 53.312743932,
+      "PIM_interference_ms": 60.76412400800005,
+      "VLM_remaining_ms": 0.0,
+      "accounting_error_ms": 5.684341886080802e-14,
+      "case": "e-frfcfs",
+      "total_ms": 136.080472878
+    },
+    {
+      "AE_GPU_wait_ms": 48.384299641999995,
+      "AE_solo_ms": 53.312743932,
+      "PIM_interference_ms": 0.018839729999658203,
+      "VLM_remaining_ms": 25.819182578,
+      "accounting_error_ms": -3.552713678800501e-13,
+      "case": "e-lookahead",
+      "total_ms": 127.535065882
+    },
+    {
+      "AE_GPU_wait_ms": 14.316999787999999,
+      "AE_solo_ms": 53.312743932,
+      "PIM_interference_ms": 0.4214368340000664,
+      "VLM_remaining_ms": 73.22371120400001,
+      "accounting_error_ms": 5.684341886080802e-14,
+      "case": "e-gap",
+      "total_ms": 141.27489175800002
+    }
+  ],
+  "schema_version": 1,
+  "source_csv": "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\e2e-gio-bcast-1109\\completed-summary\\completed-seven-evaluation.csv",
+  "source_sha256": "738af140d650fee5c55f7b53265134f5abfba425ff72c7f649293c836046ec79"
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "prepared_at": "2026-11-09T15:55:09.234230+08:00",
+  "status": "cancelled at user request after seven completed cases",
+  "simulation_restarted_for_publication": false,
+  "requested_branch": "xinyao_1109_V2",
+  "pulled_source_commit": "98a66712755010d3e9e45d0c62663e0702aa13ee",
+  "run_source_commit": "6bcd57b073e86674f5abec24eee56ecde8252f30",
+  "completed_cases": [
+    "b",
+    "c",
+    "d",
+    "e",
+    "e-frfcfs",
+    "e-lookahead",
+    "e-gap"
+  ],
+  "repetitions_each": 2,
+  "incomplete_cases": [
+    "f",
+    "g"
+  ],
+  "calibration_passed": true,
+  "full_nine_case_campaign_audit_completed": false,
+  "all_original_campaign_files_preserved": true,
+  "original_campaign_file_count": 906,
+  "original_campaign_bytes": 708737857,
+  "frozen_archive": {
+    "path": "frozen-runtime.tar.gz",
+    "bytes": 43973993,
+    "sha256": "27ee54ac01bfa54c8cd8ab0b9eda844e97a240fea5944cd867cee9282d8bc169"
+  },
+  "restore_frozen": "tar -xzf data/frozen-runtime.tar.gz -C data/campaign",
+  "notes": [
+    "configs/provenance retain original absolute server paths; they are evidence, not portable launch commands",
+    "cases-sequential-attempt is a cancelled initial attempt, never mixed into completed results",
+    "original simulator backup remains on server; backup checksums and location are included separately",
+    "validation-results includes single-layer/concurrency smoke outputs, not full fused e2e results"
+  ],
+  "published_copy_seven_case_audit_passed": true,
+  "published_copy_audit": "published-copy-audit.json",
+  "additional_validation_results": [
+    "pim-smoke",
+    "concurrency-smoke"
+  ]
+}

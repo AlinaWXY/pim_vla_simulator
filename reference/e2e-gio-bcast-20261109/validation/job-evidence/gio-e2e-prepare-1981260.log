@@ -1,0 +1,16 @@
+{"test":"native_gio_boundaries","checks":40,"passed":true}
+{"test":"staging_private_compute_export","passed":true,"staging_end_ck":14,"compute_end_ck":801,"export_issue_ck":824,"export_end_ck":849,"pim_end_ck":849,"e2e_end_ck":3508,"gpu_commands_during_compute":192,"private_external_same_ck":0,"checked_commands":1219}
+{"test":"two_ready_paths_same_ck","passed":true,"issue_ck":22,"drained_ck":47,"gpu_read_bytes":32}
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: unable to auto-detect email address (got 'xinyaowang@infinite-frontier.(none)')

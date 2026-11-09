@@ -1,5 +1,7 @@
 # PIM-VLA：基于 Ramulator2 的新版仿真器
 
+最新完整数据见 [2026-11-09 已校准并发结果](reference/e2e-gio-bcast-20261109/README.md)：7 组 e2e 各两次、全部校准候选、5 组 AE solo、原始日志和冻结运行环境。f/g 并发按用户要求取消，完整九组验收未完成。
+
 本仓库对应 `xinyao_1109` 重写：GPU rank0 与 PIM rank1 在同一原生仿真时间线上竞争，16 个通道均调用 Ramulator2 的 prerequisite、timing 与 command issue 机制。LPDDR5X-8533 时序只在 spec 中定义。PIM 请求直接由张量布局生成，运行不依赖旧 trace、外部仲裁重放或延迟常数抵消。
 
 上游基线为 CMU-SAFARI/ramulator2 **`7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`**（2026-11-03，项目版本 2.1）。原任务保存在 [重写方案](docs/rewrite-plan.txt)，逐项交付状态见 [需求矩阵](docs/requirements-matrix.md)。

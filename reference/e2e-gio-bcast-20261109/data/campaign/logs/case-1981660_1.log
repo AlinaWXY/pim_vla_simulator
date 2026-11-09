@@ -1,0 +1,2 @@
+CASE c REPEAT 0
+slurmstepd-einstein: error: *** JOB 1981663 ON einstein CANCELLED AT 2026-11-09T12:46:19 ***

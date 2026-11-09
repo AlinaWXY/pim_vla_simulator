@@ -1,0 +1,40 @@
+{
+  "scope": "Seven completed cases only; fused cases f/g cancelled and excluded",
+  "calibration": "../preliminary/calibration-diagnostics/calibration-summary.json",
+  "accounting": "total = AE standalone + PIM-stage duration delta + AE GPU wait + VLM tail",
+  "comparison_to_b": {
+    "b": {
+      "speedup": 1.0,
+      "latency_reduction_pct": 0.0
+    },
+    "c": {
+      "speedup": 1.2613262743989058,
+      "latency_reduction_pct": 20.71837237541434
+    },
+    "d": {
+      "speedup": 1.2878896510000177,
+      "latency_reduction_pct": 22.35359611566704
+    },
+    "e": {
+      "speedup": 1.3426438231926334,
+      "latency_reduction_pct": 25.52008338129994
+    },
+    "e-frfcfs": {
+      "speedup": 1.2574557385717613,
+      "latency_reduction_pct": 20.474338036278215
+    },
+    "e-lookahead": {
+      "speedup": 1.3417107706387348,
+      "latency_reduction_pct": 25.468288554921557
+    },
+    "e-gap": {
+      "speedup": 1.2112213953850737,
+      "latency_reduction_pct": 17.438710725376648
+    }
+  },
+  "lookahead_minus_e_ms": 0.08862880600000267,
+  "figures": [
+    "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\e2e-gio-bcast-1109\\completed-summary\\completed-seven-breakdown.png",
+    "C:\\Users\\26438\\Documents\\ChatGPT\\pim_vla_simulator_local\\e2e-gio-bcast-1109\\completed-summary\\completed-seven-breakdown.svg"
+  ]
+}
