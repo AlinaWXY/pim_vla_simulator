@@ -6,13 +6,13 @@
 
 上游基线为 CMU-SAFARI/ramulator2 **`7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`**（2026-11-03，项目版本 2.1）。原任务保存在 [重写方案](docs/rewrite-plan.txt)，逐项交付状态见 [需求矩阵](docs/requirements-matrix.md)。
 
-## 当前分支 · 闭环 VLM
+## Version3 闭环 VLM
 
-`xinyao_1109_V2-closed-loop` 默认使用原生逐请求的闭环 VLM 模型。dev0 阶段 A 的两次 solo 均为 134.272003 ms（+27.938%），超出 ±5% 验收范围。阶段 B、C、D 未运行。
+`xinyao_1109_V3` 使用原生逐请求闭环模型。dev0 作业 `1984774` 使用缩放流量完成了 b、e、e-frfcfs、e-gap 和 g；发布快照中 e-lookahead 仍在运行。已完成的每组并发和 AE solo 各重复两次，原始输出逐字节一致。e 和 g 的端到端延迟分别为 **128.883328 ms** 和 **127.487527 ms**。
 
-模型、运行入口和阶段 A 数据见 [闭环 VLM 访存](docs/closed-loop-vlm.md)。
+缩放后的 VLM solo 为 105.354238 ms，相对 profile 合计误差为 +0.127%。137 个工作单元偏差仍超过 1%，本轮对固定校准文件豁免了逐单元启动门槛。[结果、校准和原始数据](reference/ablation-scaled-w128/README.md)
 
-缩放流量后的 VLM solo 总时长通过 1% 容限，逐单元验收未通过。六组消融未启动。[缩放校准与消融状态](results/ablation-scaled-w128/ablation.md)
+缩放前的阶段 A、原生闭环模型及运行入口见 [闭环 VLM 访存](docs/closed-loop-vlm.md)。
 
 ## Version2 单层历史记录
 

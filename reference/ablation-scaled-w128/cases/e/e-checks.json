@@ -1,0 +1,13 @@
+{
+  "AE_timestamp_accounting_error_us": 0.0,
+  "GPU_DQ_actual_read_bytes": 8582441088,
+  "GPU_DQ_actual_write_bytes": 6561121504,
+  "GPU_DQ_expected_read_bytes": 8582441088,
+  "GPU_DQ_expected_write_bytes": 6561121504,
+  "PIM_DQ_actual_bytes": 951091200,
+  "PIM_DQ_expected_bytes": 951091200,
+  "all_durations_nonnegative": true,
+  "completion_order": true,
+  "stage_coverage": 1620,
+  "vlm_coverage": 2357
+}
