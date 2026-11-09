@@ -1,0 +1,71 @@
+{
+  "binary_path": "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/bin/pim_vla_sim",
+  "binary_sha256": "76d1b07e6c1d89839abc438a0a5079aa4aef6cee24103d50f00cb92e65d9176b",
+  "calibrated_vlm_source": {
+    "binary_sha256": "8158a54eb739b625adbf6fdb57122ac666deba341e6f706375f5ea8cbd3dafdb",
+    "calibration_sha256": "5a7c4a5b5010eb6774ed012163d4f9ac01ded736696a606314afc6c2e4755ae9",
+    "calibration_validation": {
+      "kernel_count": 2353,
+      "kernel_relative_error_median": 0.0034336486486486895,
+      "kernel_relative_error_p90": 0.08648135840217555,
+      "passed": true,
+      "relative_error": 0.01851029972013599,
+      "target_us": 104950.49603462219,
+      "total_us": 106893.161172,
+      "work_units": 2357
+    },
+    "config_sha256": "e5b9dfdc3635c147ee202b267c1a2ab3261146a2c49bdca4657e732840415359",
+    "provenance_sha256": "fdbb9f88267615c8d3481c1883cbd354676ab1033eee52b160d84749ddfda95f",
+    "raw_path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/calibration/candidate-01/raw.json",
+    "raw_sha256": "a346f19ed0dea4010516183ed96a7f3e08b61c4340bf9fc61423281ea837185e",
+    "runtime_libraries": {
+      "libramulator.so": {
+        "path": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/lib/libramulator.so",
+        "sha256": "5d40bd44b5856697d84bb1b15399f2b13030bfa05d9995a497edd44399845623"
+      }
+    },
+    "selected_candidate": 1,
+    "source_commit": "6bcd57b073e86674f5abec24eee56ecde8252f30",
+    "spec_sha256": "73cf1a6894c32c1ffb5726d099c6807756fa0f6a1cdf46d1eee9afc5ba44f3c6",
+    "vlm_sha256": "4024e7a68526f8c953598aa7fa52b6790ed8cd3d5b3008ad649868752e1157d0"
+  },
+  "calibration_parameters": {
+    "alpha": 1.0,
+    "window": 1024,
+    "write_high": 768,
+    "write_low": 256
+  },
+  "configs": {
+    "f": "17aacf4ca4f00c7f10349c1e148e15d63a9cb92b02b5856f508569474e6e4b11",
+    "g": "9aee56e770befc5800a179c1cfd0f0bb94977532e3a526693a2f73f5fbca99a2"
+  },
+  "created_utc": "2026-11-09T07:34:24.410324+00:00",
+  "execution_model": "fused_kernel_windows",
+  "inputs": {
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/ae-token_gpu_after.json": "3ffd64f1d8cc4d048cb763c2a4923e5a8763c5653f30cf165b781b9577aa4e0a",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/ae-token_local_after.json": "0ecf6eba432b61d70b7d30ab0fa1ecbecbdda8e9b8fc1969840b653a70fb8042",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/calibrated-vlm-durations.json": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/token_gpu_after.json": "de71b39ed4e38d182e30b76ac0edb420ae55b7f5147745ebd98cc953bf9e8a52",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/token_local_after.json": "bac340808b40b88b8ec929da2d9c0209e5fe98c8fda5a4d51688297eaffd159c",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/vlm.json": "4024e7a68526f8c953598aa7fa52b6790ed8cd3d5b3008ad649868752e1157d0"
+  },
+  "recalibrated": false,
+  "runtime_libraries": {
+    "libramulator.so": {
+      "path": "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/lib/libramulator.so",
+      "sha256": "5d40bd44b5856697d84bb1b15399f2b13030bfa05d9995a497edd44399845623"
+    }
+  },
+  "schema_version": 1,
+  "scope": "f/g once each; complete 18 AE layers x 10 denoising steps and 2357 calibrated VLM units",
+  "source_commit": "0046e8bfd29fb272a98fd945d135e5ac967d1a1c",
+  "source_inputs": {
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/ae-token_gpu_after.json": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/input-data/ae-token_gpu_after.json",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/ae-token_local_after.json": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/input-data/ae-token_local_after.json",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/calibrated-vlm-durations.json": "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/calibration-source/calibrated-vlm-durations.json",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/token_gpu_after.json": "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/programs/generated/fused-kernel/token_gpu_after.json",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/token_local_after.json": "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/programs/generated/fused-kernel/token_local_after.json",
+    "/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109/frozen/inputs/vlm.json": "/fact_data/xinyaowang/pim_vla_gio_bcast_e2e_20261109-112224/results/e2e-gio-bcast-calibrated/frozen/source/input-data/vlm.json"
+  },
+  "window_policy": "one descriptor per window; join current VLM kernel before every handoff"
+}

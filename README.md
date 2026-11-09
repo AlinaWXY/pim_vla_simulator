@@ -8,9 +8,18 @@
 
 本分支新增用户 2026-11-09 指定的 **fused kernel 窗口模型**：输入上传和粗指令交付后，PIM 私有 FIFO32 计算与按校准时长推进的 VLM kernel 重叠；PIM 完整落盘后等当前 kernel 结束，再集中导出并执行 AE GPU 算子。每条粗指令分别交接，连续 PIM 算子也不合并窗口。PIM 仍使用原生时序，VLM 不再逐笔仿真访存。执行边界、校准来源及指标区别见 [模型说明](docs/fused-kernel-execution.md)。
 
+完整 18 层 × 10 步、2357 个校准 VLM 工作单元的 f/g 已各运行一次并通过独立审计（源码 `0046e8b`，作业 `1982852`、审计 `1982856`）：
+
+| 窗口模型 | e2e / ms | 导出前等待当前 VLM / ms | 实际运行耗时 |
+|---|---:|---:|---:|
+| f：GPU RoPE | 137.764615296 | 71.018671122 | 484.588 s |
+| g：本地 RoPE | 133.980726110 | 74.431107618 | 487.233 s |
+
+VLM 原生访存请求数为 0；全部 kernel 保持各自的校准时长，上传/导出/AE GPU 区间不与 VLM kernel 重叠。全部 PIM 阶段、逐通道字节、刷新与 FIFO 顺序检查通过。见 [结果审计](reference/fused-kernel-e2e/summary.json)、[阶段分解](reference/fused-kernel-e2e/phase-durations.csv)。f 在 einstein、g 在 infinite-frontier 运行，实际耗时是本次运行记录，不作为同机严格性能对照。
+
 本分支以 `6bcd57b` 的 gio-bcast 实现为对照，按用户 2026-11-09 的澄清，将 fused 描述符内部恢复为 **32 项缓冲、按程序顺序发射**。只检查队首的依赖、资源及 Ramulator 原生 prerequisite/timing；队首未发射时，后续子指令及其 ACT/PRE 不得提前发射。队首发射后立即推进 FIFO，不等待它全部完成；显式 completion 依赖、资源冲突和 barrier 仍须等待，因此保留合法流水重叠。
 
-本轮验证范围为 **第 0 层 × 第 0 个 denoising step 的 AE solo**，使用相同输入比较修改前后的模拟 latency 和 native 进程实际耗时。下述历史结果绑定各自的源码提交，不代表本分支的 FIFO32 结果；本轮不启动校准或完整端到端实验。
+此前 FIFO32 的首次验证范围为 **第 0 层 × 第 0 个 denoising step 的 AE solo**，使用相同输入比较修改前后的模拟 latency 和 native 进程实际耗时。下述历史结果绑定各自的源码提交，不代表当前窗口模型的结果。
 
 ## Version2 单层历史记录
 

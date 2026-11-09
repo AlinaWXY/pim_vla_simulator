@@ -71,3 +71,38 @@ steps, exact calibrated kernel durations, zero native GPU transactions, no
 kernel overlap with handoff/nonlinear intervals, and full phase/timestamp
 identities. Small native regressions include long/short kernels, same-cycle
 completion with a trailing barrier, channel imbalance and pure transfer stages.
+
+## Completed run, 2026-11-09
+
+Source `0046e8bfd29fb272a98fd945d135e5ac967d1a1c`, native binary SHA-256
+`76d1b07e6c1d89839abc438a0a5079aa4aef6cee24103d50f00cb92e65d9176b`.
+Validation job `1982834`, full f/g array `1982852`, audit `1982856` all completed
+successfully. Validation includes 91 Python tests, 13 new frontend fixtures,
+224 native spec checks, 12 sequencer regressions, five refresh regressions,
+resource checks and the original frontend smoke.
+
+| Metric / ms unless stated | f / GPU RoPE | g / local RoPE |
+|---|---:|---:|
+| Total | 137.764615296 | 133.980726110 |
+| AE end | 136.271984338 | 133.980726110 |
+| Explicit VLM join | 71.018671122 | 74.431107618 |
+| Native PIM phases, excluding join | 41.447661136 | 41.385915410 |
+| AE GPU helpers | 23.805652080 | 18.163703082 |
+| VLM tail | 1.492630958 | 0 |
+| Calibrated VLM duration sum | 106.893161172 | 106.893161172 |
+| Native commands | 131946000 | 133220480 |
+| Wall seconds | 484.587571230 | 487.233322663 |
+
+This model change removes the 619790815 GPU transactions per case, but retains
+roughly 132 million PIM/refresh commands. The wall times were observed on
+einstein (f) and infinite-frontier (g); they are not a controlled same-host speedup
+benchmark. The simulated latency changes because descriptor handoffs now wait
+for whole kernels and O/FFN outputs really spill to DRAM before export.
+
+The [independent audit](../reference/fused-kernel-e2e/summary.json) verifies full
+coverage, exact calibrated durations, zero native GPU transactions, exclusive
+handoffs, FIFO order, byte conservation and source/runtime/input hashes. Raw
+results and binaries are retained in the server campaign
+`/fact_data/xinyaowang/pim_vla_fused_kernel_20261109/results/fused-kernel-e2e-20261109`.
+The local result archive SHA-256 is
+`a78a41486ea1f6e55dd697705144f95c1bc06babe1112eab57018ed1ea812cb3`.
