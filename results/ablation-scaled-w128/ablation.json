@@ -1397,31 +1397,95 @@
     ]
   },
   "calibration_sha256": "96141e70cf3220c45ce28a7619761b1c89de732a25b487c408ce18c21485816f",
-  "comparison": null,
+  "comparison": {
+    "best_streaming_case": "e",
+    "g_minus_best_ms": -1.3958012180000168,
+    "g_relative_delta": -0.010829959438297343
+  },
   "results": [
     {
+      "ae_gpu_wait_ms": 0.0,
+      "ae_solo_ms": 64.222010356,
+      "allowed_unit_errors": true,
       "case": "b",
-      "status": "未运行"
+      "identity_error_us": 0.0,
+      "pim_stage_delta_ms": 0.0,
+      "raw_sha256": "a45904636d1b6736945c17f69977ad15fecf525458d48f3ce4753ecbc64ba374",
+      "speedup_over_b": 1.0,
+      "status": "已完成",
+      "total_ms": 169.576248394,
+      "vlm_slowdown_ms": 0.0,
+      "vlm_tail_ms": 105.35423803799999
     },
     {
+      "ae_gpu_wait_ms": 49.665476322,
+      "ae_solo_ms": 53.312743932,
+      "allowed_unit_errors": true,
       "case": "e",
-      "status": "未运行"
+      "identity_error_us": 0.0,
+      "pim_stage_delta_ms": 0.3262457799999989,
+      "raw_sha256": "c16e9a4f8e2e568ae381e7b999f51b0f244ac10f496ecd676918ff8ceee627b6",
+      "speedup_over_b": 1.3157345531171687,
+      "status": "已完成",
+      "total_ms": 128.883328322,
+      "vlm_slowdown_ms": 4.466820721999996,
+      "vlm_tail_ms": 25.578862288
     },
     {
+      "ae_gpu_wait_ms": 50.086319402,
+      "ae_solo_ms": 53.312743932,
+      "allowed_unit_errors": true,
       "case": "e-lookahead",
-      "status": "未运行"
+      "identity_error_us": 0.0,
+      "pim_stage_delta_ms": 0.014481782000000144,
+      "raw_sha256": "a2c5d6d279a78254afbccc8ba28a7f85fe65621ca5291303979352d659980a04",
+      "speedup_over_b": 1.314687996467034,
+      "status": "已完成",
+      "total_ms": 128.985925824,
+      "vlm_slowdown_ms": 4.569418223999996,
+      "vlm_tail_ms": 25.572380708
     },
     {
+      "ae_gpu_wait_ms": 57.10198816,
+      "ae_solo_ms": 53.312743932,
+      "allowed_unit_errors": true,
       "case": "e-frfcfs",
-      "status": "未运行"
+      "identity_error_us": -2.8421709430404007e-11,
+      "pim_stage_delta_ms": 18.928990080000034,
+      "raw_sha256": "fb73b06e8820e834d3b301d4ef1c3b6cd8b83a5252b2bd67526ef0642144d7e4",
+      "speedup_over_b": 1.311051248150252,
+      "status": "已完成",
+      "total_ms": 129.34372217199999,
+      "vlm_slowdown_ms": 1.7527289779999997,
+      "vlm_tail_ms": 0.0
     },
     {
+      "ae_gpu_wait_ms": 12.049548938,
+      "ae_solo_ms": 53.312743932,
+      "allowed_unit_errors": true,
       "case": "e-gap",
-      "status": "未运行"
+      "identity_error_us": 0.0,
+      "pim_stage_delta_ms": 0.004992036000000084,
+      "raw_sha256": "5a00a64cf5b1e01d072758c698b2c369540e96457eefa0fc7302e0bc91bce82f",
+      "speedup_over_b": 1.1487176375646664,
+      "status": "已完成",
+      "total_ms": 147.622220508,
+      "vlm_slowdown_ms": 23.205712908000045,
+      "vlm_tail_ms": 82.254935602
     },
     {
+      "ae_gpu_wait_ms": 38.935810634,
+      "ae_solo_ms": 57.742093430000004,
+      "allowed_unit_errors": true,
       "case": "g",
-      "status": "未运行"
+      "identity_error_us": -1.4210854715202004e-11,
+      "pim_stage_delta_ms": 0.016482536000000002,
+      "raw_sha256": "23ee3a6f53c9d86a33878564a811fd88ebd036d722ed308255cd112041138147",
+      "speedup_over_b": 1.3301399144377901,
+      "status": "已完成",
+      "total_ms": 127.487527104,
+      "vlm_slowdown_ms": 3.9695859839999996,
+      "vlm_tail_ms": 30.793140504
     }
   ]
 }

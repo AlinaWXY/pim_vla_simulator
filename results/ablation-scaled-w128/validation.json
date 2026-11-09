@@ -22,5 +22,96 @@
   "source_archive_sha256": "c14d380b7d671a59564d5bbfaeb57fed02d8bc7a7299405f4f5e51be6e0bd203",
   "source_commit": "72758625ab2d12a626ea81d73ca3972fcf3f9feb",
   "unchanged_synthetic_closed_loop_raw_cmp": "passed",
-  "uniform_raw_cmp": "passed"
+  "uniform_raw_cmp": "passed",
+  "waived_ablation": {
+    "calibration_sha256": "96141e70cf3220c45ce28a7619761b1c89de732a25b487c408ce18c21485816f",
+    "case_evidence": {
+      "b": {
+        "ae_solo_cmp_identical": true,
+        "ae_solo_raw_sha256": "7076755e10b0a2f34a6d11b3b7bfefbcd87ebb07e57499ef666a5c06359b00c7",
+        "job": "1984774_0",
+        "matching_ordinal_windows_and_read_write_bytes": true,
+        "native_raw_files": [
+          "results/ablation-scaled-w128/cases/b/native/b/repeat-0/raw.json",
+          "results/ablation-scaled-w128/cases/b/native/b/repeat-1/raw.json"
+        ],
+        "raw_files_cmp_identical": true,
+        "raw_sha256": "a45904636d1b6736945c17f69977ad15fecf525458d48f3ce4753ecbc64ba374",
+        "time_identity_error_us": 0.0
+      },
+      "e": {
+        "ae_solo_cmp_identical": true,
+        "ae_solo_raw_sha256": "71cf63a75ced67010b5c4453555bc022d3f47986c235094c8afd6b1de9853f71",
+        "job": "1984774_1",
+        "matching_ordinal_windows_and_read_write_bytes": true,
+        "native_raw_files": [
+          "results/ablation-scaled-w128/cases/e/native/e/repeat-0/raw.json",
+          "results/ablation-scaled-w128/cases/e/native/e/repeat-1/raw.json"
+        ],
+        "raw_files_cmp_identical": true,
+        "raw_sha256": "c16e9a4f8e2e568ae381e7b999f51b0f244ac10f496ecd676918ff8ceee627b6",
+        "time_identity_error_us": 0.0
+      },
+      "e-frfcfs": {
+        "ae_solo_cmp_identical": true,
+        "ae_solo_raw_sha256": "71cf63a75ced67010b5c4453555bc022d3f47986c235094c8afd6b1de9853f71",
+        "job": "1984774_3",
+        "matching_ordinal_windows_and_read_write_bytes": true,
+        "native_raw_files": [
+          "results/ablation-scaled-w128/cases/e-frfcfs/native/e-frfcfs/repeat-0/raw.json",
+          "results/ablation-scaled-w128/cases/e-frfcfs/native/e-frfcfs/repeat-1/raw.json"
+        ],
+        "raw_files_cmp_identical": true,
+        "raw_sha256": "fb73b06e8820e834d3b301d4ef1c3b6cd8b83a5252b2bd67526ef0642144d7e4",
+        "time_identity_error_us": 0.0
+      },
+      "e-gap": {
+        "ae_solo_cmp_identical": true,
+        "ae_solo_raw_sha256": "71cf63a75ced67010b5c4453555bc022d3f47986c235094c8afd6b1de9853f71",
+        "job": "1984774_4",
+        "matching_ordinal_windows_and_read_write_bytes": true,
+        "native_raw_files": [
+          "results/ablation-scaled-w128/cases/e-gap/native/e-gap/repeat-0/raw.json",
+          "results/ablation-scaled-w128/cases/e-gap/native/e-gap/repeat-1/raw.json"
+        ],
+        "raw_files_cmp_identical": true,
+        "raw_sha256": "5a00a64cf5b1e01d072758c698b2c369540e96457eefa0fc7302e0bc91bce82f",
+        "time_identity_error_us": 0.0
+      },
+      "e-lookahead": {
+        "ae_solo_cmp_identical": true,
+        "ae_solo_raw_sha256": "71cf63a75ced67010b5c4453555bc022d3f47986c235094c8afd6b1de9853f71",
+        "job": "1984774_2",
+        "matching_ordinal_windows_and_read_write_bytes": true,
+        "native_raw_files": [
+          "results/ablation-scaled-w128/cases/e-lookahead/native/e-lookahead/repeat-0/raw.json",
+          "results/ablation-scaled-w128/cases/e-lookahead/native/e-lookahead/repeat-1/raw.json"
+        ],
+        "raw_files_cmp_identical": true,
+        "raw_sha256": "a2c5d6d279a78254afbccc8ba28a7f85fe65621ca5291303979352d659980a04",
+        "time_identity_error_us": 0.0
+      },
+      "g": {
+        "ae_solo_cmp_identical": true,
+        "ae_solo_raw_sha256": "372c37c159e4cd3dba37052636ca58a14f52bb59e74e1cb49f72cdc4af519002",
+        "job": "1984774_5",
+        "matching_ordinal_windows_and_read_write_bytes": true,
+        "native_raw_files": [
+          "results/ablation-scaled-w128/cases/g/native/g/repeat-0/raw.json",
+          "results/ablation-scaled-w128/cases/g/native/g/repeat-1/raw.json"
+        ],
+        "raw_files_cmp_identical": true,
+        "raw_sha256": "23ee3a6f53c9d86a33878564a811fd88ebd036d722ed308255cd112041138147",
+        "time_identity_error_us": -1.4551915228366852e-11
+      }
+    },
+    "cases_array": 1984774,
+    "node": "infinite-frontier",
+    "original_calibration_commit": "24078b76778a7e30a3baecc73d0583c021340e20",
+    "per_unit_gate_waived": true,
+    "report_job": 1984775,
+    "solo_unit_errors_over_one_percent": 137,
+    "source_commit": "a766f13d2316cf8d6d4e2b32091af5765dbeefce",
+    "total_error_tolerance_pct": 1
+  }
 }

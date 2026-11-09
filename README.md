@@ -12,7 +12,7 @@
 
 模型、运行入口和阶段 A 数据见 [闭环 VLM 访存](docs/closed-loop-vlm.md)。
 
-缩放流量后的 VLM solo 总时长通过 1% 容限，逐单元验收未通过。六组消融未启动。[缩放校准与消融状态](results/ablation-scaled-w128/ablation.md)
+缩放流量后的 VLM solo 总时长通过 1% 容限，仍有 137 个单元超差。按授权复用该校准完成六组消融，各组两次原始输出逐字节一致。[缩放校准与消融结果](results/ablation-scaled-w128/ablation.md)
 
 ## Version2 单层历史记录
 
