@@ -1,0 +1,26 @@
+{
+  "artifacts_server": "dev0:/fact_data/xinyaowang/pim_vla_ablation_20261109/results/ablation-scaled-w128",
+  "calibration_sha256": "96141e70cf3220c45ce28a7619761b1c89de732a25b487c408ce18c21485816f",
+  "cases_array": 1984246,
+  "cases_status": "cancelled by calibration dependency",
+  "dev0_fit_job": 1984245,
+  "exit_code": 2,
+  "final_unit_violations_by_class": {
+    "memory_limited": 49,
+    "simulator_slower_than_thor": 88
+  },
+  "fit_elapsed": "00:27:39",
+  "fit_node": "infinite-frontier",
+  "gate_passed": false,
+  "initial_solo_us": 105409.731994,
+  "locally_refined_units": 154,
+  "native_sequencer_including_write_address_prefix": "passed",
+  "raw_sha256": "24a74290f5d6f93e2f80575f64911896c552f68517d35256b3d27ed30a20f31e",
+  "report_job": 1984247,
+  "report_status": "completed",
+  "scaled_windows_and_byte_conservation": "passed",
+  "source_archive_sha256": "c14d380b7d671a59564d5bbfaeb57fed02d8bc7a7299405f4f5e51be6e0bd203",
+  "source_commit": "72758625ab2d12a626ea81d73ca3972fcf3f9feb",
+  "unchanged_synthetic_closed_loop_raw_cmp": "passed",
+  "uniform_raw_cmp": "passed"
+}

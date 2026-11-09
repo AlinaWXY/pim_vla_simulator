@@ -1,0 +1,1427 @@
+{
+  "calibration": {
+    "max_absolute_unit_error": 0.09128607867743321,
+    "passed": false,
+    "raw_paths": [
+      "/fact_data/xinyaowang/pim_vla_ablation_20261109/results/ablation-scaled-w128/final-solo/raw.json"
+    ],
+    "raw_sha256": [
+      "24a74290f5d6f93e2f80575f64911896c552f68517d35256b3d27ed30a20f31e"
+    ],
+    "relative_error": 0.001270284202392391,
+    "removed_read_bytes": 3221933984,
+    "removed_write_bytes": 1467809504,
+    "s_k_histogram": {
+      "(0.25, 0.5]": 20,
+      "(0.5, 0.75]": 380,
+      "(0.75, 0.9]": 260,
+      "(0.9, 1]": 214,
+      "1": 1483
+    },
+    "scaled_profile_time_share": 0.6958170412334794,
+    "scaled_solo_time_share": 0.6959745553050556,
+    "scaled_units": 874,
+    "target_us": 105220.578,
+    "total_us": 105354.238038,
+    "unit_violations": [
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 29.324800000000003,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char *, (unsigned long)3>>(int, T2, T3)",
+        "ordinal": 2096,
+        "relative_error": 0.09128607867743321,
+        "s_k": 0.5573146744913423,
+        "solo_us": 32.001746,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.2528,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1065,
+        "relative_error": 0.07387679463171026,
+        "s_k": 1.0,
+        "solo_us": 11.010244,
+        "w_k": 126
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.915200000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1286,
+        "relative_error": 0.05887663166855828,
+        "s_k": 0.8412296218386958,
+        "solo_us": 17.91111,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.272,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 381,
+        "relative_error": 0.04949707943925219,
+        "s_k": 1.0,
+        "solo_us": 10.780434,
+        "w_k": 127
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.8896,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 864,
+        "relative_error": 0.04596411611519602,
+        "s_k": 1.0,
+        "solo_us": 21.849772,
+        "w_k": 111
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 21.190400000000004,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1395,
+        "relative_error": 0.04536997885835081,
+        "s_k": 1.0,
+        "solo_us": 22.151808,
+        "w_k": 111
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.4192,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 232,
+        "relative_error": 0.04246074678206835,
+        "s_k": 0.7119946140251746,
+        "solo_us": 15.03145,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 5.849600000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::sin_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 2)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1510,
+        "relative_error": 0.04213313730853385,
+        "s_k": 1.0,
+        "solo_us": 6.096062,
+        "w_k": 118
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 15.814400000000001,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1276,
+        "relative_error": 0.04189270538243628,
+        "s_k": 0.7870550161812297,
+        "solo_us": 16.476908,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.265600000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1083,
+        "relative_error": 0.04028308135910219,
+        "s_k": 1.0,
+        "solo_us": 10.67913,
+        "w_k": 124
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 19.001599999999996,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1783,
+        "relative_error": 0.0383772945436176,
+        "s_k": 1.0,
+        "solo_us": 19.73083,
+        "w_k": 112
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.864,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1450,
+        "relative_error": 0.034614444971537095,
+        "s_k": 0.8374867699413067,
+        "solo_us": 17.447738,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 25.4528,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char *, (unsigned long)3>>(int, T2, T3)",
+        "ordinal": 1697,
+        "relative_error": 0.0339713508926327,
+        "s_k": 0.4069914466344366,
+        "solo_us": 26.317466,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.3104,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 183,
+        "relative_error": 0.03376144475481069,
+        "s_k": 1.0,
+        "solo_us": 10.658494,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 31.1104,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char *, (unsigned long)3>>(int, T2, T3)",
+        "ordinal": 2188,
+        "relative_error": 0.03305306264143182,
+        "s_k": 0.6616856477339588,
+        "solo_us": 32.138694,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.2912,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 327,
+        "relative_error": 0.03304687499999992,
+        "s_k": 1.0,
+        "solo_us": 10.631292,
+        "w_k": 125
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.856,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 189,
+        "relative_error": 0.031085573476702377,
+        "s_k": 0.8846472829549142,
+        "solo_us": 18.411064,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 18.6176,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 900,
+        "relative_error": 0.030270389309041024,
+        "s_k": 0.9333910450632424,
+        "solo_us": 19.181162,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 67.2064,
+        "name": "nvjet_sm110_tst_144x128_64x6_4x1_v_bz_bias_TNN",
+        "ordinal": 535,
+        "relative_error": 0.030110644224359717,
+        "s_k": 1.0,
+        "solo_us": 69.230028,
+        "w_k": 114
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.659200000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 720,
+        "relative_error": 0.03006921855638156,
+        "s_k": 1.0,
+        "solo_us": 21.280406,
+        "w_k": 115
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.2848,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1299,
+        "relative_error": 0.030041614810205175,
+        "s_k": 1.0,
+        "solo_us": 10.593772,
+        "w_k": 124
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 11.052800000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 570,
+        "relative_error": 0.029756441806600753,
+        "s_k": 1.0,
+        "solo_us": 11.381692,
+        "w_k": 113
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.887999999999998,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 387,
+        "relative_error": 0.029083743291592246,
+        "s_k": 0.8862065234379697,
+        "solo_us": 18.40825,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 18.4128,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 595,
+        "relative_error": 0.028637469586374698,
+        "s_k": 0.9376563401962671,
+        "solo_us": 18.940096,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.2782,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 732,
+        "relative_error": 0.02860403572609993,
+        "s_k": 1.0,
+        "solo_us": 10.572198,
+        "w_k": 125
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.848,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 552,
+        "relative_error": 0.02827212389380529,
+        "s_k": 1.0,
+        "solo_us": 11.154696,
+        "w_k": 121
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 36.7936,
+        "name": "nvjet_sm110_tst_128x200_64x5_2x1_v_bz_NNT",
+        "ordinal": 2231,
+        "relative_error": 0.02784951730735785,
+        "s_k": 0.7252875679396767,
+        "solo_us": 37.818284,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.1536,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 206,
+        "relative_error": 0.02686658082408866,
+        "s_k": 0.8047873200711628,
+        "solo_us": 16.587592,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 40.5376,
+        "name": "nvjet_sm110_tst_128x200_64x5_2x1_v_bz_NNT",
+        "ordinal": 1679,
+        "relative_error": 0.026863060467319233,
+        "s_k": 0.780764703036558,
+        "solo_us": 41.626564,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.9952,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 93,
+        "relative_error": 0.026364049767171105,
+        "s_k": 1.0,
+        "solo_us": 11.285078,
+        "w_k": 116
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 29.6832,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char *, (unsigned long)3>>(int, T2, T3)",
+        "ordinal": 1820,
+        "relative_error": 0.02622190329883578,
+        "s_k": 0.5313814951553356,
+        "solo_us": 30.46155,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 21.279999999999998,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1359,
+        "relative_error": 0.025805263157894665,
+        "s_k": 1.0,
+        "solo_us": 21.829136,
+        "w_k": 111
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.3904,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 828,
+        "relative_error": 0.025753491839296982,
+        "s_k": 1.0,
+        "solo_us": 20.915524,
+        "w_k": 124
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.619200000000001,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1366,
+        "relative_error": 0.025317639802631353,
+        "s_k": 0.6767203020900979,
+        "solo_us": 13.964006,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.076800000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1324,
+        "relative_error": 0.02517901572452219,
+        "s_k": 0.8190127970749543,
+        "solo_us": 16.481598,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.512,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 648,
+        "relative_error": 0.024885725429017125,
+        "s_k": 1.0,
+        "solo_us": 21.022456,
+        "w_k": 119
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.382399999999999,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1402,
+        "relative_error": 0.02460575083692018,
+        "s_k": 0.6745550745550746,
+        "solo_us": 13.711684,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.5232,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 26,
+        "relative_error": 0.02434216753431162,
+        "s_k": 0.6829093429243986,
+        "solo_us": 13.852384,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.16,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1288,
+        "relative_error": 0.024312252475247487,
+        "s_k": 0.8228956228956229,
+        "solo_us": 16.552886,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 2.9951999999999996,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1512,
+        "relative_error": 0.023745325854700905,
+        "s_k": 1.0,
+        "solo_us": 3.066322,
+        "w_k": 96
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.7104,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 774,
+        "relative_error": 0.023579926273458396,
+        "s_k": 0.8332451541532394,
+        "solo_us": 17.10443,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 12.448,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 534,
+        "relative_error": 0.023224775064267345,
+        "s_k": 1.0,
+        "solo_us": 12.737102,
+        "w_k": 92
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.7072,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 142,
+        "relative_error": 0.02268480744125312,
+        "s_k": 0.7377943952199474,
+        "solo_us": 15.04083,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 19.5968,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 261,
+        "relative_error": 0.02258695297191382,
+        "s_k": 0.9679886481156353,
+        "solo_us": 20.039432,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.265600000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1371,
+        "relative_error": 0.02255669420199502,
+        "s_k": 1.0,
+        "solo_us": 10.497158,
+        "w_k": 126
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.728,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 871,
+        "relative_error": 0.022452797202797248,
+        "s_k": 0.6829631945362944,
+        "solo_us": 14.036232,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.252799999999999,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 422,
+        "relative_error": 0.02198880220026944,
+        "s_k": 0.6917822125088078,
+        "solo_us": 14.566202,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.8624,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 809,
+        "relative_error": 0.02194526200369351,
+        "s_k": 0.6826528407863469,
+        "solo_us": 14.166614,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.4464,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 46,
+        "relative_error": 0.021421267424798218,
+        "s_k": 0.8707659115426106,
+        "solo_us": 17.820124,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 10.265600000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 678,
+        "relative_error": 0.021277470386533492,
+        "s_k": 0.9872958257713249,
+        "solo_us": 10.484026,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.278400000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 588,
+        "relative_error": 0.021192014321294916,
+        "s_k": 1.0,
+        "solo_us": 10.49622,
+        "w_k": 127
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.3392,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1036,
+        "relative_error": 0.020483744614179455,
+        "s_k": 0.8146713967891287,
+        "solo_us": 16.673888,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 40.1088,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float>>>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "ordinal": 2027,
+        "relative_error": 0.01974010690920691,
+        "s_k": 1.0,
+        "solo_us": 40.900552,
+        "w_k": 113
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.044800000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 134,
+        "relative_error": 0.019682140007977633,
+        "s_k": 0.7892407705612214,
+        "solo_us": 16.360596,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 38.0224,
+        "name": "nvjet_sm110_tst_128x200_64x5_2x1_v_bz_NNT",
+        "ordinal": 2323,
+        "relative_error": 0.019498716546036077,
+        "s_k": 0.6729552200593653,
+        "solo_us": 38.763788,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.1904,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 665,
+        "relative_error": 0.01928052866716312,
+        "s_k": 0.8533562576115767,
+        "solo_us": 17.52184,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 55.136,
+        "name": "nvjet_sm110_tst_128x248_64x4_2x1_v_bz_TNT",
+        "ordinal": 1950,
+        "relative_error": 0.01914952118398139,
+        "s_k": 0.6949672629244619,
+        "solo_us": 56.191828,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.656,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 286,
+        "relative_error": 0.019025382096069965,
+        "s_k": 0.7227519207416047,
+        "solo_us": 14.934836,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 37.952,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float>>>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "ordinal": 2104,
+        "relative_error": 0.019017179595278266,
+        "s_k": 1.0,
+        "solo_us": 38.67374,
+        "w_k": 124
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.3424,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 417,
+        "relative_error": 0.018954014542079234,
+        "s_k": 1.0,
+        "solo_us": 10.53843,
+        "w_k": 124
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 57.6,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 1406,
+        "relative_error": 0.018902500000000044,
+        "s_k": 0.7653918914144577,
+        "solo_us": 58.688784,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 227.66080000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1785,
+        "relative_error": 0.01890025863038347,
+        "s_k": 0.63280488751087,
+        "solo_us": 231.963648,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 21.190400000000004,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 702,
+        "relative_error": 0.018899312896405673,
+        "s_k": 1.0,
+        "solo_us": 21.590884,
+        "w_k": 111
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.2048,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 406,
+        "relative_error": 0.01887564178515011,
+        "s_k": 0.7945172538174823,
+        "solo_us": 16.510676,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 2.6368,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1513,
+        "relative_error": 0.018822815533980464,
+        "s_k": 1.0,
+        "solo_us": 2.686432,
+        "w_k": 101
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.323200000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 255,
+        "relative_error": 0.01866843614383118,
+        "s_k": 1.0,
+        "solo_us": 10.515918,
+        "w_k": 127
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 21.0816,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1431,
+        "relative_error": 0.01819558287795986,
+        "s_k": 1.0,
+        "solo_us": 21.465192,
+        "w_k": 115
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.745600000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1568,
+        "relative_error": 0.018176812065972214,
+        "s_k": 0.8585340685563188,
+        "solo_us": 15.013628,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.662400000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 606,
+        "relative_error": 0.018019957983193002,
+        "s_k": 1.0,
+        "solo_us": 10.854536,
+        "w_k": 115
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.281599999999997,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 405,
+        "relative_error": 0.01775145945093115,
+        "s_k": 1.0,
+        "solo_us": 20.641628,
+        "w_k": 124
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.2592,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1101,
+        "relative_error": 0.01761735807860254,
+        "s_k": 1.0,
+        "solo_us": 10.43994,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 67.17439999999999,
+        "name": "nvjet_sm110_tst_256x200_64x3_2x1_v_bz_TNT",
+        "ordinal": 1615,
+        "relative_error": 0.017391744474085424,
+        "s_k": 0.8713721592741094,
+        "solo_us": 68.34268,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 10.278400000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 804,
+        "relative_error": 0.017176603362390797,
+        "s_k": 0.9919156211063139,
+        "solo_us": 10.454948,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 19.808,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1161,
+        "relative_error": 0.01703483441033926,
+        "s_k": 1.0,
+        "solo_us": 20.145426,
+        "w_k": 125
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.598400000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 21,
+        "relative_error": 0.016733091787439314,
+        "s_k": 1.0,
+        "solo_us": 10.775744,
+        "w_k": 119
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.459200000000003,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 955,
+        "relative_error": 0.016589305351905947,
+        "s_k": 0.8795267638147454,
+        "solo_us": 17.748836,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.643200000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 242,
+        "relative_error": 0.016457058566433425,
+        "s_k": 0.7289920481409843,
+        "solo_us": 14.884184,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 18.496,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 667,
+        "relative_error": 0.01645404411764706,
+        "s_k": 0.9013650850923086,
+        "solo_us": 18.800334,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.310400000000001,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 268,
+        "relative_error": 0.016302129919498975,
+        "s_k": 0.7076223801450164,
+        "solo_us": 14.54369,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 24.6848,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char *, (unsigned long)3>>(int, T2, T3)",
+        "ordinal": 1973,
+        "relative_error": 0.016247731397459164,
+        "s_k": 0.40063485413662253,
+        "solo_us": 25.085872,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.248,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1222,
+        "relative_error": 0.016237469806763327,
+        "s_k": 0.65673293165446,
+        "solo_us": 13.463114,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 56.160000000000004,
+        "name": "nvjet_sm110_tst_144x128_64x6_4x1_v_bz_bias_TNN",
+        "ordinal": 166,
+        "relative_error": 0.016183368945868803,
+        "s_k": 0.874759703478915,
+        "solo_us": 57.068858,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.2848,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 363,
+        "relative_error": 0.01617882700684503,
+        "s_k": 1.0,
+        "solo_us": 10.451196,
+        "w_k": 122
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 19.6544,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1341,
+        "relative_error": 0.015963041354607688,
+        "s_k": 0.9694346247264507,
+        "solo_us": 19.968144,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.44,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 80,
+        "relative_error": 0.015933600917431123,
+        "s_k": 0.870683268408097,
+        "solo_us": 17.717882,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 19.104000000000003,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 45,
+        "relative_error": 0.015822969011725085,
+        "s_k": 0.9584801298623219,
+        "solo_us": 19.406282,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.947200000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1251,
+        "relative_error": 0.01581738848151537,
+        "s_k": 1.0,
+        "solo_us": 21.27853,
+        "w_k": 115
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 57.651199999999996,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 1136,
+        "relative_error": 0.015459452708703525,
+        "s_k": 0.7589359132490492,
+        "solo_us": 58.542456,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 232.6208,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 2337,
+        "relative_error": 0.015388967796516884,
+        "s_k": 0.6407564782188563,
+        "solo_us": 236.200594,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.740799999999998,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 106,
+        "relative_error": 0.015220074522589666,
+        "s_k": 0.6738685850395785,
+        "solo_us": 13.949936,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 19.788800000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 2059,
+        "relative_error": 0.014987972994825238,
+        "s_k": 1.0,
+        "solo_us": 20.085394,
+        "w_k": 104
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 37.791999999999994,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float>>>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "ordinal": 2012,
+        "relative_error": 0.014793289585097513,
+        "s_k": 1.0,
+        "solo_us": 38.351068,
+        "w_k": 124
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 15.238399999999999,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1358,
+        "relative_error": 0.014734486560268989,
+        "s_k": 0.7646686264668626,
+        "solo_us": 15.46293,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 58.572799999999994,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 1226,
+        "relative_error": 0.014599404501748348,
+        "s_k": 0.7765523531792168,
+        "solo_us": 59.427928,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 11.1232,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 147,
+        "relative_error": 0.014384529631760623,
+        "s_k": 1.0,
+        "solo_us": 11.283202,
+        "w_k": 113
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.076800000000002,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 792,
+        "relative_error": 0.014350792955052372,
+        "s_k": 1.0,
+        "solo_us": 20.364918,
+        "w_k": 127
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 11.5392,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1335,
+        "relative_error": 0.014313297282307236,
+        "s_k": 1.0,
+        "solo_us": 11.704364,
+        "w_k": 106
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 52.4864,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 1100,
+        "relative_error": 0.014124573222777714,
+        "s_k": 0.7004643813707921,
+        "solo_us": 53.227748,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 52.6016,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 551,
+        "relative_error": 0.013989954678184757,
+        "s_k": 0.691974666306959,
+        "solo_us": 53.337494,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 63.577600000000004,
+        "name": "nvjet_sm110_tst_128x248_64x4_2x1_v_bz_TNT",
+        "ordinal": 1904,
+        "relative_error": 0.01345593416549229,
+        "s_k": 0.7060162846803377,
+        "solo_us": 64.433096,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 24.819200000000002,
+        "name": "nvjet_sm110_tst_512x64_64x2_1x4_h_bz_bias_TNT",
+        "ordinal": 989,
+        "relative_error": 0.013427910649819408,
+        "s_k": 0.6876193362630701,
+        "solo_us": 25.15247,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 55.1936,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 911,
+        "relative_error": 0.013293425324675257,
+        "s_k": 0.7295106188891601,
+        "solo_us": 55.927312,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 55.64799999999999,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 488,
+        "relative_error": 0.013177544565842636,
+        "s_k": 0.7417075614706714,
+        "solo_us": 56.381304,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 38.4576,
+        "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 7)]::operator ()() const::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>, (int)4, TrivialOffsetCalculator<(int)1, unsigned int>, TrivialOffsetCalculator<(int)1, unsigned int>, at::native::memory::LoadWithCast<(int)1>, at::native::memory::StoreWithCast<(int)1>>(int, T1, T2, T4, T5, T6, T7)",
+        "ordinal": 2112,
+        "relative_error": 0.012888583790980235,
+        "s_k": 0.9424071131137978,
+        "solo_us": 38.953264,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 55.84000000000001,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 74,
+        "relative_error": 0.012583094555873808,
+        "s_k": 0.7385925300221935,
+        "solo_us": 56.54264,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 38.5216,
+        "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 7)]::operator ()() const::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>, (int)4, TrivialOffsetCalculator<(int)1, unsigned int>, TrivialOffsetCalculator<(int)1, unsigned int>, at::native::memory::LoadWithCast<(int)1>, at::native::memory::StoreWithCast<(int)1>>(int, T1, T2, T4, T5, T6, T7)",
+        "ordinal": 1698,
+        "relative_error": 0.012423263831201181,
+        "s_k": 0.9364673327219782,
+        "solo_us": 39.000164,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.0896,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1294,
+        "relative_error": 0.012353942919649974,
+        "s_k": 0.7884408022428294,
+        "solo_us": 16.28837,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.312000000000001,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 611,
+        "relative_error": 0.01233819110576917,
+        "s_k": 0.6530612244897959,
+        "solo_us": 13.476246,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.336000000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 984,
+        "relative_error": 0.012143382352940879,
+        "s_k": 1.0,
+        "solo_us": 10.461514,
+        "w_k": 124
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 54.976,
+        "name": "nvjet_sm110_tst_144x128_64x6_4x1_v_bz_bias_TNN",
+        "ordinal": 1480,
+        "relative_error": 0.012117287543655264,
+        "s_k": 0.8527735977672313,
+        "solo_us": 55.64216,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.678400000000003,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::<unnamed>::where_kernel_impl(at::TensorIterator &)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 11)]::operator ()() const::[lambda(bool, float, float) (instance 1)]>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "ordinal": 1502,
+        "relative_error": 0.012102359938603202,
+        "s_k": 0.9577594201172357,
+        "solo_us": 16.880248,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 17.286400000000004,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 2151,
+        "relative_error": 0.012046348574601629,
+        "s_k": 0.9943949804832414,
+        "solo_us": 17.494638,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 13.888,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 511,
+        "relative_error": 0.011889112903225696,
+        "s_k": 0.6918218623481781,
+        "solo_us": 14.053116,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 17.4016,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1553,
+        "relative_error": 0.011760987495402775,
+        "s_k": 1.0,
+        "solo_us": 17.60626,
+        "w_k": 127
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 38.988800000000005,
+        "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 7)]::operator ()() const::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>, (int)4, TrivialOffsetCalculator<(int)1, unsigned int>, TrivialOffsetCalculator<(int)1, unsigned int>, at::native::memory::LoadWithCast<(int)1>, at::native::memory::StoreWithCast<(int)1>>(int, T1, T2, T4, T5, T6, T7)",
+        "ordinal": 1729,
+        "relative_error": 0.011743167268548849,
+        "s_k": 0.9669101813278593,
+        "solo_us": 39.446652,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.351999999999997,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1196,
+        "relative_error": 0.011539383561643968,
+        "s_k": 0.818496999258781,
+        "solo_us": 16.540692,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 5.2032,
+        "name": "void at::native::vectorized_gather_kernel<(int)16, long>(char *, char *, T2 *, int, long, long, long, long, bool)",
+        "ordinal": 1485,
+        "relative_error": 0.011515605781057925,
+        "s_k": 0.9605584642233856,
+        "solo_us": 5.263118,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 26.624000000000002,
+        "name": "nvjet_sm110_tst_512x64_64x2_1x4_h_bz_bias_TNT",
+        "ordinal": 494,
+        "relative_error": 0.011351712740384379,
+        "s_k": 0.7364939360529217,
+        "solo_us": 26.926228,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 34.336,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, void at::native::<unnamed>::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase &, T2)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1638,
+        "relative_error": 0.011267590866728794,
+        "s_k": 0.992016749094371,
+        "solo_us": 34.722884,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.672000000000004,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1270,
+        "relative_error": 0.011196857005757899,
+        "s_k": 0.8329224738152214,
+        "solo_us": 16.858674,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 54.96319999999999,
+        "name": "nvjet_sm110_tst_224x128_64x7_1x2_2cta_h_bz_bias_TNN",
+        "ordinal": 128,
+        "relative_error": 0.0110901112016768,
+        "s_k": 0.7262263387437615,
+        "solo_us": 55.572748,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 55.9808,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::AUnaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float>>, std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1951,
+        "relative_error": 0.010840573911055085,
+        "s_k": 0.8562875017591444,
+        "solo_us": 56.587664,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 20.8,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 811,
+        "relative_error": 0.01078519230769226,
+        "s_k": 1.0,
+        "solo_us": 21.024332,
+        "w_k": 119
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.425600000000001,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1227,
+        "relative_error": 0.01073242786985884,
+        "s_k": 1.0,
+        "solo_us": 10.537492,
+        "w_k": 126
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 33.113600000000005,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, void at::native::<unnamed>::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase &, T2)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 2343,
+        "relative_error": 0.010697719366060898,
+        "s_k": 0.9595509967098896,
+        "solo_us": 33.46784,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 60.352,
+        "name": "nvjet_sm110_tst_256x200_64x3_2x1_v_bz_TNT",
+        "ordinal": 1773,
+        "relative_error": 0.010690648197242858,
+        "s_k": 0.7850467289719626,
+        "solo_us": 60.997202,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 63.8144,
+        "name": "nvjet_sm110_tst_256x200_64x3_2x1_v_bz_TNT",
+        "ordinal": 1635,
+        "relative_error": 0.0106212704342592,
+        "s_k": 0.8280275307635426,
+        "solo_us": 64.49219,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 16.2752,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 575,
+        "relative_error": 0.010606935705859133,
+        "s_k": 0.8064962980654407,
+        "solo_us": 16.44783,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.278200000000002,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1263,
+        "relative_error": 0.010534334805704981,
+        "s_k": 1.0,
+        "solo_us": 10.386474,
+        "w_k": 126
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 19.603199999999998,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 153,
+        "relative_error": 0.010530015507672408,
+        "s_k": 0.9586919932676125,
+        "solo_us": 19.809622,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 14.9632,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1466,
+        "relative_error": 0.010453779940119645,
+        "s_k": 0.728628444423201,
+        "solo_us": 15.119622,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 15.398399999999999,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 1448,
+        "relative_error": 0.010404067955112284,
+        "s_k": 0.7576340667614825,
+        "solo_us": 15.558606,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 15.468799999999998,
+        "name": "nvjet_sm110_tst_128x128_64x6_1x2_h_bz_bias_TNT",
+        "ordinal": 154,
+        "relative_error": 0.010232209350434562,
+        "s_k": 0.7571608870725404,
+        "solo_us": 15.62708,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 34.5792,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, void at::native::<unnamed>::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase &, T2)::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1653,
+        "relative_error": 0.01020434249491009,
+        "s_k": 1.0,
+        "solo_us": 34.932058,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 38.9632,
+        "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 7)]::operator ()() const::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>, (int)4, TrivialOffsetCalculator<(int)1, unsigned int>, TrivialOffsetCalculator<(int)1, unsigned int>, at::native::memory::LoadWithCast<(int)1>, at::native::memory::StoreWithCast<(int)1>>(int, T1, T2, T4, T5, T6, T7)",
+        "ordinal": 1591,
+        "relative_error": 0.010169031291064279,
+        "s_k": 0.9692513584546671,
+        "solo_us": 39.359418,
+        "w_k": 128
+      },
+      {
+        "classification": "simulator_slower_than_thor",
+        "measured_us": 62.099199999999996,
+        "name": "nvjet_sm110_tst_144x128_64x6_4x1_v_bz_bias_TNN",
+        "ordinal": 877,
+        "relative_error": 0.01015291662372464,
+        "s_k": 0.9570159389580031,
+        "solo_us": 62.729688,
+        "w_k": 128
+      },
+      {
+        "classification": "memory_limited",
+        "measured_us": 10.303999999999998,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase &, at::native::GeluType)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(c10::BFloat16) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "ordinal": 1281,
+        "relative_error": 0.010006793478261056,
+        "s_k": 1.0,
+        "solo_us": 10.40711,
+        "w_k": 127
+      }
+    ]
+  },
+  "calibration_sha256": "96141e70cf3220c45ce28a7619761b1c89de732a25b487c408ce18c21485816f",
+  "comparison": null,
+  "results": [
+    {
+      "case": "b",
+      "status": "未运行"
+    },
+    {
+      "case": "e",
+      "status": "未运行"
+    },
+    {
+      "case": "e-lookahead",
+      "status": "未运行"
+    },
+    {
+      "case": "e-frfcfs",
+      "status": "未运行"
+    },
+    {
+      "case": "e-gap",
+      "status": "未运行"
+    },
+    {
+      "case": "g",
+      "status": "未运行"
+    }
+  ]
+}

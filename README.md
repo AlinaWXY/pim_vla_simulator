@@ -12,6 +12,8 @@
 
 模型、运行入口和阶段 A 数据见 [闭环 VLM 访存](docs/closed-loop-vlm.md)。
 
+缩放流量后的 VLM solo 总时长通过 1% 容限，逐单元验收未通过。六组消融未启动。[缩放校准与消融状态](results/ablation-scaled-w128/ablation.md)
+
 ## Version2 单层历史记录
 
 以下为此前 **第 0 层 × 第 0 个 denoising step 的 AE latency** 验证记录，固定 **GPU rank0 REFpb、PIM rank1 REFab**。该轮未运行 VLM 校准、完整 AE 或端到端并发实验。Down权重与输入放在同一行：12 fragments/行、22行/44KiB每bank，输入按query散布16个bank，每行统一ACTAB，预写跨BG交错。结果及PIM/GPU breakdown见 [Down同排单层报告](docs/down-row-single-layer.md)；该历史版本的 fused 描述符仍使用 32 项窗口内有限乱序，不能将其数值作为当前按序 FIFO32 的结果。
