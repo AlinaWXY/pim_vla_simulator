@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "execution_model": "fused_kernel_windows",
+  "source_commit": "0046e8bfd29fb272a98fd945d135e5ac967d1a1c",
+  "results": [
+    {
+      "variant": "token_gpu_after",
+      "total_ms": 137.76461529600002,
+      "AE_elapsed_ms": 136.271984338,
+      "AE_VLM_join_ms": 71.018671122,
+      "PIM_stage_sum_ms": 112.466332258,
+      "PIM_native_ms": 41.447661136,
+      "AE_GPU_compute_ms": 23.805652079999998,
+      "VLM_tail_ms": 1.492630958,
+      "VLM_calibrated_sum_ms": 106.893161172,
+      "wall_seconds": 484.5875712297857,
+      "checked_commands": 131946000,
+      "frontend_iterations": 16618792,
+      "PIM_stages": 1800,
+      "VLM_units": 2357,
+      "pim_read_bytes": 315555840,
+      "pim_write_bytes": 600145920,
+      "vlm_accounted_read_bytes": 11804375072,
+      "vlm_accounted_write_bytes": 8028931008,
+      "native_GPU_transactions": 0,
+      "case": "f"
+    },
+    {
+      "variant": "token_local_after",
+      "total_ms": 133.98072611,
+      "AE_elapsed_ms": 133.98072611,
+      "AE_VLM_join_ms": 74.431107618,
+      "PIM_stage_sum_ms": 115.817023028,
+      "PIM_native_ms": 41.385915409999996,
+      "AE_GPU_compute_ms": 18.163703081999998,
+      "VLM_tail_ms": 0.0,
+      "VLM_calibrated_sum_ms": 106.893161172,
+      "wall_seconds": 487.23332266299985,
+      "checked_commands": 133220480,
+      "frontend_iterations": 16773768,
+      "PIM_stages": 1620,
+      "VLM_units": 2357,
+      "pim_read_bytes": 303759360,
+      "pim_write_bytes": 576552960,
+      "vlm_accounted_read_bytes": 11804375072,
+      "vlm_accounted_write_bytes": 8028931008,
+      "native_GPU_transactions": 0,
+      "case": "g"
+    }
+  ],
+  "scope": "Full 18 layers x 10 steps; all 2357 calibrated VLM units; f/g once each",
+  "native_GPU_requests_simulated": false,
+  "recalibration_executed": false,
+  "repeat_consistency_claimed": false,
+  "PIM_native_definition": "Native PIM stage time minus explicit VLM join time; no AE-solo estimate",
+  "manifest_sha256": "a5cd041be4877a435a31fd21aaacfa3a485cdb040ead83e15e75b098f46ddc08",
+  "evidence": {
+    "f": {
+      "raw.json": "f518791f9479a0fd05bfc1d6dd6b5bbca44347cc4145db46b9cd041151f7b2ed",
+      "provenance.json": "9ff122a82e6c7f67ea01566cae5a813d604f0e3295600928b2a8664c678e1e7f",
+      "execution.json": "4a11b7e25dabcbc95771bae3a503d867c5d11a4298e3bc8e5748f03e5ee75987",
+      "input-config.json": "17aacf4ca4f00c7f10349c1e148e15d63a9cb92b02b5856f508569474e6e4b11"
+    },
+    "g": {
+      "raw.json": "2bd6b92ecf893a9c19c583a0483c342ee5a0858ec2130dda657f397977c40a0d",
+      "provenance.json": "6968391184f137b1e90262172277a60159f936badf47648d8fe606c80fd5cedf",
+      "execution.json": "c94a9cc50cf44f50d9af3954edf137dd8fa8418d78f4b727d18018cdea21b7ff",
+      "input-config.json": "9aee56e770befc5800a179c1cfd0f0bb94977532e3a526693a2f73f5fbca99a2"
+    }
+  }
+}

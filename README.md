@@ -1,14 +1,40 @@
 # PIM-VLA：基于 Ramulator2 的新版仿真器
 
-最新完整数据见 [2026-11-09 已校准并发结果](reference/e2e-gio-bcast-20261109/README.md)：7 组 e2e 各两次、全部校准候选、5 组 AE solo、原始日志和冻结运行环境。f/g 并发按用户要求取消，完整九组验收未完成。
+历史逐请求模型数据见 [2026-11-09 已校准并发结果](reference/e2e-gio-bcast-20261109/README.md)：7 组 e2e 各两次、全部校准候选、5 组 AE solo、原始日志和冻结运行环境。该轮 f/g 并发按用户要求取消；下方记录新 FIFO32、校准 kernel 窗口及连续 PIM 描述符策略的完整 f/g 结果，两种执行模型应分别解读。
 
 本仓库对应 `xinyao_1109` 重写：GPU rank0 与 PIM rank1 在同一原生仿真时间线上竞争，16 个通道均调用 Ramulator2 的 prerequisite、timing 与 command issue 机制。LPDDR5X-8533 时序只在 spec 中定义。PIM 请求直接由张量布局生成，运行不依赖旧 trace、外部仲裁重放或延迟常数抵消。
 
 上游基线为 CMU-SAFARI/ramulator2 **`7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`**（2026-11-03，项目版本 2.1）。原任务保存在 [重写方案](docs/rewrite-plan.txt)，逐项交付状态见 [需求矩阵](docs/requirements-matrix.md)。
 
-## Version2 单层检查
+## 当前分支：FIFO32 按序发射
 
-当前按用户要求，仅验证 **第 0 层 × 第 0 个 denoising step 的 AE latency**，固定 **GPU rank0 REFpb、PIM rank1 REFab**。VLM 校准、完整 AE 和端到端并发实验保持暂停。最新更新将Down权重与输入放在同一行：12 fragments/行、22行/44KiB每bank，输入按query散布16个bank，每行统一ACTAB，预写跨BG交错。最新结果及PIM/GPU breakdown见 [Down同排单层报告](docs/down-row-single-layer.md)；原生ACTAB、每bank RoPE、输出池、FIFO32与其他既有结构保留。
+本分支实现用户 2026-11-09 指定的 **fused kernel 窗口模型**：输入上传和粗指令交付后，PIM 私有 FIFO32 计算与按校准时长推进的 VLM kernel 重叠。按最新澄清，**QKV→本地 RoPE、PV→O 连续执行**：前段本地存储完成后立即按原生 CA 时序交付下一条粗指令，当前 VLM kernel 继续运行；真实数据上传/导出、Q 交换及 AE GPU 算子仍保留独占交接。PIM 完整落盘后，在需要导出时等待当前 kernel 结束。VLM 不再逐笔仿真访存；连续粗指令造成的微小共享 CA 干扰不另行延长校准 kernel 时长，PIM 指令的 CA/decode 成本仍完整计时。执行边界、校准来源及指标区别见 [模型说明](docs/fused-kernel-execution.md)。
+
+**连续执行策略的完整 f/g 已各运行一次并通过审计**：18 层 × 10 步、2357 个校准 VLM 工作单元，源码 `924141c`，作业 `1983025`、审计 `1983030`。远端 24 项原生前端回归和 91 项 Python 测试通过；新增 10 项审计单测后，本地 22 项审计单测全部通过。
+
+| 当前连续执行模型 | e2e / ms | AE 完成 / ms | 独占交接前等待 VLM / ms | 实际运行耗时 |
+|---|---:|---:|---:|---:|
+| f：GPU RoPE | 137.737998608 | 124.515315582 | 59.276970970 | 478.752 s |
+| g：本地 RoPE | 131.832380624 | 118.609697598 | 59.036419932 | 477.272 s |
+
+f/g 的 180/360 次连续粗指令交付均实际跨越正在运行的 VLM kernel，全部私有 PIM 计算被 VLM 执行覆盖。与下方旧策略相比，g 的 AE 提前 **15.371028512 ms** 完成，但随后仍有 **13.222683026 ms** VLM 尾部，因此总 latency 减少 **2.148345486 ms（1.60347%）**。前后工作负载、校准输入、非路径配置和运行库均相同，见 [新结果审计](reference/fused-kernel-continuous-e2e/summary.json)、[策略对比与时间分解](reference/fused-kernel-continuous-e2e/policy-comparison.json)。本轮 f/g 均在 einstein 运行；旧 g 使用另一主机，实际耗时差不能作为严格同机加速比。
+
+以下是**此前每个描述符都等待 VLM 的历史结果**，包括 QKV→本地 RoPE、PV→O 的额外等待，不能当作最新连续执行策略的结果。该轮完整 18 层 × 10 步、2357 个校准 VLM 工作单元的 f/g 各运行一次并通过独立审计（源码 `0046e8b`，作业 `1982852`、审计 `1982856`）：
+
+| 历史每描述符等待模型 | e2e / ms | 等待当前 VLM / ms | 实际运行耗时 |
+|---|---:|---:|---:|
+| f：GPU RoPE | 137.764615296 | 71.018671122 | 484.588 s |
+| g：本地 RoPE | 133.980726110 | 74.431107618 | 487.233 s |
+
+该历史运行的 VLM 原生访存请求数为 0；全部 kernel 保持各自的校准时长，上传/导出/AE GPU 区间不与 VLM kernel 重叠。全部 PIM 阶段、逐通道字节、刷新与 FIFO 顺序检查通过。见 [历史结果审计](reference/fused-kernel-e2e/summary.json)、[历史阶段分解](reference/fused-kernel-e2e/phase-durations.csv)。f 在 einstein、g 在 infinite-frontier 运行，实际耗时是该次运行记录，不作为同机严格性能对照。
+
+本分支以 `6bcd57b` 的 gio-bcast 实现为对照，按用户 2026-11-09 的澄清，将 fused 描述符内部恢复为 **32 项缓冲、按程序顺序发射**。只检查队首的依赖、资源及 Ramulator 原生 prerequisite/timing；队首未发射时，后续子指令及其 ACT/PRE 不得提前发射。队首发射后立即推进 FIFO，不等待它全部完成；显式 completion 依赖、资源冲突和 barrier 仍须等待，因此保留合法流水重叠。
+
+此前 FIFO32 的首次验证范围为 **第 0 层 × 第 0 个 denoising step 的 AE solo**，使用相同输入比较修改前后的模拟 latency 和 native 进程实际耗时。下述历史结果绑定各自的源码提交，不代表当前窗口模型的结果。
+
+## Version2 单层历史记录
+
+以下为此前 **第 0 层 × 第 0 个 denoising step 的 AE latency** 验证记录，固定 **GPU rank0 REFpb、PIM rank1 REFab**。该轮未运行 VLM 校准、完整 AE 或端到端并发实验。Down权重与输入放在同一行：12 fragments/行、22行/44KiB每bank，输入按query散布16个bank，每行统一ACTAB，预写跨BG交错。结果及PIM/GPU breakdown见 [Down同排单层报告](docs/down-row-single-layer.md)；该历史版本的 fused 描述符仍使用 32 项窗口内有限乱序，不能将其数值作为当前按序 FIFO32 的结果。
 
 五种单层总延迟依次为 **345.013 / 316.757 / 287.631 / 318.337 / 289.798 μs**（feature/GPU/stream、token/GPU/stream、token/local/stream、token/GPU/fused、token/local/fused）。源提交 `5fcd84b`、作业 `1981031`；52项Python、224项原生时序检查与5组刷新回归通过，五配置均两次逐字节一致。Token/GPU fused Down由61.918降到45.000 μs（−27.32%），整层仍比同布局streaming慢约0.50%；bank RoPE组合约0.75%。[独立暂存布局基线及VLM比较](docs/rank-refresh-single-layer.md)和更早的[双REFpb结果](docs/version2-single-layer.md)均作为历史对照保留。
 

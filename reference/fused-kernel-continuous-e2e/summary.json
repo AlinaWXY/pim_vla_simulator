@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "execution_model": "fused_kernel_windows",
+  "window_policy": "continuous_pim_descriptors",
+  "source_commit": "924141c285811ce26bde6e58bcf011ff3b435e88",
+  "results": [
+    {
+      "variant": "token_gpu_after",
+      "total_ms": 137.737998608,
+      "AE_elapsed_ms": 124.51531558200001,
+      "AE_VLM_join_ms": 59.27697097,
+      "PIM_stage_sum_ms": 100.709663502,
+      "PIM_native_ms": 41.432692532,
+      "AE_GPU_compute_ms": 23.805652079999998,
+      "VLM_tail_ms": 13.222683026,
+      "VLM_calibrated_sum_ms": 106.893161172,
+      "wall_seconds": 478.7524512419477,
+      "checked_commands": 131917872,
+      "frontend_iterations": 16615352,
+      "PIM_stages": 1800,
+      "VLM_units": 2357,
+      "PIM_descriptor_continuations": 180,
+      "pim_read_bytes": 315555840,
+      "pim_write_bytes": 600145920,
+      "vlm_accounted_read_bytes": 11804375072,
+      "vlm_accounted_write_bytes": 8028931008,
+      "native_GPU_transactions": 0,
+      "case": "f"
+    },
+    {
+      "variant": "token_local_after",
+      "total_ms": 131.83238062400002,
+      "AE_elapsed_ms": 118.609697598,
+      "AE_VLM_join_ms": 59.036419931999994,
+      "PIM_stage_sum_ms": 100.445994516,
+      "PIM_native_ms": 41.409574584,
+      "AE_GPU_compute_ms": 18.163703081999998,
+      "VLM_tail_ms": 13.222683026,
+      "VLM_calibrated_sum_ms": 106.893161172,
+      "wall_seconds": 477.2722536958754,
+      "checked_commands": 133165952,
+      "frontend_iterations": 16766995,
+      "PIM_stages": 1620,
+      "VLM_units": 2357,
+      "PIM_descriptor_continuations": 360,
+      "pim_read_bytes": 303759360,
+      "pim_write_bytes": 576552960,
+      "vlm_accounted_read_bytes": 11804375072,
+      "vlm_accounted_write_bytes": 8028931008,
+      "native_GPU_transactions": 0,
+      "case": "g"
+    }
+  ],
+  "scope": "Full 18 layers x 10 steps; all 2357 calibrated VLM units; f/g once each",
+  "native_GPU_requests_simulated": false,
+  "recalibration_executed": false,
+  "repeat_consistency_claimed": false,
+  "PIM_native_definition": "Native PIM stage time minus explicit VLM join time; no AE-solo estimate",
+  "manifest_sha256": "8ede521ef2fb8a2ec0c989ae9f128964239ad1629b1380e0313c1927164912c2",
+  "evidence": {
+    "f": {
+      "raw.json": "aa80872433d6c5a326dca066fd05f2d112aed7de68200d79e49fb1e3af27612a",
+      "provenance.json": "5c18b7092af1219aab4d4bc7a6e7c3de02109687584acbd1e6fb111311d9ef96",
+      "execution.json": "48b7daf9c92f6ca0ef33a6625d15b41118bba897d03c4877df6fc856496b9914",
+      "input-config.json": "8b31c3c449840c0fe26251fb996422b224d5a19131dd5cd00d2b6295e12f71d5"
+    },
+    "g": {
+      "raw.json": "047f0c4f626379e4df026a70bce3962e781378db9eb38cc2a933b27f9941f794",
+      "provenance.json": "60b3c3bb0bc6097d55846ce21ff9f3b3027858bda90747e332c1939706a45353",
+      "execution.json": "111d13f31de0eb20ee36699add8eeb87d7e54e7531fce1537ad426efe6203815",
+      "input-config.json": "1dce324d76ff10ef7cf46d37596503fa45703ff70d0ac79b5f1915dccc7487cd"
+    }
+  }
+}

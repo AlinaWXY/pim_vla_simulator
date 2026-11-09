@@ -69,9 +69,11 @@ struct Cursor {
   Clock tail=0;
   void reset(const std::vector<Operation>* p,Clock now) {ops=p;next=0;decoded_until=p?std::min<size_t>(32,p->size()):0;done.assign(p?p->size():0,NEVER);dispatched.assign(p?p->size():0,0);tail=now;}
   void mark(size_t index,Clock complete) {
-    require(index>=next&&index<decoded_until&&!dispatched[index],"instruction FIFO invalid dispatch");
+    require(index==next&&index<decoded_until&&!dispatched[index],"instruction FIFO requires head-only dispatch");
     dispatched[index]=1;done[index]=complete;tail=std::max(tail,complete);
-    while(next<ops->size()&&dispatched[next])++next;
+    // Retire the queue entry on issue, not completion: dependencies and native
+    // resource/timing readiness govern overlap with the following instruction.
+    ++next;
     decoded_until=std::min(ops->size(),next+32);
   }
   bool issued() const {return !ops || next==ops->size();}
@@ -111,6 +113,9 @@ class PIMController {
   const Kernel* kernel=nullptr;
   uint64_t kernel_total=0,kernel_next=0,kernel_reads=0,kernel_writes=0,issued_reads=0,issued_writes=0;
   Cursor top,inner;
+  // -1 retains request-level scheduling; 0 uploads/launches, 1 computes
+  // privately, and 2 exports after the current calibrated GPU kernel joins.
+  int coarse_phase=-1,coarse_descriptor=-1;
   int descriptor_index=-1;
   Clock descriptor_ready=0;
   uint64_t gpu_read_bytes=0,gpu_write_bytes=0,pim_read_bytes=0,pim_write_bytes=0;
@@ -124,6 +129,9 @@ class PIMController {
   void reset_serial_epoch(Clock origin);
   bool kernel_finished() const;
   bool stage_finished(Clock clk) const;
+  Clock coarse_upload_ready() const;
+  Clock coarse_result_ready() const;
+  void settle_coarse(Clock clk);
   Clock step(Clock clk,bool permit_gpu);
   int command(const Operation& op,bool local) const;
   Clock ready_at(int cmd,const AddrVec_t& addr) const;

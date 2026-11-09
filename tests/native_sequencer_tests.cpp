@@ -26,7 +26,7 @@ void warm_row_zero(PIMController& c) {
 
 struct Observation {
   std::vector<Clock> issue, complete;
-  Clock first_prefetch=NEVER, end=0;
+  Clock end=0;
   uint64_t out_of_order=0, prefetched=0, read_bytes=0;
 };
 using Inspect=std::function<void(const PIMController&,Clock,const Observation&)>;
@@ -52,18 +52,24 @@ Observation execute(const ConfigNode& spec, std::vector<Operation> children, con
     const Clock issued_at=now;
     now=c.step(now,false);
     require(now>=issued_at && now<100000,"descriptor clock did not make bounded progress");
+    require(c.out_of_order_issues==0 && c.prefetched_prerequisites==0,
+            "FIFO descriptor issued a younger instruction or prerequisite");
     if(c.inner.ops) {
       require(c.inner.decoded_until>=c.inner.next && c.inner.decoded_until-c.inner.next<=32,
               "resident descriptor exceeded FIFO32");
+      require(c.inner.decoded_until==std::min(c.inner.ops->size(),c.inner.next+32),
+              "FIFO32 did not refill its decoded entries after head dispatch");
       for(size_t i=0;i<c.inner.dispatched.size();++i) {
+        require(bool(c.inner.dispatched[i])==(i<c.inner.next),
+                "FIFO descriptor left a hole in its dispatched prefix");
         if(c.inner.dispatched[i] && observed.issue[i]==NEVER) {
+          require(i==0 || observed.issue[i-1]<=issued_at,
+                  "FIFO child issued before its predecessor was dispatched");
           observed.issue[i]=issued_at;
           observed.complete[i]=c.inner.done[i];
         }
       }
     }
-    if(c.prefetched_prerequisites && observed.first_prefetch==NEVER)
-      observed.first_prefetch=issued_at;
     if(inspect)inspect(c,issued_at,observed);
   }
   c.checker.advance(now);
@@ -74,7 +80,26 @@ Observation execute(const ConfigNode& spec, std::vector<Operation> children, con
   observed.prefetched=c.prefetched_prerequisites;
   observed.read_bytes=c.pim_read_bytes;
   require(c.gpu_read_bytes==0 && c.gpu_write_bytes==0,"sequencer-only test executed GPU memory work");
+  require(observed.out_of_order==0 && observed.prefetched==0,"FIFO dispatch statistics recorded reordering");
   return observed;
+}
+
+void cursor_rejects_non_head() {
+  const std::vector<Operation> operations={operation("RD",0),operation("RD",1)};
+  Cursor cursor;
+  cursor.reset(&operations,0);
+  bool rejected=false;
+  try {cursor.mark(1,5);}
+  catch(const std::runtime_error&) {rejected=true;}
+  require(rejected,"FIFO cursor accepted a non-head dispatch");
+  require(cursor.next==0 && !cursor.dispatched[0] && !cursor.dispatched[1],
+          "rejected non-head dispatch changed FIFO state");
+  // Completion of the first instruction is in the future. Advancing the
+  // issue head must still permit the next instruction to be dispatched.
+  cursor.mark(0,10);
+  cursor.mark(1,7);
+  require(cursor.issued() && cursor.tail==10,"FIFO cursor serialized completion order");
+  std::cout<<"{\"sequencer\":\"fifo_cursor_rejects_non_head\",\"status\":\"passed\"}\n";
 }
 
 void report(const std::string& name,const Observation& observation) {
@@ -147,14 +172,23 @@ int main(int argc,char** argv) {
     const auto spec=Config::parse_config_file(argv[1]);
     gpu_owned_act_bypass(spec,true);
     gpu_owned_act_bypass(spec,false);
+    cursor_rejects_non_head();
+    {
+      const auto result=execute(spec,{operation("RD",0,0),operation("RD",1,1)});
+      require(result.issue[1]>=result.issue[0] && result.issue[1]<result.complete[0],
+              "in-order independent requests lost native pipeline overlap");
+      require(result.read_bytes==64,"pipeline overlap test lost or duplicated reads");
+      report("fifo_in_order_pipeline_overlap",result);
+    }
     {
       auto producer=operation("RD",0,0),head=operation("RD",1,1),ready=operation("RD",2,2);
       head.deps={0};
       const auto result=execute(spec,{producer,head,ready});
-      require(result.issue[2]<result.complete[0],"ready younger RD did not bypass a real completion-blocked head");
       require(result.issue[1]>=result.complete[0],"dependent head issued before its producer completed");
-      require(result.out_of_order>0 && result.read_bytes==96,"out-of-order issue or read-byte accounting missing");
-      report("completion_dependency_bypass",result);
+      require(result.issue[2]>=result.issue[1],"younger RD bypassed the completion-blocked FIFO head");
+      require(result.issue[2]<result.complete[1],"FIFO waited for head completion instead of head issue");
+      require(result.read_bytes==96,"completion dependency test lost or duplicated reads");
+      report("completion_dependency_blocks_younger_issue",result);
     }
     {
       auto producer=operation("RD",0,0),head=operation("RD",1,1);
@@ -189,22 +223,32 @@ int main(int argc,char** argv) {
       children.push_back(operation("RD",32,2));
       children.push_back(operation("RD",33,3));
       const auto result=execute(spec,std::move(children),[](const PIMController& c,Clock,const Observation& observed) {
-        if(c.inner.ops && observed.issue[1]==NEVER)
-          require(!c.inner.dispatched[33],"request outside [head, head+32) dispatched early");
+        if(c.inner.ops && c.inner.next==1) {
+          require(c.inner.decoded_until==33,"FIFO32 refill did not admit exactly [head, head+32)");
+          require(observed.issue[1]==NEVER && !c.inner.dispatched[32] && !c.inner.dispatched[33],
+                  "decoded or not-yet-decoded younger request bypassed the FIFO head");
+        }
       });
-      require(result.issue[32]<result.complete[0],"last slot inside the sliding FIFO32 was not usable");
-      require(result.issue[33]>=result.issue[1],"request beyond FIFO32 crossed the blocked head");
+      require(result.issue[32]>=result.issue[31] && result.issue[32]>=result.complete[0],
+              "last decoded FIFO entry bypassed earlier requests");
+      require(result.issue[33]>=result.issue[32],"request beyond the initial FIFO32 issued out of order");
       require(result.read_bytes==34*32,"FIFO32 test lost or duplicated requests");
-      report("fifo32_window_boundary",result);
+      report("fifo32_capacity_refill_and_issue_order",result);
     }
     {
       auto producer=operation("RD",0,0),head=operation("RD",1,1),future=operation("LOCALRD",2,2,1);
       head.deps={0};
-      const auto result=execute(spec,{producer,head,future});
-      require(result.prefetched>0 && result.first_prefetch<result.complete[0],
-              "independent next-row native prerequisites did not prefetch during dependency wait");
-      require(result.issue[1]>=result.complete[0],"prefetch bypassed head data dependency");
-      report("safe_next_bank_prefetch",result);
+      const auto result=execute(spec,{producer,head,future},[](const PIMController& c,Clock,const Observation& observed) {
+        if(c.inner.ops && observed.issue[1]==NEVER) {
+          const auto* bank=c.device.m_bank_nodes.at(16+8); // rank1, BG2, bank0
+          const auto opened=c.device.m_spec->states.at("Opened");
+          require(bank->m_state==opened && bank->m_row_state.count(0) && !bank->m_row_state.count(1),
+                  "younger PRE/ACT changed another bank before the FIFO head dispatched");
+        }
+      });
+      require(result.issue[1]>=result.complete[0] && result.issue[2]>=result.issue[1],
+              "younger next-row request bypassed the completion-blocked FIFO head");
+      report("fifo_blocks_younger_prerequisites",result);
     }
     {
       auto producer=operation("RD",0,0),head=operation("RD",1,1),future=operation("LOCALRD",2,1,1);
@@ -215,7 +259,6 @@ int main(int argc,char** argv) {
           const auto opened=c.device.m_spec->states.at("Opened");
           require(bank->m_state==opened && bank->m_row_state.count(0),
                   "younger prefetch evicted the row required by an older undispatched request");
-          require(observed.first_prefetch==NEVER,"conflicting same-bank prerequisite prefetched before the older request");
         }
       });
       require(result.issue[2]>result.issue[1],"conflicting younger row displaced the older access");
@@ -245,15 +288,18 @@ int main(int argc,char** argv) {
     }
     {
       // The producer must change row0 -> row1 through real PRE/ACT/tRCD.
-      // A warm read in another bank could otherwise issue while those native
-      // prerequisites are still outstanding.
+      // A younger warm read must wait for producer issue, not completion,
+      // both with an explicit issue dependency and with FIFO ordering alone.
       auto producer=operation("LOCALRD",0,0,1),consumer=operation("RD",1,1,0);
       const auto independent=execute(spec,{producer,consumer});
-      require(independent.issue[1]<independent.issue[0],"issue-dependency fixture did not expose an independent early read");
+      require(independent.issue[1]>=independent.issue[0],"younger read bypassed the head's native prerequisites");
+      require(independent.issue[1]<independent.complete[0],"FIFO serialized independent command completion");
       consumer.issue_deps={0};
       const auto result=execute(spec,{producer,consumer});
       require(result.issue[1]>=result.issue[0],"issue dependency allowed consumer before producer dispatch");
       require(result.issue[1]<result.complete[0],"issue dependency incorrectly waited for producer completion");
+      require(result.issue==independent.issue && result.complete==independent.complete,
+              "redundant issue dependency changed in-order pipeline timing");
       require(result.read_bytes==32,"issue dependency lost or duplicated external read traffic");
       report("issue_dependency_is_not_completion_dependency",result);
     }

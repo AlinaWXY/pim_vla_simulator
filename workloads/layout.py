@@ -18,6 +18,7 @@ K_PREFIX_BASE, WORK_BASE = 0x10000, 0x14000
 Q_BASE, K_SUFFIX_BASE, COEF_BASE = 0x14100, 0x14200, 0x14000
 Q_IMPORT_BASE = 0x15000
 STAGING_BASE, SCORE_BASE, O_BASE = 0x80000, 0xA0000, 0xC0000
+FUSED_RESULT_BASE, FUSED_RESULT_BYTES_PER_BANK = 0x90000, 2048
 GU_BASE, DOWN_BASE = 0x40000, 0x50000
 DOWN_FRAGMENTS = 256
 DOWN_WEIGHT_COLUMNS = 4
@@ -91,6 +92,32 @@ def score_location(token, packet):
     return packet * 4, SCORE_BASE + token * 32
 
 
+def fused_result_location(packet):
+    """Stripe one operator's result packets across existing DRAM banks."""
+    capacity = BANKS * FUSED_RESULT_BYTES_PER_BANK // BURST_BYTES
+    if type(packet) is not int or not 0 <= packet < capacity:
+        raise ValueError("fused result packet exceeds reserved DRAM capacity")
+    return packet % BANKS, FUSED_RESULT_BASE + packet // BANKS * BURST_BYTES
+
+
+def validate_regions(regions, layer_stride_bytes=LAYER_STRIDE_BYTES):
+    """Reserved per-bank DRAM ranges must fit one layer without overlap."""
+    intervals = []
+    for name, bounds in regions.items():
+        if len(bounds) != 2:
+            raise ValueError(f"invalid DRAM region {name}")
+        begin, end = bounds
+        if not (type(begin) is int and type(end) is int and
+                0 <= begin < end <= layer_stride_bytes and
+                begin % BURST_BYTES == 0 and end % BURST_BYTES == 0):
+            raise ValueError(f"invalid or out-of-capacity DRAM region {name}")
+        intervals.append((begin, end, name))
+    intervals.sort()
+    for left, right in zip(intervals, intervals[1:]):
+        if left[1] > right[0]:
+            raise ValueError(f"overlapping DRAM regions {left[2]} and {right[2]}")
+
+
 def gu_weight_location(reduction, output, projection=0):
     channel, local = divmod(output, 256)
     output_slot, bank = divmod(local, 16)
@@ -127,10 +154,10 @@ def down_input_location(fragment, query):
     return query, offset
 
 
-def contract(layout):
+def contract(layout, *, fused_kernel_windows=False):
     if layout not in ("feature", "token"):
         raise ValueError(layout)
-    return {
+    result = {
         "shape": {"heads": 8, "head_dim": 256, "hidden": 1024, "ffn": 4096,
                   "queries": 16, "prefix": 968, "valid_kv": 984, "padded_kv": 992},
         "topology": {"channels": 16, "ranks": 2, "gpu_rank": 0, "pim_rank": 1,
@@ -178,6 +205,19 @@ def contract(layout):
         "operator_shapes": operator_shapes(layout),
         "numeric_execution": False,
     }
+    if fused_kernel_windows:
+        result["regions_per_bank"]["fused_result_spill"] = [
+            FUSED_RESULT_BASE, FUSED_RESULT_BASE + FUSED_RESULT_BYTES_PER_BANK]
+        result["fused_result_spill"] = {
+            "storage": "DRAM; no additional SRAM",
+            "bytes_per_bank": FUSED_RESULT_BYTES_PER_BANK,
+            "packet_mapping": "bank=packet%16; byte_offset=base+floor(packet/16)*32",
+            "operator_bytes_per_bank": {"o": 2048, "gate_up": 2048, "down": 256},
+            "reuse": "after the preceding operator's complete external export",
+            "formats": {"o": "BF16", "gate_up": "FP32", "down": "FP32"},
+        }
+    validate_regions(result["regions_per_bank"])
+    return result
 
 
 def operator_shapes(layout):

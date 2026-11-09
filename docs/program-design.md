@@ -3,9 +3,11 @@
 `programs/gen_pim_program.py` generates JSON directly from tensor definitions.
 It does not read an old native trace, a CA/DQ event file, or a replay schedule.
 All five valid layout/RoPE/dataflow variants are generated with source hashes.
-This document describes the Version2 implementation. The current requested
-measurement is **one layer and one denoising step**, with coefficients and
-weights already resident; calibration and full end-to-end runs are paused.
+This document describes the Version2 dataflow with the 2026-11-09 FIFO32
+in-order correction. The current requested measurement is **one layer and one
+denoising step**, with coefficients and weights already resident, comparing
+simulated latency and native wall time against the `6bcd57b` baseline. This
+comparison does not start calibration or full end-to-end runs.
 The workload format retains the full 18-layer, 10-step schedule, but that
 capability is not a claim that Version2 full-workload experiments have run.
 The JSON is a layer-relative address template: the controller adds
@@ -20,9 +22,12 @@ reservation ends at 1MiB, so adjacent layers cannot overlap.
 Each stage contains sixteen channel programs. Stage completion is a
 global barrier. `deps` refers to **completion**, with indices local to a
 stage/channel program; a descriptor's children use a separate index space.
-Streaming outer requests issue in program order. Fused descriptor children
-may issue out of order within the decoded 32-entry window, subject to explicit
-dependencies, resource identities, and native DRAM checks. `issue_deps` waits
+Streaming outer requests and fused descriptor children issue in program order.
+The descriptor's 32-entry FIFO bounds decoded buffering; it is not an
+out-of-order selection window. Only the head and its native prerequisites may
+issue, subject to explicit dependencies, resource identities, and native DRAM
+checks. Dispatch advances the head without waiting for completion, so legally
+independent operations can remain in flight together. `issue_deps` waits
 for a producer's **issue**, allowing overlap with its execution; it does not
 replace a completion dependency on consumed data. `BARRIER` has no command or
 latency. It fences the window and waits for preceding issued completion tails
@@ -58,10 +63,11 @@ its input or overwrite output until all 512 first-tile exports complete.
 `MAC_RUN`/`ROPE_RUN` carries eight version-2 wire words and CRC16,
 plus a timing-free expansion. The controller must feed these children through
 its finite 32-entry internal FIFO and complete the descriptor after all
-children finish. Dependency-ready younger instructions and their ACT/PRE
-prerequisites may issue early; younger preopening cannot replace a different
-row still required by an older unissued array request. Named I/O epochs and
-barriers fence this reordering. The generator adds explicit RAW, WAR and WAW
+children finish. Younger instructions and their ACT/PRE prerequisites cannot
+issue before the head. Native prerequisites prepare only the current head;
+there is no younger-instruction prefetch. Named I/O epochs retain external
+bus ownership, and barriers drain preceding completion tails. The generator
+retains explicit RAW, WAR and WAW
 completion dependencies for exact array columns, SRF slots, output words,
 gather/RMW state and RoPE slots, rather than relying on textual issue order.
 Only the RoPE overlap edges use `issue_deps` deliberately. Array and local
@@ -207,7 +213,8 @@ then loads K into slot 1 while Q executes. K load and K EXEC have an issue
 dependency on Q EXEC, while K EXEC also waits for its own input/coefficient
 completion. Q and K stores consume their completed FIFO entries in order.
 No execution-completion edge serializes different banks. Fused ROPE_RUN
-expands this same sequence through the private-CA 32-entry window.
+expands this same sequence through the private-CA in-order FIFO32. In-order
+dispatch does not add completion edges between otherwise independent banks.
 
 Feature W_O full residency is arranged as sixteen rotated feature-shard
 slots, each 16KiB per bank, placing the active shard in slot zero. Token W_O

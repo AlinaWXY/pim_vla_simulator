@@ -31,6 +31,16 @@ def library_hashes(manifest):
 def execute(binary, config, output, *, resume=False):
     output = Path(output)
     config = validate_config(dict(config))
+    if config.get("execution_model") == "fused_kernel_windows":
+        ledger = read_json(config["calibrated_vlm_path"])
+        if ledger.get("kind") != "calibrated_vlm_durations":
+            raise ValueError("invalid calibrated VLM duration ledger")
+        if ledger["source"]["vlm_sha256"] != sha256(config["vlm_path"]):
+            raise ValueError("calibrated ledger belongs to another VLM input")
+        if ledger["source"]["spec_sha256"] != object_sha256(config["spec"]):
+            raise ValueError("calibrated ledger belongs to another DRAM spec")
+        if ledger["calibration_parameters"] != config["calibration"]:
+            raise ValueError("calibrated ledger parameter mismatch")
     libraries = runtime_libraries(binary)
     binary_hash = sha256(binary)
     if output.exists() and any(output.iterdir()):
@@ -44,7 +54,7 @@ def execute(binary, config, output, *, resume=False):
             raise ValueError(f"resume binary or result hash differs in {output}")
         if library_hashes(provenance) != library_hashes({"runtime_libraries": libraries}):
             raise ValueError(f"resume runtime library differs in {output}")
-        for key in ("program_path", "vlm_path", "ae_schedule_path"):
+        for key in ("program_path", "vlm_path", "ae_schedule_path", "calibrated_vlm_path"):
             if config.get(key) and provenance["inputs"][key]["sha256"] != sha256(config[key]):
                 raise ValueError(f"resume input {key} differs in {output}")
         return read_json(output / "raw.json")
@@ -57,7 +67,7 @@ def execute(binary, config, output, *, resume=False):
     if sha256(binary) != binary_hash or runtime_libraries(binary) != libraries:
         raise ValueError("native executable or runtime library changed during execution")
     inputs = {}
-    for key in ("program_path", "vlm_path", "ae_schedule_path"):
+    for key in ("program_path", "vlm_path", "ae_schedule_path", "calibrated_vlm_path"):
         if config.get(key):
             inputs[key] = {"name": Path(config[key]).name, "sha256": sha256(config[key])}
     spec = config.get("spec")
@@ -68,6 +78,7 @@ def execute(binary, config, output, *, resume=False):
         "runtime_libraries": libraries,
         "config_sha256": sha256(output / "input-config.json"), "inputs": inputs,
         "calibration": config.get("calibration"), "spec": config.get("spec"),
+        "execution_model": config.get("execution_model", "native_dram_requests"),
         "spec_sha256": object_sha256(config.get("spec")),
         "raw_sha256": sha256(output / "raw.json"),
     })

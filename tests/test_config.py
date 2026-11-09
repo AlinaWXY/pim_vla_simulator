@@ -22,6 +22,14 @@ from tools.verify_input_provenance import verify_inputs
 
 
 class ConfigurationTests(unittest.TestCase):
+    def test_calibrated_windows_are_only_concurrent_fused_combined(self):
+        good = dict(case_config("f"), execution_model="fused_kernel_windows", calibrated_vlm_path="durations.json")
+        validate_config(good)
+        for change in (dict(mode="serial"), dict(dataflow="streaming"), dict(run_kind="ae_solo"),
+                       dict(calibrated_vlm_path=""), dict(execution_model="unknown"), dict(execution_model="native_dram_requests")):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                validate_config(dict(good, **change))
+
     def test_matrix(self):
         self.assertEqual(len(CASES), 9)
         self.assertEqual(len({variant_name(c) for c in CASES.values()}), 5)

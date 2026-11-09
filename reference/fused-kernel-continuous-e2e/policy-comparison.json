@@ -1,0 +1,140 @@
+{
+  "old_source": "0046e8bfd29fb272a98fd945d135e5ac967d1a1c",
+  "new_source": "924141c285811ce26bde6e58bcf011ff3b435e88",
+  "all_workload_and_calibration_inputs_identical": true,
+  "nonpath_configs_and_runtime_libraries_identical": true,
+  "both_native_audits_passed": true,
+  "input_sha256": {
+    "ae-token_gpu_after.json": "3ffd64f1d8cc4d048cb763c2a4923e5a8763c5653f30cf165b781b9577aa4e0a",
+    "ae-token_local_after.json": "0ecf6eba432b61d70b7d30ab0fa1ecbecbdda8e9b8fc1969840b653a70fb8042",
+    "calibrated-vlm-durations.json": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
+    "token_gpu_after.json": "de71b39ed4e38d182e30b76ac0edb420ae55b7f5147745ebd98cc953bf9e8a52",
+    "token_local_after.json": "bac340808b40b88b8ec929da2d9c0209e5fe98c8fda5a4d51688297eaffd159c",
+    "vlm.json": "4024e7a68526f8c953598aa7fa52b6790ed8cd3d5b3008ad649868752e1157d0"
+  },
+  "cases": {
+    "f": {
+      "metrics": {
+        "total_us": {
+          "old_ms": 137.76461529600002,
+          "new_ms": 137.737998608,
+          "difference_ms": -0.026616688000009162
+        },
+        "AE_elapsed_us": {
+          "old_ms": 136.271984338,
+          "new_ms": 124.51531558200001,
+          "difference_ms": -11.756668756
+        },
+        "AE_VLM_join_us": {
+          "old_ms": 71.018671122,
+          "new_ms": 59.27697097,
+          "difference_ms": -11.741700151999998
+        },
+        "VLM_remaining_us": {
+          "old_ms": 1.492630958,
+          "new_ms": 13.222683026,
+          "difference_ms": 11.730052068
+        }
+      },
+      "latency_reduction_percent": 0.019320409629730584,
+      "wall_seconds": {
+        "old": 484.5875712297857,
+        "new": 478.7524512419477
+      },
+      "continuation_by_outgoing_stage": {
+        "pv": 180
+      },
+      "launches_with_active_VLM": 180,
+      "launch_overlapped_VLM_ms": 0.003715418,
+      "phase_durations_ms": {
+        "upload": 4.339276172,
+        "compute": 34.389791758,
+        "join": 59.27697097,
+        "download": 2.0951074199999997,
+        "transfer": 0.604801764,
+        "continue": 0.0,
+        "launch": 0.003715418
+      },
+      "join_by_stage_ms": {
+        "qkv": 12.289738845999999,
+        "qkt": 14.272372562,
+        "o": 12.747014784,
+        "gate_up": 11.073262591999999,
+        "down": 8.894582186
+      },
+      "total_latency_decomposition_ms": {
+        "VLM": 106.89316117199999,
+        "AE_GPU": 23.805652079999998,
+        "exclusive_PIM": 7.039185356,
+        "descriptor_launch_without_VLM": 0.0,
+        "private_compute_without_VLM": 0.0
+      },
+      "raw_sha256": {
+        "old": "f518791f9479a0fd05bfc1d6dd6b5bbca44347cc4145db46b9cd041151f7b2ed",
+        "new": "aa80872433d6c5a326dca066fd05f2d112aed7de68200d79e49fb1e3af27612a"
+      }
+    },
+    "g": {
+      "metrics": {
+        "total_us": {
+          "old_ms": 133.98072611,
+          "new_ms": 131.83238062400002,
+          "difference_ms": -2.1483454860000055
+        },
+        "AE_elapsed_us": {
+          "old_ms": 133.98072611,
+          "new_ms": 118.609697598,
+          "difference_ms": -15.371028512000018
+        },
+        "AE_VLM_join_us": {
+          "old_ms": 74.43110761800001,
+          "new_ms": 59.036419932,
+          "difference_ms": -15.394687686000005
+        },
+        "VLM_remaining_us": {
+          "old_ms": 0.0,
+          "new_ms": 13.222683026,
+          "difference_ms": 13.222683026
+        }
+      },
+      "latency_reduction_percent": 1.6034735356159957,
+      "wall_seconds": {
+        "old": 487.23332266299985,
+        "new": 477.2722536958754
+      },
+      "continuation_by_outgoing_stage": {
+        "qkv": 180,
+        "pv": 180
+      },
+      "launches_with_active_VLM": 360,
+      "launch_overlapped_VLM_ms": 0.00742896,
+      "phase_durations_ms": {
+        "upload": 4.347041873999999,
+        "compute": 34.626629254,
+        "continue": 0.0,
+        "download": 2.098944778,
+        "launch": 0.00742896,
+        "join": 59.036419931999994,
+        "transfer": 0.32952971799999997
+      },
+      "join_by_stage_ms": {
+        "rope": 11.701181366,
+        "qkt": 14.81613679,
+        "o": 11.569469282,
+        "gate_up": 12.129729178,
+        "down": 8.819903316
+      },
+      "total_latency_decomposition_ms": {
+        "VLM": 106.89316117199999,
+        "AE_GPU": 18.163703081999998,
+        "exclusive_PIM": 6.77551637,
+        "descriptor_launch_without_VLM": 0.0,
+        "private_compute_without_VLM": 0.0
+      },
+      "raw_sha256": {
+        "old": "2bd6b92ecf893a9c19c583a0483c342ee5a0858ec2130dda657f397977c40a0d",
+        "new": "047f0c4f626379e4df026a70bce3962e781378db9eb38cc2a933b27f9941f794"
+      }
+    }
+  }
+}
