@@ -81,7 +81,8 @@ durations instead of GPU request-level simulation.
 `phases` distinguishes payload upload, descriptor-only launch, private compute,
 zero-time continuation, join, download and transfer, with per-channel ready
 times; `ae_gpu` records exclusive GPU helper intervals. `AE_VLM_join_us` measures
-waiting **before export**. `AE_GPU_wait_us` retains its older meaning and is zero
+waiting **before exclusive handoff**, including payload transfers, AE GPU work
+and setup boundaries. `AE_GPU_wait_us` retains its older meaning and is zero
 here. Stage duration includes its join wait; subtract the explicit join when
 reporting native PIM phase time, and do not label that value an AE-solo result.
 Current raw output uses schema 3 and
@@ -105,6 +106,44 @@ kernel overlap with payload handoff/nonlinear intervals, and full phase/timestam
 identities. A descriptor-only launch can overlap an already-running VLM kernel;
 it cannot admit a new one. Native completion barriers, all-channel readiness and
 exact kernel timestamps still constrain continuous PIM boundaries.
+
+## Completed continuous execution run, 2026-11-09
+
+Full f/g runs each cover 18 layers × 10 steps and all 2357 calibrated VLM units.
+Source `924141c285811ce26bde6e58bcf011ff3b435e88`, native binary SHA-256
+`9cb7f3b806a1ec69b7277edb65cb2a1f0a3f7984294cf4c571a2e20e5a71c248`.
+The full array `1983025` and audit `1983030` passed. Remote validation passed
+24 native frontend fixtures and 91 Python tests; ten additional auditor unit
+tests subsequently passed locally, bringing that unit-test suite to 22.
+
+| Metric / ms unless stated | f / GPU RoPE | g / local RoPE |
+|---|---:|---:|
+| Total | 137.737998608 | 131.832380624 |
+| AE end | 124.515315582 | 118.609697598 |
+| Explicit VLM join | 59.276970970 | 59.036419932 |
+| Native PIM phases, excluding join | 41.432692532 | 41.409574584 |
+| AE GPU helpers | 23.805652080 | 18.163703082 |
+| VLM tail | 13.222683026 | 13.222683026 |
+| Continuations overlapping an active VLM kernel | 180 | 360 |
+| Wall seconds | 478.752 | 477.272 |
+
+All private computation and continuation launches overlap VLM execution in
+these runs. The measured g total decomposes into 106.893161172 ms calibrated
+VLM + 18.163703082 ms AE GPU work + 6.775516370 ms exclusive PIM transfers.
+Join time is already covered by VLM time and must not be added again.
+Compared with the historical policy below, g finishes AE 15.371028512 ms
+earlier, but its VLM tail grows by 13.222683026 ms; total latency therefore
+falls by 2.148345486 ms (1.60347%). For f, AE finishes 11.756668756 ms earlier
+and total latency falls by 0.026616688 ms (0.01932%).
+
+The [saved audit](../reference/fused-kernel-continuous-e2e/summary.json) and
+[policy comparison](../reference/fused-kernel-continuous-e2e/policy-comparison.json)
+bind both runs to identical workload/calibration input hashes, non-path
+configuration values and runtime libraries. Both new cases ran on einstein;
+the historical g ran on infinite-frontier, so wall-time differences are not a
+controlled same-host speedup measurement. Each case ran once; repeat consistency
+is not claimed. The result archive SHA-256 is
+`c242bb798f1b4ecf000a350cfc8801ebdbba9d730b32fb333a8ee76d1b25214f`.
 
 ## Historical run with a join after every descriptor, 2026-11-09
 
