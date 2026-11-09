@@ -67,18 +67,71 @@ def staged_input(b, rows, fragments, *, input_location=None, query_order=None, f
     return b.fence(writes)
 
 
+def streaming_gemm(b, *, rows, fragments, columns, initial, emit_mac):
+    """Fill the idle 512B SRF half while MACs consume the active half."""
+    half_slots = L.SRF_BYTES // (2 * 32)
+    batch_views = half_slots // rows
+
+    def batch_slot(first):
+        return ((first // batch_views) % 2) * half_slots
+
+    def fill(first, begin, end, deps):
+        loads = []
+        for index in range(begin, end):
+            view, row = divmod(index, rows)
+            loads.append(b.emit("WRGB", row * 32, -1, deps=deps,
+                                slot=batch_slot(first) + index, rows=1,
+                                tensor_fragment=first + view, tensor_row=row,
+                                epoch=b.group + "_stream"))
+        return loads
+
+    loads = fill(0, 0, min(batch_views, fragments) * rows, initial)
+    reuse_after = ()
+    last_mac = None
+    for first in range(0, fragments, batch_views):
+        next_first = first + batch_views
+        current_views = min(batch_views, fragments - first)
+        next_rows = max(0, min(batch_views, fragments - next_first)) * rows
+        mac_count = current_views * columns
+        writes_per_mac = (next_rows + mac_count - 1) // mac_count
+        next_loads = []
+        for index in range(mac_count):
+            view, col = divmod(index, columns)
+            last_mac = emit_mac(first + view, col, batch_slot(first) + view * rows,
+                                loads if index == 0 else ())
+            # FIFO issue order places these writes after the MAC issues. The
+            # dependency only waits for readers from the previous use of this half.
+            start = len(next_loads)
+            stop = min(start + writes_per_mac, next_rows)
+            next_loads.extend(fill(next_first, start, stop, reuse_after))
+        loads = next_loads
+        reuse_after = (last_mac,)
+    return last_mac
+
+
 def gemm(b, *, rows, fragments, columns, base, fused, views, output_tile=0,
          tile_stride=0, initial=(), input_location=None, weight_offset=None,
          row_activation_fragments=0):
-    """Whole 1KiB input batches; weight columns pipeline through bank PEs."""
+    """Pipeline weight columns through bank PEs with the selected input schedule."""
     input_location = input_location or (lambda f, row: L.staging(f, row, rows))
     weight_offset = weight_offset or (lambda f, col: base + output_tile * tile_stride + (f * columns + col) * 32)
+
+    def emit_mac(fragment, col, slot, deps):
+        return b.emit("MACAB", weight_offset(fragment, col), -1, deps=deps, slot=slot,
+                      rows=rows, output_columns=columns, output_column=col,
+                      fragment=fragment, output_tile=output_tile,
+                      output_bytes_per_bank=rows * columns * 4)
+
+    if not fused:
+        return streaming_gemm(b, rows=rows, fragments=fragments, columns=columns,
+                              initial=initial, emit_mac=emit_mac)
+
     previous = list(initial)
     last_mac = None
     row_macs = []
     for first in range(0, fragments, views):
         activation = None
-        if fused and row_activation_fragments and first % row_activation_fragments == 0:
+        if row_activation_fragments and first % row_activation_fragments == 0:
             # Prepare every bank uniformly before the row's first scattered
             # LOCALRD. Drain all previous-row MAC completions, including any
             # reordered columns. The native ACTAB preq supplies PREab.
@@ -89,25 +142,16 @@ def gemm(b, *, rows, fragments, columns, base, fused, views, output_tile=0,
         for f in range(first, min(first + views, fragments)):
             slot = (f % views) * rows
             for row in range(rows):
-                if fused:
-                    bank, offset = input_location(f, row)
-                    rd = b.emit("LOCALRD", offset, bank, deps=previous,
-                                dest_slot=slot + row, tensor_fragment=f, tensor_row=row,
-                                **({"issue_deps": [activation]} if activation is not None else {}))
-                    loads.append(b.emit("BCAST", deps=[rd], bank=-1, slot=slot + row,
-                                        source_bank=bank, tensor_fragment=f))
-                else:
-                    loads.append(b.emit("WRGB", row * 32, -1, deps=previous,
-                                        slot=slot + row, rows=1, tensor_fragment=f,
-                                        tensor_row=row, epoch=b.group + "_stream"))
+                bank, offset = input_location(f, row)
+                rd = b.emit("LOCALRD", offset, bank, deps=previous,
+                            dest_slot=slot + row, tensor_fragment=f, tensor_row=row,
+                            **({"issue_deps": [activation]} if activation is not None else {}))
+                loads.append(b.emit("BCAST", deps=[rd], bank=-1, slot=slot + row,
+                                    source_bank=bank, tensor_fragment=f))
         first_mac = True
         for f in range(first, min(first + views, fragments)):
             for col in range(columns):
-                last_mac = b.emit("MACAB", weight_offset(f, col),
-                                  -1, deps=loads if first_mac else (), slot=(f % views) * rows,
-                                  rows=rows, output_columns=columns, output_column=col,
-                                  fragment=f, output_tile=output_tile,
-                                  output_bytes_per_bank=rows * columns * 4)
+                last_mac = emit_mac(f, col, (f % views) * rows, loads if first_mac else ())
                 if row_activation_fragments:
                     row_macs.append(last_mac)
                 first_mac = False

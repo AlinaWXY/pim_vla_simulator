@@ -56,9 +56,13 @@ dataflow raises an error rather than converting missing producers into time.
 
 MAC output geometry is `rows * output_columns * 4` bytes per bank. QKV uses
 1536B; token PV 1024B; feature PV 512B; Gate/Up and each O tile 2048B; Down
-256B. Each input batch occupies at most 1024B, and the first refill of the
-next batch depends on the last MAC's completion. O's second tile cannot fill
-its input or overwrite output until all 512 first-tile exports complete.
+256B. Fused GEMMs fill batches of up to 1024B and wait for the last MAC
+before reusing the SRF. Streaming GEMMs split the same 1KiB SRF into two
+512B halves. WRGB fills the idle half between MAC issues. The next batch's
+first MAC waits for its complete input, and each refill waits for the final
+MAC from the previous use of that half. Token QKV holds two 256B views per
+half. O's second tile cannot fill its input or overwrite output until all
+512 first-tile exports complete.
 
 `MAC_RUN`/`ROPE_RUN` carries eight version-2 wire words and CRC16,
 plus a timing-free expansion. The controller must feed these children through
