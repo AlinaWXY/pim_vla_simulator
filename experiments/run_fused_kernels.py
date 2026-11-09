@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from experiments.common import read_json, write_json, sha256, source_revision, object_sha256
 from experiments.config import validate_config
 from experiments.native import execute, runtime_libraries
+from tools.audit_fused_kernels import WINDOW_POLICY, safe_continuations
 
 
 def utc():
@@ -36,7 +37,7 @@ def prepare(output, baseline, ledger_path, program_dir, binary, library):
     shutil.copy2(binary, frozen_binary)
     shutil.copy2(library, output / "frozen/lib/libramulator.so")
     os.environ["LD_LIBRARY_PATH"] = str(output / "frozen/lib") + ":" + os.environ.get("LD_LIBRARY_PATH", "")
-    inputs, source_inputs, configs = {}, {}, {}
+    inputs, source_inputs, configs, continuation_counts = {}, {}, {}, {}
     for case in ("f", "g"):
         cfg = read_json(baseline / f"configs/{case}.json")
         cfg.update(execution_model="fused_kernel_windows", calibration=ledger["calibration_parameters"])
@@ -58,6 +59,9 @@ def prepare(output, baseline, ledger_path, program_dir, binary, library):
             cfg[key] = str(destination)
         if ledger["source"]["vlm_sha256"] != sha256(cfg["vlm_path"]) or ledger["source"]["spec_sha256"] != object_sha256(cfg["spec"]):
             raise ValueError("Calibrated ledger does not match frozen VLM/spec")
+        continuation_counts[case] = len(safe_continuations(read_json(cfg["ae_schedule_path"]), read_json(cfg["program_path"])))
+        if continuation_counts[case] != {"f": 180, "g": 360}[case]:
+            raise ValueError(f"Unexpected full-workload descriptor continuation count: {case}={continuation_counts[case]}")
         validate_config(cfg)
         config_path = output / f"configs/{case}.json"
         write_json(config_path, cfg)
@@ -70,13 +74,16 @@ def prepare(output, baseline, ledger_path, program_dir, binary, library):
         binary_path=str(frozen_binary), binary_sha256=sha256(frozen_binary), runtime_libraries=runtime_libraries(frozen_binary),
         inputs=inputs, source_inputs=source_inputs, configs=configs,
         calibrated_vlm_source=ledger["source"], calibration_parameters=ledger["calibration_parameters"],
-        recalibrated=False, window_policy="one descriptor per window; join current VLM kernel before every handoff",
+        recalibrated=False, window_policy=WINDOW_POLICY, expected_descriptor_continuations=continuation_counts,
+        window_policy_description="Skip VLM joins only at adjacent same-layer/step PIM descriptors with barrier-only outgoing suffix and incoming prefix on all 16 channels; allow a running kernel through descriptor launch, but admit new kernels only in compute",
         scope="f/g once each; complete 18 AE layers x 10 denoising steps and 2357 calibrated VLM units"))
     print(f"Prepared {output}: {commit}", flush=True)
 
 
 def run_case(output, case):
     manifest = read_json(output / "frozen/manifest.json")
+    if manifest.get("window_policy") != WINDOW_POLICY:
+        raise ValueError("Campaign does not use the continuous PIM descriptor policy")
     os.environ["PIM_VLA_SOURCE_COMMIT"] = manifest["source_commit"]
     os.environ["LD_LIBRARY_PATH"] = str(output / "frozen/lib") + ":" + os.environ.get("LD_LIBRARY_PATH", "")
     if sha256(manifest["binary_path"]) != manifest["binary_sha256"] or runtime_libraries(manifest["binary_path"]) != manifest["runtime_libraries"]:
@@ -91,6 +98,10 @@ def run_case(output, case):
     print(f"Starting {case} at {started}", flush=True)
     start = time.monotonic()
     raw = execute(manifest["binary_path"], read_json(config_path), output / f"native/{case}")
+    if raw.get("window_policy") != WINDOW_POLICY or raw.get("schema_version") != 3:
+        raise ValueError("Native result did not use the frozen continuous-descriptor policy")
+    if raw["metrics"]["PIM_descriptor_continuations"] != manifest["expected_descriptor_continuations"][case]:
+        raise ValueError("Native continuation count differs from the frozen workload contract")
     execution = dict(case=case, started_utc=started, finished_utc=utc(), wall_seconds=time.monotonic()-start,
                      hostname=socket.gethostname(), slurm_job_id=os.environ.get("SLURM_JOB_ID"), total_us=raw["metrics"]["total_us"])
     write_json(output / f"native/{case}/execution.json", execution)

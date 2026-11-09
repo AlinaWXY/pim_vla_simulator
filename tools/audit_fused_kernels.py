@@ -10,6 +10,7 @@ import math
 from pathlib import Path
 
 MODEL = "fused_kernel_windows"
+WINDOW_POLICY = "continuous_pim_descriptors"
 GPU_COUNTERS = ("gpu_read_bytes", "gpu_write_bytes", "GPU_reads", "GPU_writes", "GPU_act1", "GPU_act2",
                 "GPU_prepb", "GPU_preab", "GPU_row_hits", "GPU_row_misses")
 
@@ -60,6 +61,32 @@ def disjoint(left, right, label):
             j += 1
 
 
+def safe_continuations(schedule, program):
+    """Derive safe outgoing stage IDs from actual adjacent events and all 16 programs."""
+    templates = {stage["name"]: stage for stage in program["stages"]}
+    edges = {}
+    for name, stage in templates.items():
+        require(len(stage["channels"]) == 16, "program does not contain 16 channels")
+        head_only, tail_only = [], []
+        for ops in stage["channels"]:
+            indices = [i for i, op in enumerate(ops) if op["op"] in {"MAC_RUN", "ROPE_RUN"}]
+            require(len(indices) <= 1, "multiple descriptors within one stage are unsupported")
+            head_only.append(bool(indices) and all(op["op"] == "BARRIER" for op in ops[:indices[0]]))
+            tail_only.append(bool(indices) and all(op["op"] == "BARRIER" for op in ops[indices[0]+1:]))
+        edges[name] = all(head_only), all(tail_only)
+    events = schedule["events"]
+    outgoing, stage_id = set(), -1
+    for index, event in enumerate(events[:-1]):
+        if event["kind"] != "pim":
+            continue
+        stage_id += 1
+        next_event = events[index+1]
+        if (next_event["kind"] == "pim" and event["step"] == next_event["step"] and
+                event["layer"] == next_event["layer"] and edges[event["stage"]][1] and edges[next_event["stage"]][0]):
+            outgoing.add(stage_id)
+    return outgoing
+
+
 def audit_timeline(raw, schedule, ledger, program):
     """Validate generic saved timelines; full-workload scope is checked by audit_case."""
     clock = integer(raw["clock_ps"], "clock")
@@ -80,6 +107,14 @@ def audit_timeline(raw, schedule, ledger, program):
 
     require(raw["execution_model"] == program["execution_model"] == MODEL, "execution model mismatch")
     require(ledger["kind"] == "calibrated_vlm_durations", "invalid calibrated ledger kind")
+    continuous = raw.get("window_policy") == WINDOW_POLICY
+    if continuous:
+        require(raw.get("schema_version") == 3, "continuous descriptors require native schema 3")
+    else:
+        require(raw.get("schema_version", 2) == 2 and "window_policy" not in raw,
+                "unsupported native window policy")
+    outgoing = safe_continuations(schedule, program) if continuous else set()
+    incoming = {sid+1 for sid in outgoing}
     stages, phases, kernels, ae_gpu, metrics = (raw[key] for key in ("stages", "phases", "kernels", "ae_gpu", "metrics"))
     templates = {stage["name"]: stage for stage in program["stages"]}
     require(len(templates) == len(program["stages"]), "duplicate program stage")
@@ -92,9 +127,12 @@ def audit_timeline(raw, schedule, ledger, program):
         a, b = interval(phase, "phase")
         ready = phase["channel_ready_ck"]
         require(len(ready) == 16 and all(integer(x, "channel ready") <= b for x in ready), "phase crossed a channel barrier early")
-        if phase["phase"] == "join":
-            require(all(x == b for x in ready), "join ready clocks differ from its completion")
-            joins.append((a, b))
+        if phase["phase"] in {"join", "continue"}:
+            require(all(x == b for x in ready), "join/continue ready clocks differ from completion")
+            if phase["phase"] == "continue":
+                require(a == b, "descriptor continuation must have zero duration")
+            else:
+                joins.append((a, b))
         else:
             # Empty downloads can be immediately ready after a long join.
             require(max(a, max(ready)) == b, "phase completion differs from all-channel ready barrier")
@@ -112,14 +150,22 @@ def audit_timeline(raw, schedule, ledger, program):
         require(len(channels) == 16, "program does not contain 16 channels")
         counts = [sum(op["op"] in {"MAC_RUN", "ROPE_RUN"} for op in ops) for ops in channels]
         require(len(set(counts)) == 1 and counts[0] in {0, 1}, "unsupported descriptor grouping across channels")
-        expected = ["upload", "compute", "join", "download"] if counts[0] else ["transfer"]
+        expected = (["launch" if sid in incoming else "upload", "compute",
+                     "continue" if sid in outgoing else "join", "download"] if counts[0] else ["transfer"])
         group = by_stage[sid]
         require([p["phase"] for p in group] == expected, f"{name}: phase sequence differs")
         a, b = to_cycles(stage["start_us"], name), to_cycles(stage["end_us"], name)
         require(a <= b and to_cycles(stage["duration_us"], name) == b-a, "inconsistent PIM stage duration")
         require(group[0]["start_ck"] == a and group[-1]["end_ck"] == b, "phases do not cover their entire stage")
         require(all(x["end_ck"] == y["start_ck"] for x, y in zip(group, group[1:])), "noncontiguous stage phases")
+        if sid in outgoing:
+            require(group[-1]["start_ck"] == group[-1]["end_ck"], "continuous descriptor boundary has a nonzero download")
         stage_cycles += b-a
+    continuation_count = sum(phase["phase"] == "continue" for phase in phases)
+    require(continuation_count == len(outgoing), "continuation records differ from derived safe boundaries")
+    if continuous:
+        require(integer(metrics["PIM_descriptor_continuations"], "continuations") == continuation_count,
+                "native continuation count differs from derived safe boundaries")
     require(len(kernels) == len(ledger["units"]), "VLM ledger coverage mismatch")
     kernel_intervals, previous_end, calibrated_sum = [], 0, 0
     for kernel, unit in zip(kernels, ledger["units"]):
@@ -178,7 +224,8 @@ def audit_timeline(raw, schedule, ledger, program):
             "final completion/tail identity failed")
     require(metrics["AE_GPU_wait_us"] == 0 and not metrics["serial_epoch_reset"], "legacy GPU wait or serial reset reported")
     return dict(AE_cycles=ae_end, total_cycles=total, stage_cycles=stage_cycles, join_cycles=join_cycles,
-                native_PIM_cycles=stage_cycles-join_cycles, AE_GPU_cycles=ae_gpu_cycles, phases=phase_rows)
+                native_PIM_cycles=stage_cycles-join_cycles, AE_GPU_cycles=ae_gpu_cycles,
+                descriptor_continuations=continuation_count, phases=phase_rows)
 
 
 def audit_case(raw, cfg, program, schedule, vlm, ledger, execution):
@@ -196,6 +243,9 @@ def audit_case(raw, cfg, program, schedule, vlm, ledger, execution):
     require(len(vlm["units"]) == len(ledger["units"]) == len(raw["kernels"]) == 2357, "expected all 2357 VLM units")
     require(len({u["ordinal"] for u in vlm["units"]}) == 2357, "duplicate VLM ordinals")
     timing = audit_timeline(raw, schedule, ledger, program)
+    require(raw.get("window_policy") == WINDOW_POLICY, "full-run audit requires the continuous-descriptor policy")
+    require(timing["descriptor_continuations"] == (180 if cfg["rope"] == "gpu" else 360),
+            "full workload continuation count differs from f=180 / g=360")
     require(all(metrics[key] == 0 for key in GPU_COUNTERS), "native GPU requests/commands were issued")
     require(metrics["PIM_out_of_order_issues"] == metrics["PIM_prefetched_prerequisites"] == 0, "FIFO reordered/prefetched")
     reads = writes = 0
@@ -252,6 +302,7 @@ def audit_case(raw, cfg, program, schedule, vlm, ledger, execution):
                   VLM_tail_ms=metrics["VLM_remaining_us"]/1000, VLM_calibrated_sum_ms=metrics["vlm_calibrated_sum_us"]/1000,
                   wall_seconds=execution["wall_seconds"], checked_commands=metrics["checked_commands"],
                   frontend_iterations=metrics["frontend_iterations"], PIM_stages=len(stages), VLM_units=2357,
+                  PIM_descriptor_continuations=timing["descriptor_continuations"],
                   pim_read_bytes=template_r*180, pim_write_bytes=template_w*180,
                   vlm_accounted_read_bytes=reads, vlm_accounted_write_bytes=writes, native_GPU_transactions=0)
     return result, timing["phases"]
@@ -264,6 +315,7 @@ def main():
     run = args.run.resolve()
     manifest_path = run / "frozen/manifest.json"
     manifest = read(manifest_path)
+    require(manifest["window_policy"] == WINDOW_POLICY, "frozen window policy differs")
     require(sha(manifest["binary_path"]) == manifest["binary_sha256"], "frozen binary changed")
     for library in manifest["runtime_libraries"].values():
         require(sha(library["path"]) == library["sha256"], "runtime library changed")
@@ -286,10 +338,13 @@ def main():
         require(ledger["calibration_parameters"] == cfg["calibration"], "ledger calibration differs")
         row, phase_rows = audit_case(read(destination / "raw.json"), cfg, program, schedule, vlm, ledger, read(destination / "execution.json"))
         row["case"] = case
+        require(row["PIM_descriptor_continuations"] == manifest["expected_descriptor_continuations"][case],
+                "frozen continuation contract differs")
         results.append(row)
         all_phases.extend(dict(phase, case=case) for phase in phase_rows)
         evidence[case] = {name: sha(destination / name) for name in ("raw.json", "provenance.json", "execution.json", "input-config.json")}
-    summary = dict(passed=True, execution_model=MODEL, source_commit=manifest["source_commit"], results=results,
+    summary = dict(passed=True, execution_model=MODEL, window_policy=WINDOW_POLICY,
+                   source_commit=manifest["source_commit"], results=results,
                    scope="Full 18 layers x 10 steps; all 2357 calibrated VLM units; f/g once each",
                    native_GPU_requests_simulated=False, recalibration_executed=False, repeat_consistency_claimed=False,
                    PIM_native_definition="Native PIM stage time minus explicit VLM join time; no AE-solo estimate",

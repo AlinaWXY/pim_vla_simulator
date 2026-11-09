@@ -15,10 +15,10 @@ Json read_json(const std::string& path) {
 }
 struct CoarseEvent {std::string kind,name;Clock duration=0;int step=0,layer=0;};
 struct CalibratedKernel {int ordinal=0;std::string name,kind;Clock duration=0,start=0,end=0;uint64_t reads=0,writes=0;};
-enum class Phase {None,Upload,Compute,Join,Download,Transfer};
+enum class Phase {None,Upload,Launch,Compute,Join,Continue,Download,Transfer};
 const char* phase_name(Phase p) {
-  switch(p) {case Phase::Upload:return "upload";case Phase::Compute:return "compute";
-    case Phase::Join:return "join";case Phase::Download:return "download";
+  switch(p) {case Phase::Upload:return "upload";case Phase::Launch:return "launch";case Phase::Compute:return "compute";
+    case Phase::Join:return "join";case Phase::Continue:return "continue";case Phase::Download:return "download";
     case Phase::Transfer:return "transfer";default:return "none";}
 }
 int descriptor_index(const std::vector<Operation>& ops) {
@@ -69,6 +69,25 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
     event.step=e.value("step",0);event.layer=e.value("layer",0);event.duration=cycles(e.value("us",0.0));
     require(event.kind=="gpu"||(event.kind=="pim"&&programs.count(event.name)),"invalid AE event");events.push_back(event);
   }
+  // A descriptor boundary is not a GPU handoff when both sides contain only
+  // private PIM work. Check the actual operations on every channel, so payload
+  // uploads/exports and AE GPU helpers can never take this shortcut.
+  std::vector<bool> continues(events.size(),false);
+  for(size_t i=0;i+1<events.size();++i) {
+    const auto& from=events[i];const auto& to=events[i+1];
+    if(from.kind!="pim"||to.kind!="pim"||from.step!=to.step||from.layer!=to.layer)continue;
+    bool safe=true;
+    for(int c=0;c<16&&safe;++c) {
+      int a=descriptors.at(from.name)[c],b=descriptors.at(to.name)[c];
+      if(a<0||b<0){safe=false;break;}
+      const auto& outgoing=programs.at(from.name).channels[c];
+      const auto& incoming=programs.at(to.name).channels[c];
+      auto barrier=[](const Operation& op){return op.name=="BARRIER";};
+      safe=std::all_of(outgoing.begin()+a+1,outgoing.end(),barrier)&&
+           std::all_of(incoming.begin(),incoming.begin()+b,barrier);
+    }
+    continues[i]=safe;
+  }
   auto vlm=read_json(cfg["vlm_path"].as<std::string>());
   auto ledger=read_json(cfg["calibrated_vlm_path"].as<std::string>());
   require(ledger.at("kind")=="calibrated_vlm_durations"&&ledger.at("clock_ps")==clock_ps,"calibrated VLM ledger kind/clock mismatch");
@@ -109,23 +128,24 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
       if(active_kernel>=0&&now>=kernels[active_kernel].start+kernels[active_kernel].duration) {
         kernels[active_kernel].end=now;active_kernel=-1;changed=true;
       }
-      if(phase==Phase::Compute)for(auto& mc:channels)mc->settle_coarse(now);
       if(ae_gpu_end!=NEVER&&now>=ae_gpu_end) {
         const auto& e=events[ae_index];ae_gpu.push_back({{"name",e.name},{"step",e.step},{"layer",e.layer},
             {"start_ck",ae_gpu_start},{"end_ck",now},{"start_us",us(ae_gpu_start)},{"end_us",us(now)}});
         ae_gpu_end=NEVER;++ae_index;changed=true;
       }
       std::array<Clock,16> ready;ready.fill(now);
-      if(phase==Phase::Upload&&all([&](const auto& mc){return mc.coarse_upload_ready()<=now;})) {
+      if((phase==Phase::Upload||phase==Phase::Launch)&&all([&](const auto& mc){return mc.coarse_upload_ready()<=now;})) {
         for(int c=0;c<16;++c)ready[c]=channels[c]->coarse_upload_ready();
         finish_phase(ready);change_phase(Phase::Compute,1);changed=true;
       }
+      if(phase==Phase::Compute)for(auto& mc:channels)mc->settle_coarse(now);
       if(phase==Phase::Compute&&all([&](const auto& mc){return mc.coarse_result_ready()<=now;})) {
         for(int c=0;c<16;++c)ready[c]=channels[c]->coarse_result_ready();
-        finish_phase(ready);change_phase(Phase::Join,1);changed=true;
+        finish_phase(ready);change_phase(continues[ae_index]?Phase::Continue:Phase::Join,1);changed=true;
       }
-      if(phase==Phase::Join&&active_kernel<0) {
-        ready.fill(now);join_total+=now-phase_start;finish_phase(ready);change_phase(Phase::Download,2);changed=true;
+      if(phase==Phase::Continue||(phase==Phase::Join&&active_kernel<0)) {
+        ready.fill(now);if(phase==Phase::Join)join_total+=now-phase_start;
+        finish_phase(ready);change_phase(Phase::Download,2);changed=true;
       }
       if((phase==Phase::Download||phase==Phase::Transfer)&&all([&](const auto& mc){return mc.stage_finished(now);})) {
         for(int c=0;c<16;++c)ready[c]=std::max(channels[c]->top.tail,channels[c]->pim_dq_end);
@@ -137,7 +157,8 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
         phase=Phase::None;++ae_index;changed=true;
       }
       if(phase==Phase::None&&ae_gpu_end==NEVER&&ae_index<events.size()) {
-        require(active_kernel<0,"new AE handoff started before the current VLM kernel ended");
+        bool continuation=ae_index>0&&continues[ae_index-1];
+        require(active_kernel<0||continuation,"new AE handoff started before the current VLM kernel ended");
         const auto& e=events[ae_index];
         if(e.kind=="gpu") {ae_gpu_start=now;ae_gpu_end=now+e.duration;}
         else {
@@ -147,7 +168,10 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
             auto& mc=*channels[c];mc.row_offset=e.layer*(stride/2048);mc.set_stage(program.channels[c],stage_id,now,e.name);
             mc.coarse_descriptor=indices[c];mc.coarse_phase=indices[0]<0?-1:0;
           }
-          phase=indices[0]<0?Phase::Transfer:Phase::Upload;wake();
+          // Native CA/decode still times this launch. An already-running VLM
+          // kernel keeps its calibrated deadline across descriptor-only CA;
+          // new VLM kernels are admitted once private computation starts.
+          phase=indices[0]<0?Phase::Transfer:(continuation?Phase::Launch:Phase::Upload);wake();
         }
         changed=true;
       }
@@ -165,7 +189,8 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
     if(++iterations%10000000==0)std::cerr<<"progress ck="<<now<<" kernels="<<vlm_index<<" stages="<<stages.size()<<"\n";
     now=next;require(now<cycles(5000000),"simulation exceeded five seconds of model time");
   }
-  Json raw={{"schema_version",2},{"execution_model","fused_kernel_windows"},{"clock_ps",clock_ps},
+  Json raw={{"schema_version",3},{"execution_model","fused_kernel_windows"},{"clock_ps",clock_ps},
+            {"window_policy","continuous_pim_descriptors"},
             {"vlm_memory_model","calibrated_kernel_durations; no per-request GPU DRAM simulation"},
             {"refresh_policy",{{"rank0","REFpb"},{"rank1","REFab"}}},{"stages",stages},{"phases",phases},{"ae_gpu",ae_gpu}};
   uint64_t pr=0,pw=0,commands=0,ooo=0,prefetch=0,vr=0,vw=0;
@@ -196,6 +221,7 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
     {"vlm_calibrated_sum_us",us(calibrated_total)},{"vlm_accounted_read_bytes",vr},{"vlm_accounted_write_bytes",vw},
     {"gpu_read_bytes",0},{"gpu_write_bytes",0},{"pim_read_bytes",pr},{"pim_write_bytes",pw},
     {"checked_commands",commands},{"PIM_out_of_order_issues",ooo},{"PIM_prefetched_prerequisites",prefetch},
+    {"PIM_descriptor_continuations",std::count(continues.begin(),continues.end(),true)},
     {"serial_epoch_reset",false},{"frontend_iterations",iterations}};
   for(const char* key:{"GPU_act1","GPU_act2","GPU_prepb","GPU_preab","GPU_reads","GPU_writes","GPU_row_hits","GPU_row_misses"})raw["metrics"][key]=0;
   std::filesystem::create_directories(output);std::ofstream out(output+"/raw.json");out<<raw.dump(2)<<'\n';

@@ -15,8 +15,10 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "ramulator2/python"))
 from ramulator.dram.lpddr5x_pim import build_spec
+from tools.audit_fused_kernels import audit_timeline
 
 MODEL = "fused_kernel_windows"
 CHANNELS = 16
@@ -126,11 +128,14 @@ class Runner:
         assert result.returncode == 0, f"{name}: native run failed\n{result.stdout}\n{result.stderr}"
         raw = json.loads((directory / "native/raw.json").read_text())
         self.common(raw, stages, durations, sectors)
+        audit_timeline(raw, events or schedule(stages), ledger, workload)
         return raw
 
     def common(self, raw, stages, durations, sectors):
         metrics = raw["metrics"]
+        assert raw["schema_version"] == 3
         assert raw["execution_model"] == MODEL
+        assert raw["window_policy"] == "continuous_pim_descriptors"
         assert metrics["AE_GPU_wait_us"] == 0
         assert metrics["vlm_accounted_read_bytes"] == len(durations) * sectors * 32
         assert metrics["vlm_accounted_write_bytes"] == len(durations) * sectors * 32
@@ -161,15 +166,25 @@ class Runner:
             assert bus["gpu_read_bytes"] == bus["gpu_write_bytes"] == 0
         assert sum(bus["pim_read_bytes"] for bus in raw["bus"]) == expected_reads
         assert sum(bus["pim_write_bytes"] for bus in raw["bus"]) == expected_writes
+        continuations = sum(p["phase"] == "continue" for p in raw["phases"])
+        assert metrics["PIM_descriptor_continuations"] == continuations
+        assert sum(p["phase"] == "launch" for p in raw["phases"]) == continuations
         for phase in raw["phases"]:
             assert phase["start_ck"] <= phase["end_ck"]
             if phase["phase"] != "join":
                 ready = phase["channel_ready_ck"]
                 assert len(ready) == CHANNELS
-                assert max(ready) == phase["end_ck"], phase
-            if phase["phase"] in {"upload", "join", "download", "transfer"}:
+                # Empty download may follow a long join: native completion
+                # timestamps stay earlier than the phase's zero-length boundary.
+                assert max(phase["start_ck"], max(ready)) == phase["end_ck"], phase
+            if phase["phase"] in {"upload", "launch", "join", "download", "transfer"}:
                 assert all(not phase["start_ck"] <= k["start_ck"] < phase["end_ck"]
-                           for k in raw["kernels"]), ("kernel started in exclusive phase", phase)
+                           for k in raw["kernels"]), ("kernel started before private compute", phase)
+            if phase["phase"] == "continue":
+                assert phase["start_ck"] == phase["end_ck"], phase
+            if phase["phase"] in {"upload", "download", "transfer"} and phase["start_ck"] < phase["end_ck"]:
+                assert all(k["end_ck"] <= phase["start_ck"] or k["start_ck"] >= phase["end_ck"]
+                           for k in raw["kernels"]), ("VLM overlapped exclusive transfer", phase)
         for ae in raw["ae_gpu"]:
             for kernel in raw["kernels"]:
                 assert kernel["end_ck"] <= ae["start_ck"] or kernel["start_ck"] >= ae["end_ck"], \
@@ -200,6 +215,43 @@ def assert_private_start(raw, stage_id=0):
     assert raw["kernels"][0]["start_ck"] == compute["start_ck"]
     assert raw["kernels"][0]["start_ck"] >= max(upload["channel_ready_ck"])
     return compute
+
+
+def completion_barriers(stage):
+    """Exercise allowed outer suffixes and same-CK descriptor retirement."""
+    for channel, outer in enumerate(stage["channels"]):
+        descriptor = next(op for op in outer if op["op"] in {"MAC_RUN", "ROPE_RUN"})
+        children = descriptor["children"]
+        children.append(operation(channel, "BARRIER", len(children), deps=[len(children) - 1]))
+        outer.append(operation(channel, "BARRIER", len(outer), deps=[descriptor["id"]]))
+    return stage
+
+
+def assert_continuation(raw, outgoing=0, incoming=1):
+    previous = [p["phase"] for p in raw["phases"] if p["stage_id"] == outgoing]
+    following = [p["phase"] for p in raw["phases"] if p["stage_id"] == incoming]
+    assert previous == ["upload", "compute", "continue", "download"], previous
+    assert following == ["launch", "compute", "join", "download"], following
+    compute = phase(raw, "compute", outgoing)
+    boundary = phase(raw, "continue", outgoing)
+    download = phase(raw, "download", outgoing)
+    launch = phase(raw, "launch", incoming)
+    assert compute["end_ck"] == boundary["start_ck"] == boundary["end_ck"]
+    assert boundary["end_ck"] == download["start_ck"] == download["end_ck"] == launch["start_ck"]
+    assert launch["end_ck"] > launch["start_ck"], "descriptor CA/decode launch lost its native latency"
+    assert phase(raw, "compute", incoming)["start_ck"] == launch["end_ck"]
+    assert raw["metrics"]["PIM_descriptor_continuations"] == 1
+    return launch
+
+
+def assert_separate_handoffs(raw):
+    assert raw["metrics"]["PIM_descriptor_continuations"] == 0
+    assert not any(p["phase"] in {"continue", "launch"} for p in raw["phases"])
+    for stage in raw["stages"]:
+        stage_id = stage["stage_id"]
+        if any(p["phase"] == "compute" and p["stage_id"] == stage_id for p in raw["phases"]):
+            phase(raw, "upload", stage_id)
+            phase(raw, "join", stage_id)
 
 
 def main():
@@ -283,6 +335,111 @@ def main():
         assert transfer["kernels"][0]["start_ck"] >= gate["end_ck"]
         assert_private_start(transfer, 1)
         print("fused-kernel regression passed: pure_transfer_cannot_open_kernel_window", flush=True)
+
+        # QKV -> local RoPE has no external transfer between descriptors. The
+        # final GPU nonlinear helper is still a real handoff, even without RD.
+        qkv = completion_barriers(fused_stage("qkv", export_count=0))
+        rope = completion_barriers(fused_stage("rope", upload_count=0, export_count=0))
+        for outer in rope["channels"]:
+            next(op for op in outer if op["op"] == "MAC_RUN")["op"] = "ROPE_RUN"
+        qkv_rope = runner.run("qkv_rope_keep_active_kernel_until_gpu_handoff",
+                              [qkv, rope], [long_duration, 7])
+        launch = assert_continuation(qkv_rope)
+        first, second = qkv_rope["kernels"]
+        assert first["start_ck"] < launch["start_ck"] < launch["end_ck"] < first["end_ck"]
+        assert phase(qkv_rope, "compute", 1)["end_ck"] < first["end_ck"]
+        assert phase(qkv_rope, "join", 1)["end_ck"] == first["end_ck"]
+        assert phase(qkv_rope, "download", 1)["start_ck"] == phase(qkv_rope, "download", 1)["end_ck"]
+        assert qkv_rope["ae_gpu"][0]["start_ck"] == first["end_ck"]
+        assert second["start_ck"] >= qkv_rope["ae_gpu"][0]["end_ck"]
+        print("fused-kernel regression passed: qkv_rope_keep_active_kernel_until_gpu_handoff", flush=True)
+
+        # PV -> O continues directly; O's external result export drains only
+        # after the same, unmodified VLM kernel deadline has been reached.
+        private_pair = [completion_barriers(fused_stage("pv", export_count=0)),
+                        fused_stage("o", upload_count=0)]
+        pv_o = runner.run("pv_o_join_only_at_real_export", private_pair, [long_duration, 7])
+        launch = assert_continuation(pv_o)
+        first, second = pv_o["kernels"]
+        assert first["start_ck"] < launch["start_ck"] < launch["end_ck"] < first["end_ck"]
+        assert phase(pv_o, "compute", 1)["end_ck"] < first["end_ck"]
+        assert phase(pv_o, "join", 1)["end_ck"] == first["end_ck"]
+        export = phase(pv_o, "download", 1)
+        assert export["start_ck"] == first["end_ck"] < export["end_ck"]
+        assert second["start_ck"] >= pv_o["ae_gpu"][0]["end_ck"]
+        print("fused-kernel regression passed: pv_o_join_only_at_real_export", flush=True)
+
+        # A completed kernel must not be replaced during descriptor launch,
+        # including a completion tie at an outgoing terminal BARRIER.
+        boundary_tie = runner.run("continuation_tie_waits_for_native_launch", private_pair,
+                                  [span, long_duration, 7])
+        launch = assert_continuation(boundary_tie)
+        assert boundary_tie["kernels"][0]["end_ck"] == phase(boundary_tie, "compute", 0)["end_ck"]
+        assert boundary_tie["kernels"][1]["start_ck"] == launch["end_ck"]
+        assert boundary_tie["kernels"][1]["start_ck"] > boundary_tie["kernels"][0]["end_ck"]
+        assert boundary_tie["kernels"][2]["start_ck"] >= boundary_tie["ae_gpu"][0]["end_ck"]
+        print("fused-kernel regression passed: continuation_tie_waits_for_native_launch", flush=True)
+
+        chain_probe = runner.run("continuous_chain_tie_probe", private_pair, [1])
+        assert_continuation(chain_probe)
+        chain_span = phase(chain_probe, "compute", 1)["end_ck"] - phase(chain_probe, "compute", 0)["start_ck"]
+        chain_tie = runner.run("continuous_final_result_tie_does_not_start_kernel", private_pair,
+                               [chain_span, 5])
+        assert_continuation(chain_tie)
+        assert chain_tie["kernels"][0]["end_ck"] == phase(chain_tie, "compute", 1)["end_ck"]
+        assert chain_tie["kernels"][1]["start_ck"] >= chain_tie["ae_gpu"][0]["end_ck"]
+        assert chain_tie["metrics"]["AE_VLM_join_us"] == 0
+        print("fused-kernel regression passed: continuous_final_result_tie_does_not_start_kernel", flush=True)
+
+        # One nonprivate operation on channel 15 must block the shortcut for
+        # every channel; checking only channel 0 would accept these fixtures.
+        incoming_upload = [private_pair[0], fused_stage("next_upload", upload_count=0,
+                                                        slow_upload_channel=15)]
+        blocked_upload = runner.run("channel15_upload_blocks_continuation", incoming_upload,
+                                    [long_duration, 7])
+        assert_separate_handoffs(blocked_upload)
+        assert phase(blocked_upload, "join", 0)["end_ck"] == blocked_upload["kernels"][0]["end_ck"]
+        assert phase(blocked_upload, "upload", 1)["start_ck"] >= blocked_upload["kernels"][0]["end_ck"]
+        print("fused-kernel regression passed: channel15_upload_blocks_continuation", flush=True)
+
+        outgoing_export = deepcopy(private_pair)
+        outer = outgoing_export[0]["channels"][15]
+        descriptor = next(op for op in outer if op["op"] == "MAC_RUN")
+        outer.append(operation(15, "RD", len(outer), deps=[descriptor["id"]], epoch="output"))
+        blocked_export = runner.run("channel15_export_blocks_continuation", outgoing_export,
+                                    [long_duration, 7])
+        assert_separate_handoffs(blocked_export)
+        download = phase(blocked_export, "download", 0)
+        assert download["start_ck"] == blocked_export["kernels"][0]["end_ck"] < download["end_ck"]
+        assert phase(blocked_export, "upload", 1)["start_ck"] >= download["end_ck"]
+        print("fused-kernel regression passed: channel15_export_blocks_continuation", flush=True)
+
+        gpu_events = schedule(private_pair)
+        gpu_events["events"].insert(1, dict(kind="gpu", name="between_descriptors", us=0.03, step=0, layer=0))
+        blocked_gpu = runner.run("ae_gpu_boundary_blocks_continuation", private_pair,
+                                 [long_duration, 7], events=gpu_events)
+        assert_separate_handoffs(blocked_gpu)
+        assert blocked_gpu["ae_gpu"][0]["start_ck"] == blocked_gpu["kernels"][0]["end_ck"]
+        assert phase(blocked_gpu, "upload", 1)["start_ck"] >= blocked_gpu["ae_gpu"][0]["end_ck"]
+        print("fused-kernel regression passed: ae_gpu_boundary_blocks_continuation", flush=True)
+
+        for field in ("layer", "step"):
+            events = schedule(private_pair)
+            events["events"][1][field] = 1
+            blocked = runner.run(f"{field}_boundary_blocks_continuation", private_pair,
+                                 [long_duration, 7], events=events)
+            assert_separate_handoffs(blocked)
+            assert phase(blocked, "join", 0)["end_ck"] == blocked["kernels"][0]["end_ck"]
+            assert phase(blocked, "upload", 1)["start_ck"] >= blocked["kernels"][0]["end_ck"]
+            print(f"fused-kernel regression passed: {field}_boundary_blocks_continuation", flush=True)
+
+        last_only = runner.run("last_private_descriptor_keeps_terminal_join", [qkv], [long_duration, 7],
+                               events=schedule([qkv], nonlinear_us=0))
+        assert_separate_handoffs(last_only)
+        assert not last_only["ae_gpu"]
+        assert phase(last_only, "join")["end_ck"] == last_only["kernels"][0]["end_ck"]
+        assert last_only["kernels"][1]["start_ck"] == phase(last_only, "download")["end_ck"]
+        print("fused-kernel regression passed: last_private_descriptor_keeps_terminal_join", flush=True)
 
         traffic = runner.run("sector_counts_do_not_generate_gpu_requests", stages, [long_duration, 7],
                              sectors=10_000_000)

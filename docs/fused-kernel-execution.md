@@ -1,9 +1,11 @@
 # Fused execution with calibrated VLM kernels
 
-This execution model follows the user's 2026-11-09 scheduling clarification.
+This execution model follows the user's latest 2026-11-09 scheduling clarification.
 `execution_model=fused_kernel_windows` applies only to concurrent fused f/g.
-The user selected **one descriptor per window**: PV→O and QKV→local RoPE
-also wait for the current VLM kernel before handing off the next descriptor.
+Continuous PIM work keeps the current VLM kernel running across PV→O and
+QKV→local RoPE. These boundaries deliver the next coarse command as soon as
+native timing permits; they do not wait for the current VLM kernel to finish.
+This supersedes the earlier rule that joined after every descriptor.
 The older `native_dram_requests` path remains an explicit, separate model.
 
 Each descriptor stage follows these boundaries across all sixteen channels:
@@ -15,12 +17,31 @@ Each descriptor stage follows these boundaries across all sixteen channels:
    kernels in dependency order. The GPU starts another kernel whenever the
    current one finishes and the private computation is still active; there is
    no kernel-size fitting or preemption.
-3. Finish the entire private program, including output writes to DRAM. Close
-   admission of new VLM kernels. If a VLM kernel is active, wait for its exact
-   calibrated completion event.
-4. Export all outputs using native ordinary DRAM reads. Execute the next AE GPU
-   helper/nonlinear block, or deliver the next descriptor, while VLM admission
-   remains closed. Pure transfer/setup stages have no VLM window.
+3. Finish the entire private program, including output writes to DRAM. At a
+   continuous boundary, retire the preceding stage's completion barriers and
+   deliver the next descriptor while the already-running VLM kernel continues.
+   At a payload transfer or AE GPU boundary, close admission of new VLM kernels
+   and wait for the current kernel's exact calibrated completion event.
+4. Export all outputs using native ordinary DRAM reads and execute the next AE
+   GPU helper/nonlinear block with VLM admission closed. Input payload uploads
+   and pure transfer/setup stages also remain exclusive. Only a descriptor-only
+   continuation may overlap an existing VLM kernel.
+
+A continuation requires adjacent PIM events in the same layer and denoising
+step, with one descriptor in each stage on all sixteen channels. Only BARRIER
+operations may follow the outgoing descriptor or precede the incoming one.
+The descriptor bodies must still pass the private-command checks. In the current
+f/g programs this admits PV→O, and in g also QKV→local RoPE. RoPE export/import
+and Q exchange retain their exclusive handoff behavior. A program name alone
+does not grant a continuation, and no payload request is skipped.
+
+The outgoing stage must fully finish before its controller cursor is replaced.
+The next descriptor still consumes native shared CA time and decode latency
+(21 CK + 1 CK under the current spec), including any prerequisite/refresh delay.
+All channels must finish delivery before the next private compute phase begins.
+An active VLM kernel retains its original start and completion timestamps across
+this descriptor-only launch. If it finishes during launch, a new VLM kernel
+starts only when the next compute phase opens.
 
 Native zero-time barriers and descriptor completion are settled before admitting
 a kernel at the same cycle. This prevents a kernel from starting just as PIM
@@ -51,11 +72,23 @@ rank0 row state or command-level interference. Their bytes are retained as
 This is a deliberate model change under the requested exclusive handoff rules,
 not a claim that the detailed concurrent DRAM trajectory is unchanged.
 
-`phases` records upload/compute/join/download boundaries and per-channel ready
+During a descriptor-only continuation, calibrated VLM time advances continuously.
+The model does not add the small shared-CA contention delay of that coarse
+command to the VLM kernel duration. The PIM-side command still pays its full
+native CA/decode cost. This is an explicit limitation of using calibrated kernel
+durations instead of GPU request-level simulation.
+
+`phases` distinguishes payload upload, descriptor-only launch, private compute,
+zero-time continuation, join, download and transfer, with per-channel ready
 times; `ae_gpu` records exclusive GPU helper intervals. `AE_VLM_join_us` measures
 waiting **before export**. `AE_GPU_wait_us` retains its older meaning and is zero
 here. Stage duration includes its join wait; subtract the explicit join when
 reporting native PIM phase time, and do not label that value an AE-solo result.
+Current raw output uses schema 3 and
+`window_policy: continuous_pim_descriptors`. `PIM_descriptor_continuations`
+counts safe boundaries: the full current f schedule has 180 and g has 360.
+These identifiers distinguish new runs from the historical every-descriptor
+join results below.
 
 ## Execution and audit
 
@@ -68,11 +101,16 @@ the same tool's `--case f` / `--case g`, then audit with
 
 The audit verifies native PIM byte conservation and refresh, all 18 layers × 10
 steps, exact calibrated kernel durations, zero native GPU transactions, no
-kernel overlap with handoff/nonlinear intervals, and full phase/timestamp
-identities. Small native regressions include long/short kernels, same-cycle
-completion with a trailing barrier, channel imbalance and pure transfer stages.
+kernel overlap with payload handoff/nonlinear intervals, and full phase/timestamp
+identities. A descriptor-only launch can overlap an already-running VLM kernel;
+it cannot admit a new one. Native completion barriers, all-channel readiness and
+exact kernel timestamps still constrain continuous PIM boundaries.
 
-## Completed run, 2026-11-09
+## Historical run with a join after every descriptor, 2026-11-09
+
+The following measurements used the superseded every-descriptor join policy,
+including joins at QKV→local RoPE and PV→O. They are retained unchanged as a
+historical baseline and are not measurements of the continuation policy above.
 
 Source `0046e8bfd29fb272a98fd945d135e5ac967d1a1c`, native binary SHA-256
 `76d1b07e6c1d89839abc438a0a5079aa4aef6cee24103d50f00cb92e65d9176b`.
@@ -96,10 +134,10 @@ resource checks and the original frontend smoke.
 This model change removes the 619790815 GPU transactions per case, but retains
 roughly 132 million PIM/refresh commands. The wall times were observed on
 einstein (f) and infinite-frontier (g); they are not a controlled same-host speedup
-benchmark. The simulated latency changes because descriptor handoffs now wait
-for whole kernels and O/FFN outputs really spill to DRAM before export.
+benchmark. In that historical run every descriptor handoff waited for whole
+kernels, and O/FFN outputs already spilled to DRAM before export.
 
-The [independent audit](../reference/fused-kernel-e2e/summary.json) verifies full
+The [historical independent audit](../reference/fused-kernel-e2e/summary.json) verifies full
 coverage, exact calibrated durations, zero native GPU transactions, exclusive
 handoffs, FIFO order, byte conservation and source/runtime/input hashes. Raw
 results and binaries are retained in the server campaign

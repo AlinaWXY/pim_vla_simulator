@@ -13,9 +13,26 @@ RD exports. The descriptor's completion includes all local result stores.
 `stage.kernel_window` exposes `descriptor_index_by_channel` and
 `export_begin_by_channel` under `mode: descriptor_compute`. An export index equal
 to the channel program length means that stage has no external export. The
-frontend releases a VLM compute window only after descriptor delivery on every
-channel, and joins the current VLM kernel before external export. No timing
-constants are encoded by this generator.
+frontend admits a new VLM kernel only after descriptor delivery on every
+channel, and joins the current VLM kernel before external payload export.
+An already-running VLM kernel continues across a safe descriptor-only boundary.
+No timing constants are encoded by this generator.
+
+The frontend classifies a continuous boundary structurally: two adjacent PIM
+events must belong to the same layer/step and each contain one descriptor on
+all sixteen channels. Only completion BARRIERs may follow the outgoing
+descriptor or precede the incoming one. Both descriptor bodies retain the
+private-only checks. The current programs therefore allow QKV→local RoPE and
+PV→O without joining VLM. Their preceding local stores and barriers still
+complete before the next stage starts. No generator command, source dependency,
+FIFO entry or output DRAM transfer is removed by this scheduling change.
+
+The next descriptor is issued through the native shared CA/decode path while
+the current calibrated VLM kernel continues. Its duration does not include a
+new estimate of the coarse command's small GPU CA interference; PIM command
+timing remains explicit. No new VLM kernel starts during descriptor delivery.
+This replaces the earlier every-descriptor join policy, whose measured results
+remain separately identified as historical in the execution document.
 
 RoPE import/export and both Q-exchange stages use
 `mode: exclusive_handoff`: the entire stage remains an exclusive GPU handoff,
