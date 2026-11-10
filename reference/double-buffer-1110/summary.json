@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "source_commit": "a08db04cfeb8630f74ccdce1f109fe6260d193ca",
+  "publication_source_commit": "6a7436007ce37560586486812fcd2ab5af88cba8",
+  "baseline_source_commit": "a766f13d2316cf8d6d4e2b32091af5765dbeefce",
+  "workload": {
+    "layers": 18,
+    "denoising_steps": 10,
+    "channels": 16,
+    "clock_ps": 938,
+    "mac_freq_mult": 4,
+    "dataflow": "streaming",
+    "layout": "token",
+    "rope": "local",
+    "arbitration": "pim_head",
+    "vlm_release": "closed_loop",
+    "w_max": 128,
+    "write_high": 96,
+    "write_low": 32,
+    "alpha": 1.0
+  },
+  "repetitions": {
+    "baseline_original_combined": 2,
+    "baseline_original_ae_solo": 2,
+    "baseline_instrumented_combined": 1,
+    "double_buffer_combined": 1,
+    "double_buffer_ae_solo": 1,
+    "double_buffer_placement_replay": 1
+  },
+  "slurm": {
+    "baseline": 1984774,
+    "observer_build": 1989804,
+    "e_baseline_replay": "1989805_0",
+    "e_double_buffer_combined": "1989805_2",
+    "e_double_buffer_solo": "1989805_3",
+    "e_double_buffer_placement": "1991040_1"
+  },
+  "inputs": {
+    "ae_schedule_path": {
+      "name": "ae-token_local_before.json",
+      "sha256": "9716dcb4e6b9b7ae86a303660d51857ca3500b717a0471ef245b3b78311d1114"
+    },
+    "mlp_path": {
+      "name": "calibration-scaled.json",
+      "sha256": "96141e70cf3220c45ce28a7619761b1c89de732a25b487c408ce18c21485816f"
+    },
+    "program_path": {
+      "name": "token_local_before.json",
+      "sha256": "5851418294638fd6a0c9dac9e0636e1cd1713e1fc34e5f720478068e488016ae"
+    },
+    "vlm_path": {
+      "name": "final-vlm.json",
+      "sha256": "454bc445e561fe661be0f66460faecb8be8bfa9d61c27fa3fe7f71d3cf3b6678"
+    }
+  },
+  "verification": {
+    "baseline_combined_byte_identical": true,
+    "double_buffer_placement_byte_identical": true,
+    "configs_equal_except_program_path": true,
+    "dq_bytes_equal": true,
+    "kernel_counts_and_work_equal": true
+  },
+  "runs": [
+    {
+      "case": "e",
+      "e2e_ms": 128.883328322,
+      "ae_solo_ms": 53.312743932,
+      "ae_elapsed_ms": 103.304466034,
+      "ae_gpu_wait_ms": 49.665476322,
+      "pim_stage_ms": 34.57672015,
+      "vlm_tail_ms": 25.578862288,
+      "vlm_kernel_duration_sum_ms": 109.82105876,
+      "gpu_rw_during_pim": 120969226,
+      "gpu_rw_per_pim_us": 3498.5743435240197,
+      "gpu_ready_admitted": 123996884,
+      "gpu_ready_rejected": 16630588,
+      "gpu_ready_admit_pct": 88.1740119739904,
+      "wrgb_issue_during_mac": 0,
+      "wrgb_total": 19123200,
+      "wrgb_dq_during_mac_ck": 0,
+      "wrgb_dq_total_ck": 38246400
+    },
+    {
+      "case": "e-db",
+      "e2e_ms": 129.504898712,
+      "ae_solo_ms": 48.672569554,
+      "ae_elapsed_ms": 85.724947476,
+      "ae_gpu_wait_ms": 36.626022215999996,
+      "pim_stage_ms": 30.036655697999997,
+      "vlm_tail_ms": 43.779951236,
+      "vlm_kernel_duration_sum_ms": 110.44262914999999,
+      "gpu_rw_during_pim": 93645278,
+      "gpu_rw_per_pim_us": 3117.699884485988,
+      "gpu_ready_admitted": 95998908,
+      "gpu_ready_rejected": 16020938,
+      "gpu_ready_admit_pct": 85.69812531254506,
+      "wrgb_issue_during_mac": 17995825,
+      "wrgb_total": 19123200,
+      "wrgb_dq_during_mac_ck": 32465903,
+      "wrgb_dq_total_ck": 38246400
+    }
+  ],
+  "delta_db_minus_baseline": {
+    "e2e_ms": 0.621570389999988,
+    "ae_solo_ms": -4.6401743779999975,
+    "ae_elapsed_ms": -17.579518558000004,
+    "ae_gpu_wait_ms": -13.039454106000008,
+    "pim_stage_ms": -4.540064452000003,
+    "vlm_tail_ms": 18.201088948000002,
+    "vlm_kernel_duration_sum_ms": 0.621570389999988,
+    "gpu_rw_during_pim": -27323948,
+    "gpu_rw_per_pim_us": -380.87445903803155,
+    "gpu_ready_admitted": -27997976,
+    "gpu_ready_rejected": -609650,
+    "gpu_ready_admit_pct": -2.475886661445344,
+    "wrgb_issue_during_mac": 17995825,
+    "wrgb_total": 0,
+    "wrgb_dq_during_mac_ck": 32465903,
+    "wrgb_dq_total_ck": 0
+  },
+  "gpu_placement": {
+    "operator": "all",
+    "accepted_total": "95998908",
+    "gpu_rd_wr": "93645278",
+    "gpu_rd_wr_during_mac": "48921464",
+    "gpu_rd_wr_during_mac_both_halves_ready": "32053255",
+    "gpu_rd_wr_during_mac_next_half_loading": "15195014",
+    "gpu_rd_wr_during_mac_final_batch": "1673195",
+    "gpu_rd_wr_outside_mac": "44723814",
+    "both_halves_ready_pct_of_all_rd_wr": "34.228372945830756",
+    "both_halves_ready_pct_of_rd_wr_during_mac": "65.51981968487289",
+    "gpu_dq_ck": "187290556",
+    "gpu_dq_ck_during_mac": "103370207",
+    "gpu_dq_ck_during_mac_both_halves_ready": "62997582",
+    "both_halves_ready_pct_of_all_gpu_dq_ck": "33.63628329449777",
+    "gpu_bursts_wholly_both_halves_ready": "31410616",
+    "gpu_bursts_partly_both_halves_ready": "176350"
+  }
+}

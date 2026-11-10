@@ -6,6 +6,10 @@
 
 上游基线为 CMU-SAFARI/ramulator2 **`7bead6cb7c4b03e095c6d4769ae3181a8e0bf6da`**（2026-11-03，项目版本 2.1）。原任务保存在 [重写方案](docs/rewrite-plan.txt)，逐项交付状态见 [需求矩阵](docs/requirements-matrix.md)。
 
+## Version4 Streaming 输入双缓冲
+
+`xinyao_1110_V4` 将每 bank 的 1 KiB 输入 SRF 划为两个 512 B 半区，使 streaming `WRGB` 可以在另一半的 `MACAB` 执行时搬运数据。Case e 使用原 PIMHead 策略与 Version3 的 W_max=128 缩放流量。AE solo 从 **53.313 ms** 降到 **48.673 ms**，端到端从 **128.883 ms** 增至 **129.505 ms**。 [双缓冲结果与原始证据](reference/double-buffer-1110/README.md)
+
 ## Version3 闭环 VLM
 
 `xinyao_1109_V3` 使用原生逐请求闭环模型。dev0 作业 `1984774` 使用缩放流量完成了 b、e、e-frfcfs、e-gap 和 g；发布快照中 e-lookahead 仍在运行。已完成的每组并发和 AE solo 各重复两次，原始输出逐字节一致。e 和 g 的端到端延迟分别为 **128.883328 ms** 和 **127.487527 ms**。

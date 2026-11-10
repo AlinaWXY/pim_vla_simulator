@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "archive": {
+    "name": "native-evidence.tar.gz",
+    "sha256": "334292308e8856eb5ca590926e6a0123f68bffbf9d4515838b60801e1eed9520",
+    "bytes": 3643895
+  },
+  "files": {
+    "logs/prepare-1989804.log": {
+      "sha256": "836cbaa9de8b1dfd33716073ed2a2107b1b15af6cad1725bb731b4e7ff394456",
+      "bytes": 1394
+    },
+    "logs/replay-1989805_0.log": {
+      "sha256": "6999f73606756dc2d938327b36a350c63173a7de099676f848eca89b20fa2805",
+      "bytes": 523
+    },
+    "logs/replay-1989805_2.log": {
+      "sha256": "06a20221552acf7866731bd60365a146bc1dbacbdc4decfdcafbedd5b1cb7f88",
+      "bytes": 481
+    },
+    "logs/replay-1989805_3.log": {
+      "sha256": "29c48c266dfc4c57e2ab96ba92f638f012fba1a088a1bf0013ec2908a6c2a3b0",
+      "bytes": 496
+    },
+    "logs/replay-1991040_1.log": {
+      "sha256": "32914e437592142c8a6af5d99e433be22c9e7aabee8daafd47082426c9eefbe4",
+      "bytes": 314
+    },
+    "observers/gpu-placement/gap_profile.h": {
+      "sha256": "e5282e9b47315da1b007ab4f17f2bdbaa51be6b4a176b39037f32e85d9298033",
+      "bytes": 9876
+    },
+    "observers/gpu-placement/instrument.py": {
+      "sha256": "8ade14c0680f15c88cc438b95a69c201082f51c2a6db6ee32628dfdc86e82495",
+      "bytes": 1247
+    },
+    "observers/input-timing/input_profile.h": {
+      "sha256": "fc78e3da68936b0af52f56d4eb9cc728f572365ed16b3e52428a07c969392167",
+      "bytes": 7760
+    },
+    "observers/input-timing/instrument.py": {
+      "sha256": "f970d72bf6720ef432ba15c2880d83f9ce781683ec0bc3553da723a36c4d4274",
+      "bytes": 1442
+    },
+    "runs/e-db-solo/input-config.json": {
+      "sha256": "d1093c751b23d81d239705492681913ee24cb6d5a2dcf9ab2013a9c1045ccea7",
+      "bytes": 106648
+    },
+    "runs/e-db-solo/layer0-ch0-commands.csv": {
+      "sha256": "fd5424e85daadff4e3f17f9154f8664e9703d7ad0295055b4ea6c0aab2ce1aeb",
+      "bytes": 384403
+    },
+    "runs/e-db-solo/profile.csv": {
+      "sha256": "757cae1769f47fbe18566696178979df01aa962a4ca5e880497181628215e939",
+      "bytes": 7136871
+    },
+    "runs/e-db-solo/raw.json": {
+      "sha256": "a283579c173beb72106ae12c29dc702e5d166582004e5d187426c7a9589839f1",
+      "bytes": 5542740
+    },
+    "runs/e-db/gpu-placement-profile.csv": {
+      "sha256": "54ed46686883cb7f56c6018e09570b8a87bbe5142190aa3d90ad845dfa535d52",
+      "bytes": 763
+    },
+    "runs/e-db/input-config.json": {
+      "sha256": "074c46aae1117da7b2e91168904a622815ec034aad7f049a06da502341e5c33b",
+      "bytes": 106767
+    },
+    "runs/e-db/layer0-ch0-commands.csv": {
+      "sha256": "a9e8326b15ca154f7486c5b6ecae129d57827063fe77c614fed9b22d1454fac3",
+      "bytes": 778391
+    },
+    "runs/e-db/profile.csv": {
+      "sha256": "4f0b1853d3ff5eb8c47bf15bae2fa7eac0293f0ae0ee1236bf236bf52953a48c",
+      "bytes": 7484759
+    },
+    "runs/e-db/raw.json": {
+      "sha256": "cf6df61c9b342862e3bd34f87489b2a211f4354568778265afeb7a726b5dea02",
+      "bytes": 9305715
+    },
+    "runs/e/profile.csv": {
+      "sha256": "cd2f22532e94bffac3728e3ef1433ffe931f4e8bf060af4c48b43d680733ae14",
+      "bytes": 7398664
+    }
+  },
+  "original_baseline": {
+    "archive": "../ablation-scaled-w128/dev0-evidence.tar.gz",
+    "combined_raw_sha256": "c16e9a4f8e2e568ae381e7b999f51b0f244ac10f496ecd676918ff8ceee627b6",
+    "ae_solo_raw_sha256": "71cf63a75ced67010b5c4453555bc022d3f47986c235094c8afd6b1de9853f71"
+  },
+  "binaries": {
+    "observer_sha256": "c507e4be1a6320ca542dec34b2466f746a5346021a85f8edad77addc433f8491",
+    "placement_observer_sha256": "bcbce1bb0b1c6d88c36d4972ff5d6840307096ceb66937170277dc60ea766576",
+    "runtime_sha256": "5d40bd44b5856697d84bb1b15399f2b13030bfa05d9995a497edd44399845623"
+  },
+  "programs": {
+    "double_buffer_token_local_before_sha256": "0c49ca51b4ee28fcce8edcd697bc2237643e59f1d8f1a57be605e427b6398a46",
+    "baseline_token_local_before_sha256": "5851418294638fd6a0c9dac9e0636e1cd1713e1fc34e5f720478068e488016ae"
+  }
+}
