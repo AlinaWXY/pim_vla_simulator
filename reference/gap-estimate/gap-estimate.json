@@ -357,18 +357,22 @@
   },
   "g_model_comparison": {
     "closed_loop_ms": {
-      "ae_gpu_or_no_vlm_ms": 18.163703082000005,
-      "exclusive_pim_ms": 0,
-      "vlm_slowdown_ms": 3.9695859839999996,
-      "vlm_solo_ms": 105.35423803799999
+      "ae_elapsed_ms": 96.6943866,
+      "ae_gpu_wait_ms": 38.935810634,
+      "ae_solo_ms": 57.742093430000004,
+      "pim_stage_delta_ms": 0.016482536000000002,
+      "vlm_tail_ms": 30.793140504
     },
     "closed_loop_raw_sha256": "23ee3a6f53c9d86a33878564a811fd88ebd036d722ed308255cd112041138147",
     "closed_loop_total_ms": 127.487527104,
+    "closed_loop_vlm_solo_ms": 105.35423803799999,
+    "estimate_vlm_kernel_sum_ms": 106.89316117199999,
     "overlap_estimate_ms": {
-      "ae_gpu_or_no_vlm_ms": 16.68122316,
-      "exclusive_pim_ms": 6.758327519999995,
-      "vlm_slowdown_ms": 0,
-      "vlm_solo_ms": 106.89316117199999
+      "ae_elapsed_ms": 56.16715859999999,
+      "ae_gpu_wait_ms": 0,
+      "ae_solo_ms": 56.16715859999999,
+      "pim_stage_delta_ms": 0,
+      "vlm_tail_ms": 74.165553252
     },
     "overlap_estimate_total_ms": 130.332711852
   },

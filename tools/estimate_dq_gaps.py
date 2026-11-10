@@ -360,15 +360,15 @@ def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms):
 def g_model_comparison(estimate):
     archive = read_json(SCALED_ABLATION)
     old = next(row for row in archive["results"] if row["case"] == "g")
-    solo_ms = archive["calibration"]["total_us"] / 1000
-    slowdown_ms = old["vlm_slowdown_ms"]
-    old_parts = dict(vlm_solo_ms=solo_ms, vlm_slowdown_ms=slowdown_ms, exclusive_pim_ms=0,
-                     ae_gpu_or_no_vlm_ms=old["total_ms"] - solo_ms - slowdown_ms)
-    new_parts = dict(vlm_solo_ms=estimate["vlm_kernel_sum_ms"], vlm_slowdown_ms=0,
-                     exclusive_pim_ms=estimate["ae_solo_ms"] - estimate["ae_gpu_ms"] - estimate["overlap_ms"],
-                     ae_gpu_or_no_vlm_ms=estimate["ae_gpu_ms"])
+    old_parts = {key: old[key] for key in ("ae_solo_ms", "pim_stage_delta_ms", "ae_gpu_wait_ms", "vlm_tail_ms")}
+    old_parts["ae_elapsed_ms"] = math.fsum(old_parts[key] for key in
+                                          ("ae_solo_ms", "pim_stage_delta_ms", "ae_gpu_wait_ms"))
+    new_parts = dict(ae_solo_ms=estimate["ae_solo_ms"], pim_stage_delta_ms=0, ae_gpu_wait_ms=0,
+                     ae_elapsed_ms=estimate["ae_solo_ms"], vlm_tail_ms=estimate["vlm_remaining_ms"])
     return dict(closed_loop_ms=old_parts, overlap_estimate_ms=new_parts,
                 closed_loop_total_ms=old["total_ms"], overlap_estimate_total_ms=estimate["total_ms"],
+                closed_loop_vlm_solo_ms=archive["calibration"]["total_us"] / 1000,
+                estimate_vlm_kernel_sum_ms=estimate["vlm_kernel_sum_ms"],
                 closed_loop_raw_sha256=old["raw_sha256"])
 
 
@@ -414,14 +414,18 @@ def report_md(data):
         lines += [f"整 kernel 融合窗口的归档与回退版本重跑分别为 {g_e2e['archived_total_ms']:.6f} ms、"
                   f"{g_e2e['total_ms']:.6f} ms，同口径差值 {g_e2e['delta_from_archive_ms']:+.6f} ms。", ""]
     comparison = data["g_model_comparison"]
-    lines += ["逐请求闭环在 I/O epoch 期间限制新 GPU DRAM 命令，已发请求仍可返回，kernel 的标称计算时间继续流逝。"
-              "上面的重叠估算将整段 I/O epoch 作为 VLM 暂停时间。下表比较这两种口径。", "",
+    lines += ["两种口径都在 AE 时间里计入 PIM I/O，包括搬入、读出和 Q 交换。逐请求闭环在 I/O epoch "
+              "期间限制新 GPU DRAM 命令，已发请求仍可返回，kernel 的标称计算时间继续流逝。"
+              "重叠估算把整段 I/O epoch 作为 VLM 暂停时间，影响的是 AE 结束后的 VLM 剩余量。", "",
               "| g 的时间项（ms） | 归档逐请求闭环 | AE solo 重叠估算 |",
               "|---|---:|---:|"]
-    for key, label in (("vlm_solo_ms", "VLM 基线"), ("vlm_slowdown_ms", "并发时 VLM kernel 总时长增量"),
-                       ("exclusive_pim_ms", "单独串行计费的 PIM I/O"), ("ae_gpu_or_no_vlm_ms", "AE GPU 或 VLM 未运行的时间")):
+    for key, label in (("ae_solo_ms", "AE solo（含 PIM I/O）"), ("pim_stage_delta_ms", "并发 PIM stage 增量"),
+                       ("ae_gpu_wait_ms", "AE GPU 等待"), ("ae_elapsed_ms", "AE 完成时刻"),
+                       ("vlm_tail_ms", "AE 完成后的 VLM 尾部")):
         lines.append(f"| {label} | {comparison['closed_loop_ms'][key]:.6f} | {comparison['overlap_estimate_ms'][key]:.6f} |")
-    lines.append(f"| 端到端 | {comparison['closed_loop_total_ms']:.6f} | {comparison['overlap_estimate_total_ms']:.6f} |")
+    lines += [f"| 端到端 | {comparison['closed_loop_total_ms']:.6f} | {comparison['overlap_estimate_total_ms']:.6f} |", "",
+              f"闭环使用 {comparison['closed_loop_vlm_solo_ms']:.6f} ms 的 VLM solo 校准，"
+              f"重叠估算使用 {comparison['estimate_vlm_kernel_sum_ms']:.6f} ms 的融合窗口 E2E kernel 合计。"]
     if "VLM_in_AE_by_phase_ms" in g_e2e:
         phases = g_e2e["VLM_in_AE_by_phase_ms"]
         lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
