@@ -27,14 +27,19 @@ FUSED = ROOT / "reference/fused-kernel-continuous-e2e/summary.json"
 SCALED_ABLATION = ROOT / "results/ablation-scaled-w128/ablation.json"
 FUSED_COMPUTE_STAGES = {"qkv", "qkt", "pv", "o", "gate_up", "down", "rope"}
 FUSED_TRANSFER_STAGES = {"rope_export", "rope_import", "q_exchange_export", "q_exchange_import"}
-# Match the early shared-tensor phase rules to the current g program.
+# Match the early shared-tensor phase rules to the current fused programs.
 # Inputs are at the stage head and the score consumer is at the stage tail.
-G_SHARED_IO = {
+FUSED_INPUT_AND_SCORE_IO = {
     "qkv": ("qkv_input", "WR", "head", "projection_gpu_input_stage"),
     "qkt": ("score_export", "RD", "tail", "qk_scores_dram_export"),
     "pv": ("pv_input", "WR", "head", "pv_gpu_input_stage"),
     "gate_up": ("gate_up_input", "WR", "head", "gate_up_gpu_input_stage"),
     "down": ("down_input", "WR", "head", "down_gpu_input_stage"),
+}
+FUSED_SHARED_IO = {
+    "f": dict(FUSED_INPUT_AND_SCORE_IO, rope_export=("rope_export", "RD", "whole", "gpu_rope_export"),
+              rope_import=("rope_import", "WR", "whole", "gpu_rope_import")),
+    "g": FUSED_INPUT_AND_SCORE_IO,
 }
 PAIR_REFERENCE = dict(RRR=(6, 4), RRW=(6, 4), RWR=(15, 13), RWW=(5, 3),
                       WRR=(15, 13), WRW=(15, 13), WWR=(14, 12), WWW=(4, 2))
@@ -87,7 +92,8 @@ def interval_union_ck(intervals):
     return total
 
 
-def load_trace(directory, step, layer, *, g_shared_io=False):
+def load_trace(directory, step, layer, *, shared_io_rules=None):
+    shared_io_rules = shared_io_rules or {}
     on, off = (directory / mode for mode in ("on", "off"))
     verification = read_json(directory / "verification.json")
     if ((on / "raw.json").read_bytes() != (off / "raw.json").read_bytes()
@@ -137,7 +143,7 @@ def load_trace(directory, step, layer, *, g_shared_io=False):
         dq = 0
         blocked_count = blocked_full = blocked_ck = 0
         channels = []
-        shared_rule = G_SHARED_IO.get(event["name"]) if g_shared_io else None
+        shared_rule = shared_io_rules.get(event["name"])
         shared_span = None
         for channel in range(N):
             key = sid, channel
@@ -207,8 +213,8 @@ def load_trace(directory, step, layer, *, g_shared_io=False):
                 if len(matches) != 1:
                     raise ValueError(f"cannot identify a shared-tensor epoch: {directory}, {key}")
                 candidate = matches[0]
-                if ((boundary == "head" and candidate[0] != start)
-                        or (boundary == "tail" and candidate[1] != end)
+                if ((boundary in ("head", "whole") and candidate[0] != start)
+                        or (boundary in ("tail", "whole") and candidate[1] != end)
                         or (shared_span is not None and candidate != shared_span)):
                     raise ValueError(f"shared-tensor epoch not aligned across the stage/channels: {directory}, {key}")
                 shared_span = candidate
@@ -367,11 +373,17 @@ def fused_summary(traces, ck_ms, b_ms):
     return rows
 
 
-def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms, *, g_shared_io=False):
+def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms, *, shared_io_rules=None):
+    shared_io_rules = shared_io_rules or {}
     stages = []
-    expected = set(G_SHARED_IO) if g_shared_io else set()
+    expected = set(shared_io_rules)
     if {row["name"] for row in geometry if "shared_tensor_io" in row} != expected:
         raise ValueError("fused AE solo shared-tensor phase coverage differs")
+    if "rope_export" in expected:
+        positions = {row["name"]: row["event_index"] for row in geometry}
+        rope_events = timeline["events"][positions["rope_export"] + 1:positions["rope_import"]]
+        if not any(row["kind"] == "gpu" and row["name"] == "rope_apply" for row in rope_events):
+            raise ValueError("shared Q/K I/O requires retained GPU RoPE between export and import")
     for row in geometry:
         name, duration, epoch = (row[key] for key in ("name", "t_ck", "epoch_union_ck"))
         if not 0 <= epoch <= duration or name not in FUSED_COMPUTE_STAGES | FUSED_TRANSFER_STAGES:
@@ -393,13 +405,16 @@ def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms, *, g_shared_io=False
         raise ValueError("fused AE solo stages and GPU blocks do not cover the timeline")
     scale = timeline["clock_ps"] * REPEATS / 1e9
     deduplicated_ck = sum(row["deduplicated_io_ck"] for row in stages)
+    q_exchange_ck = sum(row["accounted_ck"] for row in stages
+                        if row["name"] in ("q_exchange_export", "q_exchange_import"))
     ae_ms = (ae_ck - deduplicated_ck) * scale
     epoch_free_ms = sum(row["overlap_ck"] for row in stages) * scale
     overlap_ms = min(vlm_ms, epoch_free_ms)
     total_ms = ae_ms + vlm_ms - overlap_ms
     return dict(ae_solo_ms=ae_ms, ae_trace_ms=ae_ck * scale, ae_gpu_ms=ae_gpu_ck * scale,
-                ae_accounting="legacy_shared_tensor_io" if g_shared_io else "explicit_native_io",
+                ae_accounting="legacy_shared_tensor_io" if shared_io_rules else "explicit_native_io",
                 deduplicated_io_ms=deduplicated_ck * scale, vlm_profile_ms=vlm_ms,
+                q_exchange_ms=q_exchange_ck * scale,
                 epoch_free_compute_stage_ms=epoch_free_ms, overlap_ms=overlap_ms,
                 vlm_remaining_ms=vlm_ms - overlap_ms, total_ms=total_ms,
                 explicit_native_io_total_ms=ae_ck * scale + vlm_ms - overlap_ms,
@@ -471,7 +486,7 @@ def report_md(data):
     lines += ["", "## c–g 同切片对照", "",
               f"在实跑的两个候选切片中，step {selected['step']} / layer {selected['layer']} 的 e/g "
               "端到端比值最高。五个变体均使用该切片重复 180 次。c–e 取 α=1.0、same_first，"
-              "f/g 取融合阶段的重叠估算，g 使用旧版共享张量 I/O 去重。", "",
+              "f/g 取融合阶段的重叠估算，并统一使用旧版共享张量 I/O 去重。", "",
               "重叠指 AE 结束前已经推进的 VLM profile 等效时间。它与 VLM 尾部之和为 "
               f"{comparison['vlm_profile_ms']:.6f} ms，计费 AE 与尾部之和为端到端估算。", "",
               "| 变体 | 计费 AE (ms) | AE 期间 VLM 重叠 (ms) | AE 后 VLM 尾部 (ms) | 端到端估算 (ms) |",
@@ -496,13 +511,13 @@ def report_md(data):
     lines += ["", "## f、g 的 AE solo 重叠估算", "",
               "端到端时间等于计费 AE 加 c–e 使用的同一份 VLM profile 时长，再减去 VLM 可在 AE "
               "期间完成的时间。使用回退版本实跑的 AE solo 切片，step 0 / layer 0 重复 180 次。"
-              "f 保留原生 I/O，g 按旧版共享张量口径去重，同时沿用当前 trace 中的 AE GPU 块时长。", "",
+              "f/g 均按旧版共享张量口径去重，同时沿用当前 trace 中的 AE GPU 块时长。", "",
               "私有 PIM 计算指描述符内走私有 CA 的本地访问与运算，例如 LOCALRD、BCAST、MACAB、"
               "本地 RoPE 和结果写回。描述符发令占用共享 CA。"
               "AE solo trace 记录的是 stage 和 I/O epoch 边界。估算取含私有计算的 stage 在所有通道"
               "均处于 I/O epoch 外的时长，按理想重叠计入。该窗口也可能包含屏障及等待。"
-              "RoPE 导入导出、Q 交换等纯传输 stage 全程保留在 AE 时间内。"
-              "g 扣除的共享张量阶段原本就在 I/O epoch 内，扣除后 epoch 外重叠时长相同。", "",
+              "Q 交换及其余非去重传输全程计入 AE。"
+              "去重阶段原本就在 I/O epoch 内，扣除后 epoch 外重叠时长相同。", "",
               "| 切片 × 180 | 原始 AE (ms) | 去重 I/O (ms) | 计费 AE (ms) | VLM profile (ms) | epoch 外重叠 (ms) | 端到端估算 (ms) | b / 端到端 |",
               "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for label, r in data["fused_ae_solo_overlap"].items():
@@ -539,15 +554,19 @@ def report_md(data):
               "原始 DQ 流量和时间线完整保留。", "",
               "当前 AE 输入对普通保留 kernel 使用自然缓存 trace，对另测的边界 helper 使用 32 MiB "
               "清缓存后的设备 kernel 中位数。两类时长都包含各自运行时经历的访存。"
-              "g 的估算沿用旧版共享分配假设，将对应的暂存写入及 score 读出归入现有 GPU producer 或 consumer。"
-              "Q 交换和其他结果导出仍计入 AE。", "",
-              "| g 的去重阶段 | 当前 epoch | 首层 × 180 (ms) | 末层 × 180 (ms) |", "|---|---|---:|---:|"]
+              "f/g 沿用旧版共享分配假设，将对应的暂存写入及 score 读出归入现有 GPU producer 或 consumer。"
+              "f 额外去重 GPU RoPE 已覆盖的 Q/K 导出和导入。跨 rank Q 交换和其他结果导出仍计入 AE。", "",
+              f"| {selected['slice']} × 180 的去重阶段 | 当前 epoch | f (ms) | g (ms) |", "|---|---|---:|---:|"]
     scale = data["clock_ps"] * REPEATS / 1e9
-    first, last = ({row["name"]: row for row in data["fused_ae_solo_overlap"][label]["stages"]}
-                   for label in ("g-s0-l0", "g-s9-l17"))
-    for stage, (epoch, _, _, _) in G_SHARED_IO.items():
-        lines.append(f"| {stage} | {epoch} | {first[stage]['deduplicated_io_ck'] * scale:.6f} | "
-                     f"{last[stage]['deduplicated_io_ck'] * scale:.6f} |")
+    fused = data["fused_ae_solo_overlap"]
+    f, g = (fused[f"{case}-{selected['slice']}"] for case in "fg")
+    f_stages, g_stages = ({row["name"]: row["deduplicated_io_ck"] for row in case["stages"]}
+                         for case in (f, g))
+    for stage, (epoch, _, _, _) in FUSED_SHARED_IO["f"].items():
+        g_value = f"{g_stages[stage] * scale:.6f}" if stage in g_stages else "—"
+        lines.append(f"| {stage} | {epoch} | {f_stages[stage] * scale:.6f} | {g_value} |")
+    lines += ["", f"同切片中完整计入 AE 的 Q 交换时间为 f {f['q_exchange_ms']:.6f} ms、"
+              f"g {g['q_exchange_ms']:.6f} ms。"]
     if "VLM_in_AE_by_phase_ms" in g_e2e:
         phases = g_e2e["VLM_in_AE_by_phase_ms"]
         lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
@@ -654,7 +673,7 @@ def main():
             for step, layer in slices:
                 label = f"{case}-s{step}-l{layer}"
                 timeline, geometry, gaps, verification = load_trace(
-                    args.traces / label, step, layer, g_shared_io=case == "g")
+                    args.traces / label, step, layer, shared_io_rules=FUSED_SHARED_IO.get(case))
                 if timeline["clock_ps"] != clock_ps:
                     raise ValueError(f"trace clock differs for {label}")
                 data["geometry"][label] = geometry
@@ -692,7 +711,7 @@ def main():
     data["fused_ae_solo_overlap"] = {}
     for label, (timeline, geometry) in fused_slices.items():
         data["fused_ae_solo_overlap"][label] = fused_ae_solo_overlap(
-            timeline, geometry, profile_ms, baseline, g_shared_io=label.startswith("g-"))
+            timeline, geometry, profile_ms, baseline, shared_io_rules=FUSED_SHARED_IO[label[0]])
     data["g_model_comparison"] = g_model_comparison(data["fused_ae_solo_overlap"]["g-s0-l0"])
     data["slice_comparison"]["d"] = [
         compare(row[key], data["replay"]["d-s9-l17"][alpha][policy][key],

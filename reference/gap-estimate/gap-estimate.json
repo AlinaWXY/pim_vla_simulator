@@ -15,37 +15,38 @@
   },
   "fused_ae_solo_overlap": {
     "f-s0-l0": {
-      "ae_accounting": "explicit_native_io",
+      "ae_accounting": "legacy_shared_tensor_io",
       "ae_gpu_ms": 21.70235592,
-      "ae_solo_ms": 61.32792204,
+      "ae_solo_ms": 56.161586879999994,
       "ae_trace_ms": 61.32792204,
       "b_ms": 162.07086343999998,
-      "deduplicated_io_ms": 0.0,
+      "deduplicated_io_ms": 5.16633516,
       "epoch_free_compute_stage_ms": 32.69704788,
       "explicit_native_io_total_ms": 133.85145236,
       "overlap_ms": 32.69704788,
+      "q_exchange_ms": 0.23586948,
       "repetitions": 180,
-      "speedup_vs_b": 1.2108263345854664,
+      "speedup_vs_b": 1.2594375089087615,
       "stages": [
         {
-          "accounted_ck": 51160,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 49502,
+          "deduplicated_io_ck": 1658,
           "io_epoch_union_ck": 1658,
           "name": "qkv",
           "overlap_ck": 49502,
           "t_ck": 51160
         },
         {
-          "accounted_ck": 1236,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 0,
+          "deduplicated_io_ck": 1236,
           "io_epoch_union_ck": 1236,
           "name": "rope_export",
           "overlap_ck": 0,
           "t_ck": 1236
         },
         {
-          "accounted_ck": 1030,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 0,
+          "deduplicated_io_ck": 1030,
           "io_epoch_union_ck": 1030,
           "name": "rope_import",
           "overlap_ck": 0,
@@ -68,16 +69,16 @@
           "t_ck": 1350
         },
         {
-          "accounted_ck": 17385,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 14374,
+          "deduplicated_io_ck": 3011,
           "io_epoch_union_ck": 3011,
           "name": "qkt",
           "overlap_ck": 14374,
           "t_ck": 17385
         },
         {
-          "accounted_ck": 16918,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 15549,
+          "deduplicated_io_ck": 1369,
           "io_epoch_union_ck": 1369,
           "name": "pv",
           "overlap_ck": 15549,
@@ -92,58 +93,59 @@
           "t_ck": 27684
         },
         {
-          "accounted_ck": 54256,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 51439,
+          "deduplicated_io_ck": 2817,
           "io_epoch_union_ck": 7182,
           "name": "gate_up",
           "overlap_ck": 47074,
           "t_ck": 54256
         },
         {
-          "accounted_ck": 63627,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 44149,
+          "deduplicated_io_ck": 19478,
           "io_epoch_union_ck": 20013,
           "name": "down",
           "overlap_ck": 43614,
           "t_ck": 63627
         }
       ],
-      "total_ms": 133.85145236,
+      "total_ms": 128.68511719999998,
       "vlm_profile_ms": 105.22057819999999,
       "vlm_remaining_ms": 72.52353031999999
     },
     "f-s9-l17": {
-      "ae_accounting": "explicit_native_io",
+      "ae_accounting": "legacy_shared_tensor_io",
       "ae_gpu_ms": 24.4818,
-      "ae_solo_ms": 64.14484859999999,
+      "ae_solo_ms": 58.95487584,
       "ae_trace_ms": 64.14484859999999,
       "b_ms": 162.07086343999998,
-      "deduplicated_io_ms": 0.0,
+      "deduplicated_io_ms": 5.18997276,
       "epoch_free_compute_stage_ms": 32.77758456,
       "explicit_native_io_total_ms": 136.58784223999996,
       "overlap_ms": 32.77758456,
+      "q_exchange_ms": 0.16529436,
       "repetitions": 180,
-      "speedup_vs_b": 1.1865687368808677,
+      "speedup_vs_b": 1.2334360068499342,
       "stages": [
         {
-          "accounted_ck": 51024,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 49443,
+          "deduplicated_io_ck": 1581,
           "io_epoch_union_ck": 1581,
           "name": "qkv",
           "overlap_ck": 49443,
           "t_ck": 51024
         },
         {
-          "accounted_ck": 1235,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 0,
+          "deduplicated_io_ck": 1235,
           "io_epoch_union_ck": 1235,
           "name": "rope_export",
           "overlap_ck": 0,
           "t_ck": 1235
         },
         {
-          "accounted_ck": 1447,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 0,
+          "deduplicated_io_ck": 1447,
           "io_epoch_union_ck": 1447,
           "name": "rope_import",
           "overlap_ck": 0,
@@ -166,16 +168,16 @@
           "t_ck": 932
         },
         {
-          "accounted_ck": 17378,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 14381,
+          "deduplicated_io_ck": 2997,
           "io_epoch_union_ck": 2997,
           "name": "qkt",
           "overlap_ck": 14381,
           "t_ck": 17378
         },
         {
-          "accounted_ck": 16903,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 15534,
+          "deduplicated_io_ck": 1369,
           "io_epoch_union_ck": 1369,
           "name": "pv",
           "overlap_ck": 15534,
@@ -190,23 +192,23 @@
           "t_ck": 27791
         },
         {
-          "accounted_ck": 54365,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 51548,
+          "deduplicated_io_ck": 2817,
           "io_epoch_union_ck": 7181,
           "name": "gate_up",
           "overlap_ck": 47184,
           "t_ck": 54365
         },
         {
-          "accounted_ck": 63793,
-          "deduplicated_io_ck": 0,
+          "accounted_ck": 44500,
+          "deduplicated_io_ck": 19293,
           "io_epoch_union_ck": 19828,
           "name": "down",
           "overlap_ck": 43965,
           "t_ck": 63793
         }
       ],
-      "total_ms": 136.58784223999996,
+      "total_ms": 131.39786947999997,
       "vlm_profile_ms": 105.22057819999999,
       "vlm_remaining_ms": 72.44299364
     },
@@ -220,6 +222,7 @@
       "epoch_free_compute_stage_ms": 32.72760792,
       "explicit_native_io_total_ms": 128.66012887999997,
       "overlap_ms": 32.72760792,
+      "q_exchange_ms": 0.24735059999999998,
       "repetitions": 180,
       "speedup_vs_b": 1.309569650562295,
       "stages": [
@@ -310,6 +313,7 @@
       "epoch_free_compute_stage_ms": 32.80831344,
       "explicit_native_io_total_ms": 129.79169456,
       "overlap_ms": 32.80831344,
+      "q_exchange_ms": 0.24735059999999998,
       "repetitions": 180,
       "speedup_vs_b": 1.2976061006599464,
       "stages": [
@@ -2188,6 +2192,13 @@
             "length_ck": 9792
           }
         },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 1658,
+          "epoch": "qkv_input",
+          "historical_phase": "projection_gpu_input_stage",
+          "start_ck": 0
+        },
         "t_ck": 51160
       },
       {
@@ -2212,6 +2223,13 @@
             "length_ck": 10880
           }
         },
+        "shared_tensor_io": {
+          "command": "RD",
+          "end_ck": 1236,
+          "epoch": "rope_export",
+          "historical_phase": "gpu_rope_export",
+          "start_ck": 0
+        },
         "t_ck": 1236
       },
       {
@@ -2235,6 +2253,13 @@
             "count": 3120,
             "length_ck": 7936
           }
+        },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 1030,
+          "epoch": "rope_import",
+          "historical_phase": "gpu_rope_import",
+          "start_ck": 0
         },
         "t_ck": 1030
       },
@@ -2308,6 +2333,13 @@
             "length_ck": 14880
           }
         },
+        "shared_tensor_io": {
+          "command": "RD",
+          "end_ck": 17385,
+          "epoch": "score_export",
+          "historical_phase": "qk_scores_dram_export",
+          "start_ck": 14374
+        },
         "t_ck": 17385
       },
       {
@@ -2335,6 +2367,13 @@
             "count": 368,
             "length_ck": 5680
           }
+        },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 1369,
+          "epoch": "pv_input",
+          "historical_phase": "pv_gpu_input_stage",
+          "start_ck": 0
         },
         "t_ck": 16918
       },
@@ -2392,6 +2431,13 @@
             "length_ck": 11952
           }
         },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 2817,
+          "epoch": "gate_up_input",
+          "historical_phase": "gate_up_gpu_input_stage",
+          "start_ck": 0
+        },
         "t_ck": 54256
       },
       {
@@ -2424,6 +2470,13 @@
             "length_ck": 180224
           }
         },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 19478,
+          "epoch": "down_input",
+          "historical_phase": "down_gpu_input_stage",
+          "start_ck": 0
+        },
         "t_ck": 63627
       }
     ],
@@ -2454,6 +2507,13 @@
             "length_ck": 8560
           }
         },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 1581,
+          "epoch": "qkv_input",
+          "historical_phase": "projection_gpu_input_stage",
+          "start_ck": 0
+        },
         "t_ck": 51024
       },
       {
@@ -2478,6 +2538,13 @@
             "length_ck": 10864
           }
         },
+        "shared_tensor_io": {
+          "command": "RD",
+          "end_ck": 1235,
+          "epoch": "rope_export",
+          "historical_phase": "gpu_rope_export",
+          "start_ck": 0
+        },
         "t_ck": 1235
       },
       {
@@ -2501,6 +2568,13 @@
             "count": 3184,
             "length_ck": 14608
           }
+        },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 1447,
+          "epoch": "rope_import",
+          "historical_phase": "gpu_rope_import",
+          "start_ck": 0
         },
         "t_ck": 1447
       },
@@ -2574,6 +2648,13 @@
             "length_ck": 14656
           }
         },
+        "shared_tensor_io": {
+          "command": "RD",
+          "end_ck": 17378,
+          "epoch": "score_export",
+          "historical_phase": "qk_scores_dram_export",
+          "start_ck": 14381
+        },
         "t_ck": 17378
       },
       {
@@ -2601,6 +2682,13 @@
             "count": 368,
             "length_ck": 5680
           }
+        },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 1369,
+          "epoch": "pv_input",
+          "historical_phase": "pv_gpu_input_stage",
+          "start_ck": 0
         },
         "t_ck": 16903
       },
@@ -2658,6 +2746,13 @@
             "length_ck": 11952
           }
         },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 2817,
+          "epoch": "gate_up_input",
+          "historical_phase": "gate_up_gpu_input_stage",
+          "start_ck": 0
+        },
         "t_ck": 54365
       },
       {
@@ -2689,6 +2784,13 @@
             "count": 6352,
             "length_ck": 177264
           }
+        },
+        "shared_tensor_io": {
+          "command": "WR",
+          "end_ck": 19293,
+          "epoch": "down_input",
+          "historical_phase": "down_gpu_input_stage",
+          "start_ck": 0
         },
         "t_ck": 63793
       }
@@ -84576,9 +84678,9 @@
             "vlm_tail_ms": 86.2382534399999
           },
           "f": {
-            "ae_ms": 61.32792204,
+            "ae_ms": 56.161586879999994,
             "overlap_ms": 32.69704788,
-            "total_ms": 133.85145236,
+            "total_ms": 128.68511719999998,
             "vlm_tail_ms": 72.52353031999999
           },
           "g": {
@@ -84617,9 +84719,9 @@
             "vlm_tail_ms": 86.2377722459999
           },
           "f": {
-            "ae_ms": 64.14484859999999,
+            "ae_ms": 58.95487584,
             "overlap_ms": 32.77758456,
-            "total_ms": 136.58784223999996,
+            "total_ms": 131.39786947999997,
             "vlm_tail_ms": 72.44299364
           },
           "g": {
