@@ -469,6 +469,92 @@ def same_slice_comparison(data):
                 selected_slice=chosen["slice"], candidates=candidates)
 
 
+def e_idle_breakdown(data, gaps, edges, burst_ck):
+    comparison = data["same_slice_comparison"]
+    selected = next(row for row in comparison["candidates"] if row["slice"] == comparison["selected_slice"])
+    label = f"e-{selected['slice']}"
+    replay = data["replay"][label]["1.0"]
+    directions = "RW"
+    min_left = {p: min(edges[p + d] for d in directions) for p in "RWO"}
+    min_right = {p: min(edges[d + p] for d in directions) for p in "RWO"}
+    phases, transitions = [], Counter()
+    totals = Counter()
+    for row in replay["same_first"]["stages"]:
+        histogram = Counter((b - a, "RWO"[left], "RWO"[right])
+                            for channel in gaps[row["event_index"]] for a, b, left, right in channel)
+        if row["active_repetitions"] != REPEATS or sum(histogram.values()) * REPEATS != row["count"]:
+            raise ValueError("e idle audit requires VLM active for every repetition")
+        short_ck = hard_ck = short_count = hard_count = 0
+        for (width, left, right), count in histogram.items():
+            if width < burst_ck:
+                short_ck += width * count * REPEATS
+                short_count += count * REPEATS
+            elif width < burst_ck + min_left[left] + min_right[right]:
+                hard_ck += width * count * REPEATS
+                hard_count += count * REPEATS
+        edge_ck = edge_out_ck = 0
+        for combo, group in row["combinations"].items():
+            if combo[1] == "-":
+                if group["count"]:
+                    raise ValueError("e idle audit found a gap the replay did not attempt")
+                continue
+            feasible = group["count"] - group["infeasible_count"]
+            into, out = combo[:2], combo[-2:]
+            edge_ck += feasible * edges[into]
+            edge_out_ck += feasible * edges[out]
+            transitions[into] += feasible * edges[into]
+            transitions[out] += feasible * edges[out]
+        idle = row["length_ck"]
+        if idle != sum(width * count * REPEATS for (width, _, _), count in histogram.items()):
+            raise ValueError("e idle geometry and replay length differ")
+        used = int(row["sum_u_channel_ck"])
+        if used != row["sum_u_channel_ck"]:
+            raise ValueError("e idle guard capacity must be an integer number of cycles")
+        guard = idle - row["infeasible_ck"] - used
+        conservative = guard - edge_ck - edge_out_ck
+        chosen_direction_ck = row["infeasible_ck"] - short_ck - hard_ck
+        chosen_direction_count = row["infeasible_count"] - short_count - hard_count
+        if min(conservative, chosen_direction_ck, chosen_direction_count) < 0:
+            raise ValueError(f"e idle loss classification differs: {row['name']}")
+        phase = dict(idle_ck=idle, filled_ck=used, guard_ck=guard,
+                     left_guard_ck=edge_ck, right_guard_ck=edge_out_ck,
+                     conservative_guard_ck=conservative, short_ck=short_ck, short_count=short_count,
+                     hard_rank_ck=hard_ck, hard_rank_count=hard_count,
+                     chosen_direction_ck=chosen_direction_ck, chosen_direction_count=chosen_direction_count,
+                     infeasible_ck=row["infeasible_ck"], infeasible_count=row["infeasible_count"],
+                     gap_count=row["count"])
+        totals.update(phase)
+        phases.append(dict(stage=row["name"], **phase))
+
+    ck_ms = data["clock_ps"] / 1e9
+    mean_ck_ms = ck_ms / N
+    e_overlap = selected["cases"]["e"]["overlap_ms"]
+    g_overlap = selected["cases"]["g"]["overlap_ms"]
+    geometry = data["geometry"][label]
+    pim_stage_channel_ck = sum(row["t_ck"] for row in geometry) * N * REPEATS
+    pim_dq_channel_ck = sum(row["dq_channel_ck"] for row in geometry) * REPEATS
+    if pim_stage_channel_ck - pim_dq_channel_ck != totals["idle_ck"]:
+        raise ValueError("e native PIM DQ and idle do not cover the PIM stages")
+    # Each channel's use is bounded by its accepted gap capacity, and the
+    # slowest-channel progress is bounded by mean use. Equality certifies that
+    # every accepted gap was consumed in this e same_first run.
+    if not math.isclose(totals["filled_ck"] * mean_ck_ms, e_overlap, rel_tol=0, abs_tol=1e-9):
+        raise ValueError("e VLM progress does not certify full use of the accepted capacity")
+    idle_ms = totals["idle_ck"] * mean_ck_ms
+    best_overlap_ms = comparison["vlm_profile_ms"] - replay["best"]["tail_ms"]
+    payload_ck = burst_ck * math.fsum(sum(row["requests"]) for row in replay["same_first"]["stages"])
+    return dict(slice=selected["slice"], totals=dict(totals), stages=phases,
+                guard_by_transition_ck=dict(transitions), fill_fraction=totals["filled_ck"] / totals["idle_ck"],
+                pim_stage_channel_ck=pim_stage_channel_ck, pim_dq_channel_ck=pim_dq_channel_ck,
+                idle_ms=idle_ms, overlap_ms=e_overlap, unused_idle_ms=idle_ms - e_overlap,
+                best_overlap_ms=best_overlap_ms, best_recovered_ms=best_overlap_ms - e_overlap,
+                payload_equivalent_ck=payload_ck, burst_ck=burst_ck,
+                g_overlap_ms=g_overlap, g_vs_e_raw_idle_ms=g_overlap - idle_ms,
+                g_overlap_gain_ms=g_overlap - e_overlap,
+                g_ae_delta_ms=selected["cases"]["g"]["ae_ms"] - selected["cases"]["e"]["ae_ms"],
+                g_end_to_end_gain_ms=selected["e_minus_g_ms"])
+
+
 def report_md(data):
     baseline = data["b_ms"]
     lines = [
@@ -500,6 +586,38 @@ def report_md(data):
         cases = candidate["cases"]
         lines.append(f"| {candidate['slice']} | {cases['e']['total_ms']:.6f} | {cases['g']['total_ms']:.6f} | "
                      f"{candidate['e_over_g']:.6f} | {candidate['e_minus_g_ms']:.6f} | {candidate['g_explicit_io_ms']:.6f} |")
+    usage = data["e_idle_breakdown"]
+    totals = usage["totals"]
+    mean_ck_ms = data["clock_ps"] / 1e9 / N
+    lines += ["", "### e 的 DQ 空隙去向", "",
+              f"以下按 {usage['slice']}、α=1.0、same_first 统计。通道 CK 为 16 通道 ×180 次之和，"
+              "均摊时长为通道 CK 除以 16 后换算。范围为全部 PIM stage，包含 c–e 原模型允许填充的 Q 交换空隙。", "",
+              "| DQ 空闲分项 | 通道 CK | 均摊时长 (ms) |",
+              "|---|---:|---:|"]
+    for key, title in (("idle_ck", "纯 PIM 的 DQ 空闲"), ("filled_ck", "VLM 实际消耗的 profile 推进预算"),
+                       ("guard_ck", "可用空隙扣除的跨 rank 边界开销"),
+                       ("short_ck", "空隙原长不足 2 CK"),
+                       ("hard_rank_ck", "任意边界方向均放不下 2 CK"),
+                       ("chosen_direction_ck", "当前方向选择下放不下 2 CK")):
+        ck = totals[key]
+        lines.append(f"| {title} | {ck:,} | {ck * mean_ck_ms:.6f} |")
+    lines += ["", f"有 {totals['infeasible_count']:,} 个整段不可用空隙，共 {totals['infeasible_ck']:,} 通道 CK。"
+              f"same_first 消耗了全部接受的预算，占原始空闲的 {usage['fill_fraction']:.2%}。"
+              f"直接边界开销中 W→R 占 {usage['guard_by_transition_ck']['WR']:,} 通道 CK。"
+              f"best 实际比 same_first 多推进 {usage['best_recovered_ms']:.6f} ms。", "",
+              f"按 {usage['burst_ck']} CK/burst 折算，VLM 实际发送的流体请求量约相当于 "
+              f"{usage['payload_equivalent_ck']:,.0f} 通道 CK 的 DQ 数据载荷。"
+              "该值来自请求量折算，profile 推进预算还涵盖 kernel 其余服务时间，原生 GPU DQ 时序未在本模型中重建。", "",
+              f"g 的理想重叠比 e 多 {usage['g_overlap_gain_ms']:.6f} ms。其中 "
+              f"{usage['g_vs_e_raw_idle_ms']:.6f} ms 来自 g 的重叠窗口比 e 的原始 DQ 空闲更长，"
+              f"{usage['unused_idle_ms']:.6f} ms 来自 e 未能利用的空闲。"
+              f"扣除 g 增加的 {usage['g_ae_delta_ms']:.6f} ms 计费 AE，端到端净收益为 "
+              f"{usage['g_end_to_end_gain_ms']:.6f} ms。", "",
+              "| e 的 stage | 原始空闲 CK | 已用 CK | 边界扣减 CK | 任意方向都不可用 CK | 当前方向下不可用 CK |",
+              "|---|---:|---:|---:|---:|---:|"]
+    for row in usage["stages"]:
+        lines.append(f"| {row['stage']} | {row['idle_ck']:,} | {row['filled_ck']:,} | {row['guard_ck']:,} | "
+                     f"{row['short_ck'] + row['hard_rank_ck']:,} | {row['chosen_direction_ck']:,} |")
     lines += ["", "## c、d、e 的估算", "",
               "| 切片 × 180 | α | policy | AE (ms) | VLM 尾部 (ms) | total (ms) | VLM 损失 (ms) | b / total |",
               "|---|---:|---|---:|---:|---:|---:|---:|"]
@@ -743,6 +861,13 @@ def main():
                             ("overlap_ms", "180× epoch 外重叠 (ms)"),
                             ("total_ms", "180× 端到端 (ms)"))]
     data["same_slice_comparison"] = same_slice_comparison(data)
+    selected = next(row for row in data["same_slice_comparison"]["candidates"]
+                    if row["slice"] == data["same_slice_comparison"]["selected_slice"])
+    _, _, e_gaps, _ = load_trace(args.traces / f"e-{selected['slice']}", selected["step"], selected["layer"])
+    commands = read_json(ROOT / "reference/spec/spec.json")["commands"]
+    if {commands[name]["dq_cycles"] for name in ("RD", "WR")} != {2}:
+        raise ValueError("e idle audit requires the replay's 2 CK minimum DQ burst")
+    data["e_idle_breakdown"] = e_idle_breakdown(data, e_gaps, edges, commands["RD"]["dq_cycles"])
     write_json(output / "gap-estimate.json", data)
     (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")
 
