@@ -27,6 +27,15 @@ FUSED = ROOT / "reference/fused-kernel-continuous-e2e/summary.json"
 SCALED_ABLATION = ROOT / "results/ablation-scaled-w128/ablation.json"
 FUSED_COMPUTE_STAGES = {"qkv", "qkt", "pv", "o", "gate_up", "down", "rope"}
 FUSED_TRANSFER_STAGES = {"rope_export", "rope_import", "q_exchange_export", "q_exchange_import"}
+# Match the early shared-tensor phase rules to the current g program.
+# Inputs are at the stage head and the score consumer is at the stage tail.
+G_SHARED_IO = {
+    "qkv": ("qkv_input", "WR", "head", "projection_gpu_input_stage"),
+    "qkt": ("score_export", "RD", "tail", "qk_scores_dram_export"),
+    "pv": ("pv_input", "WR", "head", "pv_gpu_input_stage"),
+    "gate_up": ("gate_up_input", "WR", "head", "gate_up_gpu_input_stage"),
+    "down": ("down_input", "WR", "head", "down_gpu_input_stage"),
+}
 PAIR_REFERENCE = dict(RRR=(6, 4), RRW=(6, 4), RWR=(15, 13), RWW=(5, 3),
                       WRR=(15, 13), WRW=(15, 13), WWR=(14, 12), WWW=(4, 2))
 
@@ -78,7 +87,7 @@ def interval_union_ck(intervals):
     return total
 
 
-def load_trace(directory, step, layer):
+def load_trace(directory, step, layer, *, g_shared_io=False):
     on, off = (directory / mode for mode in ("on", "off"))
     verification = read_json(directory / "verification.json")
     if ((on / "raw.json").read_bytes() != (off / "raw.json").read_bytes()
@@ -111,7 +120,7 @@ def load_trace(directory, step, layer):
                     or row["direction"] not in ("R", "W") or row["fused_io_epoch"] not in ("0", "1")):
                 raise ValueError(f"invalid burst in {directory}: {row}")
             bursts[sid, channel].append((int(row["start_ck"]), int(row["end_ck"]),
-                                         row["direction"], row["fused_io_epoch"] == "1"))
+                                         row["direction"], row["command"], row["fused_io_epoch"] == "1"))
     with (on / "dq-epochs.csv").open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
             sid, channel = int(row["stage_id"]), int(row["channel"])
@@ -128,6 +137,8 @@ def load_trace(directory, step, layer):
         dq = 0
         blocked_count = blocked_full = blocked_ck = 0
         channels = []
+        shared_rule = G_SHARED_IO.get(event["name"]) if g_shared_io else None
+        shared_span = None
         for channel in range(N):
             key = sid, channel
             intervals = epochs[key]
@@ -137,6 +148,7 @@ def load_trace(directory, step, layer):
                     raise ValueError(f"overlapping or out-of-stage epochs: {directory}, {key}")
                 last = b
             epoch_index = 0
+            epoch_commands = [set() for _ in intervals] if shared_rule else []
 
             def overlap(a, b):
                 nonlocal epoch_index
@@ -167,12 +179,17 @@ def load_trace(directory, step, layer):
             last, left = start, "O"
             occupied = Counter()
             byte_counts = Counter()
-            for a, b, direction, fused in bursts[key]:
+            for a, b, direction, command, fused in bursts[key]:
                 if not last <= a < b <= end:
                     raise ValueError(f"overlapping or out-of-stage bursts: {directory}, {key}")
                 add_gap(last, a, left, direction)
                 if overlap(a, b) != (b - a if fused else 0):
                     raise ValueError(f"burst and I/O epoch disagree: {directory}, {key}")
+                if shared_rule and fused:
+                    left_ck, right_ck = intervals[epoch_index]
+                    if not left_ck <= a < b <= right_ck:
+                        raise ValueError(f"burst crosses I/O epoch boundaries: {directory}, {key}")
+                    epoch_commands[epoch_index].add(command)
                 occupied[direction] += b - a
                 byte_counts[direction] += 32
                 last, left = b, direction
@@ -183,6 +200,18 @@ def load_trace(directory, step, layer):
                 raise ValueError(f"burst and native DQ counters disagree: {directory}, {key}")
             dq += occupied.total()
             channels.append(gaps)
+            if shared_rule:
+                _, command, boundary, _ = shared_rule
+                matches = [(a, b) for (a, b), commands in zip(intervals, epoch_commands, strict=True)
+                           if commands == {command}]
+                if len(matches) != 1:
+                    raise ValueError(f"cannot identify a shared-tensor epoch: {directory}, {key}")
+                candidate = matches[0]
+                if ((boundary == "head" and candidate[0] != start)
+                        or (boundary == "tail" and candidate[1] != end)
+                        or (shared_span is not None and candidate != shared_span)):
+                    raise ValueError(f"shared-tensor epoch not aligned across the stage/channels: {directory}, {key}")
+                shared_span = candidate
         if dq + lengths.total() != N * duration:
             raise ValueError(f"stage DQ plus idle differs from duration: {directory}, {sid}")
         stage_gaps[index] = channels
@@ -196,6 +225,12 @@ def load_trace(directory, step, layer):
                              epoch_touching_gap_count=blocked_count, epoch_internal_gap_count=blocked_full,
                              epoch_blocked_idle_channel_ck=blocked_ck,
                              idle_outside_epoch_channel_ck=lengths.total() - blocked_ck))
+        if shared_span is not None:
+            epoch, command, _, historical_phase = shared_rule
+            a, b = shared_span
+            geometry[-1]["shared_tensor_io"] = dict(epoch=epoch, command=command,
+                                                   historical_phase=historical_phase,
+                                                   start_ck=a - start, end_ck=b - start)
     return timeline, geometry, stage_gaps, verification
 
 
@@ -332,14 +367,24 @@ def fused_summary(traces, ck_ms, b_ms):
     return rows
 
 
-def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms):
+def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms, *, g_shared_io=False):
     stages = []
+    expected = set(G_SHARED_IO) if g_shared_io else set()
+    if {row["name"] for row in geometry if "shared_tensor_io" in row} != expected:
+        raise ValueError("fused AE solo shared-tensor phase coverage differs")
     for row in geometry:
         name, duration, epoch = (row[key] for key in ("name", "t_ck", "epoch_union_ck"))
         if not 0 <= epoch <= duration or name not in FUSED_COMPUTE_STAGES | FUSED_TRANSFER_STAGES:
             raise ValueError(f"unexpected fused AE solo stage: {name}")
-        overlap = duration - epoch if name in FUSED_COMPUTE_STAGES else 0
-        stages.append(dict(name=name, t_ck=duration, io_epoch_union_ck=epoch, overlap_ck=overlap))
+        shared = row.get("shared_tensor_io")
+        deduplicated = shared["end_ck"] - shared["start_ck"] if shared else 0
+        if not 0 <= deduplicated <= epoch:
+            raise ValueError(f"invalid shared-tensor time for {name}")
+        accounted = duration - deduplicated
+        retained_io = epoch - deduplicated
+        overlap = accounted - retained_io if name in FUSED_COMPUTE_STAGES else 0
+        stages.append(dict(name=name, t_ck=duration, io_epoch_union_ck=epoch,
+                           deduplicated_io_ck=deduplicated, accounted_ck=accounted, overlap_ck=overlap))
 
     ae_ck = timeline["ae_end_ck"]
     ae_gpu_ck = sum(event["end_ck"] - event["start_ck"]
@@ -347,13 +392,17 @@ def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms):
     if ae_ck != ae_gpu_ck + sum(row["t_ck"] for row in stages):
         raise ValueError("fused AE solo stages and GPU blocks do not cover the timeline")
     scale = timeline["clock_ps"] * REPEATS / 1e9
-    ae_ms = ae_ck * scale
+    deduplicated_ck = sum(row["deduplicated_io_ck"] for row in stages)
+    ae_ms = (ae_ck - deduplicated_ck) * scale
     epoch_free_ms = sum(row["overlap_ck"] for row in stages) * scale
     overlap_ms = min(vlm_ms, epoch_free_ms)
     total_ms = ae_ms + vlm_ms - overlap_ms
-    return dict(ae_solo_ms=ae_ms, ae_gpu_ms=ae_gpu_ck * scale, vlm_kernel_sum_ms=vlm_ms,
+    return dict(ae_solo_ms=ae_ms, ae_trace_ms=ae_ck * scale, ae_gpu_ms=ae_gpu_ck * scale,
+                ae_accounting="legacy_shared_tensor_io" if g_shared_io else "explicit_native_io",
+                deduplicated_io_ms=deduplicated_ck * scale, vlm_profile_ms=vlm_ms,
                 epoch_free_compute_stage_ms=epoch_free_ms, overlap_ms=overlap_ms,
                 vlm_remaining_ms=vlm_ms - overlap_ms, total_ms=total_ms,
+                explicit_native_io_total_ms=ae_ck * scale + vlm_ms - overlap_ms,
                 repetitions=REPEATS, b_ms=b_ms, speedup_vs_b=b_ms / total_ms, stages=stages)
 
 
@@ -368,7 +417,7 @@ def g_model_comparison(estimate):
     return dict(closed_loop_ms=old_parts, overlap_estimate_ms=new_parts,
                 closed_loop_total_ms=old["total_ms"], overlap_estimate_total_ms=estimate["total_ms"],
                 closed_loop_vlm_solo_ms=archive["calibration"]["total_us"] / 1000,
-                estimate_vlm_kernel_sum_ms=estimate["vlm_kernel_sum_ms"],
+                estimate_vlm_profile_ms=estimate["vlm_profile_ms"],
                 closed_loop_raw_sha256=old["raw_sha256"])
 
 
@@ -393,28 +442,30 @@ def report_md(data):
                 lines.append(f"| {label} | {alpha} | {policy} | {row['ae_ms']:.6f} | {row['tail_ms']:.6f} | "
                              f"{row['total_ms']:.6f} | {row['vlm_loss_ms']:.6f} | {row['speedup_vs_b']:.6f} |")
     lines += ["", "## f、g 的 AE solo 重叠估算", "",
-              "端到端时间等于 AE solo 加整 kernel 融合窗口 E2E 记录中的 VLM kernel 执行时长之和，"
-              "再减去 VLM 可在 AE 期间完成的时间。"
-              "使用回退版本实跑的 AE solo 切片，step 0 / layer 0 重复 180 次。AE 总长已经包含搬入、"
-              "读出、Q 交换及 AE GPU 块。", "",
+              "端到端时间等于计费 AE 加 c–e 使用的同一份 VLM profile 时长，再减去 VLM 可在 AE "
+              "期间完成的时间。使用回退版本实跑的 AE solo 切片，step 0 / layer 0 重复 180 次。"
+              "f 保留原生 I/O，g 按旧版共享张量口径去重，同时沿用当前 trace 中的 AE GPU 块时长。", "",
               "私有 PIM 计算指描述符内走私有 CA 的本地访问与运算，例如 LOCALRD、BCAST、MACAB、"
               "本地 RoPE 和结果写回。描述符发令占用共享 CA。"
               "AE solo trace 记录的是 stage 和 I/O epoch 边界。估算取含私有计算的 stage 在所有通道"
               "均处于 I/O epoch 外的时长，按理想重叠计入。该窗口也可能包含屏障及等待。"
               "RoPE 导入导出、Q 交换等纯传输 stage 全程保留在 AE 时间内。"
-              "本表的串行基准 b 用 c 的 AE solo 加同一份 VLM kernel 时长。", "",
-              "| 切片 × 180 | AE solo (ms) | E2E VLM kernel 合计 (ms) | epoch 外重叠 (ms) | AE 后 VLM 剩余 (ms) | 端到端估算 (ms) | b (ms) | b / 端到端 |",
+              "g 扣除的共享张量阶段原本就在 I/O epoch 内，扣除后 epoch 外重叠时长相同。", "",
+              "| 切片 × 180 | 原始 AE (ms) | 去重 I/O (ms) | 计费 AE (ms) | VLM profile (ms) | epoch 外重叠 (ms) | 端到端估算 (ms) | b / 端到端 |",
               "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for label, r in data["fused_ae_solo_overlap"].items():
-        lines.append(f"| {label} | {r['ae_solo_ms']:.6f} | {r['vlm_kernel_sum_ms']:.6f} | {r['overlap_ms']:.6f} | "
-                     f"{r['vlm_remaining_ms']:.6f} | {r['total_ms']:.6f} | {r['b_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
+        lines.append(f"| {label} | {r['ae_trace_ms']:.6f} | {r['deduplicated_io_ms']:.6f} | {r['ae_solo_ms']:.6f} | "
+                     f"{r['vlm_profile_ms']:.6f} | {r['overlap_ms']:.6f} | {r['total_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
+    g_reference = data["fused_ae_solo_overlap"]["g-s0-l0"]
+    lines += ["", f"g 首层切片按同一份 VLM profile、保留全部原生 I/O 时为 "
+              f"{g_reference['explicit_native_io_total_ms']:.6f} ms。", ""]
     g_e2e = data["fused_windows"]["g"]
-    lines += ["", "### g 的模型口径对照", ""]
+    lines += ["### g 的模型口径对照", ""]
     if "archived_total_ms" in g_e2e:
         lines += [f"整 kernel 融合窗口的归档与回退版本重跑分别为 {g_e2e['archived_total_ms']:.6f} ms、"
                   f"{g_e2e['total_ms']:.6f} ms，同口径差值 {g_e2e['delta_from_archive_ms']:+.6f} ms。", ""]
     comparison = data["g_model_comparison"]
-    lines += ["两种口径都在 AE 时间里计入 PIM I/O，包括搬入、读出和 Q 交换。"
+    lines += ["逐请求闭环在 AE 时间里计入原生 PIM I/O。g 的重叠估算在 AE 中计入按旧版规则去重后保留的 PIM I/O。"
               "VLM 的实测 kernel 时长来自 Thor 自然缓存 trace，包含该次执行实际经历的访存等待。"
               "L2 读 miss 和写流量代理来自单独采集的计数器。", "",
               "逐请求闭环在 I/O epoch 期间限制新 GPU DRAM 命令，已发请求仍可返回。"
@@ -422,13 +473,13 @@ def report_md(data):
               "重叠估算把整段 I/O epoch 作为 VLM 暂停时间，影响的是 AE 结束后的 VLM 剩余量。", "",
               "| g 的时间项（ms） | 归档逐请求闭环 | AE solo 重叠估算 |",
               "|---|---:|---:|"]
-    for key, label in (("ae_solo_ms", "AE solo（含 PIM I/O）"), ("pim_stage_delta_ms", "并发 PIM stage 增量"),
+    for key, label in (("ae_solo_ms", "计费 AE solo（含保留的 PIM I/O）"), ("pim_stage_delta_ms", "并发 PIM stage 增量"),
                        ("ae_gpu_wait_ms", "AE GPU 等待"), ("ae_elapsed_ms", "AE 完成时刻"),
                        ("vlm_tail_ms", "AE 完成后的 VLM 尾部")):
         lines.append(f"| {label} | {comparison['closed_loop_ms'][key]:.6f} | {comparison['overlap_estimate_ms'][key]:.6f} |")
     lines += [f"| 端到端 | {comparison['closed_loop_total_ms']:.6f} | {comparison['overlap_estimate_total_ms']:.6f} |", "",
               f"闭环使用 {comparison['closed_loop_vlm_solo_ms']:.6f} ms 的 VLM solo 校准，"
-              f"重叠估算使用 {comparison['estimate_vlm_kernel_sum_ms']:.6f} ms 的融合窗口 E2E kernel 合计。"]
+              f"重叠估算使用 {comparison['estimate_vlm_profile_ms']:.6f} ms 的 VLM profile。"]
     lines += ["", "### AE GPU 计时与历史共享张量 I/O 去重", "",
               "早期账本（`09234a9`）用冷缓存的 AE GPU kernel 时长，保留的 GPU producer 或 consumer "
               "如果已承担同一共享张量的存取，便在合成 AE 时间线中去除对应的 native phase。"
@@ -436,8 +487,15 @@ def report_md(data):
               "原始 DQ 流量和时间线完整保留。", "",
               "当前 AE 输入对普通保留 kernel 使用自然缓存 trace，对另测的边界 helper 使用 32 MiB "
               "清缓存后的设备 kernel 中位数。两类时长都包含各自运行时经历的访存。"
-              "本表的 AE solo 采用原生 trace 的显式 I/O 口径，完整保留搬入、读出和 Q 交换。"
-              "历史去重依赖 GPU kernel 与 native phase 访问的是同一共享张量，并且承担同一笔实际存取。"]
+              "g 的估算沿用旧版共享分配假设，将对应的暂存写入及 score 读出归入现有 GPU producer 或 consumer。"
+              "Q 交换和其他结果导出仍计入 AE。", "",
+              "| g 的去重阶段 | 当前 epoch | 首层 × 180 (ms) | 末层 × 180 (ms) |", "|---|---|---:|---:|"]
+    scale = data["clock_ps"] * REPEATS / 1e9
+    first, last = ({row["name"]: row for row in data["fused_ae_solo_overlap"][label]["stages"]}
+                   for label in ("g-s0-l0", "g-s9-l17"))
+    for stage, (epoch, _, _, _) in G_SHARED_IO.items():
+        lines.append(f"| {stage} | {epoch} | {first[stage]['deduplicated_io_ck'] * scale:.6f} | "
+                     f"{last[stage]['deduplicated_io_ck'] * scale:.6f} |")
     if "VLM_in_AE_by_phase_ms" in g_e2e:
         phases = g_e2e["VLM_in_AE_by_phase_ms"]
         lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
@@ -543,7 +601,8 @@ def main():
         for case, slices in SLICES.items():
             for step, layer in slices:
                 label = f"{case}-s{step}-l{layer}"
-                timeline, geometry, gaps, verification = load_trace(args.traces / label, step, layer)
+                timeline, geometry, gaps, verification = load_trace(
+                    args.traces / label, step, layer, g_shared_io=case == "g")
                 if timeline["clock_ps"] != clock_ps:
                     raise ValueError(f"trace clock differs for {label}")
                 data["geometry"][label] = geometry
@@ -580,9 +639,8 @@ def main():
     data["fused_windows"] = fused_summary(args.traces, ck_ms, baseline)
     data["fused_ae_solo_overlap"] = {}
     for label, (timeline, geometry) in fused_slices.items():
-        vlm_ms = data["fused_windows"][label[0]]["VLM_calibrated_sum_ms"]
         data["fused_ae_solo_overlap"][label] = fused_ae_solo_overlap(
-            timeline, geometry, vlm_ms, baseline - profile_ms + vlm_ms)
+            timeline, geometry, profile_ms, baseline, g_shared_io=label.startswith("g-"))
     data["g_model_comparison"] = g_model_comparison(data["fused_ae_solo_overlap"]["g-s0-l0"])
     data["slice_comparison"]["d"] = [
         compare(row[key], data["replay"]["d-s9-l17"][alpha][policy][key],
@@ -598,7 +656,7 @@ def main():
     }
     data["slice_comparison"]["g"] = [
         compare(*(data["provenance"][label]["ae_slice_ck"] * REPEATS * ck_ms
-                  for label in g_labels), "180× AE solo (ms)"),
+                  for label in g_labels), "180× 原始 AE trace (ms)"),
         compare(*(sum(r["idle_outside_epoch_channel_ck"] for r in data["geometry"][label])
                   for label in g_labels), "epoch 外 idle (通道 CK)"),
     ]
@@ -609,7 +667,9 @@ def main():
         data["fused_g_repeated"] = repeated
     data["slice_comparison"]["g"] += [
         compare(*(data["fused_ae_solo_overlap"][label][key] for label in g_labels), metric)
-        for key, metric in (("overlap_ms", "180× epoch 外重叠 (ms)"),
+        for key, metric in (("deduplicated_io_ms", "180× 去重 I/O (ms)"),
+                            ("ae_solo_ms", "180× 计费 AE (ms)"),
+                            ("overlap_ms", "180× epoch 外重叠 (ms)"),
                             ("total_ms", "180× 端到端 (ms)"))]
     write_json(output / "gap-estimate.json", data)
     (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")
