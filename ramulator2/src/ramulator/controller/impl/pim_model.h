@@ -62,11 +62,21 @@ class BusChecker {
   Clock private_start=0;
   int account_stage=-1,external_rank=0;
   bool split_traffic=false,io_epoch=false;
+  std::ostream* dq_trace=nullptr;
+  std::ostream* epoch_trace=nullptr;
+  const std::string* trace_stage_name=nullptr;
+  int trace_channel=0;
+  Clock trace_epoch_start=0;
   uint64_t checked=0;
   std::map<int,BusStat> stats;
   void observe(int cmd,const AddrVec_t& addr,Clock now,int stage);
   void advance(Clock now);
-  void set_stage(Clock now,int stage) {advance(now);account_stage=stage;io_epoch=false;}
+  void trace_epoch_change(Clock now,bool active);
+  void set_stage(Clock now,int stage) {
+    advance(now);
+    if(epoch_trace)trace_epoch_change(now,false);
+    account_stage=stage;io_epoch=false;
+  }
   void retire(Clock now);
 };
 struct GpuRequest { AddrVec_t addr; int cmd; uint64_t sequence; Clock arrival; bool array_preq=false; };

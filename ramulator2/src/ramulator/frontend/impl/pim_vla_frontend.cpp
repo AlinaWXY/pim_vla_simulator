@@ -100,6 +100,8 @@ int probe_mlp(const std::string& config_file) {
 int run(const std::string& config_file,const std::string& output) {
   auto cfg=Config::parse_config_file(config_file);
   auto execution=cfg["execution_model"].as<std::string>("native_dram_requests");
+  const bool trace=cfg["trace_ae_dq"].as<bool>(false);
+  require(!trace||execution=="native_dram_requests","trace_ae_dq requires native_dram_requests");
   if(execution=="fused_kernel_windows")return run_fused_kernels(config_file,output);
   require(execution=="native_dram_requests","unknown execution_model");
   require(cfg.is_map()&&!cfg.map().count("refresh_allbank"),"refresh_allbank is retired: rank0 uses REFpb and rank1 uses REFab");
@@ -110,6 +112,17 @@ int run(const std::string& config_file,const std::string& output) {
   auto us=[&](Clock c){return c*tick_us;};
   std::string kind=cfg["run_kind"].as<std::string>("combined");
   require(kind=="combined"||kind=="ae_solo"||kind=="vlm_solo","invalid run_kind");
+  require(!trace||kind=="ae_solo","trace_ae_dq requires ae_solo");
+  std::ofstream bursts,epochs,timeline;
+  if(trace) {
+    bursts.open(output+"/dq-bursts.csv");
+    epochs.open(output+"/dq-epochs.csv");
+    timeline.open(output+"/dq-timeline.json");
+    require(bursts&&epochs&&timeline,"cannot open AE DQ trace files");
+    bursts<<"channel,stage_id,stage,start_ck,end_ck,direction,command,fused_io_epoch\n";
+    epochs<<"channel,stage_id,start_ck,end_ck\n";
+    timeline<<"{\"clock_ps\":"<<std::setprecision(15)<<tick_us*1000000<<",\"channels\":16,\"events\":[";
+  }
   bool do_ae=kind!="vlm_solo",do_vlm=kind!="ae_solo";
   bool serial=cfg["mode"].as<std::string>("concurrent")=="serial";
   bool fused=cfg["dataflow"].as<std::string>("streaming")=="fused";
@@ -135,6 +148,11 @@ int run(const std::string& config_file,const std::string& output) {
   for(int c=0;c<16;c++) {
     channels[c]=std::make_unique<PIMController>(c,specification,specification["metadata"]);
     auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;mc.legacy_gap_batch=!closed;
+    if(trace) {
+      mc.checker.dq_trace=&bursts;
+      mc.checker.epoch_trace=fused?&epochs:nullptr;
+      mc.checker.trace_channel=c;
+    }
     mc.checker.split_traffic=closed&&do_ae&&do_vlm;
     if(closed)set_watermarks(mc,w_max);
     else {
@@ -191,6 +209,15 @@ int run(const std::string& config_file,const std::string& output) {
   size_t ae_index=0,vlm_index=0;
   int active_kernel=-1;
   Clock stage_start=0;
+  Clock gpu_start=0;
+  auto trace_event=[&](Clock start,Clock end,int stage_id) {
+    if(!trace)return;
+    const auto& e=events[ae_index];
+    if(ae_index)timeline<<',';
+    timeline<<"\n{\"kind\":"<<json_string(e.kind)<<",\"name\":"<<json_string(e.name)
+            <<",\"stage_id\":"<<stage_id<<",\"step\":"<<e.step<<",\"layer\":"<<e.layer
+            <<",\"start_ck\":"<<start<<",\"end_ck\":"<<end<<'}';
+  };
   std::array<Clock,16> next_tick{};
   uint64_t iterations=0;
   auto all=[&](auto predicate){for(const auto& mc:channels)if(!predicate(*mc))return false;return true;};
@@ -208,9 +235,13 @@ int run(const std::string& config_file,const std::string& output) {
         if(closed)require(k.end==std::max(k.start+k.nominal,k.memory_done),"closed-loop kernel completion was not causal");
         active_kernel=-1;state_changed=true;
       }
-      if(ae_gpu_active&&now>=ae_gpu_end) {ae_gpu_active=false;ae_gpu_end=NEVER;++ae_index;state_changed=true;}
+      if(ae_gpu_active&&now>=ae_gpu_end) {
+        trace_event(gpu_start,ae_gpu_end,-1);
+        ae_gpu_active=false;ae_gpu_end=NEVER;++ae_index;state_changed=true;
+      }
       if(pim_active&&all([&](const auto& mc){return mc.stage_finished(now);})) {
         const auto& e=events[ae_index];
+        trace_event(stage_start,now,static_cast<int>(results.size()));
         results.push_back({static_cast<int>(results.size()),e.step,e.layer,e.name,stage_start,now,0});
         pim_active=false;++ae_index;for(auto& mc:channels){mc->checker.set_stage(now,-1);mc->stage=-1;}state_changed=true;
       }
@@ -224,9 +255,11 @@ int run(const std::string& config_file,const std::string& output) {
               wait_since=-1;
             }
             ae_gpu_active=true;ae_gpu_end=now+cycles(e.us);state_changed=true;
+            if(trace)gpu_start=now;
           } else if(wait_since<0)wait_since=now;
         } else {
           stage_start=now;pim_active=true;
+          if(trace)for(auto& mc:channels)mc->checker.trace_stage_name=&e.name;
           for(int c=0;c<16;c++){channels[c]->row_offset=std::max(0,e.layer)*layer_stride_rows;channels[c]->set_stage(programs.at(e.name).channels[c],results.size(),now,e.name);next_tick[c]=now;}
           state_changed=true;
         }
@@ -258,6 +291,11 @@ int run(const std::string& config_file,const std::string& output) {
     if(++iterations%10000000==0)std::cerr<<"progress ck="<<now<<" kernels="<<vlm_index<<" stages="<<results.size()<<"\n";
     now=next;
     require(now<cycles(5000000),"simulation exceeded 5 seconds of model time");
+  }
+  if(trace) {
+    timeline<<"\n],\"ae_end_ck\":"<<ae_end<<"}\n";
+    bursts.close();epochs.close();timeline.close();
+    require(bursts&&epochs&&timeline,"failed to write AE DQ trace files");
   }
   uint64_t gr=0,gw=0,pr=0,pw=0,checks=0;
   for(const auto& mc:channels){mc->checker.advance(now);gr+=mc->gpu_read_bytes;gw+=mc->gpu_write_bytes;pr+=mc->pim_read_bytes;pw+=mc->pim_write_bytes;checks+=mc->checker.checked;}

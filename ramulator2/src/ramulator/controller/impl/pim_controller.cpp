@@ -412,6 +412,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu) {
     }
   }
   if(fused&&clk<pim_dq_end)epoch=true;
+  if(checker.epoch_trace)checker.trace_epoch_change(clk,epoch);
   checker.io_epoch=epoch;
   Candidate gpu=permit_gpu&&!epoch?next_gpu(clk):Candidate{};
   Candidate refresh=next_refresh(clk),chosen;

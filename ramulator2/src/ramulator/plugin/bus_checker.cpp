@@ -1,5 +1,12 @@
 #include "ramulator/controller/impl/pim_model.h"
 namespace PimVla {
+void BusChecker::trace_epoch_change(Clock now,bool active) {
+  if(active==io_epoch||account_stage<0)return;
+  if(active)trace_epoch_start=now;
+  else if(now>trace_epoch_start)
+    *epoch_trace<<trace_channel<<','<<account_stage<<','<<trace_epoch_start<<','<<now<<'\n';
+}
+
 void BusChecker::advance(Clock now) {
   require(now>=account_clock,"bus checker clock went backward");
   auto overlap=[&](Clock start,Clock end){return std::max<Clock>(0,std::min(now,end)-std::max(account_clock,start));};
@@ -54,6 +61,9 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
     if(b.start-old.end<gap)throw std::runtime_error("DQ turnaround violation at CK "+std::to_string(now));
   }
   bursts.push_back(b);
+  if(dq_trace&&b.rank==1&&stage>=0)
+    *dq_trace<<trace_channel<<','<<stage<<','<<*trace_stage_name<<','<<b.start<<','<<b.end<<','
+             <<b.direction<<','<<spec->command_names[cmd]<<','<<io_epoch<<'\n';
   (m.direction=='R'?s.read:s.write)+=32;
   if(addr[1]==0)(m.direction=='R'?s.gpu_read:s.gpu_write)+=32;
   else (m.direction=='R'?s.pim_read:s.pim_write)+=32;
