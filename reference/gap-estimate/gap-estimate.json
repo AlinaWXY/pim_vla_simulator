@@ -13,10 +13,218 @@
     "WR": 11,
     "WW": 1
   },
+  "fused_ae_solo_overlap": {
+    "f-s0-l0": {
+      "ae_gpu_ms": 21.70235592,
+      "ae_solo_ms": 61.32792204,
+      "overlap_ms": 32.69704788,
+      "pim_compute_window_ms": 32.69704788,
+      "repetitions": 180,
+      "speedup_vs_b": 1.2108263345854664,
+      "stages": [
+        {
+          "io_epoch_union_ck": 1658,
+          "name": "qkv",
+          "overlap_ck": 49502,
+          "t_ck": 51160
+        },
+        {
+          "io_epoch_union_ck": 1236,
+          "name": "rope_export",
+          "overlap_ck": 0,
+          "t_ck": 1236
+        },
+        {
+          "io_epoch_union_ck": 1030,
+          "name": "rope_import",
+          "overlap_ck": 0,
+          "t_ck": 1030
+        },
+        {
+          "io_epoch_union_ck": 0,
+          "name": "q_exchange_export",
+          "overlap_ck": 0,
+          "t_ck": 47
+        },
+        {
+          "io_epoch_union_ck": 1303,
+          "name": "q_exchange_import",
+          "overlap_ck": 0,
+          "t_ck": 1350
+        },
+        {
+          "io_epoch_union_ck": 3011,
+          "name": "qkt",
+          "overlap_ck": 14374,
+          "t_ck": 17385
+        },
+        {
+          "io_epoch_union_ck": 1369,
+          "name": "pv",
+          "overlap_ck": 15549,
+          "t_ck": 16918
+        },
+        {
+          "io_epoch_union_ck": 4140,
+          "name": "o",
+          "overlap_ck": 23544,
+          "t_ck": 27684
+        },
+        {
+          "io_epoch_union_ck": 7182,
+          "name": "gate_up",
+          "overlap_ck": 47074,
+          "t_ck": 54256
+        },
+        {
+          "io_epoch_union_ck": 20013,
+          "name": "down",
+          "overlap_ck": 43614,
+          "t_ck": 63627
+        }
+      ],
+      "total_ms": 133.85145236,
+      "vlm_profile_ms": 105.22057819999999,
+      "vlm_remaining_ms": 72.52353031999999
+    },
+    "g-s0-l0": {
+      "ae_gpu_ms": 16.68122316,
+      "ae_solo_ms": 56.16715859999999,
+      "overlap_ms": 32.72760792,
+      "pim_compute_window_ms": 32.72760792,
+      "repetitions": 180,
+      "speedup_vs_b": 1.2596821163700362,
+      "stages": [
+        {
+          "io_epoch_union_ck": 1658,
+          "name": "qkv",
+          "overlap_ck": 49502,
+          "t_ck": 51160
+        },
+        {
+          "io_epoch_union_ck": 0,
+          "name": "rope",
+          "overlap_ck": 1283,
+          "t_ck": 1283
+        },
+        {
+          "io_epoch_union_ck": 533,
+          "name": "q_exchange_export",
+          "overlap_ck": 0,
+          "t_ck": 533
+        },
+        {
+          "io_epoch_union_ck": 885,
+          "name": "q_exchange_import",
+          "overlap_ck": 0,
+          "t_ck": 932
+        },
+        {
+          "io_epoch_union_ck": 2704,
+          "name": "qkt",
+          "overlap_ck": 14595,
+          "t_ck": 17299
+        },
+        {
+          "io_epoch_union_ck": 1684,
+          "name": "pv",
+          "overlap_ck": 15300,
+          "t_ck": 16984
+        },
+        {
+          "io_epoch_union_ck": 4634,
+          "name": "o",
+          "overlap_ck": 23094,
+          "t_ck": 27728
+        },
+        {
+          "io_epoch_union_ck": 7498,
+          "name": "gate_up",
+          "overlap_ck": 46696,
+          "t_ck": 54194
+        },
+        {
+          "io_epoch_union_ck": 20385,
+          "name": "down",
+          "overlap_ck": 43368,
+          "t_ck": 63753
+        }
+      ],
+      "total_ms": 128.66012887999997,
+      "vlm_profile_ms": 105.22057819999999,
+      "vlm_remaining_ms": 72.49297028
+    },
+    "g-s9-l17": {
+      "ae_gpu_ms": 17.90176752,
+      "ae_solo_ms": 57.3794298,
+      "overlap_ms": 32.80831344,
+      "pim_compute_window_ms": 32.80831344,
+      "repetitions": 180,
+      "speedup_vs_b": 1.2486998030916223,
+      "stages": [
+        {
+          "io_epoch_union_ck": 1581,
+          "name": "qkv",
+          "overlap_ck": 49443,
+          "t_ck": 51024
+        },
+        {
+          "io_epoch_union_ck": 0,
+          "name": "rope",
+          "overlap_ck": 1283,
+          "t_ck": 1283
+        },
+        {
+          "io_epoch_union_ck": 533,
+          "name": "q_exchange_export",
+          "overlap_ck": 0,
+          "t_ck": 533
+        },
+        {
+          "io_epoch_union_ck": 885,
+          "name": "q_exchange_import",
+          "overlap_ck": 0,
+          "t_ck": 932
+        },
+        {
+          "io_epoch_union_ck": 2998,
+          "name": "qkt",
+          "overlap_ck": 14682,
+          "t_ck": 17680
+        },
+        {
+          "io_epoch_union_ck": 1370,
+          "name": "pv",
+          "overlap_ck": 15485,
+          "t_ck": 16855
+        },
+        {
+          "io_epoch_union_ck": 4163,
+          "name": "o",
+          "overlap_ck": 23508,
+          "t_ck": 27671
+        },
+        {
+          "io_epoch_union_ck": 7497,
+          "name": "gate_up",
+          "overlap_ck": 46828,
+          "t_ck": 54325
+        },
+        {
+          "io_epoch_union_ck": 20427,
+          "name": "down",
+          "overlap_ck": 43087,
+          "t_ck": 63514
+        }
+      ],
+      "total_ms": 129.79169456,
+      "vlm_profile_ms": 105.22057819999999,
+      "vlm_remaining_ms": 72.41226476
+    }
+  },
   "fused_g_repeated": {
     "g-s0-l0": {
       "AE_GPU_compute_ms": 16.68122316,
-      "AE_GPU_profile_ms": 16.67808000000002,
       "AE_VLM_join_ms": 59.03593592400001,
       "AE_elapsed_ms": 117.133029524,
       "PIM_descriptor_continuations": 360,
@@ -24,15 +232,6 @@
       "VLM_calibrated_sum_ms": 106.89316117199999,
       "VLM_tail_ms": 13.222683026,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
-      "phase_durations_ms": {
-        "compute": 34.627113262,
-        "continue": 0.0,
-        "download": 2.107977718,
-        "join": 59.035935924,
-        "launch": 0.00742896,
-        "transfer": 0.33346087599999996,
-        "upload": 4.339889624
-      },
       "raw_sha256": "acad6534df5c32a0e891fb63226c039e42828a51030d8310c075036a7858c26f",
       "source": "本轮原生融合窗口",
       "speedup_vs_b": 1.2432969777050247,
@@ -41,7 +240,6 @@
     },
     "g-s9-l17": {
       "AE_GPU_compute_ms": 17.90176752,
-      "AE_GPU_profile_ms": 17.89920000000002,
       "AE_VLM_join_ms": 59.045850584,
       "AE_elapsed_ms": 118.336045478,
       "PIM_descriptor_continuations": 360,
@@ -49,15 +247,6 @@
       "VLM_calibrated_sum_ms": 106.89316117199999,
       "VLM_tail_ms": 13.222683026,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
-      "phase_durations_ms": {
-        "compute": 34.617197663999995,
-        "continue": 0.0,
-        "download": 2.100413686,
-        "join": 59.045850584,
-        "launch": 0.007429898,
-        "transfer": 0.328481972,
-        "upload": 4.334904154
-      },
       "raw_sha256": "84f0b60380ba6f315930932b9997e5763ebb881c6ebff37d7cb658020a63adf8",
       "source": "本轮原生融合窗口",
       "speedup_vs_b": 1.2319278643307372,
@@ -65,74 +254,9 @@
       "total_ms": 131.558728504
     }
   },
-  "fused_kernel_sum": {
-    "f": {
-      "ae_gpu_ms": 23.801590600000022,
-      "exclusive_pim_io_ms": 7.039185356,
-      "exclusive_pim_io_phases_ms": {
-        "download": 2.0951074199999997,
-        "transfer": 0.604801764,
-        "upload": 4.339276172
-      },
-      "gpu_compute_ms": 129.0221688,
-      "overlapping_pim_ms": 34.393507176,
-      "phase_source": "本轮原生融合窗口",
-      "speedup_vs_b": 1.1911601530452138,
-      "total_ms": 136.061354156,
-      "vlm_profile_ms": 105.22057819999999
-    },
-    "g": {
-      "ae_gpu_ms": 18.16047700000002,
-      "exclusive_pim_io_ms": 6.775516369999999,
-      "exclusive_pim_io_phases_ms": {
-        "download": 2.098944778,
-        "transfer": 0.32952971799999997,
-        "upload": 4.347041873999999
-      },
-      "gpu_compute_ms": 123.38105520000002,
-      "overlapping_pim_ms": 34.634058214,
-      "phase_source": "本轮原生融合窗口",
-      "speedup_vs_b": 1.2451992356977228,
-      "total_ms": 130.15657157,
-      "vlm_profile_ms": 105.22057819999999
-    }
-  },
-  "fused_kernel_sum_repeated": {
-    "g-s0-l0": {
-      "ae_gpu_ms": 16.67808000000002,
-      "exclusive_pim_io_ms": 6.781328218,
-      "exclusive_pim_io_phases_ms": {
-        "download": 2.107977718,
-        "transfer": 0.33346087599999996,
-        "upload": 4.339889624
-      },
-      "gpu_compute_ms": 121.89865820000001,
-      "overlapping_pim_ms": 34.634542222,
-      "phase_source": "本轮原生融合窗口",
-      "speedup_vs_b": 1.2594877257255381,
-      "total_ms": 128.67998641800003,
-      "vlm_profile_ms": 105.22057819999999
-    },
-    "g-s9-l17": {
-      "ae_gpu_ms": 17.89920000000002,
-      "exclusive_pim_io_ms": 6.763799812,
-      "exclusive_pim_io_phases_ms": {
-        "download": 2.100413686,
-        "transfer": 0.328481972,
-        "upload": 4.334904154
-      },
-      "gpu_compute_ms": 123.11977820000001,
-      "overlapping_pim_ms": 34.62462756199999,
-      "phase_source": "本轮原生融合窗口",
-      "speedup_vs_b": 1.2478164362320399,
-      "total_ms": 129.88357801200002,
-      "vlm_profile_ms": 105.22057819999999
-    }
-  },
   "fused_windows": {
     "f": {
       "AE_GPU_compute_ms": 23.805652079999998,
-      "AE_GPU_profile_ms": 23.801590600000022,
       "AE_VLM_join_ms": 59.27697097,
       "AE_elapsed_ms": 124.51531558200001,
       "PIM_descriptor_continuations": 180,
@@ -142,15 +266,6 @@
       "archived_total_ms": 137.737998608,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
       "delta_from_archive_ms": 0.0,
-      "phase_durations_ms": {
-        "compute": 34.389791758,
-        "continue": 0.0,
-        "download": 2.0951074199999997,
-        "join": 59.27697097,
-        "launch": 0.003715418,
-        "transfer": 0.604801764,
-        "upload": 4.339276172
-      },
       "raw_sha256": "0f658d8dc8cba6a21b8649792508055b6fcb6cdbafde4d13ceef5eaeb5294dfc",
       "source": "本轮原生融合窗口",
       "speedup_vs_b": 1.1766605081960781,
@@ -159,7 +274,6 @@
     },
     "g": {
       "AE_GPU_compute_ms": 18.163703081999998,
-      "AE_GPU_profile_ms": 18.16047700000002,
       "AE_VLM_join_ms": 59.036419932,
       "AE_elapsed_ms": 118.609697598,
       "PIM_descriptor_continuations": 360,
@@ -169,15 +283,6 @@
       "archived_total_ms": 131.83238062400002,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
       "delta_from_archive_ms": 0.0,
-      "phase_durations_ms": {
-        "compute": 34.626629254,
-        "continue": 0.0,
-        "download": 2.098944778,
-        "join": 59.036419931999994,
-        "launch": 0.00742896,
-        "transfer": 0.32952971799999997,
-        "upload": 4.347041873999999
-      },
       "raw_sha256": "645843a57a6bcff958533d0c457351d097484e8bdb82ac7a4f6650b1a4996cae",
       "source": "本轮原生融合窗口",
       "speedup_vs_b": 1.2293706801991486,
@@ -211,6 +316,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 11,
         "gap_channel_ck": 651328,
         "gap_count": 16400,
@@ -238,6 +344,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 12,
         "gap_channel_ck": 11584,
         "gap_count": 3136,
@@ -261,6 +368,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 23,
         "gap_channel_ck": 8288,
         "gap_count": 3136,
@@ -284,6 +392,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 24,
         "gap_channel_ck": 1264,
         "gap_count": 16,
@@ -303,6 +412,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 25,
         "gap_channel_ck": 0,
         "gap_count": 0,
@@ -317,6 +427,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 26,
         "gap_channel_ck": 789456,
         "gap_count": 31744,
@@ -340,6 +451,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 32,
         "gap_channel_ck": 127184,
         "gap_count": 17920,
@@ -371,6 +483,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 34,
         "gap_channel_ck": 182784,
         "gap_count": 20480,
@@ -406,6 +519,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 49,
         "gap_channel_ck": 617024,
         "gap_count": 32768,
@@ -437,6 +551,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 53,
         "gap_channel_ck": 242480,
         "gap_count": 67584,
@@ -470,6 +585,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 11,
         "gap_channel_ck": 710112,
         "gap_count": 8208,
@@ -497,6 +613,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 12,
         "gap_channel_ck": 21296,
         "gap_count": 3200,
@@ -520,6 +637,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 23,
         "gap_channel_ck": 8272,
         "gap_count": 3136,
@@ -543,6 +661,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 24,
         "gap_channel_ck": 752,
         "gap_count": 16,
@@ -562,6 +681,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 25,
         "gap_channel_ck": 10816,
         "gap_count": 1616,
@@ -589,6 +709,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 26,
         "gap_channel_ck": 404352,
         "gap_count": 15872,
@@ -612,6 +733,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 31,
         "gap_channel_ck": 141968,
         "gap_count": 12032,
@@ -643,6 +765,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 33,
         "gap_channel_ck": 331632,
         "gap_count": 24576,
@@ -678,6 +801,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 48,
         "gap_channel_ck": 620080,
         "gap_count": 32768,
@@ -709,6 +833,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 52,
         "gap_channel_ck": 238384,
         "gap_count": 67584,
@@ -742,6 +867,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 11,
         "gap_channel_ck": 710592,
         "gap_count": 8208,
@@ -769,6 +895,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 12,
         "gap_channel_ck": 21296,
         "gap_count": 3200,
@@ -792,6 +919,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 23,
         "gap_channel_ck": 8288,
         "gap_count": 3152,
@@ -815,6 +943,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 24,
         "gap_channel_ck": 752,
         "gap_count": 16,
@@ -834,6 +963,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 25,
         "gap_channel_ck": 16672,
         "gap_count": 1680,
@@ -861,6 +991,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 26,
         "gap_channel_ck": 398256,
         "gap_count": 15872,
@@ -884,6 +1015,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 31,
         "gap_channel_ck": 145824,
         "gap_count": 12032,
@@ -915,6 +1047,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 33,
         "gap_channel_ck": 330144,
         "gap_count": 24576,
@@ -950,6 +1083,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 48,
         "gap_channel_ck": 622624,
         "gap_count": 32768,
@@ -981,6 +1115,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 52,
         "gap_channel_ck": 238976,
         "gap_count": 67584,
@@ -1014,6 +1149,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 11,
         "gap_channel_ck": 710112,
         "gap_count": 8208,
@@ -1041,6 +1177,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 12,
         "gap_channel_ck": 13296,
         "gap_count": 16,
@@ -1060,6 +1197,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 13,
         "gap_channel_ck": 13968,
         "gap_count": 2048,
@@ -1083,6 +1221,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 14,
         "gap_channel_ck": 10816,
         "gap_count": 1616,
@@ -1110,6 +1249,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 15,
         "gap_channel_ck": 399248,
         "gap_count": 15872,
@@ -1133,6 +1273,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 20,
         "gap_channel_ck": 146864,
         "gap_count": 12032,
@@ -1164,6 +1305,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 22,
         "gap_channel_ck": 330160,
         "gap_count": 24576,
@@ -1199,6 +1341,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 37,
         "gap_channel_ck": 617152,
         "gap_count": 32768,
@@ -1230,6 +1373,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 41,
         "gap_channel_ck": 240704,
         "gap_count": 67584,
@@ -1263,6 +1407,7 @@
         "epoch_blocked_idle_channel_ck": 10144,
         "epoch_internal_gap_count": 144,
         "epoch_touching_gap_count": 144,
+        "epoch_union_ck": 1658,
         "event_index": 11,
         "gap_channel_ck": 802176,
         "gap_count": 160,
@@ -1290,6 +1435,7 @@
         "epoch_blocked_idle_channel_ck": 11584,
         "epoch_internal_gap_count": 3136,
         "epoch_touching_gap_count": 3136,
+        "epoch_union_ck": 1236,
         "event_index": 12,
         "gap_channel_ck": 11584,
         "gap_count": 3136,
@@ -1313,6 +1459,7 @@
         "epoch_blocked_idle_channel_ck": 8288,
         "epoch_internal_gap_count": 3136,
         "epoch_touching_gap_count": 3136,
+        "epoch_union_ck": 1030,
         "event_index": 23,
         "gap_channel_ck": 8288,
         "gap_count": 3136,
@@ -1336,6 +1483,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 24,
         "gap_channel_ck": 752,
         "gap_count": 16,
@@ -1355,6 +1503,7 @@
         "epoch_blocked_idle_channel_ck": 16752,
         "epoch_internal_gap_count": 1664,
         "epoch_touching_gap_count": 1664,
+        "epoch_union_ck": 1303,
         "event_index": 25,
         "gap_channel_ck": 17504,
         "gap_count": 1680,
@@ -1382,6 +1531,7 @@
         "epoch_blocked_idle_channel_ck": 16432,
         "epoch_internal_gap_count": 320,
         "epoch_touching_gap_count": 336,
+        "epoch_union_ck": 3011,
         "event_index": 26,
         "gap_channel_ck": 246416,
         "gap_count": 336,
@@ -1405,6 +1555,7 @@
         "epoch_blocked_idle_channel_ck": 6032,
         "epoch_internal_gap_count": 384,
         "epoch_touching_gap_count": 384,
+        "epoch_union_ck": 1369,
         "event_index": 31,
         "gap_channel_ck": 254816,
         "gap_count": 400,
@@ -1432,6 +1583,7 @@
         "epoch_blocked_idle_channel_ck": 33472,
         "epoch_internal_gap_count": 16352,
         "epoch_touching_gap_count": 16384,
+        "epoch_union_ck": 4140,
         "event_index": 32,
         "gap_channel_ck": 410176,
         "gap_count": 16384,
@@ -1455,6 +1607,7 @@
         "epoch_blocked_idle_channel_ck": 49376,
         "epoch_internal_gap_count": 16672,
         "epoch_touching_gap_count": 16688,
+        "epoch_union_ck": 7182,
         "event_index": 47,
         "gap_channel_ck": 802560,
         "gap_count": 16688,
@@ -1486,6 +1639,7 @@
         "epoch_blocked_idle_channel_ck": 185040,
         "epoch_internal_gap_count": 8560,
         "epoch_touching_gap_count": 8576,
+        "epoch_union_ck": 20013,
         "event_index": 51,
         "gap_channel_ck": 882864,
         "gap_count": 8576,
@@ -1519,6 +1673,7 @@
         "epoch_blocked_idle_channel_ck": 10144,
         "epoch_internal_gap_count": 144,
         "epoch_touching_gap_count": 144,
+        "epoch_union_ck": 1658,
         "event_index": 11,
         "gap_channel_ck": 802176,
         "gap_count": 160,
@@ -1546,6 +1701,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 12,
         "gap_channel_ck": 20528,
         "gap_count": 16,
@@ -1565,6 +1721,7 @@
         "epoch_blocked_idle_channel_ck": 4432,
         "epoch_internal_gap_count": 2048,
         "epoch_touching_gap_count": 2048,
+        "epoch_union_ck": 533,
         "event_index": 13,
         "gap_channel_ck": 4432,
         "gap_count": 2048,
@@ -1588,6 +1745,7 @@
         "epoch_blocked_idle_channel_ck": 10064,
         "epoch_internal_gap_count": 1600,
         "epoch_touching_gap_count": 1600,
+        "epoch_union_ck": 885,
         "event_index": 14,
         "gap_channel_ck": 10816,
         "gap_count": 1616,
@@ -1615,6 +1773,7 @@
         "epoch_blocked_idle_channel_ck": 11520,
         "epoch_internal_gap_count": 288,
         "epoch_touching_gap_count": 304,
+        "epoch_union_ck": 2704,
         "event_index": 15,
         "gap_channel_ck": 245040,
         "gap_count": 304,
@@ -1638,6 +1797,7 @@
         "epoch_blocked_idle_channel_ck": 11072,
         "epoch_internal_gap_count": 400,
         "epoch_touching_gap_count": 400,
+        "epoch_union_ck": 1684,
         "event_index": 20,
         "gap_channel_ck": 255872,
         "gap_count": 416,
@@ -1665,6 +1825,7 @@
         "epoch_blocked_idle_channel_ck": 41376,
         "epoch_internal_gap_count": 16352,
         "epoch_touching_gap_count": 16384,
+        "epoch_union_ck": 4634,
         "event_index": 21,
         "gap_channel_ck": 410880,
         "gap_count": 16384,
@@ -1688,6 +1849,7 @@
         "epoch_blocked_idle_channel_ck": 54432,
         "epoch_internal_gap_count": 16704,
         "epoch_touching_gap_count": 16720,
+        "epoch_union_ck": 7498,
         "event_index": 36,
         "gap_channel_ck": 801568,
         "gap_count": 16720,
@@ -1719,6 +1881,7 @@
         "epoch_blocked_idle_channel_ck": 190992,
         "epoch_internal_gap_count": 8720,
         "epoch_touching_gap_count": 8736,
+        "epoch_union_ck": 20385,
         "event_index": 40,
         "gap_channel_ck": 884880,
         "gap_count": 8736,
@@ -1752,6 +1915,7 @@
         "epoch_blocked_idle_channel_ck": 8912,
         "epoch_internal_gap_count": 128,
         "epoch_touching_gap_count": 128,
+        "epoch_union_ck": 1581,
         "event_index": 11,
         "gap_channel_ck": 800000,
         "gap_count": 144,
@@ -1779,6 +1943,7 @@
         "epoch_blocked_idle_channel_ck": 0,
         "epoch_internal_gap_count": 0,
         "epoch_touching_gap_count": 0,
+        "epoch_union_ck": 0,
         "event_index": 12,
         "gap_channel_ck": 20528,
         "gap_count": 16,
@@ -1798,6 +1963,7 @@
         "epoch_blocked_idle_channel_ck": 4432,
         "epoch_internal_gap_count": 2048,
         "epoch_touching_gap_count": 2048,
+        "epoch_union_ck": 533,
         "event_index": 13,
         "gap_channel_ck": 4432,
         "gap_count": 2048,
@@ -1821,6 +1987,7 @@
         "epoch_blocked_idle_channel_ck": 10064,
         "epoch_internal_gap_count": 1600,
         "epoch_touching_gap_count": 1600,
+        "epoch_union_ck": 885,
         "event_index": 14,
         "gap_channel_ck": 10816,
         "gap_count": 1616,
@@ -1848,6 +2015,7 @@
         "epoch_blocked_idle_channel_ck": 16224,
         "epoch_internal_gap_count": 320,
         "epoch_touching_gap_count": 336,
+        "epoch_union_ck": 2998,
         "event_index": 15,
         "gap_channel_ck": 251136,
         "gap_count": 336,
@@ -1871,6 +2039,7 @@
         "epoch_blocked_idle_channel_ck": 6048,
         "epoch_internal_gap_count": 400,
         "epoch_touching_gap_count": 400,
+        "epoch_union_ck": 1370,
         "event_index": 20,
         "gap_channel_ck": 253808,
         "gap_count": 416,
@@ -1898,6 +2067,7 @@
         "epoch_blocked_idle_channel_ck": 33840,
         "epoch_internal_gap_count": 16336,
         "epoch_touching_gap_count": 16384,
+        "epoch_union_ck": 4163,
         "event_index": 21,
         "gap_channel_ck": 409968,
         "gap_count": 16384,
@@ -1921,6 +2091,7 @@
         "epoch_blocked_idle_channel_ck": 54416,
         "epoch_internal_gap_count": 16688,
         "epoch_touching_gap_count": 16704,
+        "epoch_union_ck": 7497,
         "event_index": 36,
         "gap_channel_ck": 803664,
         "gap_count": 16704,
@@ -1952,6 +2123,7 @@
         "epoch_blocked_idle_channel_ck": 191664,
         "epoch_internal_gap_count": 8768,
         "epoch_touching_gap_count": 8784,
+        "epoch_union_ck": 20427,
         "event_index": 40,
         "gap_channel_ck": 881056,
         "gap_count": 8784,
@@ -57309,25 +57481,18 @@
         "percent": 0.24653789617556932
       },
       {
-        "alternate": 123.11977820000001,
-        "base": 121.89865820000001,
-        "difference": 1.221119999999999,
-        "metric": "180× GPU 计算合计 (ms)",
-        "percent": 1.001750157082526
+        "alternate": 32.80831344,
+        "base": 32.72760792,
+        "difference": 0.0807055200000022,
+        "metric": "180× PIM 计算期重叠 (ms)",
+        "percent": 0.24659767434662694
       },
       {
-        "alternate": 6.763799812,
-        "base": 6.781328218,
-        "difference": -0.017528405999999386,
-        "metric": "180× 独占 PIM I/O (ms)",
-        "percent": -0.2584804250216455
-      },
-      {
-        "alternate": 129.88357801200002,
-        "base": 128.67998641800003,
-        "difference": 1.2035915939999882,
-        "metric": "180× 含 I/O 的端到端 (ms)",
-        "percent": 0.9353370539613604
+        "alternate": 129.79169456,
+        "base": 128.66012887999997,
+        "difference": 1.1315656800000227,
+        "metric": "180× 端到端 (ms)",
+        "percent": 0.8794998806937571
       }
     ]
   },
