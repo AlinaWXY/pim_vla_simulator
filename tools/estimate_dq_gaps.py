@@ -23,6 +23,7 @@ ALPHAS = (1.0, 0.5)
 MATRIX = ROOT / "reference/spec/command-pair-matrix.json"
 PROFILE = ROOT / "input-data/vlm.json"
 FUSED = ROOT / "reference/fused-kernel-continuous-e2e/summary.json"
+EXCLUSIVE_PHASES = ("upload", "download", "transfer")
 PAIR_REFERENCE = dict(RRR=(6, 4), RRW=(6, 4), RWR=(15, 13), RWW=(5, 3),
                       WRR=(15, 13), WRW=(15, 13), WWR=(14, 12), WWW=(4, 2))
 
@@ -251,6 +252,10 @@ def load_fused_program(path):
     return read_json(path)
 
 
+def ae_gpu_profile_ms(schedule):
+    return math.fsum(event["us"] for event in schedule["events"] if event["kind"] == "gpu") / 1000
+
+
 def fused_result(path, case, ck_ms, expected_stages, b_ms):
     raw = read_json(path)
     metrics = raw["metrics"]
@@ -261,13 +266,18 @@ def fused_result(path, case, ck_ms, expected_stages, b_ms):
         raise ValueError(f"unexpected fused-window results: {path}")
     cfg = read_json(path.parent / "input-config.json")
     ledger = read_json(cfg["calibrated_vlm_path"])
-    audit = audit_timeline(raw, read_json(cfg["ae_schedule_path"]), ledger,
-                           load_fused_program(cfg["program_path"]))
+    schedule = read_json(cfg["ae_schedule_path"])
+    audit = audit_timeline(raw, schedule, ledger, load_fused_program(cfg["program_path"]))
+    phase_cycles = Counter()
+    for phase in audit["phases"]:
+        phase_cycles[phase["phase"]] += phase["duration_cycles"]
     total = metrics["total_us"] / 1000
     return dict(total_ms=total, AE_elapsed_ms=metrics["AE_elapsed_us"] / 1000,
                 AE_VLM_join_ms=metrics["AE_VLM_join_us"] / 1000,
                 PIM_native_ms=audit["native_PIM_cycles"] * ck_ms,
                 AE_GPU_compute_ms=audit["AE_GPU_cycles"] * ck_ms,
+                AE_GPU_profile_ms=ae_gpu_profile_ms(schedule),
+                phase_durations_ms={name: ck * ck_ms for name, ck in phase_cycles.items()},
                 VLM_tail_ms=metrics["VLM_remaining_us"] / 1000,
                 VLM_calibrated_sum_ms=math.fsum(k["duration_cycles"] for k in raw["kernels"]) * ck_ms,
                 PIM_descriptor_continuations=metrics["PIM_descriptor_continuations"],
@@ -278,6 +288,7 @@ def fused_result(path, case, ck_ms, expected_stages, b_ms):
 
 def fused_summary(traces, ck_ms, b_ms):
     archive = read_json(FUSED)
+    comparison = read_json(FUSED.with_name("policy-comparison.json"))
     if not archive["passed"]:
         raise ValueError("archived fused-window audit failed")
     rows = {}
@@ -289,9 +300,27 @@ def fused_summary(traces, ck_ms, b_ms):
             row["delta_from_archive_ms"] = row["total_ms"] - reference["total_ms"]
         else:
             row = dict(reference, source=f"已验证归档 `{archive['source_commit'][:7]}`")
+            row["phase_durations_ms"] = comparison["cases"][case]["phase_durations_ms"]
+            row["AE_GPU_profile_ms"] = ae_gpu_profile_ms(
+                read_json(ROOT / f"input-data/ae-{reference['variant']}.json"))
         row["speedup_vs_b"] = b_ms / row["total_ms"]
         rows[case] = row
     return rows
+
+
+def fused_kernel_sum(row, profile_ms, b_ms):
+    phases = row["phase_durations_ms"]
+    exclusive = {phase: phases[phase] for phase in EXCLUSIVE_PHASES}
+    io_ms = math.fsum(exclusive.values())
+    overlap_ms = math.fsum(phases[phase] for phase in ("compute", "launch"))
+    if not math.isclose(io_ms + overlap_ms, row["PIM_native_ms"], rel_tol=0, abs_tol=1e-7):
+        raise ValueError("fused native phases do not conserve PIM time")
+    gpu_ms = profile_ms + row["AE_GPU_profile_ms"]
+    total_ms = gpu_ms + io_ms
+    return dict(vlm_profile_ms=profile_ms, ae_gpu_ms=row["AE_GPU_profile_ms"], gpu_compute_ms=gpu_ms,
+                exclusive_pim_io_phases_ms=exclusive, exclusive_pim_io_ms=io_ms,
+                overlapping_pim_ms=overlap_ms, total_ms=total_ms, speedup_vs_b=b_ms / total_ms,
+                phase_source=row["source"])
 
 
 def report_md(data):
@@ -314,15 +343,17 @@ def report_md(data):
             for policy, row in policies.items():
                 lines.append(f"| {label} | {alpha} | {policy} | {row['ae_ms']:.6f} | {row['tail_ms']:.6f} | "
                              f"{row['total_ms']:.6f} | {row['vlm_loss_ms']:.6f} | {row['speedup_vs_b']:.6f} |")
-    lines += ["", "## f、g 的融合窗口", "",
-              "| 变体 | 数据来源 | total (ms) | AE 完成 (ms) | VLM join (ms) | VLM 尾部 (ms) | VLM 校准总长 (ms) | b / total |",
-              "|---|---|---:|---:|---:|---:|---:|---:|"]
-    for case, r in data["fused_windows"].items():
-        lines.append(f"| {case} | {r['source']} | {r['total_ms']:.6f} | {r['AE_elapsed_ms']:.6f} | "
-                     f"{r['AE_VLM_join_ms']:.6f} | {r['VLM_tail_ms']:.6f} | "
-                     f"{r['VLM_calibrated_sum_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
-    lines += ["", "f、g 的并发数据来自连续融合窗口，使用原校准 kernel 时长。g 的 epoch 过滤结果按纯 PIM "
-              "几何统计，保留跨越 epoch 边界的空隙中位于 epoch 外的部分。", "",
+    lines += ["", "## f、g 的 kernel 时长相加", "",
+              "PIM 私有计算窗口内，按 GPU 可使用共享 DQ 和 CA 的理想重叠假设计费。"
+              "GPU 计算时间直接相加 VLM 与 AE GPU 的 profile 时长。端到端列另加独占 PIM I/O 的"
+              "上传、导出和纯传输阶段时长。PIM 私有计算和连续描述符启动按重叠处理，I/O 交接按即时切换处理。", "",
+              "| 变体 | VLM profile (ms) | AE GPU (ms) | GPU 计算合计 (ms) | 独占 PIM I/O (ms) | 含 I/O 的端到端 (ms) | b / 端到端 |",
+              "|---|---:|---:|---:|---:|---:|---:|"]
+    for case, r in data["fused_kernel_sum"].items():
+        lines.append(f"| {case} | {r['vlm_profile_ms']:.6f} | {r['ae_gpu_ms']:.6f} | {r['gpu_compute_ms']:.6f} | "
+                     f"{r['exclusive_pim_io_ms']:.6f} | {r['total_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
+    lines += ["", "独占 I/O 时长取自原生融合窗口的阶段记录。JSON 中的 `fused_windows` "
+              "保留整 kernel 调度重跑数据。g 的 epoch 过滤按纯 PIM trace 的几何区间统计。", "",
               "## 切片代表性", "",
               "| 变体 | 指标 | α | policy | step 0 / layer 0 | step 9 / layer 17 | 差值 | 相对偏差 (%) |",
               "|---|---|---:|---|---:|---:|---:|---:|"]
@@ -370,7 +401,7 @@ def report_md(data):
               "- 每个空隙先假设尾方向等于入口方向，最多重新计算两次右边开销。仍不收敛时预留两方向中较大的右边开销，"
               "JSON 按阶段记录次数。ΣU 是可用容量，逐空隙表另列实际发射的读写数，起止 CK 相对各自 stage 的起点。",
               "- DQ 估算把独立启动的单层 AE solo 时间线重复 180 次。层外 AE GPU 块和跨层 DRAM 状态延续未进入该模型。"
-              "g 的代表性对照把两种切片的 AE 调度分别重复 180 次，连续运行原融合窗口前端，并保留各自的层地址偏移。",
+              "g 的代表性对照从两套分别重复 180 次的 AE 调度提取 GPU 块和独占 I/O 时长，并保留各自的层地址偏移。",
               ""]
     return "\n".join(lines)
 
@@ -449,6 +480,9 @@ def main():
             data["replay"].setdefault(label, {}).setdefault(alpha, {})[policy] = add_units(result, ck_ms, baseline)
             print(f"{label} alpha={alpha} {policy}: {result['total_ms']:.6f} ms", flush=True)
     data["fused_windows"] = fused_summary(args.traces, ck_ms, baseline)
+    profile_ms = data["solo"]["1.0"]["profile_ms"]
+    data["fused_kernel_sum"] = {case: fused_kernel_sum(row, profile_ms, baseline)
+                                for case, row in data["fused_windows"].items()}
     data["slice_comparison"]["d"] = [
         compare(row[key], data["replay"]["d-s9-l17"][alpha][policy][key],
                 metric, alpha=alpha, policy=policy)
@@ -472,11 +506,13 @@ def main():
         repeated = {label: fused_result(path, "g", ck_ms, len(data["geometry"][label]) * REPEATS, baseline)
                     for label, path in g_paths.items()}
         data["fused_g_repeated"] = repeated
+        kernel_sums = {label: fused_kernel_sum(row, profile_ms, baseline) for label, row in repeated.items()}
+        data["fused_kernel_sum_repeated"] = kernel_sums
         data["slice_comparison"]["g"] += [
-            compare(*(repeated[label][key] for label in g_labels), metric)
-            for key, metric in (("total_ms", "180× 融合窗口 total (ms)"),
-                                ("AE_elapsed_ms", "180× 融合窗口 AE 完成 (ms)"),
-                                ("AE_VLM_join_ms", "180× 融合窗口 VLM join (ms)"))]
+            compare(*(kernel_sums[label][key] for label in g_labels), metric)
+            for key, metric in (("gpu_compute_ms", "180× GPU 计算合计 (ms)"),
+                                ("exclusive_pim_io_ms", "180× 独占 PIM I/O (ms)"),
+                                ("total_ms", "180× 含 I/O 的端到端 (ms)"))]
     write_json(output / "gap-estimate.json", data)
     (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")
 
