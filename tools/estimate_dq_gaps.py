@@ -414,8 +414,11 @@ def report_md(data):
         lines += [f"整 kernel 融合窗口的归档与回退版本重跑分别为 {g_e2e['archived_total_ms']:.6f} ms、"
                   f"{g_e2e['total_ms']:.6f} ms，同口径差值 {g_e2e['delta_from_archive_ms']:+.6f} ms。", ""]
     comparison = data["g_model_comparison"]
-    lines += ["两种口径都在 AE 时间里计入 PIM I/O，包括搬入、读出和 Q 交换。逐请求闭环在 I/O epoch "
-              "期间限制新 GPU DRAM 命令，已发请求仍可返回，kernel 的标称计算时间继续流逝。"
+    lines += ["两种口径都在 AE 时间里计入 PIM I/O，包括搬入、读出和 Q 交换。"
+              "VLM 的实测 kernel 时长来自 Thor 自然缓存 trace，包含该次执行实际经历的访存等待。"
+              "L2 读 miss 和写流量代理来自单独采集的计数器。", "",
+              "逐请求闭环在 I/O epoch 期间限制新 GPU DRAM 命令，已发请求仍可返回。"
+              "kernel 完成时刻取实测时长下限与 DRAM 请求完成时刻中的较晚者。"
               "重叠估算把整段 I/O epoch 作为 VLM 暂停时间，影响的是 AE 结束后的 VLM 剩余量。", "",
               "| g 的时间项（ms） | 归档逐请求闭环 | AE solo 重叠估算 |",
               "|---|---:|---:|"]
