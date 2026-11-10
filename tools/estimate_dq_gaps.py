@@ -429,6 +429,15 @@ def report_md(data):
     lines += [f"| 端到端 | {comparison['closed_loop_total_ms']:.6f} | {comparison['overlap_estimate_total_ms']:.6f} |", "",
               f"闭环使用 {comparison['closed_loop_vlm_solo_ms']:.6f} ms 的 VLM solo 校准，"
               f"重叠估算使用 {comparison['estimate_vlm_kernel_sum_ms']:.6f} ms 的融合窗口 E2E kernel 合计。"]
+    lines += ["", "### AE GPU 计时与历史共享张量 I/O 去重", "",
+              "早期账本（`09234a9`）用冷缓存的 AE GPU kernel 时长，保留的 GPU producer 或 consumer "
+              "如果已承担同一共享张量的存取，便在合成 AE 时间线中去除对应的 native phase。"
+              "当时的规则包括融合输入暂存写入、QKT score 批量读出及 GPU RoPE 的 Q/K 导入导出，"
+              "原始 DQ 流量和时间线完整保留。", "",
+              "当前 AE 输入对普通保留 kernel 使用自然缓存 trace，对另测的边界 helper 使用 32 MiB "
+              "清缓存后的设备 kernel 中位数。两类时长都包含各自运行时经历的访存。"
+              "本表的 AE solo 采用原生 trace 的显式 I/O 口径，完整保留搬入、读出和 Q 交换。"
+              "历史去重依赖 GPU kernel 与 native phase 访问的是同一共享张量，并且承担同一笔实际存取。"]
     if "VLM_in_AE_by_phase_ms" in g_e2e:
         phases = g_e2e["VLM_in_AE_by_phase_ms"]
         lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
