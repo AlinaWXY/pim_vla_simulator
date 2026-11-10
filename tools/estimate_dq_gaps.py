@@ -368,7 +368,7 @@ def report_md(data):
               "- same_first 无历史时优先读，best 的入口成本相同时沿用 same_first。random 按剩余读写比例抽样，"
               "条件是两个方向当前均可发。表中 random 为固定种子样本均值，JSON 记录种子、样本和 total 的标准误。",
               "- 每个空隙先假设尾方向等于入口方向，最多重新计算两次右边开销。仍不收敛时预留两方向中较大的右边开销，"
-              "JSON 按阶段记录次数。ΣU 是可用容量，逐空隙表另列实际发射的读写数。",
+              "JSON 按阶段记录次数。ΣU 是可用容量，逐空隙表另列实际发射的读写数，起止 CK 相对各自 stage 的起点。",
               "- DQ 估算把独立启动的单层 AE solo 时间线重复 180 次。层外 AE GPU 块和跨层 DRAM 状态延续未进入该模型。"
               "g 的代表性对照把两种切片的 AE 调度分别重复 180 次，连续运行原融合窗口前端，并保留各自的层地址偏移。",
               ""]
@@ -402,6 +402,7 @@ def main():
     units = {a: units_for(a, clock_ps) for a in ALPHAS}
     data = dict(schema_version=1, clock_ps=clock_ps, channels=N, repetitions=REPEATS,
                 matrix_sha256=sha256(MATRIX), vlm_sha256=sha256(PROFILE), edge_ck=edges,
+                replay_engine_sha256=sha256(engine),
                 single_direction_reference=PAIR_REFERENCE, solo={}, geometry={}, provenance={},
                 replay={}, slice_comparison={}, hand_checks_passed=True)
     for alpha in ALPHAS:
@@ -477,7 +478,7 @@ def main():
                                 ("AE_elapsed_ms", "180× 融合窗口 AE 完成 (ms)"),
                                 ("AE_VLM_join_ms", "180× 融合窗口 VLM join (ms)"))]
     write_json(output / "gap-estimate.json", data)
-    (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8")
+    (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":
