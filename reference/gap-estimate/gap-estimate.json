@@ -17,10 +17,11 @@
     "f-s0-l0": {
       "ae_gpu_ms": 21.70235592,
       "ae_solo_ms": 61.32792204,
+      "b_ms": 163.74344641199997,
       "overlap_ms": 32.69704788,
       "pim_compute_window_ms": 32.69704788,
       "repetitions": 180,
-      "speedup_vs_b": 1.2108263345854664,
+      "speedup_vs_b": 1.2082244010139567,
       "stages": [
         {
           "io_epoch_union_ck": 1658,
@@ -83,17 +84,18 @@
           "t_ck": 63627
         }
       ],
-      "total_ms": 133.85145236,
-      "vlm_profile_ms": 105.22057819999999,
-      "vlm_remaining_ms": 72.52353031999999
+      "total_ms": 135.52403533199998,
+      "vlm_kernel_sum_ms": 106.89316117199999,
+      "vlm_remaining_ms": 74.19611329199999
     },
     "g-s0-l0": {
       "ae_gpu_ms": 16.68122316,
       "ae_solo_ms": 56.16715859999999,
+      "b_ms": 163.74344641199997,
       "overlap_ms": 32.72760792,
       "pim_compute_window_ms": 32.72760792,
       "repetitions": 180,
-      "speedup_vs_b": 1.2596821163700362,
+      "speedup_vs_b": 1.2563495693846969,
       "stages": [
         {
           "io_epoch_union_ck": 1658,
@@ -150,17 +152,18 @@
           "t_ck": 63753
         }
       ],
-      "total_ms": 128.66012887999997,
-      "vlm_profile_ms": 105.22057819999999,
-      "vlm_remaining_ms": 72.49297028
+      "total_ms": 130.332711852,
+      "vlm_kernel_sum_ms": 106.89316117199999,
+      "vlm_remaining_ms": 74.165553252
     },
     "g-s9-l17": {
       "ae_gpu_ms": 17.90176752,
       "ae_solo_ms": 57.3794298,
+      "b_ms": 163.74344641199997,
       "overlap_ms": 32.80831344,
       "pim_compute_window_ms": 32.80831344,
       "repetitions": 180,
-      "speedup_vs_b": 1.2486998030916223,
+      "speedup_vs_b": 1.2455356655509924,
       "stages": [
         {
           "io_epoch_union_ck": 1581,
@@ -217,9 +220,9 @@
           "t_ck": 63514
         }
       ],
-      "total_ms": 129.79169456,
-      "vlm_profile_ms": 105.22057819999999,
-      "vlm_remaining_ms": 72.41226476
+      "total_ms": 131.46427753199998,
+      "vlm_kernel_sum_ms": 106.89316117199999,
+      "vlm_remaining_ms": 74.08484773199999
     }
   },
   "fused_g_repeated": {
@@ -230,6 +233,17 @@
       "PIM_descriptor_continuations": 360,
       "PIM_native_ms": 41.41587044,
       "VLM_calibrated_sum_ms": 106.89316117199999,
+      "VLM_in_AE_by_phase_ms": {
+        "ae_gpu": 0.0,
+        "compute": 34.627113262,
+        "continue": 0.0,
+        "download": 0.0,
+        "join": 59.035935924,
+        "launch": 0.00742896,
+        "transfer": 0.0,
+        "upload": 0.0
+      },
+      "VLM_in_AE_ms": 93.670478146,
       "VLM_tail_ms": 13.222683026,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
       "raw_sha256": "acad6534df5c32a0e891fb63226c039e42828a51030d8310c075036a7858c26f",
@@ -245,6 +259,17 @@
       "PIM_descriptor_continuations": 360,
       "PIM_native_ms": 41.388427373999995,
       "VLM_calibrated_sum_ms": 106.89316117199999,
+      "VLM_in_AE_by_phase_ms": {
+        "ae_gpu": 0.0,
+        "compute": 34.617197663999995,
+        "continue": 0.0,
+        "download": 0.0,
+        "join": 59.045850584,
+        "launch": 0.007429898,
+        "transfer": 0.0,
+        "upload": 0.0
+      },
+      "VLM_in_AE_ms": 93.670478146,
       "VLM_tail_ms": 13.222683026,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
       "raw_sha256": "84f0b60380ba6f315930932b9997e5763ebb881c6ebff37d7cb658020a63adf8",
@@ -262,6 +287,17 @@
       "PIM_descriptor_continuations": 180,
       "PIM_native_ms": 41.432692532,
       "VLM_calibrated_sum_ms": 106.89316117199999,
+      "VLM_in_AE_by_phase_ms": {
+        "ae_gpu": 0.0,
+        "compute": 34.389791758,
+        "continue": 0.0,
+        "download": 0.0,
+        "join": 59.27697097,
+        "launch": 0.003715418,
+        "transfer": 0.0,
+        "upload": 0.0
+      },
+      "VLM_in_AE_ms": 93.670478146,
       "VLM_tail_ms": 13.222683026,
       "archived_total_ms": 137.737998608,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
@@ -279,6 +315,17 @@
       "PIM_descriptor_continuations": 360,
       "PIM_native_ms": 41.409574584,
       "VLM_calibrated_sum_ms": 106.89316117199999,
+      "VLM_in_AE_by_phase_ms": {
+        "ae_gpu": 0.0,
+        "compute": 34.626629254,
+        "continue": 0.0,
+        "download": 0.0,
+        "join": 59.036419931999994,
+        "launch": 0.00742896,
+        "transfer": 0.0,
+        "upload": 0.0
+      },
+      "VLM_in_AE_ms": 93.670478146,
       "VLM_tail_ms": 13.222683026,
       "archived_total_ms": 131.83238062400002,
       "calibrated_vlm_sha256": "5af7c292921161e7eb0c41aa1e4142aad47bdecd0241b1d69b4bac18c0668a4d",
@@ -57488,11 +57535,11 @@
         "percent": 0.24659767434662694
       },
       {
-        "alternate": 129.79169456,
-        "base": 128.66012887999997,
-        "difference": 1.1315656800000227,
+        "alternate": 131.46427753199998,
+        "base": 130.332711852,
+        "difference": 1.1315656799999942,
         "metric": "180× 端到端 (ms)",
-        "percent": 0.8794998806937571
+        "percent": 0.868213101623283
       }
     ]
   },

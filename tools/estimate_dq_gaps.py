@@ -1,5 +1,6 @@
 """Check native AE traces and report offline DQ-gap interference for c/d/e."""
 import argparse
+from bisect import bisect_right
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 import csv
@@ -264,6 +265,26 @@ def load_fused_program(path):
     return read_json(path)
 
 
+def fused_vlm_in_ae_by_phase(raw, ae_end):
+    kernels = [(row["start_ck"], row["end_ck"]) for row in raw["kernels"]]
+    ends = [end for _, end in kernels]
+    phases = raw["phases"] + [dict(row, phase="ae_gpu") for row in raw["ae_gpu"]]
+    active = Counter()
+    for row in phases:
+        start, end = row["start_ck"], row["end_ck"]
+        phase = row["phase"]
+        active[phase] += 0
+        index = bisect_right(ends, start)
+        while index < len(kernels) and kernels[index][0] < end:
+            kernel_start, kernel_end = kernels[index]
+            active[phase] += min(end, kernel_end) - max(start, kernel_start)
+            index += 1
+    expected = sum(max(0, min(ae_end, end) - start) for start, end in kernels)
+    if sum(active.values()) != expected:
+        raise ValueError("fused phase VLM time differs from VLM time before AE completion")
+    return active
+
+
 def fused_result(path, case, ck_ms, expected_stages, b_ms):
     raw = read_json(path)
     metrics = raw["metrics"]
@@ -276,6 +297,7 @@ def fused_result(path, case, ck_ms, expected_stages, b_ms):
     ledger = read_json(cfg["calibrated_vlm_path"])
     audit = audit_timeline(raw, read_json(cfg["ae_schedule_path"]), ledger,
                            load_fused_program(cfg["program_path"]))
+    vlm_in_ae = fused_vlm_in_ae_by_phase(raw, audit["AE_cycles"])
     total = metrics["total_us"] / 1000
     return dict(total_ms=total, AE_elapsed_ms=metrics["AE_elapsed_us"] / 1000,
                 AE_VLM_join_ms=metrics["AE_VLM_join_us"] / 1000,
@@ -283,6 +305,8 @@ def fused_result(path, case, ck_ms, expected_stages, b_ms):
                 AE_GPU_compute_ms=audit["AE_GPU_cycles"] * ck_ms,
                 VLM_tail_ms=metrics["VLM_remaining_us"] / 1000,
                 VLM_calibrated_sum_ms=math.fsum(k["duration_cycles"] for k in raw["kernels"]) * ck_ms,
+                VLM_in_AE_ms=sum(vlm_in_ae.values()) * ck_ms,
+                VLM_in_AE_by_phase_ms={phase: ck * ck_ms for phase, ck in vlm_in_ae.items()},
                 PIM_descriptor_continuations=metrics["PIM_descriptor_continuations"],
                 raw_sha256=sha256(path), calibrated_vlm_sha256=sha256(cfg["calibrated_vlm_path"]),
                 timeline_audit_passed=True, speedup_vs_b=b_ms / total,
@@ -307,7 +331,7 @@ def fused_summary(traces, ck_ms, b_ms):
     return rows
 
 
-def fused_ae_solo_overlap(timeline, geometry, profile_ms, b_ms):
+def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms):
     stages = []
     for row in geometry:
         name, duration, epoch = (row[key] for key in ("name", "t_ck", "epoch_union_ck"))
@@ -324,12 +348,12 @@ def fused_ae_solo_overlap(timeline, geometry, profile_ms, b_ms):
     scale = timeline["clock_ps"] * REPEATS / 1e9
     ae_ms = ae_ck * scale
     compute_window_ms = sum(row["overlap_ck"] for row in stages) * scale
-    overlap_ms = min(profile_ms, compute_window_ms)
-    total_ms = ae_ms + profile_ms - overlap_ms
-    return dict(ae_solo_ms=ae_ms, ae_gpu_ms=ae_gpu_ck * scale, vlm_profile_ms=profile_ms,
+    overlap_ms = min(vlm_ms, compute_window_ms)
+    total_ms = ae_ms + vlm_ms - overlap_ms
+    return dict(ae_solo_ms=ae_ms, ae_gpu_ms=ae_gpu_ck * scale, vlm_kernel_sum_ms=vlm_ms,
                 pim_compute_window_ms=compute_window_ms, overlap_ms=overlap_ms,
-                vlm_remaining_ms=profile_ms - overlap_ms, total_ms=total_ms,
-                repetitions=REPEATS, speedup_vs_b=b_ms / total_ms, stages=stages)
+                vlm_remaining_ms=vlm_ms - overlap_ms, total_ms=total_ms,
+                repetitions=REPEATS, b_ms=b_ms, speedup_vs_b=b_ms / total_ms, stages=stages)
 
 
 def report_md(data):
@@ -353,18 +377,32 @@ def report_md(data):
                 lines.append(f"| {label} | {alpha} | {policy} | {row['ae_ms']:.6f} | {row['tail_ms']:.6f} | "
                              f"{row['total_ms']:.6f} | {row['vlm_loss_ms']:.6f} | {row['speedup_vs_b']:.6f} |")
     lines += ["", "## f、g 的 AE solo 重叠估算", "",
-              "端到端时间等于 AE solo 加 VLM profile 总长，再减去 VLM 可在 AE 期间完成的时间。"
+              "端到端时间等于 AE solo 加整 kernel 融合窗口 E2E 记录中的 VLM kernel 执行时长之和，"
+              "再减去 VLM 可在 AE 期间完成的时间。"
               "使用回退版本实跑的 AE solo 切片，step 0 / layer 0 重复 180 次。AE 总长已经包含搬入、"
               "读出、Q 交换及 AE GPU 块。", "",
               "每个含私有计算的 PIM stage，扣除 16 通道融合 I/O epoch 的区间并集，剩余时间按理想重叠计入。"
-              "RoPE 导入导出、Q 交换等纯传输 stage 全程保留在 AE 时间内。", "",
-              "| 切片 × 180 | AE solo (ms) | VLM profile (ms) | PIM 计算期重叠 (ms) | AE 后 VLM 剩余 (ms) | 端到端 (ms) | b / 端到端 |",
-              "|---|---:|---:|---:|---:|---:|---:|"]
+              "RoPE 导入导出、Q 交换等纯传输 stage 全程保留在 AE 时间内。"
+              "本表的串行基准 b 用 c 的 AE solo 加同一份 VLM kernel 时长。", "",
+              "| 切片 × 180 | AE solo (ms) | E2E VLM kernel 合计 (ms) | PIM 计算期重叠 (ms) | AE 后 VLM 剩余 (ms) | 端到端 (ms) | b (ms) | b / 端到端 |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for label, r in data["fused_ae_solo_overlap"].items():
-        lines.append(f"| {label} | {r['ae_solo_ms']:.6f} | {r['vlm_profile_ms']:.6f} | {r['overlap_ms']:.6f} | "
-                     f"{r['vlm_remaining_ms']:.6f} | {r['total_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
-    lines += ["", "JSON 中的 `fused_windows` 和 `fused_g_repeated` 保留整 kernel 调度重跑数据，供对照。", "",
-              "## 切片代表性", "",
+        lines.append(f"| {label} | {r['ae_solo_ms']:.6f} | {r['vlm_kernel_sum_ms']:.6f} | {r['overlap_ms']:.6f} | "
+                     f"{r['vlm_remaining_ms']:.6f} | {r['total_ms']:.6f} | {r['b_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
+    g_e2e = data["fused_windows"]["g"]
+    if "VLM_in_AE_by_phase_ms" in g_e2e:
+        phases = g_e2e["VLM_in_AE_by_phase_ms"]
+        lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
+                  "| AE 阶段 | VLM 实际执行（ms） |", "|---|---:|"]
+        for phase, label in (("compute", "PIM 私有计算"), ("launch", "连续描述符启动"),
+                             ("join", "等待当前 VLM kernel 完成"), ("upload", "上传"),
+                             ("download", "导出"), ("transfer", "纯传输"), ("ae_gpu", "AE GPU 块")):
+            lines.append(f"| {label} | {phases[phase]:.6f} |")
+        lines += [f"| 合计 | {g_e2e['VLM_in_AE_ms']:.6f} |", "",
+                  f"这次 E2E 的 AE 在 {g_e2e['AE_elapsed_ms']:.6f} ms 完成，"
+                  f"之后 VLM 再执行 {g_e2e['VLM_tail_ms']:.6f} ms。"
+                  "AE solo 的重叠估算取自独立的纯 AE trace，整 kernel 交接等待只出现在并发 E2E 时间线上。"]
+    lines += ["", "## 切片代表性", "",
               "| 变体 | 指标 | α | policy | step 0 / layer 0 | step 9 / layer 17 | 差值 | 相对偏差 (%) |",
               "|---|---|---:|---|---:|---:|---:|---:|"]
     for case, rows in data["slice_comparison"].items():
@@ -492,10 +530,11 @@ def main():
             data["replay"].setdefault(label, {}).setdefault(alpha, {})[policy] = add_units(result, ck_ms, baseline)
             print(f"{label} alpha={alpha} {policy}: {result['total_ms']:.6f} ms", flush=True)
     data["fused_windows"] = fused_summary(args.traces, ck_ms, baseline)
-    data["fused_ae_solo_overlap"] = {
-        label: fused_ae_solo_overlap(timeline, geometry, profile_ms, baseline)
-        for label, (timeline, geometry) in fused_slices.items()
-    }
+    data["fused_ae_solo_overlap"] = {}
+    for label, (timeline, geometry) in fused_slices.items():
+        vlm_ms = data["fused_windows"][label[0]]["VLM_calibrated_sum_ms"]
+        data["fused_ae_solo_overlap"][label] = fused_ae_solo_overlap(
+            timeline, geometry, vlm_ms, baseline - profile_ms + vlm_ms)
     data["slice_comparison"]["d"] = [
         compare(row[key], data["replay"]["d-s9-l17"][alpha][policy][key],
                 metric, alpha=alpha, policy=policy)
