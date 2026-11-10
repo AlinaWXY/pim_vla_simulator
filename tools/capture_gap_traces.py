@@ -1,4 +1,4 @@
-"""Capture the seven native AE solo slices, with a byte-for-byte trace control."""
+"""Capture native AE solo slices, with a byte-for-byte trace control."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -10,9 +10,8 @@ sys.path.insert(0, str(ROOT))
 from experiments.common import read_json, sha256, write_json
 from experiments.config import case_config, variant_name
 
-SLICES = {case: [(0, 0)] for case in "cdefg"}
-for case in "dg":
-    SLICES[case].append((9, 17))
+COMPARISON_SLICES = ((0, 0), (9, 17))
+SLICES = dict.fromkeys("cdefg", COMPARISON_SLICES)
 REPEATS = 180
 
 
@@ -34,7 +33,7 @@ def generate(variant, directory, model):
     return directory / f"{variant}.json"
 
 
-def capture(case, binary, output, ledger):
+def capture(case, binary, output, ledger, slices):
     config = case_config(case, run_kind="ae_solo")
     variant = variant_name(config)
     schedule_path = ROOT / f"input-data/ae-{variant}.json"
@@ -43,7 +42,7 @@ def capture(case, binary, output, ledger):
     spec = ROOT / "reference/spec/spec.json"
     vlm = ROOT / "input-data/vlm.json"
     config.update(spec_path=str(spec), program_path=str(program), vlm_path=str(vlm))
-    for step, layer in SLICES[case]:
+    for step, layer in slices:
         directory = output / f"{case}-s{step}-l{layer}"
         schedule_slice = directory / "ae-slice.json"
         events = [e for e in schedule["events"] if (e["step"], e["layer"]) == (step, layer)]
@@ -100,6 +99,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--cases", choices=list("cdefg"), nargs="+", default=list("cdefg"))
+    parser.add_argument("--slice", type=int, nargs=2, metavar=("STEP", "LAYER"),
+                        help="capture only one step/layer for the selected cases")
     parser.add_argument("--fused-ledger", type=Path, help="also rerun the existing full f/g model")
     parser.add_argument("--repeat-fused-g", action="store_true",
                         help="reuse prepared g-fused config and repeat each g slice using fused windows")
@@ -114,12 +115,16 @@ def main():
         return
     if len(set(args.cases)) != len(args.cases):
         parser.error("--cases must be unique")
+    slices = (tuple(args.slice),) if args.slice is not None else COMPARISON_SLICES
     for case in args.cases:
-        if (output / f"{case}-s0-l0").exists():
-            raise FileExistsError(output / f"{case}-s0-l0")
+        for step, layer in slices:
+            destination = output / f"{case}-s{step}-l{layer}"
+            if destination.exists():
+                raise FileExistsError(destination)
     ledger = args.fused_ledger.resolve() if args.fused_ledger else None
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger) for case in args.cases]
+        futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger, slices)
+                   for case in args.cases]
         for future in futures:
             future.result()
 

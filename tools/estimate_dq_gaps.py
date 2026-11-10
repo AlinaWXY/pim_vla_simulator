@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiments.common import read_json, sha256, write_json
 from tools.audit_fused_kernels import audit_timeline
-from tools.capture_gap_traces import REPEATS, SLICES
+from tools.capture_gap_traces import COMPARISON_SLICES, REPEATS, SLICES
 
 N = 16
 POLICIES = ("same_first", "best", "random")
@@ -421,18 +421,70 @@ def g_model_comparison(estimate):
                 closed_loop_raw_sha256=old["raw_sha256"])
 
 
+def same_slice_comparison(data):
+    profile_ms = data["solo"]["1.0"]["profile_ms"]
+    candidates = []
+    for step, layer in COMPARISON_SLICES:
+        suffix = f"s{step}-l{layer}"
+        rows = {}
+        for case in "cdefg":
+            label = f"{case}-{suffix}"
+            if case in "cde":
+                replay = data["replay"][label]["1.0"]["same_first"]
+                ae, tail, total = (replay[key] for key in ("ae_ms", "tail_ms", "total_ms"))
+                overlap = profile_ms - tail
+            else:
+                replay = data["fused_ae_solo_overlap"][label]
+                ae, tail, total, overlap = (replay[key] for key in
+                                             ("ae_solo_ms", "vlm_remaining_ms", "total_ms", "overlap_ms"))
+            if (not math.isclose(ae + tail, total, rel_tol=0, abs_tol=1e-9)
+                    or not math.isclose(overlap + tail, profile_ms, rel_tol=0, abs_tol=1e-9)):
+                raise ValueError(f"same-slice AE/VLM accounting differs: {label}")
+            rows[case] = dict(ae_ms=ae, overlap_ms=overlap, vlm_tail_ms=tail, total_ms=total)
+        g = data["fused_ae_solo_overlap"][f"g-{suffix}"]
+        e_total, g_total = rows["e"]["total_ms"], rows["g"]["total_ms"]
+        explicit_g = g["explicit_native_io_total_ms"]
+        if not math.isclose(explicit_g, g_total + g["deduplicated_io_ms"], rel_tol=0, abs_tol=1e-9):
+            raise ValueError(f"g explicit and shared-tensor accounting differ: {suffix}")
+        candidates.append(dict(slice=suffix, step=step, layer=layer, cases=rows,
+                               e_over_g=e_total / g_total, e_minus_g_ms=e_total - g_total,
+                               g_explicit_io_ms=explicit_g, e_minus_g_explicit_io_ms=e_total - explicit_g))
+    chosen = max(candidates, key=lambda row: row["e_over_g"])
+    return dict(alpha=1.0, streaming_policy="same_first", vlm_profile_ms=profile_ms,
+                selected_slice=chosen["slice"], candidates=candidates)
+
+
 def report_md(data):
     baseline = data["b_ms"]
     lines = [
         "# 基于 PIM DQ 空隙的 VLM 干扰估算", "",
         f"基准 b 为 c 的 AE solo 切片重复 180 次加 profile VLM，合计 **{baseline:.6f} ms**。"
-        f"16 通道，{data['clock_ps']} ps/CK。七组 trace 开关对照的 raw.json 均逐字节相同。", "",
+        f"16 通道，{data['clock_ps']} ps/CK。{len(data['provenance'])} 组 trace 开关对照的 raw.json 均逐字节相同。", "",
         "| α | VLM 单元 | solo (ms) | profile (ms) | 单元最大绝对误差 (%) | 总时长误差 (%) |",
         "|---:|---:|---:|---:|---:|---:|",
     ]
     for alpha, row in data["solo"].items():
         lines.append(f"| {alpha} | {row['units']} | {row['total_ms']:.9f} | {row['profile_ms']:.9f} | "
                      f"{row['max_unit_error_percent']:.3g} | {row['total_error_percent']:.3g} |")
+    comparison = data["same_slice_comparison"]
+    selected = next(row for row in comparison["candidates"] if row["slice"] == comparison["selected_slice"])
+    lines += ["", "## c–g 同切片对照", "",
+              f"在实跑的两个候选切片中，step {selected['step']} / layer {selected['layer']} 的 e/g "
+              "端到端比值最高。五个变体均使用该切片重复 180 次。c–e 取 α=1.0、same_first，"
+              "f/g 取融合阶段的重叠估算，g 使用旧版共享张量 I/O 去重。", "",
+              "重叠指 AE 结束前已经推进的 VLM profile 等效时间。它与 VLM 尾部之和为 "
+              f"{comparison['vlm_profile_ms']:.6f} ms，计费 AE 与尾部之和为端到端估算。", "",
+              "| 变体 | 计费 AE (ms) | AE 期间 VLM 重叠 (ms) | AE 后 VLM 尾部 (ms) | 端到端估算 (ms) |",
+              "|---|---:|---:|---:|---:|"]
+    for case, r in selected["cases"].items():
+        lines.append(f"| {case} | {r['ae_ms']:.6f} | {r['overlap_ms']:.6f} | "
+                     f"{r['vlm_tail_ms']:.6f} | {r['total_ms']:.6f} |")
+    lines += ["", "| 候选切片 | e 端到端 (ms) | g 去重后端到端 (ms) | e/g | e − g (ms) | g 保留全部 I/O (ms) |",
+              "|---|---:|---:|---:|---:|---:|"]
+    for candidate in comparison["candidates"]:
+        cases = candidate["cases"]
+        lines.append(f"| {candidate['slice']} | {cases['e']['total_ms']:.6f} | {cases['g']['total_ms']:.6f} | "
+                     f"{candidate['e_over_g']:.6f} | {candidate['e_minus_g_ms']:.6f} | {candidate['g_explicit_io_ms']:.6f} |")
     lines += ["", "## c、d、e 的估算", "",
               "| 切片 × 180 | α | policy | AE (ms) | VLM 尾部 (ms) | total (ms) | VLM 损失 (ms) | b / total |",
               "|---|---:|---|---:|---:|---:|---:|---:|"]
@@ -671,6 +723,7 @@ def main():
                             ("ae_solo_ms", "180× 计费 AE (ms)"),
                             ("overlap_ms", "180× epoch 外重叠 (ms)"),
                             ("total_ms", "180× 端到端 (ms)"))]
+    data["same_slice_comparison"] = same_slice_comparison(data)
     write_json(output / "gap-estimate.json", data)
     (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")
 
