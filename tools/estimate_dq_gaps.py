@@ -24,6 +24,7 @@ ALPHAS = (1.0, 0.5)
 MATRIX = ROOT / "reference/spec/command-pair-matrix.json"
 PROFILE = ROOT / "input-data/vlm.json"
 FUSED = ROOT / "reference/fused-kernel-continuous-e2e/summary.json"
+SCALED_ABLATION = ROOT / "results/ablation-scaled-w128/ablation.json"
 FUSED_COMPUTE_STAGES = {"qkv", "qkt", "pv", "o", "gate_up", "down", "rope"}
 FUSED_TRANSFER_STAGES = {"rope_export", "rope_import", "q_exchange_export", "q_exchange_import"}
 PAIR_REFERENCE = dict(RRR=(6, 4), RRW=(6, 4), RWR=(15, 13), RWW=(5, 3),
@@ -347,13 +348,28 @@ def fused_ae_solo_overlap(timeline, geometry, vlm_ms, b_ms):
         raise ValueError("fused AE solo stages and GPU blocks do not cover the timeline")
     scale = timeline["clock_ps"] * REPEATS / 1e9
     ae_ms = ae_ck * scale
-    compute_window_ms = sum(row["overlap_ck"] for row in stages) * scale
-    overlap_ms = min(vlm_ms, compute_window_ms)
+    epoch_free_ms = sum(row["overlap_ck"] for row in stages) * scale
+    overlap_ms = min(vlm_ms, epoch_free_ms)
     total_ms = ae_ms + vlm_ms - overlap_ms
     return dict(ae_solo_ms=ae_ms, ae_gpu_ms=ae_gpu_ck * scale, vlm_kernel_sum_ms=vlm_ms,
-                pim_compute_window_ms=compute_window_ms, overlap_ms=overlap_ms,
+                epoch_free_compute_stage_ms=epoch_free_ms, overlap_ms=overlap_ms,
                 vlm_remaining_ms=vlm_ms - overlap_ms, total_ms=total_ms,
                 repetitions=REPEATS, b_ms=b_ms, speedup_vs_b=b_ms / total_ms, stages=stages)
+
+
+def g_model_comparison(estimate):
+    archive = read_json(SCALED_ABLATION)
+    old = next(row for row in archive["results"] if row["case"] == "g")
+    solo_ms = archive["calibration"]["total_us"] / 1000
+    slowdown_ms = old["vlm_slowdown_ms"]
+    old_parts = dict(vlm_solo_ms=solo_ms, vlm_slowdown_ms=slowdown_ms, exclusive_pim_ms=0,
+                     ae_gpu_or_no_vlm_ms=old["total_ms"] - solo_ms - slowdown_ms)
+    new_parts = dict(vlm_solo_ms=estimate["vlm_kernel_sum_ms"], vlm_slowdown_ms=0,
+                     exclusive_pim_ms=estimate["ae_solo_ms"] - estimate["ae_gpu_ms"] - estimate["overlap_ms"],
+                     ae_gpu_or_no_vlm_ms=estimate["ae_gpu_ms"])
+    return dict(closed_loop_ms=old_parts, overlap_estimate_ms=new_parts,
+                closed_loop_total_ms=old["total_ms"], overlap_estimate_total_ms=estimate["total_ms"],
+                closed_loop_raw_sha256=old["raw_sha256"])
 
 
 def report_md(data):
@@ -381,15 +397,31 @@ def report_md(data):
               "再减去 VLM 可在 AE 期间完成的时间。"
               "使用回退版本实跑的 AE solo 切片，step 0 / layer 0 重复 180 次。AE 总长已经包含搬入、"
               "读出、Q 交换及 AE GPU 块。", "",
-              "每个含私有计算的 PIM stage，扣除 16 通道融合 I/O epoch 的区间并集，剩余时间按理想重叠计入。"
+              "私有 PIM 计算指描述符内走私有 CA 的本地访问与运算，例如 LOCALRD、BCAST、MACAB、"
+              "本地 RoPE 和结果写回。描述符发令占用共享 CA。"
+              "AE solo trace 记录的是 stage 和 I/O epoch 边界。估算取含私有计算的 stage 在所有通道"
+              "均处于 I/O epoch 外的时长，按理想重叠计入。该窗口也可能包含屏障及等待。"
               "RoPE 导入导出、Q 交换等纯传输 stage 全程保留在 AE 时间内。"
               "本表的串行基准 b 用 c 的 AE solo 加同一份 VLM kernel 时长。", "",
-              "| 切片 × 180 | AE solo (ms) | E2E VLM kernel 合计 (ms) | PIM 计算期重叠 (ms) | AE 后 VLM 剩余 (ms) | 端到端 (ms) | b (ms) | b / 端到端 |",
+              "| 切片 × 180 | AE solo (ms) | E2E VLM kernel 合计 (ms) | epoch 外重叠 (ms) | AE 后 VLM 剩余 (ms) | 端到端估算 (ms) | b (ms) | b / 端到端 |",
               "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for label, r in data["fused_ae_solo_overlap"].items():
         lines.append(f"| {label} | {r['ae_solo_ms']:.6f} | {r['vlm_kernel_sum_ms']:.6f} | {r['overlap_ms']:.6f} | "
                      f"{r['vlm_remaining_ms']:.6f} | {r['total_ms']:.6f} | {r['b_ms']:.6f} | {r['speedup_vs_b']:.6f} |")
     g_e2e = data["fused_windows"]["g"]
+    lines += ["", "### g 的模型口径对照", ""]
+    if "archived_total_ms" in g_e2e:
+        lines += [f"整 kernel 融合窗口的归档与回退版本重跑分别为 {g_e2e['archived_total_ms']:.6f} ms、"
+                  f"{g_e2e['total_ms']:.6f} ms，同口径差值 {g_e2e['delta_from_archive_ms']:+.6f} ms。", ""]
+    comparison = data["g_model_comparison"]
+    lines += ["逐请求闭环在 I/O epoch 期间限制新 GPU DRAM 命令，已发请求仍可返回，kernel 的标称计算时间继续流逝。"
+              "上面的重叠估算将整段 I/O epoch 作为 VLM 暂停时间。下表比较这两种口径。", "",
+              "| g 的时间项（ms） | 归档逐请求闭环 | AE solo 重叠估算 |",
+              "|---|---:|---:|"]
+    for key, label in (("vlm_solo_ms", "VLM 基线"), ("vlm_slowdown_ms", "并发时 VLM kernel 总时长增量"),
+                       ("exclusive_pim_ms", "单独串行计费的 PIM I/O"), ("ae_gpu_or_no_vlm_ms", "AE GPU 或 VLM 未运行的时间")):
+        lines.append(f"| {label} | {comparison['closed_loop_ms'][key]:.6f} | {comparison['overlap_estimate_ms'][key]:.6f} |")
+    lines.append(f"| 端到端 | {comparison['closed_loop_total_ms']:.6f} | {comparison['overlap_estimate_total_ms']:.6f} |")
     if "VLM_in_AE_by_phase_ms" in g_e2e:
         phases = g_e2e["VLM_in_AE_by_phase_ms"]
         lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
@@ -535,6 +567,7 @@ def main():
         vlm_ms = data["fused_windows"][label[0]]["VLM_calibrated_sum_ms"]
         data["fused_ae_solo_overlap"][label] = fused_ae_solo_overlap(
             timeline, geometry, vlm_ms, baseline - profile_ms + vlm_ms)
+    data["g_model_comparison"] = g_model_comparison(data["fused_ae_solo_overlap"]["g-s0-l0"])
     data["slice_comparison"]["d"] = [
         compare(row[key], data["replay"]["d-s9-l17"][alpha][policy][key],
                 metric, alpha=alpha, policy=policy)
@@ -560,7 +593,7 @@ def main():
         data["fused_g_repeated"] = repeated
     data["slice_comparison"]["g"] += [
         compare(*(data["fused_ae_solo_overlap"][label][key] for label in g_labels), metric)
-        for key, metric in (("overlap_ms", "180× PIM 计算期重叠 (ms)"),
+        for key, metric in (("overlap_ms", "180× epoch 外重叠 (ms)"),
                             ("total_ms", "180× 端到端 (ms)"))]
     write_json(output / "gap-estimate.json", data)
     (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")

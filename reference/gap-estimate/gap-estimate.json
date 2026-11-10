@@ -18,8 +18,8 @@
       "ae_gpu_ms": 21.70235592,
       "ae_solo_ms": 61.32792204,
       "b_ms": 163.74344641199997,
+      "epoch_free_compute_stage_ms": 32.69704788,
       "overlap_ms": 32.69704788,
-      "pim_compute_window_ms": 32.69704788,
       "repetitions": 180,
       "speedup_vs_b": 1.2082244010139567,
       "stages": [
@@ -92,8 +92,8 @@
       "ae_gpu_ms": 16.68122316,
       "ae_solo_ms": 56.16715859999999,
       "b_ms": 163.74344641199997,
+      "epoch_free_compute_stage_ms": 32.72760792,
       "overlap_ms": 32.72760792,
-      "pim_compute_window_ms": 32.72760792,
       "repetitions": 180,
       "speedup_vs_b": 1.2563495693846969,
       "stages": [
@@ -160,8 +160,8 @@
       "ae_gpu_ms": 17.90176752,
       "ae_solo_ms": 57.3794298,
       "b_ms": 163.74344641199997,
+      "epoch_free_compute_stage_ms": 32.80831344,
       "overlap_ms": 32.80831344,
-      "pim_compute_window_ms": 32.80831344,
       "repetitions": 180,
       "speedup_vs_b": 1.2455356655509924,
       "stages": [
@@ -354,6 +354,23 @@
       "gap_count": 46448,
       "idle_outside_epoch_channel_ck": 3109808
     }
+  },
+  "g_model_comparison": {
+    "closed_loop_ms": {
+      "ae_gpu_or_no_vlm_ms": 18.163703082000005,
+      "exclusive_pim_ms": 0,
+      "vlm_slowdown_ms": 3.9695859839999996,
+      "vlm_solo_ms": 105.35423803799999
+    },
+    "closed_loop_raw_sha256": "23ee3a6f53c9d86a33878564a811fd88ebd036d722ed308255cd112041138147",
+    "closed_loop_total_ms": 127.487527104,
+    "overlap_estimate_ms": {
+      "ae_gpu_or_no_vlm_ms": 16.68122316,
+      "exclusive_pim_ms": 6.758327519999995,
+      "vlm_slowdown_ms": 0,
+      "vlm_solo_ms": 106.89316117199999
+    },
+    "overlap_estimate_total_ms": 130.332711852
   },
   "geometry": {
     "c-s0-l0": [
@@ -57531,7 +57548,7 @@
         "alternate": 32.80831344,
         "base": 32.72760792,
         "difference": 0.0807055200000022,
-        "metric": "180× PIM 计算期重叠 (ms)",
+        "metric": "180× epoch 外重叠 (ms)",
         "percent": 0.24659767434662694
       },
       {
