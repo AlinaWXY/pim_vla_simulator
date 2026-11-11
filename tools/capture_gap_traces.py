@@ -33,13 +33,12 @@ def generate(variant, directory, model):
     return directory / f"{variant}.json"
 
 
-def capture(case, binary, output, ledger, slices):
-    config = case_config(case, run_kind="ae_solo")
+def capture(case, binary, output, ledger, slices, spec, mac_freq_mult):
+    config = case_config(case, mac_freq_mult=mac_freq_mult, run_kind="ae_solo")
     variant = variant_name(config)
     schedule_path = ROOT / f"input-data/ae-{variant}.json"
     program = generate(variant, output / "programs", "native_dram_requests")
     schedule = read_json(schedule_path)
-    spec = ROOT / "reference/spec/spec.json"
     vlm = ROOT / "input-data/vlm.json"
     config.update(spec_path=str(spec), program_path=str(program), vlm_path=str(vlm))
     for step, layer in slices:
@@ -98,6 +97,8 @@ def main():
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument("--mac-freq-mult", type=int, choices=(1, 2, 4), default=4,
+                        help="MAC frequency for newly captured traces (default: 4)")
     parser.add_argument("--cases", choices=list("cdefg"), nargs="+", default=list("cdefg"))
     parser.add_argument("--slice", type=int, nargs=2, metavar=("STEP", "LAYER"),
                         help="capture only one step/layer for the selected cases")
@@ -122,8 +123,16 @@ def main():
             if destination.exists():
                 raise FileExistsError(destination)
     ledger = args.fused_ledger.resolve() if args.fused_ledger else None
+    spec = ROOT / "reference/spec/spec.json"
+    if args.mac_freq_mult != 4:
+        sys.path.insert(0, str(ROOT / "ramulator2/python"))
+        from ramulator.dram.lpddr5x_pim import build_spec
+
+        spec = output / f"spec-k{args.mac_freq_mult}.json"
+        write_json(spec, build_spec(args.mac_freq_mult))
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger, slices)
+        futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger, slices,
+                               spec, args.mac_freq_mult)
                    for case in args.cases]
         for future in futures:
             future.result()

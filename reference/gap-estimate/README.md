@@ -2,6 +2,8 @@
 
 [对照表和分阶段报告](gap-estimate.md) · [完整结果与校验和](gap-estimate.json)
 
+[MAC 4× → 2× 消融结果与复现命令](mac-frequency-2x.md)
+
 在仓库根目录运行以下命令。构建环境见[仓库 README](../../README.md)，需要 Linux、支持 C++20 的编译器、CMake ≥ 3.18 和 Python ≥ 3.10。
 
 ```sh

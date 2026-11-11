@@ -560,7 +560,8 @@ def report_md(data):
     lines = [
         "# 基于 PIM DQ 空隙的 VLM 干扰估算", "",
         f"基准 b 为 c 的 AE solo 切片重复 180 次加 profile VLM，合计 **{baseline:.6f} ms**。"
-        f"16 通道，{data['clock_ps']} ps/CK。{len(data['provenance'])} 组 trace 开关对照的 raw.json 均逐字节相同。", "",
+        f"MAC {data['mac_freq_mult']}×，16 通道，{data['clock_ps']} ps/CK。"
+        f"{len(data['provenance'])} 组 trace 开关对照的 raw.json 均逐字节相同。", "",
         "| α | VLM 单元 | solo (ms) | profile (ms) | 单元最大绝对误差 (%) | 总时长误差 (%) |",
         "|---:|---:|---:|---:|---:|---:|",
     ]
@@ -628,7 +629,7 @@ def report_md(data):
                              f"{row['total_ms']:.6f} | {row['vlm_loss_ms']:.6f} | {row['speedup_vs_b']:.6f} |")
     lines += ["", "## f、g 的 AE solo 重叠估算", "",
               "端到端时间等于计费 AE 加 c–e 使用的同一份 VLM profile 时长，再减去 VLM 可在 AE "
-              "期间完成的时间。使用回退版本实跑的 AE solo 切片，step 0 / layer 0 重复 180 次。"
+              "期间完成的时间。两个 AE solo 切片各重复 180 次。"
               "f/g 均按旧版共享张量口径去重，同时沿用当前 trace 中的 AE GPU 块时长。", "",
               "私有 PIM 计算指描述符内走私有 CA 的本地访问与运算，例如 LOCALRD、BCAST、MACAB、"
               "本地 RoPE 和结果写回。描述符发令占用共享 CA。"
@@ -656,7 +657,7 @@ def report_md(data):
               "逐请求闭环在 I/O epoch 期间限制新 GPU DRAM 命令，已发请求仍可返回。"
               "kernel 完成时刻取实测时长下限与 DRAM 请求完成时刻中的较晚者。"
               "重叠估算把整段 I/O epoch 作为 VLM 暂停时间，影响的是 AE 结束后的 VLM 剩余量。", "",
-              "| g 的时间项（ms） | 归档逐请求闭环 | AE solo 重叠估算 |",
+              f"| g 的时间项（ms） | 4× 归档逐请求闭环 | {data['mac_freq_mult']}× AE solo 重叠估算 |",
               "|---|---:|---:|"]
     for key, label in (("ae_solo_ms", "计费 AE solo（含保留的 PIM I/O）"), ("pim_stage_delta_ms", "并发 PIM stage 增量"),
                        ("ae_gpu_wait_ms", "AE GPU 等待"), ("ae_elapsed_ms", "AE 完成时刻"),
@@ -687,7 +688,8 @@ def report_md(data):
               f"g {g['q_exchange_ms']:.6f} ms。"]
     if "VLM_in_AE_by_phase_ms" in g_e2e:
         phases = g_e2e["VLM_in_AE_by_phase_ms"]
-        lines += ["", "### g 的原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
+        windows_origin = "本轮" if "archived_total_ms" in g_e2e else "历史归档"
+        lines += ["", f"### {windows_origin} g 原生融合窗口 E2E 中，AE 结束前的 VLM 执行时间", "",
                   "| AE 阶段 | VLM 实际执行（ms） |", "|---|---:|"]
         for phase, label in (("compute", "PIM 私有计算"), ("launch", "连续描述符启动"),
                              ("join", "等待当前 VLM kernel 完成"), ("upload", "上传"),
@@ -757,6 +759,8 @@ def compare(base, alternate, metric, **labels):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--traces", type=Path, required=True)
+    parser.add_argument("--spec", type=Path, default=ROOT / "reference/spec/spec.json",
+                        help="native spec used to capture the traces (default: archived 4× spec)")
     parser.add_argument("--engine", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--jobs", type=int, default=6)
@@ -770,11 +774,14 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     working = output / "replay-input"
     working.mkdir(exist_ok=True)
+    spec = read_json(args.spec)
+    spec_digest = sha256(args.spec)
     edges = edge_costs(MATRIX)
-    clock_ps = read_json(args.traces / "c-s0-l0/on/dq-timeline.json")["clock_ps"]
+    clock_ps = spec["clock_ps"]
     ck_ms = clock_ps / 1e9
     units = {a: units_for(a, clock_ps) for a in ALPHAS}
     data = dict(schema_version=1, clock_ps=clock_ps, channels=N, repetitions=REPEATS,
+                mac_freq_mult=spec["mac_freq_mult"], spec_sha256=spec_digest,
                 matrix_sha256=sha256(MATRIX), vlm_sha256=sha256(PROFILE), edge_ck=edges,
                 replay_engine_sha256=sha256(engine),
                 single_direction_reference=PAIR_REFERENCE, solo={}, geometry={}, provenance={},
@@ -792,6 +799,8 @@ def main():
                 label = f"{case}-s{step}-l{layer}"
                 timeline, geometry, gaps, verification = load_trace(
                     args.traces / label, step, layer, shared_io_rules=FUSED_SHARED_IO.get(case))
+                if verification["spec_sha256"] != spec_digest:
+                    raise ValueError(f"trace spec differs for {label}")
                 if timeline["clock_ps"] != clock_ps:
                     raise ValueError(f"trace clock differs for {label}")
                 data["geometry"][label] = geometry
@@ -864,7 +873,7 @@ def main():
     selected = next(row for row in data["same_slice_comparison"]["candidates"]
                     if row["slice"] == data["same_slice_comparison"]["selected_slice"])
     _, _, e_gaps, _ = load_trace(args.traces / f"e-{selected['slice']}", selected["step"], selected["layer"])
-    commands = read_json(ROOT / "reference/spec/spec.json")["commands"]
+    commands = spec["commands"]
     if {commands[name]["dq_cycles"] for name in ("RD", "WR")} != {2}:
         raise ValueError("e idle audit requires the replay's 2 CK minimum DQ burst")
     data["e_idle_breakdown"] = e_idle_breakdown(data, e_gaps, edges, commands["RD"]["dq_cycles"])
