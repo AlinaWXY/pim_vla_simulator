@@ -1,5 +1,7 @@
 # MAC 4× → 2× 同切片消融
 
+[2× 分阶段报告](mac2/gap-estimate.md) · [2× 完整结果和校验和](mac2/gap-estimate.json) · [实跑 2× 时序规格](mac2/spec-k2.json)
+
 基于 `xinyao_1111`（`048c17a`）。沿用 c–g 的两组切片，每组重复 180 次。c–e 使用 α=1.0、same_first 的 DQ 重放。f/g 使用原有私有计算窗口重叠估算和共享张量 I/O 去重。
 
 2× 的 16 行 MAC 完成时间由 16 CK 增至 32 CK。仿真器、AE 程序和调度输入的校验和一致，48 组 DQ 命令对时序一致，VLM profile 为 105.220578 ms。10 组 2× 切片的 trace 开关对照均逐字节一致。用同一个重放程序复算 4×，结果与分支归档一致。
@@ -36,9 +38,23 @@ e 与 g 的端到端差距从 9.738710 ms 变为 9.979755 ms，e/g 从 1.078691 
 
 ## 复现
 
-沿用分支的构建命令，然后运行下面两步。报告包含两组切片、各策略和分阶段结果。
+在仓库根目录运行以下命令。构建需要 Linux、支持 C++20 的编译器、CMake ≥ 3.18 和 Python ≥ 3.10。
 
 ```sh
-python3 tools/capture_gap_traces.py --binary build/pim_vla_sim --output build/mac2-traces --mac-freq-mult 2
-python3 tools/estimate_dq_gaps.py --traces build/mac2-traces --spec build/mac2-traces/spec-k2.json --engine build/gap_replay --output results/mac2-gap-estimate
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target pim_vla_sim --parallel
+c++ -std=c++20 -O3 tools/gap_replay.cpp -o build/gap_replay
+
+python3 tools/capture_gap_traces.py \
+  --binary build/pim_vla_sim \
+  --output build/mac2-traces \
+  --mac-freq-mult 2
+
+python3 tools/estimate_dq_gaps.py \
+  --traces build/mac2-traces \
+  --spec build/mac2-traces/spec-k2.json \
+  --engine build/gap_replay \
+  --output results/mac2-gap-estimate
 ```
+
+生成的报告应选中 step 0 / layer 0。c–g 的端到端时间保留三位小数依次为 143.244、139.030、133.799、128.702 和 123.819 ms。报告也包含末层切片、其他仲裁策略及分阶段数据。
