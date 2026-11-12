@@ -7,6 +7,7 @@
 #include <map>
 #include <memory>
 #include <queue>
+#include <set>
 #include <string>
 #include <vector>
 #include "ramulator/base/config.h"
@@ -20,10 +21,14 @@ using Clock = int64_t;
 constexpr Clock NEVER = INT64_MAX / 4;
 inline void require(bool ok, const std::string& why) { if (!ok) throw std::runtime_error(why); }
 inline void require(bool ok, const char* why) { if (!ok) throw std::runtime_error(why); }
-struct CommandInfo { int latency=0, burst=0, completion=1, external_ca=1, private_ca=0; char direction=0; };
+struct CommandInfo {
+  int latency=0, burst=0, completion=1, external_ca=1, private_ca=0;
+  char direction=0;
+  std::string wire_command;
+};
 struct Operation {
   std::string name, epoch;
-  AddrVec_t addr;
+  AddrVec_t addr, spill_addr;
   int id=0,slot=0,result_slot=0,rows=1,pairs=1;
   int dest_slot=-1,source_bank=0,tensor_fragment=-1,output_columns=1,output_column=0;
   int fragment=0,output_tile=0,kv_token=0,lanes=16,elements=16,bytes=32,token=0;
@@ -63,13 +68,14 @@ class BusChecker {
   int account_stage=-1,external_rank=0;
   bool split_traffic=false,io_epoch=false;
   std::ostream* dq_trace=nullptr;
+  std::ostream* ca_trace=nullptr;
   std::ostream* epoch_trace=nullptr;
   const std::string* trace_stage_name=nullptr;
   int trace_channel=0;
   Clock trace_epoch_start=0;
   uint64_t checked=0;
   std::map<int,BusStat> stats;
-  void observe(int cmd,const AddrVec_t& addr,Clock now,int stage);
+  void observe(int cmd,const AddrVec_t& addr,Clock now,int stage,int opcode=-1,uint16_t bank_mask=0);
   void advance(Clock now);
   void trace_epoch_change(Clock now,bool active);
   void set_stage(Clock now,int stage) {
@@ -105,6 +111,9 @@ struct Candidate {
   Clock arrival=0; bool dependency_ready=false;
   enum Source {GPU,PIM,REFRESH,ACT2} source=GPU;
   size_t index=0; bool final=false,local=false,rowhit=false;
+  int opcode=-1;
+  size_t group=1;
+  uint16_t bank_mask=0;
 };
 class PIMController {
  public:
@@ -119,6 +128,11 @@ class PIMController {
   int channel=0,stage=-1,window=64,write_high=48,write_low=16;
   bool fused=false,write_drain=false,epoch_owned=false,gap_write_phase=false;
   bool legacy_gap_batch=false; // Keep uniform replays byte-identical.
+  bool mc_control=false, pim_mode=false;
+  int all_bank_row=-1;
+  AddrVec_t broadcast_addr;
+  std::set<std::pair<int,int>> input_rows;
+  Clock export_store_done=-1;
   int row_offset=0;
   std::string policy="frfcfs";
   Clock now=0,private_free=0,external_free=0,gpu_dq_end=0,pim_dq_end=0,last_progress=0,pim_arrival=0;
@@ -162,13 +176,16 @@ class PIMController {
   Clock ready_at(int cmd,const AddrVec_t& addr) const;
   Clock spacing(int pre,const AddrVec_t& a,int following,const AddrVec_t& b) const;
   Clock refresh_interval(int rank) const;
-  void issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage);
+  void issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage,int opcode=-1,uint16_t bank_mask=0);
  private:
   void retire_and_fill(Clock clk,bool permit_gpu);
   Candidate next_pim(Clock clk);
   Candidate next_gpu(Clock clk);
   Candidate next_refresh(Clock clk);
   Candidate make_candidate(int final,const AddrVec_t& addr,Candidate::Source src,Clock earliest,bool local=false);
+  Candidate prepare_mc_request(const Operation& op, AddrVec_t addr, Clock earliest, bool broadcast_read,
+                               int command_id);
+  void update_mc_mode(int cmd, const AddrVec_t& addr);
   void finish_pim(const Candidate& c,Clock clk);
   bool blocked_by_owner(const Candidate& c,Clock clk) const;
   Clock dependencies(const Operation& op,const Cursor& cursor) const;

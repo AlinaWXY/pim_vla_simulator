@@ -588,37 +588,41 @@ def report_md(data):
         lines.append(f"| {candidate['slice']} | {cases['e']['total_ms']:.6f} | {cases['g']['total_ms']:.6f} | "
                      f"{candidate['e_over_g']:.6f} | {candidate['e_minus_g_ms']:.6f} | {candidate['g_explicit_io_ms']:.6f} |")
     usage = data["e_idle_breakdown"]
-    totals = usage["totals"]
-    mean_ck_ms = data["clock_ps"] / 1e9 / N
-    lines += ["", "### e 的 DQ 空隙去向", "",
-              f"以下按 {usage['slice']}、α=1.0、same_first 统计。通道 CK 为 16 通道 ×180 次之和，"
-              "均摊时长为通道 CK 除以 16 后换算。范围为全部 PIM stage，包含 c–e 原模型允许填充的 Q 交换空隙。", "",
-              "| DQ 空闲分项 | 通道 CK | 均摊时长 (ms) |",
-              "|---|---:|---:|"]
-    for key, title in (("idle_ck", "纯 PIM 的 DQ 空闲"), ("filled_ck", "VLM 实际消耗的 profile 推进预算"),
-                       ("guard_ck", "可用空隙扣除的跨 rank 边界开销"),
-                       ("short_ck", "空隙原长不足 2 CK"),
-                       ("hard_rank_ck", "任意边界方向均放不下 2 CK"),
-                       ("chosen_direction_ck", "当前方向选择下放不下 2 CK")):
-        ck = totals[key]
-        lines.append(f"| {title} | {ck:,} | {ck * mean_ck_ms:.6f} |")
-    lines += ["", f"有 {totals['infeasible_count']:,} 个整段不可用空隙，共 {totals['infeasible_ck']:,} 通道 CK。"
-              f"same_first 消耗了全部接受的预算，占原始空闲的 {usage['fill_fraction']:.2%}。"
-              f"直接边界开销中 W→R 占 {usage['guard_by_transition_ck']['WR']:,} 通道 CK。"
-              f"best 实际比 same_first 多推进 {usage['best_recovered_ms']:.6f} ms。", "",
-              f"按 {usage['burst_ck']} CK/burst 折算，VLM 实际发送的流体请求量约相当于 "
-              f"{usage['payload_equivalent_ck']:,.0f} 通道 CK 的 DQ 数据载荷。"
-              "该值来自请求量折算，profile 推进预算还涵盖 kernel 其余服务时间，原生 GPU DQ 时序未在本模型中重建。", "",
-              f"g 的理想重叠比 e 多 {usage['g_overlap_gain_ms']:.6f} ms。其中 "
-              f"{usage['g_vs_e_raw_idle_ms']:.6f} ms 来自 g 的重叠窗口比 e 的原始 DQ 空闲更长，"
-              f"{usage['unused_idle_ms']:.6f} ms 来自 e 未能利用的空闲。"
-              f"扣除 g 增加的 {usage['g_ae_delta_ms']:.6f} ms 计费 AE，端到端净收益为 "
-              f"{usage['g_end_to_end_gain_ms']:.6f} ms。", "",
-              "| e 的 stage | 原始空闲 CK | 已用 CK | 边界扣减 CK | 任意方向都不可用 CK | 当前方向下不可用 CK |",
-              "|---|---:|---:|---:|---:|---:|"]
-    for row in usage["stages"]:
-        lines.append(f"| {row['stage']} | {row['idle_ck']:,} | {row['filled_ck']:,} | {row['guard_ck']:,} | "
-                     f"{row['short_ck'] + row['hard_rank_ck']:,} | {row['chosen_direction_ck']:,} |")
+    if usage.get("status") == "vlm_completed_within_ae":
+        lines += ["", "VLM 已在 AE 结束前完成。逐阶段重放保留实际推进量，"
+                  "全程有 VLM 需求时的 DQ 空闲分解不适用。"]
+    else:
+        totals = usage["totals"]
+        mean_ck_ms = data["clock_ps"] / 1e9 / N
+        lines += ["", "### e 的 DQ 空隙去向", "",
+                  f"以下按 {usage['slice']}、α=1.0、same_first 统计。通道 CK 为 16 通道 ×180 次之和，"
+                  "均摊时长为通道 CK 除以 16 后换算。范围为全部 PIM stage，包含 c–e 原模型允许填充的 Q 交换空隙。", "",
+                  "| DQ 空闲分项 | 通道 CK | 均摊时长 (ms) |",
+                  "|---|---:|---:|"]
+        for key, title in (("idle_ck", "纯 PIM 的 DQ 空闲"), ("filled_ck", "VLM 实际消耗的 profile 推进预算"),
+                           ("guard_ck", "可用空隙扣除的跨 rank 边界开销"),
+                           ("short_ck", "空隙原长不足 2 CK"),
+                           ("hard_rank_ck", "任意边界方向均放不下 2 CK"),
+                           ("chosen_direction_ck", "当前方向选择下放不下 2 CK")):
+            ck = totals[key]
+            lines.append(f"| {title} | {ck:,} | {ck * mean_ck_ms:.6f} |")
+        lines += ["", f"有 {totals['infeasible_count']:,} 个整段不可用空隙，共 {totals['infeasible_ck']:,} 通道 CK。"
+                  f"same_first 消耗了全部接受的预算，占原始空闲的 {usage['fill_fraction']:.2%}。"
+                  f"直接边界开销中 W→R 占 {usage['guard_by_transition_ck']['WR']:,} 通道 CK。"
+                  f"best 实际比 same_first 多推进 {usage['best_recovered_ms']:.6f} ms。", "",
+                  f"按 {usage['burst_ck']} CK/burst 折算，VLM 实际发送的流体请求量约相当于 "
+                  f"{usage['payload_equivalent_ck']:,.0f} 通道 CK 的 DQ 数据载荷。"
+                  "该值来自请求量折算，profile 推进预算还涵盖 kernel 其余服务时间，原生 GPU DQ 时序未在本模型中重建。", "",
+                  f"g 的理想重叠比 e 多 {usage['g_overlap_gain_ms']:.6f} ms。其中 "
+                  f"{usage['g_vs_e_raw_idle_ms']:.6f} ms 来自 g 的重叠窗口比 e 的原始 DQ 空闲更长，"
+                  f"{usage['unused_idle_ms']:.6f} ms 来自 e 未能利用的空闲。"
+                  f"扣除 g 增加的 {usage['g_ae_delta_ms']:.6f} ms 计费 AE，端到端净收益为 "
+                  f"{usage['g_end_to_end_gain_ms']:.6f} ms。", "",
+                  "| e 的 stage | 原始空闲 CK | 已用 CK | 边界扣减 CK | 任意方向都不可用 CK | 当前方向下不可用 CK |",
+                  "|---|---:|---:|---:|---:|---:|"]
+        for row in usage["stages"]:
+            lines.append(f"| {row['stage']} | {row['idle_ck']:,} | {row['filled_ck']:,} | {row['guard_ck']:,} | "
+                         f"{row['short_ck'] + row['hard_rank_ck']:,} | {row['chosen_direction_ck']:,} |")
     lines += ["", "## c、d、e 的估算", "",
               "| 切片 × 180 | α | policy | AE (ms) | VLM 尾部 (ms) | total (ms) | VLM 损失 (ms) | b / total |",
               "|---|---:|---|---:|---:|---:|---:|---:|"]
@@ -631,9 +635,10 @@ def report_md(data):
               "端到端时间等于计费 AE 加 c–e 使用的同一份 VLM profile 时长，再减去 VLM 可在 AE "
               "期间完成的时间。两个 AE solo 切片各重复 180 次。"
               "f/g 均按旧版共享张量口径去重，同时沿用当前 trace 中的 AE GPU 块时长。", "",
-              "私有 PIM 计算指描述符内走私有 CA 的本地访问与运算，例如 LOCALRD、BCAST、MACAB、"
-              "本地 RoPE 和结果写回。描述符发令占用共享 CA。"
-              "AE solo trace 记录的是 stage 和 I/O epoch 边界。估算取含私有计算的 stage 在所有通道"
+              ("顶层 Memory Controller 使用共享 CA 发送 PIM 命令。本节沿用旧估算，未建模与 VLM 的 CA 争用。"
+               if data.get("mc_command_control") else
+               "私有 PIM 计算指描述符内走私有 CA 的本地访问与运算。描述符发令占用共享 CA。") +
+              "AE solo trace 记录的是 stage 和 I/O epoch 边界。估算取含 PIM 计算的 stage 在所有通道"
               "均处于 I/O epoch 外的时长，按理想重叠计入。该窗口也可能包含屏障及等待。"
               "Q 交换及其余非去重传输全程计入 AE。"
               "去重阶段原本就在 I/O epoch 内，扣除后 epoch 外重叠时长相同。", "",
@@ -786,6 +791,8 @@ def main():
                 replay_engine_sha256=sha256(engine),
                 single_direction_reference=PAIR_REFERENCE, solo={}, geometry={}, provenance={},
                 replay={}, slice_comparison={}, hand_checks_passed=True)
+    if spec["metadata"].get("mc_command_control"):
+        data["mc_command_control"] = True
     for alpha in ALPHAS:
         path = working / f"solo-{alpha}.txt"
         write_replay_input(path, clock_ps, edges, units[alpha])
@@ -876,7 +883,11 @@ def main():
     commands = spec["commands"]
     if {commands[name]["dq_cycles"] for name in ("RD", "WR")} != {2}:
         raise ValueError("e idle audit requires the replay's 2 CK minimum DQ burst")
-    data["e_idle_breakdown"] = e_idle_breakdown(data, e_gaps, edges, commands["RD"]["dq_cycles"])
+    e_replay = data["replay"][f"e-{selected['slice']}"]["1.0"]["same_first"]
+    if data.get("mc_command_control") and e_replay["tail_ms"] == 0:
+        data["e_idle_breakdown"] = {"status": "vlm_completed_within_ae"}
+    else:
+        data["e_idle_breakdown"] = e_idle_breakdown(data, e_gaps, edges, commands["RD"]["dq_cycles"])
     write_json(output / "gap-estimate.json", data)
     (output / "gap-estimate.md").write_text(report_md(data), encoding="utf-8", newline="\n")
 

@@ -160,22 +160,35 @@ def gemm(b, *, rows, fragments, columns, base, fused, views, output_tile=0,
     return last_mac
 
 
-def local_projection_spills(b, last, feature):
+def local_projection_spills(b, last, feature, *, mc_control=False, rope_writeback=False):
     writes = []
-    for bank in range(16):
+
+    def prepare_qk(bank, col):
+        kind, local = divmod(col - 8, 8)
+        cols = 24 if feature else 48
+        regions = ([dict(bank=bank, byte_offset=((2 * local + q) * cols + kind * 8) * 4, bytes=32)
+                    for q in range(2)] if feature else
+                   [dict(bank=bank, byte_offset=(local * cols + kind * 16) * 4, bytes=64)])
+        gather = b.emit("GATHER", deps=[last], bank=bank, bytes=64, elements=16,
+                        source_regions=regions, source="qkv_output")
+        cast = b.emit("CAST", deps=[gather], bank=bank, elements=16,
+                      source="qkv_output", source_regions=regions, output_bytes=32)
+        return cast, regions
+
+    def write_qk(bank, col, cast, regions):
+        writes.append(b.emit("LOCALWR", L.WORK_BASE + col * 32, bank, deps=[cast],
+                             source="rope_writeback" if rope_writeback else "qkv_output",
+                             source_bank=bank, source_regions=regions, output_bytes=32))
+
+    if mc_control:
         for col in range(8, 24):
-            kind, local = divmod(col - 8, 8)
-            cols = 24 if feature else 48
-            regions = ([dict(bank=bank, byte_offset=((2 * local + q) * cols + kind * 8) * 4, bytes=32)
-                        for q in range(2)] if feature else
-                       [dict(bank=bank, byte_offset=(local * cols + kind * 16) * 4, bytes=64)])
-            gather = b.emit("GATHER", deps=[last], bank=bank, bytes=64, elements=16,
-                            source_regions=regions, source="qkv_output")
-            cast = b.emit("CAST", deps=[gather], bank=bank, elements=16,
-                          source="qkv_output", source_regions=regions, output_bytes=32)
-            writes.append(b.emit("LOCALWR", L.WORK_BASE + col * 32, bank, deps=[cast],
-                                 source="qkv_output", source_bank=bank,
-                                 source_regions=regions, output_bytes=32))
+            prepared = [prepare_qk(bank, col) for bank in range(16)]
+            for bank, (cast, regions) in enumerate(prepared):
+                write_qk(bank, col, cast, regions)
+    for bank in range(16):
+        if not mc_control:
+            for col in range(8, 24):
+                write_qk(bank, col, *prepare_qk(bank, col))
         for lane in range(16):
             offset = L.V_BASE + (30 * 16 + lane) * 32
             rd = b.emit("LOCALRD", offset, bank, deps=[last], dest="rmw_scratch")
@@ -193,7 +206,7 @@ def local_projection_spills(b, last, feature):
     return b.fence(writes)
 
 
-def qkv(channel, feature, fused):
+def qkv(channel, feature, fused, *, mc_control=False, rope_writeback=False):
     b = Builder(channel, "qkv")
     rows, cols, views = (16, 24, 2) if feature else (8, 48, 4)
     if fused:
@@ -201,12 +214,12 @@ def qkv(channel, feature, fused):
         inner = Builder(channel, "qkv")
         last = gemm(inner, rows=rows, fragments=64, columns=cols, base=L.QKV_BASE,
                     fused=True, views=views)
-        local_projection_spills(inner, last, feature)
+        local_projection_spills(inner, last, feature, mc_control=mc_control, rope_writeback=rope_writeback)
         b.descriptor("qkv", inner, [seal])
     else:
         last = gemm(b, rows=rows, fragments=64, columns=cols, base=L.QKV_BASE,
                     fused=False, views=views)
-        local_projection_spills(b, last, feature)
+        local_projection_spills(b, last, feature, mc_control=mc_control, rope_writeback=rope_writeback)
     return b.ops
 
 
@@ -351,8 +364,9 @@ def qkt(channel, feature, fused):
 
 
 def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0,
-                   store_to_dram=False, packet_base=0):
+                   store_to_dram=False, packet_base=0, group_stores=False):
     last = []
+    pending = []
     elements = 16 if bf16 else 8
     for packet in range(count):
         # Export order [query][bank][feature] keeps ownership explicit.
@@ -377,15 +391,20 @@ def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0,
                            source_regions=regions, output_tile=tile)
         if store_to_dram:
             target, offset = L.fused_result_location(packet_base + packet)
-            last.append(b.emit("LOCALWR", offset, target, deps=[ready], result_bank=bank,
-                               result_slot=(query * features_per_bank + lane) // 8,
-                               source_regions=regions, source="fused_result", source_bank=bank,
-                               output_tile=tile, result_packet=packet_base + packet,
-                               output_bytes=32, release_result=True))
+            pending.append(dict(offset=offset, bank=target, deps=[ready], result_bank=bank,
+                                result_slot=(query * features_per_bank + lane) // 8,
+                                source_regions=regions, source="fused_result", source_bank=bank,
+                                output_tile=tile, result_packet=packet_base + packet,
+                                output_bytes=32, release_result=True))
+            if not group_stores or len(pending) == L.BANKS:
+                last.extend(b.emit("LOCALWR", **store) for store in pending)
+                pending.clear()
         else:
             last.append(b.emit("RDRES", packet * 32, -1, deps=[ready], result_bank=bank,
                                result_slot=(query * features_per_bank + lane) // 8,
                                source_regions=regions, output_tile=tile, release_result=True, epoch=epoch))
+    if pending:
+        raise ValueError("fused all-bank export needs a whole bank stripe")
     return b.fence(last)
 
 
@@ -424,7 +443,7 @@ def pv(channel, feature, fused):
     return b.ops
 
 
-def output_projection(channel, feature, fused, store_results=False):
+def output_projection(channel, feature, fused, store_results=False, *, group_stores=False):
     outer, b = Builder(channel, "o"), Builder(channel, "o")
     fragments = 8 if feature else 16
     previous = []
@@ -434,7 +453,8 @@ def output_projection(channel, feature, fused, store_results=False):
                     initial=previous)
         done = export_results(b, 512, [last], features_per_bank=32, bf16=True,
                               epoch=f"o_tile{tile}_export", tile=tile,
-                              store_to_dram=store_results, packet_base=tile * 512)
+                              store_to_dram=store_results, packet_base=tile * 512,
+                              group_stores=group_stores)
         previous = [done]
     if fused:
         run = outer.descriptor("o", b)
@@ -444,7 +464,7 @@ def output_projection(channel, feature, fused, store_results=False):
     return b.ops
 
 
-def ffn(channel, name, fused, store_results=False):
+def ffn(channel, name, fused, store_results=False, *, group_stores=False):
     outer, b = Builder(channel, name), Builder(channel, name)
     fragments, columns, base, packets = ((64, 32, L.GU_BASE, 1024) if name == "gate_up"
                                         else (256, 4, L.DOWN_BASE, 128))
@@ -466,7 +486,8 @@ def ffn(channel, name, fused, store_results=False):
     if fused:
         if store_results:
             export_results(b, packets, [last], features_per_bank=columns,
-                           bf16=False, epoch=name + "_export", store_to_dram=True)
+                           bf16=False, epoch=name + "_export", store_to_dram=True,
+                           group_stores=group_stores)
         run = outer.descriptor(name, b, [seal])
         if store_results:
             read_spilled_results(outer, packets, run)
@@ -631,7 +652,7 @@ def kernel_window_metadata(name, channels):
             "join_before": "external_export_all_channels"}
 
 
-def generate(variant, channel_count=16, *, execution_model="native_dram_requests"):
+def generate(variant, channel_count=16, *, execution_model="native_dram_requests", mc_control=False):
     if variant not in VARIANTS or channel_count not in (1, 16):
         raise ValueError("unsupported variant/channel count")
     layout, rope_location, flow = VARIANTS[variant]
@@ -641,19 +662,22 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
     if kernel_windows and flow != "fused":
         raise ValueError("fused_kernel_windows requires a fused f/g variant")
     feature, fused, gpu = layout == "feature", flow == "fused", rope_location == "gpu"
-    factories = [("qkv", lambda c: qkv(c, feature, fused))]
+    factories = [("qkv", lambda c: qkv(c, feature, fused, mc_control=mc_control,
+                                      rope_writeback=mc_control and not gpu))]
     if gpu:
         factories += [("rope_export", lambda c: rope_gpu(c, True)),
                       ("rope_import", lambda c: rope_gpu(c, False))]
     else:
-        factories += [("rope", lambda c: rope(c, fused))]
+        factories += [("rope", lambda c: [] if mc_control else rope(c, fused))]
+    group_stores = mc_control and fused
+    store_results = kernel_windows or group_stores
     factories += [("q_exchange_export", lambda c: q_exchange(c, gpu, feature, True)),
                   ("q_exchange_import", lambda c: q_exchange(c, gpu, feature, False)),
                   ("qkt", lambda c: qkt(c, feature, fused)),
                   ("pv", lambda c: pv(c, feature, fused)),
-                  ("o", lambda c: output_projection(c, feature, fused, kernel_windows)),
-                  ("gate_up", lambda c: ffn(c, "gate_up", fused, kernel_windows)),
-                  ("down", lambda c: ffn(c, "down", fused, kernel_windows))]
+                  ("o", lambda c: output_projection(c, feature, fused, store_results, group_stores=group_stores)),
+                  ("gate_up", lambda c: ffn(c, "gate_up", fused, store_results, group_stores=group_stores)),
+                  ("down", lambda c: ffn(c, "down", fused, store_results, group_stores=group_stores))]
     stages, counts = [], {}
     for name, factory in factories:
         channels = [factory(c) for c in range(channel_count)]
@@ -662,6 +686,16 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
             validate_ops(ops, c)
             for op in walk(ops):
                 counts[op["op"]] = counts.get(op["op"], 0) + 1
+                if mc_control and op["op"] == "RDRES":
+                    _, _, _, _, row, column = op["addr"]
+                    packet = row * (L.ROW_BYTES // L.BURST_BYTES) + column
+                    if op.get("source") == "reduction_output":
+                        bank, offset = L.score_location(op["kv_token"], packet)
+                    else:
+                        if name == "o":
+                            packet += 512 * op["output_tile"]
+                        bank, offset = L.fused_result_location(packet)
+                    op["spill_addr"] = L.address(c, offset, bank)
         stage_dq = sum(op["op"] in EXTERNAL for ops in channels for op in walk(ops)) * 32
         stage = dict(name=name, gpu_before_us=0, expected_dq_bytes=stage_dq, channels=channels)
         if kernel_windows:
@@ -694,12 +728,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--compact", action="store_true", help="omit indentation in persisted JSON")
     parser.add_argument("--execution-model", choices=EXECUTION_MODELS, default="native_dram_requests")
+    parser.add_argument("--mc-control", action="store_true", help="attach DRAM accumulator spill addresses")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     variants = [args.variant] if args.variant else [v for v in VARIANTS
                if args.execution_model != "fused_kernel_windows" or VARIANTS[v][2] == "fused"]
     for variant in variants:
-        data = generate(variant, execution_model=args.execution_model)
+        data = generate(variant, execution_model=args.execution_model, mc_control=args.mc_control)
         path = args.output / (variant + ".json")
         path.write_text(json.dumps(data, separators=(",", ":") if args.compact else None,
                                    indent=None if args.compact else 2) + "\n", encoding="utf-8")

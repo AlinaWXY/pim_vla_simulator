@@ -14,6 +14,8 @@ Clock node_ready(const DRAMNode* n,int cmd,const AddrVec_t& a) {
 }
 bool starts(const std::string& s,const std::string& p) {return s.rfind(p,0)==0;}
 bool is_mac(const std::string& n) {return starts(n,"MACAB")||starts(n,"MACQK");}
+enum RDOpcode { MAC=0, MAC_INIT=1, MAC_RED=2, MAC_INIT_RED=3 };
+enum WROpcode { WB_ACC=0, WB_MAC=1, WB_ROPE=2, WB_OBUF=3 };
 }
 
 std::vector<Operation> parse_operations(const ConfigNode& node) {
@@ -23,6 +25,8 @@ std::vector<Operation> parse_operations(const ConfigNode& node) {
     require(o.id==static_cast<int>(result.size()),"program IDs must be contiguous");
     const auto address=x["addr"];
     for(const auto& a:address.seq()) o.addr.push_back(a.as<int>());
+    const auto spill=x["spill_addr"];
+    if(spill)for(const auto& a:spill.seq())o.spill_addr.push_back(a.as<int>());
     require(o.addr.size()==6,"physical address must have 6 levels");
     require(o.addr[1]==1,"PIM may only access rank1");
     o.slot=x["slot"].as<int>(0); o.result_slot=x["result_slot"].as<int>(0);
@@ -60,6 +64,7 @@ PIMController::PIMController(int ch,const ConfigNode& spec_cfg,const ConfigNode&
   ConfigNode cfg=spec_cfg["dram"]?spec_cfg:ConfigNode(ConfigNode::Map{{"dram",spec_cfg}});
   std::string impl=cfg["dram"]["impl"].as<std::string>("LPDDR5XPIM");
   device.init(DRAMSpec::create(impl,cfg));device.set_channel_id(ch);
+  mc_control=metadata["mc_command_control"].as<bool>(false);
   info.resize(device.m_spec->command_count);
   gpu_command_counts.resize(device.m_spec->command_count,0);
   for(int cmd=0;cmd<device.m_spec->command_count;cmd++) {
@@ -69,6 +74,7 @@ PIMController::PIMController(int ch,const ConfigNode& spec_cfg,const ConfigNode&
     v.completion=m["completion"].as<int>(1);v.external_ca=m["external_ca"].as<int>(1);
     v.private_ca=m["private_ca"].as<int>(0);auto dir=m["direction"].as<std::string>("");
     v.direction=dir.empty()?0:dir[0];
+    v.wire_command=m["wire_command"].as<std::string>(name);
   }
   checker.spec=device.m_spec;checker.info=&info;
   lookahead=std::make_unique<NativeLookahead>(ch,spec_cfg);
@@ -108,6 +114,18 @@ void PIMController::set_stage(const std::vector<Operation>& ops,int stage_id,Clo
   stage=stage_id;top.reset(&ops,clk);inner.reset(nullptr,clk);descriptor_index=-1;epoch_owned=false;pim_arrival=clk;
   checker.set_stage(clk,stage_id);
   resources.start_stage(name,clk);
+  if(mc_control) {
+    input_rows.clear();
+    auto collect=[&](auto&& self,const std::vector<Operation>& sequence)->void {
+      for(size_t i=0;i<sequence.size();++i) {
+        const auto& op=sequence[i];
+        if(op.name=="LOCALRD" && i+1<sequence.size() && sequence[i+1].name=="BCAST")
+          input_rows.emplace(4*op.addr[2]+op.addr[3],op.addr[4]+row_offset);
+        if(!op.children.empty())self(self,op.children);
+      }
+    };
+    collect(collect,ops);
+  }
   forecast_dirty=true;
 }
 void PIMController::begin_kernel(const Kernel* k,Clock clk) {
@@ -132,6 +150,7 @@ void PIMController::reset_serial_epoch(Clock origin) {
   for(int rank=0;rank<2;++rank)refresh_due[rank]=origin+refresh_interval(rank);
   refresh_bank.fill(0);pending_act={PendingAct{},PendingAct{}};
   external_free=private_free=gpu_dq_end=pim_dq_end=origin;
+  pim_mode=false;all_bank_row=-1;broadcast_addr.clear();export_store_done=-1;
   forecast_dirty=true;gap_write_phase=false;write_drain=false;
 }
 bool PIMController::kernel_finished() const {return !kernel || (kernel_next>=kernel_total&&gpu_outstanding==0);}
@@ -214,6 +233,104 @@ Candidate PIMController::make_candidate(int final,const AddrVec_t& addr,Candidat
   }
   return c;
 }
+
+Candidate PIMController::prepare_mc_request(const Operation& op,AddrVec_t addr,Clock earliest,
+                                            bool broadcast_read,int command_id) {
+  auto id=[&](const char* name){return device.m_spec->get_command_id(name);};
+  auto preq=[&](const char* name,const AddrVec_t& target,Clock ready) {
+    auto c=make_candidate(id(name),target,Candidate::PIM,ready);
+    c.final=false;c.rowhit=false;
+    return c;
+  };
+  const int last_row=device.m_spec->organization.level_sizes[4]-1;
+  const bool input_from_host=op.name=="WRGB";
+  const bool exporting=op.name=="RDRES";
+  const bool host_read=exporting&&export_store_done>=0;
+  const bool target_pim=!(op.name=="RD"||op.name=="WR"||host_read);
+  if(exporting) {
+    require(op.spill_addr.size()==6,"MC protocol requires an accumulator spill address");
+    addr=op.spill_addr;
+    addr[4]+=row_offset;
+    if(host_read)earliest=std::max(earliest,export_store_done);
+  }
+  const AddrVec_t host_register_row={channel,1,-1,-1,last_row-2,-1};
+  AddrVec_t requested_broadcast;
+  if(input_from_host)requested_broadcast=host_register_row;
+  const bool store_into_input=target_pim&&addr[2]>=0&&(op.name=="LOCALWR"||exporting)&&
+                              input_rows.contains({4*addr[2]+addr[3],addr[4]});
+  if(broadcast_read||store_into_input) {
+    requested_broadcast=addr;
+    requested_broadcast[5]=-1;
+  }
+  const bool transition=target_pim!=pim_mode;
+  if(!broadcast_addr.empty()&&(transition||requested_broadcast!=broadcast_addr)) {
+    const auto close=broadcast_addr;
+    return preq(close[2]<0?"PREab":"PREpb",close,std::max(earliest,pim_dq_end));
+  }
+  if(transition) {
+    AddrVec_t selector={channel,1,0,target_pim?0:1,target_pim?last_row:last_row-1,-1};
+    Clock ready=std::max(earliest,pim_dq_end);
+    const bool open=device.check_rowbuffer_hit(id("RD"),selector,now);
+    return preq(open?"PREpb":"RD",selector,ready);
+  }
+  if(input_from_host) {
+    if(broadcast_addr.empty())return preq("ACTAB",host_register_row,earliest);
+    addr=host_register_row;
+    addr[5]=op.slot;
+    earliest=std::max(earliest,ready_at(id("WR"),addr));
+  }
+  if(target_pim&&addr[2]>=0&&addr[4]==all_bank_row) {
+    AddrVec_t target={channel,1,-1,-1,all_bank_row,-1};
+    return preq("PREab",target,earliest);
+  }
+  if(broadcast_read && broadcast_addr.empty() &&
+     device.check_rowbuffer_hit(id("RD"),addr,now))
+    return preq("PREpb",addr,earliest);
+  const int cmd=exporting?id(host_read?"RD":"LOCALWR"):command_id;
+  return make_candidate(cmd,addr,Candidate::PIM,earliest);
+}
+
+void PIMController::update_mc_mode(int cmd,const AddrVec_t& addr) {
+  if(!mc_control||addr[1]!=1)return;
+  const auto& name=device.m_spec->command_names[cmd];
+  const int last_row=device.m_spec->organization.level_sizes[4]-1;
+  const bool has_broadcast=!broadcast_addr.empty();
+  if(name=="ACT2"&&pim_mode&&input_rows.contains({4*addr[2]+addr[3],addr[4]})) {
+    require(!has_broadcast,"broadcast source activated with another broadcast open");
+    broadcast_addr=addr;
+    broadcast_addr[5]=-1;
+  } else if(name=="ACTAB") {
+    require(pim_mode&&!has_broadcast,"ACTAB requires MB idle");
+    all_bank_row=addr[4];
+    if(addr[4]==last_row-2)broadcast_addr=addr;
+  } else if(name=="PREab") {
+    broadcast_addr.clear();
+    all_bank_row=-1;
+  } else if(name=="PREpb") {
+    all_bank_row=-1;
+    if(has_broadcast&&addr[2]==broadcast_addr[2]&&addr[3]==broadcast_addr[3])broadcast_addr.clear();
+    if(addr[2]==0&&(addr[3]==0||addr[3]==1)) {
+      AddrVec_t selector={channel,1,0,addr[3],last_row-addr[3],-1};
+      if(device.check_rowbuffer_hit(device.m_spec->get_command_id("RD"),selector,now))
+        pim_mode=addr[3]==0;
+    }
+  } else if(name=="RD"||name=="WR") {
+    require(!pim_mode,"DRAM host column command issued in PIM mode");
+  } else if(name=="WRGB") {
+    require(pim_mode&&has_broadcast&&broadcast_addr[4]==last_row-2,
+            "Host SRF write requires the all-bank register row");
+  } else if(is_mac(name)||starts(name,"LOCALWR")||name=="ROPE_EXEC_LOCAL") {
+    const bool input_store=name=="LOCALWR"&&has_broadcast&&
+        broadcast_addr[2]==addr[2]&&broadcast_addr[3]==addr[3]&&broadcast_addr[4]==addr[4];
+    require(pim_mode&&(!has_broadcast||input_store),"MAC/store does not match the current rank state");
+    if(addr[2]<0)require(all_bank_row==addr[4],"all-bank column requires ACTAB");
+  } else if(name=="LOCALRD") {
+    require(pim_mode&&(!has_broadcast||
+            (broadcast_addr[2]==addr[2]&&broadcast_addr[3]==addr[3]&&broadcast_addr[4]==addr[4])),
+            "PIM column read does not match the current rank state");
+  }
+}
+
 Candidate PIMController::next_pim(Clock clk) {
   // FIFO32 is decoded storage, not an out-of-order issue window. Only the
   // head may issue, including its native ACT/PRE prerequisites. Advancing on
@@ -239,6 +356,11 @@ Candidate PIMController::next_pim(Clock clk) {
     at=std::max(at,cursor.tail);
     if(at<=clk) {cursor.mark(cursor.next,clk);forecast_dirty=true;return next_pim(clk);}
   }
+  if(mc_control&&op.name=="ACTAB"&&at<=clk) {
+    // The old program's fused Down pre-activation is superseded by the
+    // broadcast ACTs and the full-bank weight prerequisite of the MAC read.
+    cursor.mark(cursor.next,clk);forecast_dirty=true;return next_pim(clk);
+  }
   // Wait only for this head's dependencies (or an explicit completion barrier),
   // not for the tail of every previously issued independent operation.
   if(at>clk) {
@@ -246,12 +368,57 @@ Candidate PIMController::next_pim(Clock clk) {
     if(policy=="gap_batch"&&!legacy_gap_batch)wait.addr=op.addr;
     return wait;
   }
-  int cmd=command(op,local);
-  try {at=std::max(at,resources.ready(op,clk));}
+  int cmd=command(op,local&&!mc_control);
+  size_t group=1;
+  int opcode=-1;
+  uint16_t mask=0;
+  if(mc_control&&op.name=="LOCALWR"&&(op.source=="rope_writeback"||op.source=="qkv_output"||
+                                      op.source=="reduction_output"||op.source=="fused_result")) {
+    const size_t required=op.source=="reduction_output"?2:16;
+    if(cursor.next+required<=cursor.decoded_until) {
+      for(size_t i=0;i<required;++i) {
+        const auto& store=cursor.ops->at(cursor.next+i);
+        if(store.name!=op.name||store.source!=op.source||store.addr[4]!=op.addr[4]||
+           store.addr[5]!=op.addr[5]||store.addr[2]<0||store.addr[2]>=4||
+           store.addr[3]<0||store.addr[3]>=4)break;
+        mask|=1u<<(4*store.addr[2]+store.addr[3]);
+      }
+      if(mask==(required==2?0x11:0xffff)) {
+        group=required;
+        opcode=op.source=="rope_writeback"?WB_ROPE:
+               (required==2||op.source=="fused_result"?WB_OBUF:WB_ACC);
+        cmd=device.m_spec->get_command_id(opcode==WB_ROPE?"ROPE_EXEC_LOCAL":"LOCALWR_LOCAL");
+      }
+    }
+    require(op.source!="rope_writeback"||(group==16&&op.addr[5]>=8&&op.addr[5]<24),
+            "RoPE writeback requires one Q/K word in every bank");
+    require(op.source!="fused_result"||group==16,"fused output requires one packet in every bank");
+    if(group==1)mask=0;
+  }
+  try {
+    if(export_store_done<0)at=std::max(at,resources.ready(op,clk));
+    for(size_t i=1;i<group;++i) {
+      const auto& store=cursor.ops->at(cursor.next+i);
+      at=std::max({at,dependencies(store,cursor),resources.ready(store,clk)});
+      for(int d:store.issue_deps)if(!cursor.dispatched.at(d))at=NEVER;
+    }
+  }
   catch(const std::exception& e){throw std::runtime_error(std::string(e.what())+" op="+op.name+" id="+std::to_string(op.id)+" stage="+std::to_string(stage));}
   AddrVec_t physical=op.addr;physical[4]+=row_offset;
+  if(group>1)physical[2]=physical[3]=-1;
   require(physical[4]<device.m_spec->organization.level_sizes[4],"PIM layer address exceeds rank capacity");
-  Candidate c=make_candidate(cmd,physical,Candidate::PIM,at,local);
+  const bool broadcast_read=op.name=="LOCALRD" && cursor.next+1<cursor.ops->size() &&
+                            cursor.ops->at(cursor.next+1).name=="BCAST";
+  const bool mc_array=mc_control&&(info[cmd].external_ca||op.name=="RDRES");
+  Candidate c=mc_array?prepare_mc_request(op,physical,at,broadcast_read,cmd):
+                       make_candidate(cmd,physical,Candidate::PIM,at,local&&!mc_control);
+  if(mc_control&&c.final) {
+    if(is_mac(op.name)) {
+      opcode=op.name=="MACQK"?MAC_INIT_RED:(op.fragment==0?MAC_INIT:MAC);
+      mask=0xffff;
+    }
+    c.opcode=opcode;c.group=group;c.bank_mask=mask;
+  }
   c.arrival=pim_arrival;c.dependency_ready=at<=clk;c.index=cursor.next;
   if(fused&&info[cmd].direction)c.at=std::max(c.at,gpu_dq_end);
   if(blocked_by_owner(c,clk))return {};
@@ -348,14 +515,15 @@ bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk)
   }
   throw std::runtime_error("unknown arbitration "+policy);
 }
-void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage) {
+void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage,int opcode,uint16_t bank_mask) {
   const auto& n=device.m_spec->command_names[cmd];
   if(n=="REFpb"||n=="REFab")
     require((n=="REFab")==refresh_all_bank.at(addr[1]),"refresh command violates fixed rank0 REFpb / rank1 REFab policy");
   if(!device.check_timing(cmd,addr,clk))throw std::runtime_error("scheduler bypassed native check_timing "+device.m_spec->command_names[cmd]+" at "+std::to_string(clk));
   int preq=device.get_preq_command(cmd,addr,clk);
   if(preq!=cmd)throw std::runtime_error("scheduler bypassed native prerequisite "+device.m_spec->command_names[cmd]+" requires "+device.m_spec->command_names[preq]+" at "+std::to_string(clk)+" rank="+std::to_string(addr[1])+" bg="+std::to_string(addr[2])+" bank="+std::to_string(addr[3])+" row="+std::to_string(addr[4]));
-  checker.observe(cmd,addr,clk,stat_stage);
+  update_mc_mode(cmd,addr);
+  checker.observe(cmd,addr,clk,stat_stage,opcode,bank_mask);
   device.issue_command(cmd,addr,clk);
   if(n=="REFpb"||n=="REFab")++refresh_counts.at(addr[1])[n=="REFab"];
   if(addr[1]==0)++gpu_command_counts[cmd];
@@ -382,12 +550,35 @@ void PIMController::finish_pim(const Candidate& c,Clock clk) {
   const auto& op=cursor.ops->at(c.index);
   if(!c.final)return;
   int cmd=c.cmd;Clock complete=clk+info[cmd].completion;
+  if(c.group>1) {
+    for(size_t i=0;i<c.group;++i) {
+      const auto& store=cursor.ops->at(cursor.next);
+      resources.issue(store,clk,complete);
+      cursor.mark(cursor.next,complete);
+    }
+    pim_arrival=clk;
+    return;
+  }
   if(op.name=="ROPE_EXEC")complete=clk+info[cmd].completion+(op.pairs-1)*device.m_spec->get_timing_value("nROPEII");
-  resources.issue(op,clk,complete);
+  if(mc_control&&op.name=="RDRES") {
+    if(export_store_done<0) {
+      resources.issue(op,clk,complete);
+      export_store_done=complete;
+      return;
+    }
+    export_store_done=-1;
+  } else resources.issue(op,clk,complete);
   if(info[cmd].direction) { (info[cmd].direction=='R'?pim_read_bytes:pim_write_bytes)+=32;
     pim_dq_end=std::max(pim_dq_end,clk+info[cmd].latency+info[cmd].burst);gap_write_phase=false; }
   size_t index=c.index;cursor.mark(index,complete);
   pim_arrival=clk;
+  if(mc_control&&c.opcode==MAC_INIT_RED) {
+    const auto& reduce=cursor.ops->at(cursor.next);
+    require(reduce.name=="REDUCE"&&reduce.kv_token==op.kv_token,"MAC_RED requires its QK reduction");
+    Clock reduced=complete+info[command(reduce,false)].completion;
+    resources.issue(reduce,complete,reduced);
+    cursor.mark(cursor.next,reduced);
+  }
   if(!op.children.empty()) {
     require(descriptor_index<0,"nested descriptors are unsupported");
     descriptor_index=index;descriptor_ready=complete;inner.reset(&op.children,complete);
@@ -446,7 +637,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu) {
   else if(can_issue(gpu)&&!protect_pim(gpu,pim,clk))chosen=gpu;
   else if(can_issue(pim))chosen=pim;
   if(chosen.cmd>=0) {
-    issue(chosen.cmd,chosen.addr,clk,stage);
+    issue(chosen.cmd,chosen.addr,clk,stage,chosen.opcode,chosen.bank_mask);
     if(chosen.source==Candidate::GPU&&chosen.final) {
       if(gpu_queues[chosen.index].front().array_preq)++gpu_row_misses;
       else ++gpu_row_hits;

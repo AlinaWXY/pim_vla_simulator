@@ -107,7 +107,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
       else if(parent.kind==Kind::Stage && parent.key=="channels")kind=Kind::Channels;
       else if(parent.kind==Kind::Channels)kind=Kind::Channel;
       else if(parent.kind==Kind::Op) {
-        if(parent.key=="addr")kind=Kind::Address;
+        if(parent.key=="addr" || parent.key=="spill_addr")kind=Kind::Address;
         else if(parent.key=="deps")kind=Kind::Deps;
         else if(parent.key=="issue_deps")kind=Kind::IssueDeps;
         else if(parent.key=="children")kind=Kind::Children;
@@ -127,7 +127,10 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
     } else if(f.kind==Kind::Channels) {
       require(f.channel_count==16,"program stage must cover exactly 16 channels");
       stack.back().channel_count=f.channel_count;
-    } else if(f.kind==Kind::Address)stack.back().operation.addr=std::move(f.integers);
+    } else if(f.kind==Kind::Address) {
+      auto& op=stack.back().operation;
+      (stack.back().key=="spill_addr"?op.spill_addr:op.addr)=std::move(f.integers);
+    }
     else if(f.kind==Kind::Deps)stack.back().operation.deps=std::move(f.integers);
     else if(f.kind==Kind::IssueDeps)stack.back().operation.issue_deps=std::move(f.integers);
     else if(f.kind==Kind::Children)stack.back().operation.children=std::move(f.operations);
@@ -187,6 +190,11 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
     require(o.id==static_cast<int>(index),"program IDs must be contiguous");
     require(o.addr.size()==6,"physical address must have 6 levels");
     require(o.addr[1]==1,"PIM may only access rank1");
+    require(o.spill_addr.empty() || (o.spill_addr.size()==6 && o.spill_addr[0]==o.addr[0] &&
+            o.spill_addr[1]==1 && o.spill_addr[2]>=0 && o.spill_addr[2]<4 &&
+            o.spill_addr[3]>=0 && o.spill_addr[3]<4 &&
+            o.spill_addr[4]>=0 && o.spill_addr[5]>=0 && o.spill_addr[5]<64),
+            "invalid accumulator spill address");
     require(o.slot>=0&&o.slot<32,"SRF capacity exceeded");
     require(o.result_slot>=0&&o.result_slot<64,"output pool capacity exceeded");
     require(o.reduction_word>=16&&o.reduction_word<512,"reduction outside bank output pool");

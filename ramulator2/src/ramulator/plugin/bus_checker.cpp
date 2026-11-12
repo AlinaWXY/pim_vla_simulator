@@ -31,7 +31,7 @@ void BusChecker::retire(Clock now) {
   // Retain the preceding burst for direction/rank switching checks.
   while(bursts.size()>1 && bursts[1].end<=now) bursts.pop_front();
 }
-void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
+void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage,int opcode,uint16_t bank_mask) {
   advance(now);
   const auto& m=info->at(cmd);
   auto& s=stats[stage]; ++s.commands; ++checked;
@@ -39,6 +39,11 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
     if(now<external_end)throw std::runtime_error("CA overlap at CK "+std::to_string(now));
     external_start=now;external_end=now+m.external_ca;
     external_rank=addr[1];
+    if(ca_trace) {
+      *ca_trace<<trace_channel<<','<<stage<<','<<external_start<<','<<external_end<<','
+               <<m.wire_command<<','<<addr[1]<<','<<addr[2]<<','<<addr[3]<<','
+               <<addr[4]<<','<<addr[5]<<','<<opcode<<','<<bank_mask<<'\n';
+    }
   }
   if(m.private_ca) {
     require(now>=private_end,"rank private CA overlap");
@@ -63,7 +68,7 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage) {
   bursts.push_back(b);
   if(dq_trace&&b.rank==1&&stage>=0)
     *dq_trace<<trace_channel<<','<<stage<<','<<*trace_stage_name<<','<<b.start<<','<<b.end<<','
-             <<b.direction<<','<<spec->command_names[cmd]<<','<<io_epoch<<'\n';
+             <<b.direction<<','<<m.wire_command<<','<<io_epoch<<'\n';
   (m.direction=='R'?s.read:s.write)+=32;
   if(addr[1]==0)(m.direction=='R'?s.gpu_read:s.gpu_write)+=32;
   else (m.direction=='R'?s.pim_read:s.pim_write)+=32;

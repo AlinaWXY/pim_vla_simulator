@@ -46,7 +46,7 @@ def _base_constraints():
     return result
 
 
-def _constraints():
+def _constraints(*, mc_control=False):
     result = []
     for tc in _base_constraints():
         # Only transfer-to-transfer interface constraints alias to SRF/pool IO.
@@ -59,9 +59,11 @@ def _constraints():
         fol = _expand(_expand(tc.following, ROW_ALIASES), {"ACT2": ACT_PULSE})
         if "ACT2" in tc.following:
             fol += ACT_ALL
+        if mc_control and "ACT2" in tc.preceding:
+            pre += ACT_ALL
         tc = _copy(tc, pre, list(dict.fromkeys(fol)))
         result.append(tc)
-    acts = ["ACT2", "ACT2_LOCAL", ACT_PULSE]
+    acts = ["ACT2", "ACT2_LOCAL", ACT_PULSE] + (ACT_ALL if mc_control else [])
     pres = ["PREpb", "PREab", "PREpb_LOCAL", "PREab_LOCAL"]
     reads = ["RD", "RDA"]
     writes = ["WR", "WRA"]
@@ -82,7 +84,8 @@ def _constraints():
         result.append(TC("Bank", [cmd], MACS, f"max(nCCDL,nMAC{rows})"))
     # Four simultaneous activations require an empty rolling FAW window.
     # Each of the 16 primitive updates enters the shared native history.
-    result.append(TC("Rank", acts + ["REFpb"], ACT_ALL, "nFAW"))
+    if not mc_control:
+        result.append(TC("Rank", acts + ["REFpb"], ACT_ALL, "nFAW"))
     for cmd, timing in (("BCAST","nBCAST"),("GATHER","nGATHER"),("REDUCE","nREDUCE")):
         result.append(TC("Rank", [cmd], [cmd], timing))
     # Shared per-rank GIO. There is no global buffer: WRGB drives DQ -> GIO ->
@@ -117,7 +120,20 @@ def _constraints():
                TC("Rank", ["RDRES"], ["REFab"], "nCL+nBL_min"),
                TC("Bank", ["WRGB"], ["REFpb"], "nCWL+nBL_min"),
                TC("Bank", ["RDRES"], ["REFpb"], "nCL+nBL_min")]
-    return [_copy(tc, _expand(tc.preceding, LOCAL_ALIASES), _expand(tc.following, LOCAL_ALIASES)) for tc in result]
+    if mc_control:
+        result = [tc for tc in result if "BCAST" not in tc.preceding + tc.following]
+        result += [TC("Rank", ["LOCALRD"], ["LOCALRD"], "nCCDS"),
+                   TC("Rank", ["LOCALWR"], ["LOCALWR"], "nCCDS_WR")]
+    result = [_copy(tc, _expand(tc.preceding, LOCAL_ALIASES), _expand(tc.following, LOCAL_ALIASES))
+              for tc in result]
+    if mc_control:
+        for tc in list(result):
+            if "LOCALWR_LOCAL" in tc.following and "LOCALWR_LOCAL" not in tc.preceding:
+                result.append(_copy(tc, fol=["ROPE_EXEC_LOCAL"]))
+            if "LOCALWR_LOCAL" in tc.preceding and "LOCALWR_LOCAL" not in tc.following:
+                result.append(TC(tc.level, ["ROPE_EXEC_LOCAL"], tc.following,
+                                 f"({tc.latency})+nROPE+7*nROPEII"))
+    return result
 
 
 class LPDDR5XPIM(LPDDR5):
@@ -204,9 +220,32 @@ LPDDR5XPIM.timing_presets = {"LPDDR5X_8533": {
 }}
 
 
-def build_spec(mac_freq_mult=4):
+MC_WIRE_COLUMNS = {**dict.fromkeys((cmd for cmd in MACS if not cmd.endswith("_LOCAL")), "RD"),
+                   "LOCALRD": "RD", "LOCALWR": "WR", "LOCALWR_LOCAL": "WR",
+                   "ROPE_EXEC_LOCAL": "WR", "WRGB": "WR"}
+MC_EXTERNAL = set(LPDDR5.commands) | {"ACTAB"} | MC_WIRE_COLUMNS.keys()
+
+
+class LPDDR5XMemoryController(LPDDR5XPIM):
+    timing_constraints = _constraints(mc_control=True)
+
+    def to_config(self):
+        config = super().to_config()
+        del config["command_expansions"]
+        config["bank_targets"].append([self.commands.index("LOCALWR_LOCAL"), "all", -1, 0])
+        return config
+
+    @classmethod
+    def _generate_bus_constraints(cls, idx, cycles, mult):
+        external = [idx[cmd] for cmd in cls.commands if cmd in MC_EXTERNAL]
+        return [[0, [idx[cmd]], external, 2 if cmd == "ACTAB" else 1]
+                for cmd in cls.commands if cmd in MC_EXTERNAL]
+
+
+def build_spec(mac_freq_mult=4, *, mc_control=False):
     """JSON-serializable native config and spec-owned completion/bus metadata."""
-    spec = LPDDR5XPIM(mac_freq_mult=mac_freq_mult)
+    spec_type = LPDDR5XMemoryController if mc_control else LPDDR5XPIM
+    spec = spec_type(mac_freq_mult=mac_freq_mult)
     org, timings = spec.resolve()
     commands = {}
     event_cycles = {"LOCALRD":"nLOCALRD","LOCALWR":"nLOCALWR","BCAST":"nBCAST",
@@ -232,6 +271,17 @@ def build_spec(mac_freq_mult=4):
             meta["completion"] = timings["nRFC" if c == "REFab" else "nRFCpb"]
         elif c in ACT_ALL:
             meta["completion"] = 3*timings["nFAW"] + timings["nRCD"]
+        if mc_control:
+            meta["private_ca"] = 0
+            meta["external_ca"] = (2 if c == "ACTAB" else 1) if c in MC_EXTERNAL else 0
+            if c in MC_WIRE_COLUMNS:
+                meta["wire_command"] = MC_WIRE_COLUMNS[c]
+            if c in ("MAC_RUN", "ROPE_RUN", "BCAST"):
+                meta["completion"] = 0
+            if c == "ROPE_EXEC_LOCAL":
+                meta["completion"] = timings["nLOCALWR"] + timings["nROPE"] + 7 * timings["nROPEII"]
+            if c == "ACTAB":
+                meta["completion"] = timings["nRCD"]
         commands[c] = meta
     native_commands = {name:{**{k:v for k,v in meta.items() if k not in ("dq_latency","dq_cycles","direction")},
                              "latency":meta["dq_latency"], "burst":meta["dq_cycles"],
@@ -240,6 +290,8 @@ def build_spec(mac_freq_mult=4):
     metadata = {"commands":native_commands,
                 "dq_turnaround":{"R_W":timings["nDQ_RTW"],"W_R":timings["nDQ_WTR"],
                                  "sibling_R_R":timings["nCS"],"sibling_W_W":timings["nDQ_RANK_WTW"]}}
+    if mc_control:
+        metadata["mc_command_control"] = True
     return {"dram":spec.to_config(),"timings":timings,"commands":commands,"metadata":metadata,"organization":org,
             "mac_freq_mult":mac_freq_mult,"clock_ps":timings["tCK_ps"],
             "source":"JESD209-5C + Version2 task-document 2026-11-09 PIM assumptions"}

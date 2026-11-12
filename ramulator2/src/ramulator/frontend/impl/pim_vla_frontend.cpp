@@ -113,13 +113,15 @@ int run(const std::string& config_file,const std::string& output) {
   std::string kind=cfg["run_kind"].as<std::string>("combined");
   require(kind=="combined"||kind=="ae_solo"||kind=="vlm_solo","invalid run_kind");
   require(!trace||kind=="ae_solo","trace_ae_dq requires ae_solo");
-  std::ofstream bursts,epochs,timeline;
+  std::ofstream bursts,commands,epochs,timeline;
   if(trace) {
     bursts.open(output+"/dq-bursts.csv");
+    commands.open(output+"/ca-commands.csv");
     epochs.open(output+"/dq-epochs.csv");
     timeline.open(output+"/dq-timeline.json");
-    require(bursts&&epochs&&timeline,"cannot open AE DQ trace files");
+    require(bursts&&commands&&epochs&&timeline,"cannot open AE bus trace files");
     bursts<<"channel,stage_id,stage,start_ck,end_ck,direction,command,fused_io_epoch\n";
+    commands<<"channel,stage_id,start_ck,end_ck,command,rank,bank_group,bank,row,column,opcode,bank_mask\n";
     epochs<<"channel,stage_id,start_ck,end_ck\n";
     timeline<<"{\"clock_ps\":"<<std::setprecision(15)<<tick_us*1000000<<",\"channels\":16,\"events\":[";
   }
@@ -150,6 +152,7 @@ int run(const std::string& config_file,const std::string& output) {
     auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;mc.legacy_gap_batch=!closed;
     if(trace) {
       mc.checker.dq_trace=&bursts;
+      mc.checker.ca_trace=&commands;
       mc.checker.epoch_trace=fused?&epochs:nullptr;
       mc.checker.trace_channel=c;
     }
@@ -294,8 +297,8 @@ int run(const std::string& config_file,const std::string& output) {
   }
   if(trace) {
     timeline<<"\n],\"ae_end_ck\":"<<ae_end<<"}\n";
-    bursts.close();epochs.close();timeline.close();
-    require(bursts&&epochs&&timeline,"failed to write AE DQ trace files");
+    bursts.close();commands.close();epochs.close();timeline.close();
+    require(bursts&&commands&&epochs&&timeline,"failed to write AE bus trace files");
   }
   uint64_t gr=0,gw=0,pr=0,pw=0,checks=0;
   for(const auto& mc:channels){mc->checker.advance(now);gr+=mc->gpu_read_bytes;gw+=mc->gpu_write_bytes;pr+=mc->pim_read_bytes;pw+=mc->pim_write_bytes;checks+=mc->checker.checked;}

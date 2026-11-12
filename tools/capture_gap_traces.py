@@ -26,18 +26,19 @@ def native(binary, config, output):
         raise RuntimeError(f"native exit {run.returncode}: {(output / 'native.log').read_text()}")
 
 
-def generate(variant, directory, model):
+def generate(variant, directory, model, *, mc_control=False):
+    protocol = ["--mc-control"] if mc_control else []
     subprocess.run([sys.executable, str(ROOT / "programs/gen_pim_program.py"),
                     "--variant", variant, "--compact", "--output", str(directory),
-                    "--execution-model", model], check=True)
+                    "--execution-model", model, *protocol], check=True)
     return directory / f"{variant}.json"
 
 
-def capture(case, binary, output, ledger, slices, spec, mac_freq_mult):
+def capture(case, binary, output, ledger, slices, spec, mac_freq_mult, mc_control):
     config = case_config(case, mac_freq_mult=mac_freq_mult, run_kind="ae_solo")
     variant = variant_name(config)
     schedule_path = ROOT / f"input-data/ae-{variant}.json"
-    program = generate(variant, output / "programs", "native_dram_requests")
+    program = generate(variant, output / "programs", "native_dram_requests", mc_control=mc_control)
     schedule = read_json(schedule_path)
     vlm = ROOT / "input-data/vlm.json"
     config.update(spec_path=str(spec), program_path=str(program), vlm_path=str(vlm))
@@ -45,6 +46,8 @@ def capture(case, binary, output, ledger, slices, spec, mac_freq_mult):
         directory = output / f"{case}-s{step}-l{layer}"
         schedule_slice = directory / "ae-slice.json"
         events = [e for e in schedule["events"] if (e["step"], e["layer"]) == (step, layer)]
+        if mc_control:
+            events = [e for e in events if not (e["kind"] == "pim" and e["stage"] == "rope")]
         if not events:
             raise ValueError(f"empty AE slice: {case}, {step}, {layer}")
         write_json(schedule_slice, {**schedule, "events": events})
@@ -59,7 +62,8 @@ def capture(case, binary, output, ledger, slices, spec, mac_freq_mult):
                         schedule_sha256=sha256(schedule_slice), program_sha256=sha256(program),
                         spec_sha256=sha256(spec), binary_sha256=sha256(binary),
                         trace_sha256={name: sha256(directory / "on" / name) for name in
-                                      ("dq-bursts.csv", "dq-epochs.csv", "dq-timeline.json")}))
+                                      ("ca-commands.csv", "dq-bursts.csv", "dq-epochs.csv",
+                                       "dq-timeline.json")}))
         print(f"{case} step {step} layer {layer}: raw.json identical", flush=True)
 
     if case in "fg" and ledger:
@@ -99,6 +103,7 @@ def main():
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--mac-freq-mult", type=int, choices=(1, 2, 4), default=4,
                         help="MAC frequency for newly captured traces (default: 4)")
+    parser.add_argument("--mc-control", action="store_true", help="use the rank-mode CA protocol")
     parser.add_argument("--cases", choices=list("cdefg"), nargs="+", default=list("cdefg"))
     parser.add_argument("--slice", type=int, nargs=2, metavar=("STEP", "LAYER"),
                         help="capture only one step/layer for the selected cases")
@@ -106,6 +111,8 @@ def main():
     parser.add_argument("--repeat-fused-g", action="store_true",
                         help="reuse prepared g-fused config and repeat each g slice using fused windows")
     args = parser.parse_args()
+    if args.mc_control and (args.fused_ledger or args.repeat_fused_g):
+        parser.error("--mc-control uses the native matched-slice paths")
     output = args.output.resolve()
     if args.repeat_fused_g:
         with ThreadPoolExecutor(max_workers=2) as pool:
@@ -124,15 +131,15 @@ def main():
                 raise FileExistsError(destination)
     ledger = args.fused_ledger.resolve() if args.fused_ledger else None
     spec = ROOT / "reference/spec/spec.json"
-    if args.mac_freq_mult != 4:
+    if args.mac_freq_mult != 4 or args.mc_control:
         sys.path.insert(0, str(ROOT / "ramulator2/python"))
         from ramulator.dram.lpddr5x_pim import build_spec
 
         spec = output / f"spec-k{args.mac_freq_mult}.json"
-        write_json(spec, build_spec(args.mac_freq_mult))
+        write_json(spec, build_spec(args.mac_freq_mult, mc_control=args.mc_control))
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger, slices,
-                               spec, args.mac_freq_mult)
+                               spec, args.mac_freq_mult, args.mc_control)
                    for case in args.cases]
         for future in futures:
             future.result()
