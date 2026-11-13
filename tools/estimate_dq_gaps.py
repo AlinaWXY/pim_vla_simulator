@@ -907,8 +907,7 @@ def main():
     if {commands[name]["dq_cycles"] for name in ("RD", "WR")} != {2}:
         raise ValueError("e idle audit requires the replay's 2 CK minimum DQ burst")
     e_replay = data["replay"][f"e-{selected['slice']}"]["1.0"]["same_first"]
-    if data.get("mc_command_control") and any(row["active_repetitions"] < REPEATS
-                                               for row in e_replay["stages"]):
+    if data.get("mc_command_control") and e_replay["tail_ms"] == 0:
         data["e_idle_breakdown"] = {"status": "vlm_completed_within_ae"}
     else:
         data["e_idle_breakdown"] = e_idle_breakdown(data, e_gaps, edges, commands["RD"]["dq_cycles"])
