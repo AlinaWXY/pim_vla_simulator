@@ -438,6 +438,26 @@ class ProgramTests(unittest.TestCase):
                     prior_use = max(o["id"] for o in macs if o["fragment"] < views)
                     self.assertTrue(all(prior_use in o["deps"] for o in loads))
 
+    def test_mc_streaming_interleaves_refills_with_macs_using_the_other_half(self):
+        for variant in ("feature_gpu_before", "token_local_before"):
+            program = generate(variant, 1, mc_control=True)
+            for stage in program["stages"]:
+                ops = stage["channels"][0]
+                writes = [op for op in ops if op["op"] == "WRGB" and op.get("source") != "host_query"]
+                with self.subTest(variant=variant, stage=stage["name"]):
+                    self.assertEqual(len(writes) % 16, 0)
+                    for start in range(0, len(writes), 16):
+                        refill = writes[start:start + 16]
+                        slot = refill[0]["slot"]
+                        self.assertIn(slot, (0, 16))
+                        self.assertEqual([op["slot"] for op in refill], list(range(slot, slot + 16)))
+                        next_mac = next(op for op in ops[refill[-1]["id"] + 1:]
+                                        if op["op"] == "MACAB" and op["slot"] // 16 == slot // 16)
+                        self.assertTrue({op["id"] for op in refill} <= set(next_mac["deps"]))
+                        if refill[0]["tensor_fragment"] != 0:
+                            self.assertTrue(any(op["op"] == "MACAB" and op["slot"] // 16 != slot // 16
+                                                for op in ops[refill[0]["id"]:refill[-1]["id"]]))
+
     def test_fused_has_six_mac_descriptors_and_optional_rope(self):
         for v in list(VARIANTS)[3:]:
             ops = [o for s in self.programs[v]["stages"] for o in s["channels"][0]]
@@ -544,6 +564,30 @@ class ProgramTests(unittest.TestCase):
             for wr, rd in zip(writes, reads):
                 self.assertEqual(rd["addr"], wr["addr"])
                 self.assertTrue(all_writes <= completion_ancestors(ops, rd["id"]))
+
+    def test_mc_local_rope_q_exchange_uses_complete_mode_phases(self):
+        for variant in ("token_local_before", "token_local_after"):
+            program = generate(variant, 1, mc_control=True)
+            stages = {s["name"]: s["channels"][0] for s in program["stages"]}
+            exported, imported = stages["q_exchange_export"], stages["q_exchange_import"]
+            self.assertEqual(len(exported), 128)
+            self.assertTrue(all(op["op"] == "RD" for op in exported))
+            if variant.endswith("_before"):
+                self.assertEqual(len(imported), 256)
+                for q, bank in ((q, b) for q in range(16) for b in range(16)):
+                    op = imported[q * 16 + bank]
+                    self.assertEqual((op["op"], op["source"], op["slot"], op["source_channel"]),
+                                     ("WRGB", "host_query", q, q % 2))
+                    self.assertEqual(op["addr"], L.address(0, L.Q_BASE + q // 2 * 32, bank))
+            else:
+                self.assertEqual({op["epoch"] for op in exported}, {"q_exchange_exclusive"})
+                self.assertTrue(all(op["op"] == "WR" and op["epoch"] == "q_exchange_exclusive"
+                                    for op in imported[:128]))
+                self.assertEqual(imported[128]["op"], "BARRIER")
+                self.assertEqual(len(imported[129:]), 256)
+                for op in imported[129:]:
+                    self.assertEqual(op["op"], "LOCALRD")
+                    self.assertIn(128, op["deps"])
 
     def test_generator_rejects_capacity_or_dependency_corruption(self):
         ops = copy.deepcopy(self.stage("token_gpu_before", "qkv"))

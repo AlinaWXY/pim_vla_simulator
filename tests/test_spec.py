@@ -167,6 +167,17 @@ class SpecTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 build_spec(bad)
 
+    def test_mc_srf_selector_uses_ca_without_array_timing(self):
+        spec = build_spec(2, mc_control=True)
+        selector = spec["commands"]["SRF_SELECT"]
+        self.assertEqual((selector["wire_command"], selector["external_ca"], selector["dq_cycles"]),
+                         ("ACTAB", 2, 0))
+        for level, pre, fol, *_ in spec["dram"]["timing_constraints"]:
+            if level:
+                self.assertNotIn(selector["id"], pre)
+        self.assertEqual(issue_gap(spec, "SRF_SELECT", "WRGB", "same_bg"), 2)
+        self.assertEqual(issue_gap(spec, "WRGB", "MACAB_M16", "same_bg"), 1)
+
     def test_refresh_covers_pim_and_buffers(self):
         ids = {c:meta["id"] for c,meta in self.spec["commands"].items()}
         for refresh, level, delay in (("REFab",1,224),("REFpb",3,128)):

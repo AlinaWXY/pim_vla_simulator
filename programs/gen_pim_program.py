@@ -42,8 +42,8 @@ class Builder:
     def fence(self, deps):
         return self.emit("BARRIER", deps=deps)
 
-    def descriptor(self, name, children, deps=()):
-        words = D.for_operator(name)
+    def descriptor(self, name, children, deps=(), *, down_staging=False):
+        words = D.for_operator(name, down_staging=down_staging)
         return self.emit("ROPE_RUN" if name == "rope" else "MAC_RUN", bank=-1,
                          deps=deps, descriptor=words, crc16=D.crc16(words),
                          operator=name, children=children.ops)
@@ -282,7 +282,7 @@ def rope_gpu(channel, export):
     return b.ops
 
 
-def q_exchange(channel, gpu_rope, feature, export):
+def q_exchange(channel, gpu_rope, feature, export, *, mc_control=False, fused=False):
     if feature:
         # Each feature shard already owns all sixteen Q rows.
         b = Builder(channel, "q_exchange_export" if export else "q_exchange_import")
@@ -295,6 +295,33 @@ def q_exchange(channel, gpu_rope, feature, export):
                        source_lane_offset=8 * (token % 2), dest_lane_offset=0)
         return b.ops
     b = Builder(channel, "q_exchange_export" if export else "q_exchange_import")
+    if mc_control and not gpu_rope:
+        epoch = "q_exchange_exclusive" if fused else b.group
+        if export:
+            for token in range(8):
+                for bank in range(L.BANKS):
+                    b.emit("RD", L.Q_BASE + token * L.BURST_BYTES, bank, epoch=epoch, tensor="Q")
+        elif fused:
+            writes = [b.emit("WR", L.Q_IMPORT_BASE + token * L.BURST_BYTES, bank,
+                             epoch=epoch, tensor="remote_Q", source_channel=channel ^ 1,
+                             source_offset=L.Q_BASE + token * L.BURST_BYTES)
+                      for token in range(8) for bank in range(L.BANKS)]
+            complete = b.fence(writes)
+            for base, parity, tensor in ((L.Q_BASE, channel % 2, "local_Q"),
+                                         (L.Q_IMPORT_BASE, 1 - channel % 2, "remote_Q")):
+                for token in range(8):
+                    for bank in range(L.BANKS):
+                        b.emit("LOCALRD", base + token * L.BURST_BYTES, bank, deps=[complete],
+                               dest_slot=2 * token + parity, tensor=tensor)
+        else:
+            # Each bank owns different features of Q. Use the SRF write
+            # path with BG/BA selecting the destination bank for each burst.
+            for token in range(L.QUERIES):
+                for bank in range(L.BANKS):
+                    offset = L.Q_BASE + token // 2 * L.BURST_BYTES
+                    b.emit("WRGB", offset, bank, slot=token, epoch=epoch, source="host_query",
+                           source_channel=(channel & ~1) + token % 2, source_offset=offset)
+        return b.ops
     if export:
         for token in range(8):
             for bank in range(16):
@@ -489,19 +516,19 @@ def output_projection(channel, feature, fused, store_results=False, *, group_sto
     return b.ops
 
 
-def ffn(channel, name, fused, store_results=False, *, group_stores=False, batch_output=False):
+def ffn(channel, name, fused, store_results=False, *, group_stores=False,
+        batch_output=False, mc_control=False):
     outer, b = Builder(channel, name), Builder(channel, name)
     fragments, columns, base, packets = ((64, 32, L.GU_BASE, 1024) if name == "gate_up"
                                         else (256, 4, L.DOWN_BASE, 128))
-    # Down's two-fragment batches divide its 12-fragment physical row evenly.
-    # Every query input is scattered to its own bank's input-only column;
-    # its LOCALRD -> BCAST fills the same (fragment parity, query) SRF slot as
-    # streaming WRGB. Both dataflows read identical weight columns. Gate/Up
-    # retains the existing two-bank staging and contiguous weight mapping.
-    input_location = L.down_input_location if name == "down" else None
+    # Down uses the same weight addresses in all modes. With MC control a
+    # whole SRF batch is read from one staging row with one broadcast ACT.
+    down_staging = name == "down" and fused and mc_control
+    input_location = None
+    if name == "down":
+        input_location = L.down_staging_location if down_staging else L.down_input_location
     weight_offset = L.down_weight_offset if name == "down" else None
-    # Co-resident Down inputs span all banks. Issue one fragment at a time,
-    # rotating across BGs, instead of the old two-bank staging interleave.
+    # Preserve the existing Host write order and change only the addresses.
     query_order = (0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15) if name == "down" else None
     seal = staged_input(outer, 16, fragments, input_location=input_location,
                         query_order=query_order, fragment_major=name == "down") if fused else None
@@ -513,7 +540,7 @@ def ffn(channel, name, fused, store_results=False, *, group_stores=False, batch_
             export_results(b, packets, [last], features_per_bank=columns,
                            bf16=False, epoch=name + "_export", store_to_dram=True,
                            group_stores=group_stores)
-        run = outer.descriptor(name, b, [seal])
+        run = outer.descriptor(name, b, [seal], down_staging=down_staging)
         if store_results:
             read_spilled_results(outer, packets, run)
         else:
@@ -542,7 +569,8 @@ def resource_accesses(op):
     elif name in ("WR", "LOCALWR"):
         writes.update(("array", b, addr[4], addr[5]) for b in banks)
     if name in ("WRGB", "BCAST"):
-        writes.update(("srf", b, op.get("slot", 0)) for b in range(16))
+        targets = banks if op.get("source") == "host_query" else range(16)
+        writes.update(("srf", b, op.get("slot", 0)) for b in targets)
         if name == "BCAST":
             reads.add(("srf", op["source_bank"], op.get("slot", 0)))
     elif name == "LOCALRD":
@@ -627,7 +655,10 @@ def validate_ops(ops, channel):
         ch, rank, bg, bank, row, col = op["addr"]
         if ch != channel or rank != 1 or row < 0 or not 0 <= col < 64:
             raise ValueError("invalid physical address")
-        if op["op"] in ("MACAB", "MACQK", "WRGB", "RDRES", "ACTAB") and (bg, bank) != (-1, -1):
+        if op["op"] == "WRGB" and op.get("source") == "host_query":
+            if not 0 <= bg < 4 or not 0 <= bank < 4 or not 0 <= op["slot"] < L.QUERIES:
+                raise ValueError("Host Q write must address a bank and query slot")
+        elif op["op"] in ("MACAB", "MACQK", "WRGB", "RDRES", "ACTAB") and (bg, bank) != (-1, -1):
             raise ValueError("all-bank/buffer command must target the whole rank")
         if not 0 <= op.get("slot", 0) < 32 or not 0 <= op.get("dest_slot", 0) < 32:
             raise ValueError("SRF capacity exceeded")
@@ -700,16 +731,18 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
         factories += [("rope", lambda c: rope(c, fused, mc_control=mc_control))]
     group_stores = mc_control and fused
     store_results = kernel_windows or group_stores
-    factories += [("q_exchange_export", lambda c: q_exchange(c, gpu, feature, True)),
-                  ("q_exchange_import", lambda c: q_exchange(c, gpu, feature, False)),
+    factories += [("q_exchange_export", lambda c: q_exchange(c, gpu, feature, True, mc_control=mc_control, fused=fused)),
+                  ("q_exchange_import", lambda c: q_exchange(c, gpu, feature, False, mc_control=mc_control, fused=fused)),
                   ("qkt", lambda c: qkt(c, feature, fused, batch_output=batch_output)),
                   ("pv", lambda c: pv(c, feature, fused, batch_output=batch_output)),
                   ("o", lambda c: output_projection(c, feature, fused, store_results,
                                                      group_stores=group_stores, batch_output=batch_output)),
                   ("gate_up", lambda c: ffn(c, "gate_up", fused, store_results,
-                                            group_stores=group_stores, batch_output=batch_output)),
+                                            group_stores=group_stores, batch_output=batch_output,
+                                            mc_control=mc_control)),
                   ("down", lambda c: ffn(c, "down", fused, store_results,
-                                         group_stores=group_stores, batch_output=batch_output))]
+                                         group_stores=group_stores, batch_output=batch_output,
+                                         mc_control=mc_control))]
     stages, counts = [], {}
     for name, factory in factories:
         channels = [factory(c) for c in range(channel_count)]
@@ -735,10 +768,14 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
         stages.append(stage)
     dq = sum(counts.get(x, 0) for x in EXTERNAL) * 32
     expected = EXPECTED_DQ[variant] * 1024 * channel_count // 16
+    if mc_control and variant == "token_local_before":
+        # Both parities of Q are sent to the SRF; formerly only the remote
+        # half was written over DQ, with the local half loaded from DRAM.
+        expected += channel_count * 8 * L.BANKS * L.BURST_BYTES
     if dq != expected:
         raise ValueError(f"DQ mismatch: {dq} != {expected}")
     sources = [Path(__file__), ROOT / "programs/descriptors.py", ROOT / "workloads/layout.py"]
-    contract = L.contract(layout, fused_kernel_windows=kernel_windows)
+    contract = L.contract(layout, fused_kernel_windows=kernel_windows, down_staging=fused and mc_control)
     contract["buffers"].update(rope_units_per_rank=16, rope_input_slots_per_bank=2,
                                 rope_output_fifo_entries_per_bank=2,
                                 qkt_scratch_words_per_bank=16,

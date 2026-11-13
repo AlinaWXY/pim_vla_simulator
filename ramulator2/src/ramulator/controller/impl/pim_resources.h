@@ -43,7 +43,8 @@ class PimResources {
     validate(o);
     Time at=now;
     if (o.name=="WRGB" || o.name=="BCAST") {
-      for (int b=0;b<BANKS;++b) at=std::max(at,srf_[b][o.slot].busy);
+      if (o.source=="host_query") at=std::max(at,srf_[bank(o)][o.slot].busy);
+      else for (int b=0;b<BANKS;++b) at=std::max(at,srf_[b][o.slot].busy);
       if (o.name=="BCAST") {
         ensure(o.source_bank>=0 && o.source_bank<BANKS,"BCAST source bank invalid");
         const auto& src=srf_[o.source_bank][o.slot];
@@ -136,7 +137,8 @@ class PimResources {
     ensure(complete>=now,"resource completion precedes issue");
     ensure(ready(o,now)<=now,"issued an operation before resource readiness");
     if(o.name=="WRGB" || o.name=="BCAST") {
-      for(int b=0;b<BANKS;++b) fill_srf(b,o.slot,o.tensor_fragment,false,complete);
+      if(o.source=="host_query") fill_srf(bank(o),o.slot,o.slot,true,complete);
+      else for(int b=0;b<BANKS;++b) fill_srf(b,o.slot,o.tensor_fragment,false,complete);
     } else if(o.name=="LOCALRD") {
       const int b=bank(o);
       if(o.dest_slot>=0) fill_srf(b,o.dest_slot,o.tensor_fragment,
@@ -207,6 +209,8 @@ class PimResources {
   template<class Op> void validate(const Op& o) const {
     ensure(o.slot>=0 && o.slot<32,"SRF slot outside 1KiB");
     ensure(o.dest_slot>=-1 && o.dest_slot<32,"SRF destination outside 1KiB");
+    if(o.source=="host_query")
+      ensure(o.name=="WRGB" && o.slot<16,"Host Q write must target a query SRF slot");
     if(o.name=="MACAB" || o.name=="MACQK") {
       ensure(o.rows>0 && o.slot+o.rows<=32,"MAC input exceeds 1KiB SRF");
       ensure(o.output_columns>0 && o.output_column>=0 && o.output_column<o.output_columns &&

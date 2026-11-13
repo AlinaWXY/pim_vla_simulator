@@ -47,7 +47,9 @@ struct NativeLookahead::Impl {
     completion.resize(shadow.m_spec->command_count);
     auto metadata=spec_cfg["metadata"]["commands"];
     for(int i=0;i<shadow.m_spec->command_count;++i) {
-      auto m=metadata[shadow.m_spec->command_names[i]];
+      const auto& name=shadow.m_spec->command_names[i];
+      auto m=metadata[name];
+      if(!m&&name=="SRF_SELECT")continue; // Optional in archived specs.
       require(bool(m),"lookahead completion metadata missing");
       completion[i]=m["completion"].as<int>();
     }

@@ -154,7 +154,17 @@ def down_input_location(fragment, query):
     return query, offset
 
 
-def contract(layout, *, fused_kernel_windows=False):
+def down_staging_location(fragment, query):
+    """Place two fragments in one broadcast row and stripe batches over banks 0/4."""
+    if not 0 <= fragment < DOWN_FRAGMENTS or not 0 <= query < QUERIES:
+        raise ValueError("invalid Down fragment/query")
+    batch, view = divmod(fragment, 2)
+    bank = 4 * (batch % 2)
+    column = (batch // 2 * 2 + view) * QUERIES + query
+    return bank, STAGING_BASE + column * BURST_BYTES
+
+
+def contract(layout, *, fused_kernel_windows=False, down_staging=False):
     if layout not in ("feature", "token"):
         raise ValueError(layout)
     result = {
@@ -205,6 +215,14 @@ def contract(layout, *, fused_kernel_windows=False):
         "operator_shapes": operator_shapes(layout),
         "numeric_execution": False,
     }
+    if down_staging:
+        result["down_row_layout"].update(
+            co_resident_input_columns_used=False, input_bank="4 * (fragment // 2 % 2)",
+            fused="32 consecutive input columns per SRF batch in the existing bank 0/4 staging region",
+            fused_row_activation="single-bank ACT and 32 broadcast reads, PRE, then ACTAB for weights")
+        result["down_input_staging"] = dict(base_byte_offset=STAGING_BASE,
+                                           bytes_per_source_bank=65536, source_banks=[0, 4],
+                                           fragments_per_batch=2, srf_slot="column % 32")
     if fused_kernel_windows:
         result["regions_per_bank"]["fused_result_spill"] = [
             FUSED_RESULT_BASE, FUSED_RESULT_BASE + FUSED_RESULT_BYTES_PER_BANK]

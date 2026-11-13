@@ -19,6 +19,7 @@ enum RDOpcode {
   MAC_INIT_RED_HIGH=5, RD_ROPE=6, RD_ROPE_Q=7, RD_ROPE_K=8
 };
 enum WROpcode { WB_ACC=0, WB_MAC=1, WB_OBUF=3 };
+constexpr int SRF_BANK_SELECT_BIT=32;
 
 int qk_opcode(const Operation& op) {
   if(op.lanes==16&&op.weight_lane_offset==0)return MAC_INIT_RED;
@@ -80,6 +81,11 @@ PIMController::PIMController(int ch,const ConfigNode& spec_cfg,const ConfigNode&
   gpu_command_counts.resize(device.m_spec->command_count,0);
   for(int cmd=0;cmd<device.m_spec->command_count;cmd++) {
     const auto& name=device.m_spec->command_names[cmd];auto m=metadata["commands"][name];
+    // Older exported specs predate the row-independent selector.
+    if(name=="SRF_SELECT") {
+      if(!m)continue;
+      srf_select_cmd=cmd;
+    }
     require(static_cast<bool>(m),"spec metadata missing command "+name);
     auto& v=info[cmd];v.latency=m["latency"].as<int>(0);v.burst=m["burst"].as<int>(0);
     v.completion=m["completion"].as<int>(1);v.external_ca=m["external_ca"].as<int>(1);
@@ -123,6 +129,7 @@ int PIMController::command(const Operation& op,bool local) const {
 void PIMController::set_stage(const std::vector<Operation>& ops,int stage_id,Clock clk,const std::string& name) {
   require(stage_finished(clk),"replacing a live PIM stage");
   stage=stage_id;top.reset(&ops,clk);inner.reset(nullptr,clk);descriptor_index=-1;epoch_owned=false;pim_arrival=clk;
+  exclusive_q_exchange=fused&&!ops.empty()&&ops.front().epoch=="q_exchange_exclusive";
   checker.set_stage(clk,stage_id);
   resources.start_stage(name,clk);
   if(mc_control) {
@@ -161,7 +168,8 @@ void PIMController::reset_serial_epoch(Clock origin) {
   for(int rank=0;rank<2;++rank)refresh_due[rank]=origin+refresh_interval(rank);
   refresh_bank.fill(0);pending_act={PendingAct{},PendingAct{}};
   external_free=private_free=gpu_dq_end=pim_dq_end=origin;
-  pim_mode=false;all_bank_row=-1;broadcast_addr.clear();export_store_done=-1;
+  pim_mode=false;srf_write_selected=false;exclusive_q_exchange=false;
+  all_bank_row=-1;broadcast_addr.clear();export_store_done=-1;
   forecast_dirty=true;gap_write_phase=false;write_drain=false;
 }
 bool PIMController::kernel_finished() const {return !kernel || (kernel_next>=kernel_total&&gpu_outstanding==0);}
@@ -255,6 +263,7 @@ Candidate PIMController::prepare_mc_request(const Operation& op,AddrVec_t addr,C
   };
   const int last_row=device.m_spec->organization.level_sizes[4]-1;
   const bool input_from_host=op.name=="WRGB";
+  const bool independent_srf=srf_select_cmd>=0;
   const bool exporting=op.name=="RDRES";
   const bool host_read=exporting&&export_store_done>=0;
   const bool target_pim=!(op.name=="RD"||op.name=="WR"||host_read);
@@ -266,7 +275,7 @@ Candidate PIMController::prepare_mc_request(const Operation& op,AddrVec_t addr,C
   }
   const AddrVec_t host_register_row={channel,1,-1,-1,last_row-2,-1};
   AddrVec_t requested_broadcast;
-  if(input_from_host)requested_broadcast=host_register_row;
+  if(input_from_host&&!independent_srf)requested_broadcast=host_register_row;
   const bool store_into_input=target_pim&&addr[2]>=0&&(op.name=="LOCALWR"||exporting)&&
                               input_rows.contains({4*addr[2]+addr[3],addr[4]});
   if(broadcast_read||store_into_input) {
@@ -285,10 +294,18 @@ Candidate PIMController::prepare_mc_request(const Operation& op,AddrVec_t addr,C
     return preq(open?"PREpb":"RD",selector,ready);
   }
   if(input_from_host) {
-    if(broadcast_addr.empty())return preq("ACTAB",host_register_row,earliest);
+    require(op.source!="host_query"||independent_srf,"Host Q write requires bank-addressed SRF writes");
+    if(independent_srf&&!srf_write_selected)
+      return preq("SRF_SELECT",host_register_row,earliest);
+    if(!independent_srf&&broadcast_addr.empty())return preq("ACTAB",host_register_row,earliest);
     addr=host_register_row;
     addr[5]=op.slot;
-    earliest=std::max(earliest,ready_at(id("WR"),addr));
+    if(op.source=="host_query") {
+      addr[2]=op.addr[2];
+      addr[3]=op.addr[3];
+      addr[5]|=SRF_BANK_SELECT_BIT;
+    }
+    if(!independent_srf)earliest=std::max(earliest,ready_at(id("WR"),addr));
   }
   if(target_pim&&addr[2]>=0&&addr[4]==all_bank_row) {
     AddrVec_t target={channel,1,-1,-1,all_bank_row,-1};
@@ -310,6 +327,9 @@ void PIMController::update_mc_mode(int cmd,const AddrVec_t& addr) {
     require(!has_broadcast,"broadcast source activated with another broadcast open");
     broadcast_addr=addr;
     broadcast_addr[5]=-1;
+  } else if(name=="SRF_SELECT") {
+    require(pim_mode&&!has_broadcast&&addr[4]==last_row-2,"invalid SRF write selector");
+    srf_write_selected=true;
   } else if(name=="ACTAB") {
     require(pim_mode&&!has_broadcast,"ACTAB requires MB idle");
     all_bank_row=addr[4];
@@ -322,14 +342,17 @@ void PIMController::update_mc_mode(int cmd,const AddrVec_t& addr) {
     if(has_broadcast&&addr[2]==broadcast_addr[2]&&addr[3]==broadcast_addr[3])broadcast_addr.clear();
     if(addr[2]==0&&(addr[3]==0||addr[3]==1)) {
       AddrVec_t selector={channel,1,0,addr[3],last_row-addr[3],-1};
-      if(device.check_rowbuffer_hit(device.m_spec->get_command_id("RD"),selector,now))
+      if(device.check_rowbuffer_hit(device.m_spec->get_command_id("RD"),selector,now)) {
         pim_mode=addr[3]==0;
+        srf_write_selected=false;
+      }
     }
   } else if(name=="RD"||name=="WR") {
     require(!pim_mode,"DRAM host column command issued in PIM mode");
   } else if(name=="WRGB") {
-    require(pim_mode&&has_broadcast&&broadcast_addr[4]==last_row-2,
-            "Host SRF write requires the all-bank register row");
+    require(pim_mode&&((srf_write_selected&&!has_broadcast)||
+            (has_broadcast&&broadcast_addr[4]==last_row-2)),
+            "Host SRF write requires the register selector");
   } else if(is_mac(name)||starts(name,"LOCALWR")) {
     const bool input_store=name=="LOCALWR"&&has_broadcast&&
         broadcast_addr[2]==addr[2]&&broadcast_addr[3]==addr[3]&&broadcast_addr[4]==addr[4];
@@ -624,6 +647,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu) {
     }
   }
   if(fused&&clk<pim_dq_end)epoch=true;
+  if(exclusive_q_exchange&&stage>=0)epoch=true;
   if(checker.epoch_trace)checker.trace_epoch_change(clk,epoch);
   checker.io_epoch=epoch;
   Candidate gpu=permit_gpu&&!epoch?next_gpu(clk):Candidate{};

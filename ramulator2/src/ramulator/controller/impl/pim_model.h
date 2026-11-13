@@ -127,8 +127,10 @@ class PIMController {
   Clock forecast_time=-1;
   int channel=0,stage=-1,window=64,write_high=48,write_low=16;
   bool fused=false,write_drain=false,epoch_owned=false,gap_write_phase=false;
+  bool exclusive_q_exchange=false;
   bool legacy_gap_batch=false; // Keep uniform replays byte-identical.
-  bool mc_control=false, pim_mode=false;
+  bool mc_control=false, pim_mode=false, srf_write_selected=false;
+  int srf_select_cmd=-1;
   int all_bank_row=-1;
   AddrVec_t broadcast_addr;
   std::set<std::pair<int,int>> input_rows;

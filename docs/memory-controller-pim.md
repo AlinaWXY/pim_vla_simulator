@@ -11,13 +11,20 @@ command. Fixed-function GATHER, CAST, and adder-tree work remains on die.
   The penultimate row of bank 1 followed by PREpb restores DRAM mode.
 - In PIM mode, a single-bank ACT to a configured input row selects broadcast.
   The subsequent RD sends the column to all SRFs. PRE closes the input row
-  and returns to MB idle. Down uses this path on its existing co-resident
-  input and weight row, then reopens that row with ACTAB for MAC.
+  and returns to MB idle. Fused Down packs two fragments' 32 input columns
+  in half a staging row and stripes batches over banks 0 and 4. One ACT
+  opens the source for all 32 broadcast reads before PRE and the weight
+  ACTAB. Weight addresses and the per-bank SRF slots follow the original
+  Down mapping.
 - ACTAB opens all 16 banks at once. It occupies two external CA cycles and
   uses the same array timings as an ordinary split ACT, with one activation
   event in the rolling activation history.
-- ACTAB to the third-last row selects register writes. Each Host WR sends
-  32 B over DQ to one SRF slot in all banks. Other PIM-mode RD and WR have no
+- ACTAB to the third-last row selects SRF writes until the rank changes
+  mode. The selector occupies two CA cycles, leaves the DRAM row buffers
+  intact, and can coexist with a weight row open for MAC. Each Host WR sends
+  32 B over DQ to one SRF slot in all banks. The MC interleaves the next
+  half's WRs with MAC RDs on the current half. Its first consumer waits for
+  all sixteen writes to complete. Other PIM-mode RD and WR have no
   DQ transfer. For a Host result, the controller issues an internal store
   into the existing score or fused-result address space and then reads the
   column in DRAM mode.
@@ -56,7 +63,17 @@ batch writes all results into their assigned DRAM columns in PIM mode, then
 switches once to DRAM mode for the Host reads. QK uses up to 496 score
 columns per batch, within the existing per-bank output pool. The two score
 packets per key share one WB_OBUF. PV, O and FFN batch the reads at the
-existing tile or stage boundaries. Q exchange uses its existing schedule.
+existing tile or stage boundaries.
+
+After local RoPE, Q exchange exports all local Q columns in DRAM mode.
+The streaming path then uses the SRF selector and bank-addressed Host WRs
+to load both query parities directly into the SRFs. Column bit 5 selects
+bank-addressed writes, BG/BA selects the destination bank, and column bits
+0–4 select the slot. Each bank owns different Q features. The
+fused path writes the remote half into DRAM, then switches to PIM mode
+once and reads the local and remote columns into their banks' SRFs.
+The fused export and import stages reserve the DQ window for the exchange
+and its setup. Physical burst counts are reported separately.
 
 Local RoPE runs after the BF16 Q/K projection stores. In each bank, the
 working row holds eight coefficient columns at 0–7, Q at 8–15, and K

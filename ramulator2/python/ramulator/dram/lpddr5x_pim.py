@@ -122,7 +122,9 @@ def _constraints(*, mc_control=False):
                TC("Bank", ["RDRES"], ["REFpb"], "nCL+nBL_min")]
     if mc_control:
         result = [tc for tc in result if "BCAST" not in tc.preceding + tc.following]
-        result += [TC("Rank", ["LOCALRD"], ["LOCALRD"], "nCCDS"),
+        result += [TC("Rank", ["REFab"], ["SRF_SELECT"], "nRFC"),
+                   TC("Rank", ["WRGB"], ["WRGB"], "nCCDL_WR"),
+                   TC("Rank", ["LOCALRD"], ["LOCALRD"], "nCCDS"),
                    TC("Rank", ["LOCALWR"], ["LOCALWR"], "nCCDS_WR")]
     result = [_copy(tc, _expand(tc.preceding, LOCAL_ALIASES), _expand(tc.following, LOCAL_ALIASES))
               for tc in result]
@@ -216,10 +218,13 @@ LPDDR5XPIM.timing_presets = {"LPDDR5X_8533": {
 MC_WIRE_COLUMNS = {**dict.fromkeys((cmd for cmd in MACS if not cmd.endswith("_LOCAL")), "RD"),
                    "LOCALRD": "RD", "LOCALRD_LOCAL": "RD", "LOCALWR": "WR",
                    "LOCALWR_LOCAL": "WR", "WRGB": "WR"}
-MC_EXTERNAL = set(LPDDR5.commands) | {"ACTAB"} | MC_WIRE_COLUMNS.keys()
+MC_WIRE_COLUMNS["SRF_SELECT"] = "ACTAB"
+MC_TWO_CYCLE_CA = {"ACTAB", "SRF_SELECT"}
+MC_EXTERNAL = set(LPDDR5.commands) | MC_TWO_CYCLE_CA | MC_WIRE_COLUMNS.keys()
 
 
 class LPDDR5XMemoryController(LPDDR5XPIM):
+    commands = LPDDR5XPIM.commands + ["SRF_SELECT"]
     timing_constraints = _constraints(mc_control=True)
 
     def to_config(self):
@@ -232,7 +237,7 @@ class LPDDR5XMemoryController(LPDDR5XPIM):
     @classmethod
     def _generate_bus_constraints(cls, idx, cycles, mult):
         external = [idx[cmd] for cmd in cls.commands if cmd in MC_EXTERNAL]
-        return [[0, [idx[cmd]], external, 2 if cmd == "ACTAB" else 1]
+        return [[0, [idx[cmd]], external, 2 if cmd in MC_TWO_CYCLE_CA else 1]
                 for cmd in cls.commands if cmd in MC_EXTERNAL]
 
 
@@ -267,7 +272,7 @@ def build_spec(mac_freq_mult=4, *, mc_control=False):
             meta["completion"] = 3*timings["nFAW"] + timings["nRCD"]
         if mc_control:
             meta["private_ca"] = 0
-            meta["external_ca"] = (2 if c == "ACTAB" else 1) if c in MC_EXTERNAL else 0
+            meta["external_ca"] = (2 if c in MC_TWO_CYCLE_CA else 1) if c in MC_EXTERNAL else 0
             if c in MC_WIRE_COLUMNS:
                 meta["wire_command"] = MC_WIRE_COLUMNS[c]
             if c in ("MAC_RUN", "ROPE_RUN", "BCAST"):
