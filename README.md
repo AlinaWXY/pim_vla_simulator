@@ -4,7 +4,7 @@
 
 MAC 4× → 2× 的 c–g 同切片消融见 [结果与复现命令](reference/gap-estimate/mac-frequency-2x.md)。
 
-顶层 MC、MAC 2× 的 b–g 逐请求回放见 [DQ-only 结果与复现](reference/mc-dq-replay/dq-only/README.md)。
+顶层 MC、MAC 2× 的 b–g 逐请求回放见 [DQ-only 结果与复现](reference/mc-dq-replay/dq-only/README.md)和 [CA 冲突延发结果与复现](reference/mc-dq-replay/ca-catch-up/README.md)。
 
 本仓库对应 `xinyao_1109` 重写：GPU rank0 与 PIM rank1 在同一原生仿真时间线上竞争，16 个通道均调用 Ramulator2 的 prerequisite、timing 与 command issue 机制。LPDDR5X-8533 时序只在 spec 中定义。PIM 请求直接由张量布局生成，运行不依赖旧 trace、外部仲裁重放或延迟常数抵消。
 

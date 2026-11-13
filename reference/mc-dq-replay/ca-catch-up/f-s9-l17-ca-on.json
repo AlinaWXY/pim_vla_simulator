@@ -1,0 +1,137 @@
+{
+  "ae_ck": 143647035,
+  "ae_solo_ck": 82938060,
+  "ca_input_sha256": "4ebc19d5aeb80498f599f4b02c96fd3a661520508136898177547ca1624a1e28",
+  "input_sha256": "516e6b8d6ca75569fd43b2992b3a1a3db6197871d27461d9e1a5dc3763a7a486",
+  "join_ck": 60708975,
+  "join_requests": [
+    218397754,
+    153773145
+  ],
+  "overlap_ck": 53601941,
+  "pim_requests": [
+    150488967,
+    97130949
+  ],
+  "profile_ck": 112175456.50319828,
+  "shared_io_ck_per_slice": {
+    "down": 19345,
+    "gate_up": 3090,
+    "pv": 1684,
+    "qkt": 2773,
+    "qkv": 1581,
+    "rope_export": 1322,
+    "rope_import": 1029
+  },
+  "stages": [
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 3679443,
+      "ca_delay_multiple_ck": 167395,
+      "event_index": 11,
+      "name": "qkv",
+      "overlap_ck": 12130010,
+      "requests": [
+        41998684,
+        21222404
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 0,
+      "ca_delay_multiple_ck": 0,
+      "event_index": 22,
+      "name": "q_exchange_export",
+      "overlap_ck": 61710,
+      "requests": [
+        0,
+        0
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 0,
+      "ca_delay_multiple_ck": 0,
+      "event_index": 23,
+      "name": "q_exchange_import",
+      "overlap_ck": 220490,
+      "requests": [
+        0,
+        0
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 586423,
+      "ca_delay_multiple_ck": 17436,
+      "event_index": 24,
+      "name": "qkt",
+      "overlap_ck": 3790150,
+      "requests": [
+        6206262,
+        7337915
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 1053291,
+      "ca_delay_multiple_ck": 48496,
+      "event_index": 29,
+      "name": "pv",
+      "overlap_ck": 3933630,
+      "requests": [
+        12471169,
+        5715162
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 1399339,
+      "ca_delay_multiple_ck": 32742,
+      "event_index": 30,
+      "name": "o",
+      "overlap_ck": 7897010,
+      "requests": [
+        21205016,
+        13031727
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 2295450,
+      "ca_delay_multiple_ck": 52739,
+      "event_index": 45,
+      "name": "gate_up",
+      "overlap_ck": 14469190,
+      "requests": [
+        25136100,
+        33963703
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 4845387,
+      "ca_delay_multiple_ck": 156599,
+      "event_index": 49,
+      "name": "down",
+      "overlap_ck": 11099751,
+      "requests": [
+        43471736,
+        15860038
+      ]
+    }
+  ],
+  "tail_ck": 0,
+  "tail_requests": [
+    0,
+    0
+  ],
+  "total_ck": 143647035,
+  "total_requests": [
+    368886721,
+    250904094
+  ],
+  "units_at_ae_end": 2357,
+  "vlm_end_ck": 138941007,
+  "vlm_solo_ck": 112458802
+}

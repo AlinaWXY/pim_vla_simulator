@@ -1,0 +1,141 @@
+{
+  "ae_ck": 154525407,
+  "ae_solo_ck": 79705980,
+  "ca_input_sha256": "a9f63570f4333adf1c721328484470bac6460cb310a56f90f89e2a07b20fc690",
+  "input_sha256": "f623d1d8f7a9f705d22ee16ae3e437c29d61d8162683ad30b552edf2c12d9ca0",
+  "join_ck": 74819427,
+  "join_requests": [
+    270411313,
+    176373558
+  ],
+  "overlap_ck": 48254454,
+  "pim_requests": [
+    98475408,
+    74530536
+  ],
+  "profile_ck": 112175456.50319828,
+  "shared_io_ck_per_slice": {},
+  "stages": [
+    {
+      "ca_deferrals_at_gap_end": 2449,
+      "ca_delay_1ck": 987201,
+      "ca_delay_multiple_ck": 58433,
+      "event_index": 11,
+      "name": "qkv",
+      "overlap_ck": 11352978,
+      "requests": [
+        20594830,
+        21893686
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 7904,
+      "ca_delay_multiple_ck": 2124,
+      "event_index": 12,
+      "name": "rope_export",
+      "overlap_ck": 232986,
+      "requests": [
+        160439,
+        94862
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 0,
+      "ca_delay_multiple_ck": 0,
+      "event_index": 23,
+      "name": "rope_import",
+      "overlap_ck": 179046,
+      "requests": [
+        17904,
+        1
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 17,
+      "ca_delay_1ck": 137578,
+      "ca_delay_multiple_ck": 635,
+      "event_index": 24,
+      "name": "q_exchange_export",
+      "overlap_ck": 107880,
+      "requests": [
+        508997,
+        52059
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 1747021,
+      "ca_delay_multiple_ck": 41082,
+      "event_index": 25,
+      "name": "qkt",
+      "overlap_ck": 8657103,
+      "requests": [
+        31652626,
+        8194504
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 352,
+      "ca_delay_1ck": 338405,
+      "ca_delay_multiple_ck": 11549,
+      "event_index": 31,
+      "name": "pv",
+      "overlap_ck": 3235273,
+      "requests": [
+        4154676,
+        6790063
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 484,
+      "ca_delay_1ck": 1271687,
+      "ca_delay_multiple_ck": 27596,
+      "event_index": 33,
+      "name": "o",
+      "overlap_ck": 4617197,
+      "requests": [
+        3787010,
+        7569695
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 5339,
+      "ca_delay_1ck": 1681451,
+      "ca_delay_multiple_ck": 59503,
+      "event_index": 48,
+      "name": "gate_up",
+      "overlap_ck": 13431893,
+      "requests": [
+        34007978,
+        22464767
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 165580,
+      "ca_delay_multiple_ck": 22926,
+      "event_index": 52,
+      "name": "down",
+      "overlap_ck": 6440098,
+      "requests": [
+        3590948,
+        7470899
+      ]
+    }
+  ],
+  "tail_ck": 0,
+  "tail_requests": [
+    0,
+    0
+  ],
+  "total_ck": 154525407,
+  "total_requests": [
+    368886721,
+    250904094
+  ],
+  "units_at_ae_end": 2357,
+  "vlm_end_ck": 151566094,
+  "vlm_solo_ck": 112458802
+}

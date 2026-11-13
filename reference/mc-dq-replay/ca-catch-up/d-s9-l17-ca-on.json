@@ -1,0 +1,153 @@
+{
+  "ae_ck": 150829690,
+  "ae_solo_ck": 76707900,
+  "ca_input_sha256": "43243a13eb678885bb072982d05a0095e82282afeda3cb21f995f4d7631a6400",
+  "input_sha256": "0ea7a73a18146bae379d5a5a03d00085cbc6767d09ac23961903d731b420cfee",
+  "join_ck": 74121790,
+  "join_requests": [
+    270798853,
+    173397367
+  ],
+  "overlap_ck": 48025331,
+  "pim_requests": [
+    98087868,
+    77506727
+  ],
+  "profile_ck": 112175456.50319828,
+  "shared_io_ck_per_slice": {},
+  "stages": [
+    {
+      "ca_deferrals_at_gap_end": 386,
+      "ca_delay_1ck": 2856359,
+      "ca_delay_multiple_ck": 93386,
+      "event_index": 11,
+      "name": "qkv",
+      "overlap_ck": 11631839,
+      "requests": [
+        37821603,
+        14000346
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 6590,
+      "ca_delay_multiple_ck": 2560,
+      "event_index": 12,
+      "name": "rope_export",
+      "overlap_ck": 299802,
+      "requests": [
+        466409,
+        186431
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 0,
+      "ca_delay_multiple_ck": 0,
+      "event_index": 23,
+      "name": "rope_import",
+      "overlap_ck": 179046,
+      "requests": [
+        17708,
+        0
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 250,
+      "ca_delay_1ck": 80825,
+      "ca_delay_multiple_ck": 27400,
+      "event_index": 24,
+      "name": "q_exchange_export",
+      "overlap_ck": 162864,
+      "requests": [
+        503838,
+        332723
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 315,
+      "ca_delay_1ck": 103653,
+      "ca_delay_multiple_ck": 1874,
+      "event_index": 25,
+      "name": "q_exchange_import",
+      "overlap_ck": 225504,
+      "requests": [
+        341382,
+        320389
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 0,
+      "ca_delay_1ck": 928767,
+      "ca_delay_multiple_ck": 23133,
+      "event_index": 26,
+      "name": "qkt",
+      "overlap_ck": 4355742,
+      "requests": [
+        13964853,
+        6732926
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 112,
+      "ca_delay_1ck": 363124,
+      "ca_delay_multiple_ck": 10213,
+      "event_index": 31,
+      "name": "pv",
+      "overlap_ck": 3480870,
+      "requests": [
+        4006829,
+        5223851
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 874,
+      "ca_delay_1ck": 2276847,
+      "ca_delay_multiple_ck": 52834,
+      "event_index": 33,
+      "name": "o",
+      "overlap_ck": 7742130,
+      "requests": [
+        13172356,
+        14315081
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 4368,
+      "ca_delay_1ck": 1405416,
+      "ca_delay_multiple_ck": 60929,
+      "event_index": 48,
+      "name": "gate_up",
+      "overlap_ck": 13471254,
+      "requests": [
+        24513114,
+        28780421
+      ]
+    },
+    {
+      "ca_deferrals_at_gap_end": 608,
+      "ca_delay_1ck": 177163,
+      "ca_delay_multiple_ck": 20622,
+      "event_index": 52,
+      "name": "down",
+      "overlap_ck": 6476280,
+      "requests": [
+        3279776,
+        7614559
+      ]
+    }
+  ],
+  "tail_ck": 0,
+  "tail_requests": [
+    0,
+    0
+  ],
+  "total_ck": 150829690,
+  "total_requests": [
+    368886721,
+    250904094
+  ],
+  "units_at_ae_end": 2357,
+  "vlm_end_ck": 148327819,
+  "vlm_solo_ck": 112458802
+}

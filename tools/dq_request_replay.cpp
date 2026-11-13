@@ -42,11 +42,16 @@ struct Gap {
   int left, right;
 };
 
+struct CaInterval {
+  Clock start, end;
+};
+
 struct Stage {
   std::string name;
   Clock duration;
   bool pim;
   std::array<std::vector<Gap>, channels> gaps;
+  std::array<std::vector<CaInterval>, channels> ca_busy{};
 };
 
 struct Channel {
@@ -71,7 +76,7 @@ struct Pass {
   Progress progress;
   Counts issued{};
   Clock active_ck = 0, stop = 0;
-  std::vector<Clock> completed_durations;
+  std::array<Count, 3> ca_delays{};  // One CK, multiple CK, next DQ window.
 };
 
 void launch(Progress& progress, const Unit& unit, Clock start) {
@@ -104,9 +109,24 @@ int choose(const Channel& lane) {
 
 using Slots = std::array<std::vector<Slot>, channels>;
 
+// Bound a run of DQ bursts by the next occupied CA interval. Both clocks
+// are cycle aligned; the first CA issue precedes DQ by the column latency.
+Clock limit_by_ca(const std::vector<CaInterval>& busy, Clock shift, double& origin,
+                  Clock last_start) {
+  const auto issue = round_up(origin) - shift;
+  auto next = std::upper_bound(busy.begin(), busy.end(), issue,
+      [](Clock cycle, const CaInterval& interval) { return cycle < interval.end; });
+  if (next != busy.end() && next->start <= issue) {
+    origin = static_cast<double>(next->end + shift);
+    ++next;
+  }
+  if (next != busy.end()) last_start = std::min(last_start, next->start + shift - 1);
+  return last_start;
+}
+
 Pass run_window(const Stage& stage, Clock start, const std::vector<Unit>& units,
                 Progress progress, Slots& slots, const Edges& edges, bool admit,
-                bool record_durations) {
+                const Counts& ca_latency, bool preserve_pace) {
   const auto end = start + stage.duration;
   Pass out;
   out.stop = start;
@@ -136,13 +156,26 @@ Pass run_window(const Stage& stage, Clock start, const std::vector<Unit>& units,
         // Profile pacing carries the solo cost of VLM-to-VLM turnarounds.
         // Only edges against the native AE trace add explicit guards here.
         while (sendable(lane, direction)) {
-          const double origin = std::max(lane.ready, double(earliest));
-          if (round_up(origin) > last_start) break;
-          const auto capacity = static_cast<Count>(std::floor((last_start - origin + 1e-7) / lane.interval)) + 1;
+          const double paced = std::max(lane.ready, double(earliest));
+          double origin = preserve_pace ? std::max(paced, double(lane.burst_end)) : paced;
+          const auto candidate = round_up(origin);
+          if (candidate > last_start) break;
+          const auto run_end = stage.ca_busy[c].empty() ? last_start
+              : limit_by_ca(stage.ca_busy[c], start + ca_latency[direction], origin, last_start);
+          const auto delay = round_up(origin) - candidate;
+          if (round_up(origin) > run_end) {
+            if (delay) ++out.ca_delays[2];
+            break;
+          }
+          if (delay) ++out.ca_delays[delay == 1 ? 0 : 1];
+          // If later requests retain their profile deadlines, recompute
+          // after any displacement instead of extending it to the batch.
+          const auto capacity = preserve_pace && origin > paced ? 1 :
+              static_cast<Count>(std::floor((run_end - origin + 1e-7) / lane.interval)) + 1;
           const auto count = std::min(capacity, sendable(lane, direction));
           check(count > 0, "nonpositive DQ run length");
           lane.burst_end = round_up(origin + (count - 1) * lane.interval) + burst_ck;
-          lane.ready = origin + count * lane.interval;
+          lane.ready = (preserve_pace ? paced : origin) + count * lane.interval;
           lane.remaining[direction] -= count;
           out.issued[direction] += count;
           lane.previous = direction;
@@ -151,7 +184,8 @@ Pass run_window(const Stage& stage, Clock start, const std::vector<Unit>& units,
             slot.assumed = assumed;
           }
           slot.last = direction;
-          direction = 1 - direction;
+          // A CA interruption ends the fast path, not the direction batch.
+          if (!sendable(lane, direction)) direction = 1 - direction;
         }
         if (lane.remaining[Read] + lane.remaining[Write] > 0) ++index;
       }
@@ -165,7 +199,6 @@ Pass run_window(const Stage& stage, Clock start, const std::vector<Unit>& units,
     }
     out.active_ck += finish - cursor;
     out.stop = cursor = finish;
-    if (record_durations) out.completed_durations.push_back(finish - progress.start);
     ++progress.ordinal;
     progress.active = false;
   }
@@ -175,11 +208,11 @@ Pass run_window(const Stage& stage, Clock start, const std::vector<Unit>& units,
 
 Pass resolve(const Stage& stage, Clock start, const std::vector<Unit>& units,
              const Progress& progress, const Edges& edges, bool admit,
-             bool record_durations = false) {
+             const Counts& ca_latency = {}, bool preserve_pace = false) {
   Slots slots;
   for (int c = 0; c < channels; ++c) slots[c].resize(stage.gaps[c].size());
   for (;;) {
-    auto pass = run_window(stage, start, units, progress, slots, edges, admit, record_durations);
+    auto pass = run_window(stage, start, units, progress, slots, edges, admit, ca_latency, preserve_pace);
     bool retry = false;
     for (int c = 0; c < channels; ++c) {
       for (size_t i = 0; i < slots[c].size(); ++i) {
@@ -236,12 +269,41 @@ void self_test(const Edges& edges) {
   const auto blocked = resolve(pim, 0, units, {}, edges, true);
   check(blocked.progress.ordinal == 2 && blocked.stop == 6,
         "sequential kernels in one gap did not complete in order");
+
+  double origin = 6.4;
+  const std::vector<CaInterval> busy{{-2, 0}, {2, 5}};
+  check(limit_by_ca(busy, 9, origin, 30) == 10 && origin == 9,
+        "CA guard did not use the command issue clock");
+  origin = 10.1;
+  check(limit_by_ca(busy, 9, origin, 30) == 30 && origin == 14,
+        "CA guard did not skip the entire occupied interval");
+
+  pim.duration = 9;
+  for (int c = 0; c < channels; ++c) {
+    pim.gaps[c] = {{0, 9, 0, 9, Open, Open}};
+    pim.ca_busy[c] = {{-3, 1}};
+  }
+  const auto ca = resolve(pim, 0, units, {}, edges, true, {3, 1});
+  check(ca.issued == Counts{32, 0} && ca.stop == 9 && ca.progress.ordinal == 1,
+        "CA guard should delay the first kernel and leave the second unfinished");
+  check(ca.ca_delays == std::array<Count, 3>{0, 16, 0}, "CA delay counters differ");
+
+  pim.duration = 8;
+  for (int c = 0; c < channels; ++c) {
+    pim.gaps[c] = {{0, 8, 0, 8, Open, Open}};
+    pim.ca_busy[c] = {{0, 1}};
+  }
+  const std::vector<Unit> paced{{{48, 0}, 9}};
+  check(resolve(pim, 0, paced, {}, edges, true).issued == Counts{32, 0}
+        && resolve(pim, 0, paced, {}, edges, true, {}, true).issued == Counts{48, 0},
+        "a one-cycle CA stall should allow catch-up in a long DQ window");
 }
 
 Json replay(const std::vector<Stage>& stages, const std::vector<Unit>& units,
-            const Edges& edges, int repeats, bool serial) {
+            const Edges& edges, int repeats, bool serial, const Counts& ca_latency,
+            bool ca_enabled, bool preserve_pace) {
   const auto open = open_dq();
-  const auto solo = resolve(open, 0, units, {}, edges, true, true);
+  const auto solo = resolve(open, 0, units, {}, edges, true);
   check(solo.progress.ordinal == units.size(), "VLM solo did not finish");
   double profile = 0;
   Count expected_reads = 0, expected_writes = 0;
@@ -256,6 +318,7 @@ Json replay(const std::vector<Stage>& stages, const std::vector<Unit>& units,
   Counts total{}, pim_counts{}, join_counts{};
   std::vector<Counts> by_stage(stages.size());
   std::vector<Clock> overlap_by_stage(stages.size());
+  std::vector<std::array<Count, 3>> ca_delays(stages.size());
   auto account = [&](const Pass& pass, Counts& bucket) {
     progress = pass.progress;
     for (int d = 0; d < 2; ++d) {
@@ -268,11 +331,12 @@ Json replay(const std::vector<Stage>& stages, const std::vector<Unit>& units,
     for (size_t i = 0; i < stages.size(); ++i) {
       const auto& stage = stages[i];
       if (!serial && stage.pim && progress.ordinal < units.size()) {
-        const auto pass = resolve(stage, now, units, progress, edges, true);
+        const auto pass = resolve(stage, now, units, progress, edges, true, ca_latency, preserve_pace);
         account(pass, by_stage[i]);
         for (int d = 0; d < 2; ++d) pim_counts[d] += pass.issued[d];
         overlap_by_stage[i] += pass.active_ck;
         overlap_ck += pass.active_ck;
+        for (size_t d = 0; d < pass.ca_delays.size(); ++d) ca_delays[i][d] += pass.ca_delays[d];
       } else if (!stage.pim && progress.active) {
         const auto pass = resolve(open, now, units, progress, edges, false);
         check(!pass.progress.active && pass.progress.ordinal == progress.ordinal + 1,
@@ -299,9 +363,17 @@ Json replay(const std::vector<Stage>& stages, const std::vector<Unit>& units,
   check(ae_end == ae_solo + join_ck && now == std::max(ae_end, vlm_end),
         "E2E does not reconcile with AE and VLM endpoints");
   auto rows = Json::array();
-  for (size_t i = 0; i < stages.size(); ++i)
-    if (stages[i].pim) rows.push_back({{"name", stages[i].name}, {"event_index", i},
-                                     {"requests", by_stage[i]}, {"overlap_ck", overlap_by_stage[i]}});
+  for (size_t i = 0; i < stages.size(); ++i) {
+    if (!stages[i].pim) continue;
+    Json row{{"name", stages[i].name}, {"event_index", i},
+             {"requests", by_stage[i]}, {"overlap_ck", overlap_by_stage[i]}};
+    if (ca_enabled) {
+      row["ca_delay_1ck"] = ca_delays[i][0];
+      row["ca_delay_multiple_ck"] = ca_delays[i][1];
+      row["ca_deferrals_at_gap_end"] = ca_delays[i][2];
+    }
+    rows.push_back(std::move(row));
+  }
   return {{"total_ck", now}, {"ae_ck", ae_end}, {"ae_solo_ck", ae_solo}, {"join_ck", join_ck},
           {"tail_ck", now - ae_end}, {"vlm_end_ck", vlm_end}, {"overlap_ck", overlap_ck},
           {"profile_ck", profile}, {"vlm_solo_ck", solo.stop}, {"units_at_ae_end", at_ae_end},
@@ -312,11 +384,13 @@ Json replay(const std::vector<Stage>& stages, const std::vector<Unit>& units,
 
 int main(int argc, char** argv) {
   try {
-    check(argc == 4, "usage: dq_request_replay input repeats serial");
+    check(argc >= 4 && argc <= 6, "usage: dq_request_replay input repeats serial [ca_trace [--preserve-pace]]");
     std::ifstream input(argv[1]);
     input.exceptions(std::ios::failbit | std::ios::badbit);
     const int repeats = std::stoi(argv[2]);
     const bool serial = std::stoi(argv[3]);
+    const bool preserve_pace = argc == 6;
+    check(!preserve_pace || std::string(argv[5]) == "--preserve-pace", "unknown CA pacing option");
     check(repeats > 0, "repeats must be positive");
     Edges edges{};
     for (auto& row : edges) for (auto& cost : row) input >> cost;
@@ -347,8 +421,30 @@ int main(int argc, char** argv) {
         }
       }
     }
+    Counts ca_latency{};
+    if (argc >= 5) {
+      std::ifstream ca(argv[4]);
+      ca.exceptions(std::ios::failbit | std::ios::badbit);
+      ca >> ca_latency[Read] >> ca_latency[Write];
+      check(ca_latency[Read] >= 0 && ca_latency[Write] >= 0, "negative column latency");
+      for (auto& stage : stages) {
+        if (!stage.pim) continue;
+        for (auto& busy : stage.ca_busy) {
+          size_t size;
+          ca >> size;
+          busy.resize(size);
+          Clock previous = -unbounded;
+          for (auto& interval : busy) {
+            ca >> interval.start >> interval.end;
+            check(previous < interval.start && interval.start < interval.end,
+                  "CA intervals must be sorted, merged and nonempty");
+            previous = interval.end;
+          }
+        }
+      }
+    }
     self_test(edges);
-    std::cout << replay(stages, units, edges, repeats, serial).dump() << '\n';
+    std::cout << replay(stages, units, edges, repeats, serial, ca_latency, argc >= 5, preserve_pace).dump() << '\n';
   } catch (const std::exception& error) {
     std::cerr << "dq_request_replay: " << error.what() << '\n';
     return 1;
