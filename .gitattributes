@@ -3,3 +3,4 @@
 *.json text eol=lf
 # Keep the original run artifacts byte-for-byte for their SHA-256 checks.
 reference/gap-estimate/mac2/** -text
+reference/mc-dq-replay/traces-s9-l17.tar.gz -text

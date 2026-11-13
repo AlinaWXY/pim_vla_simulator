@@ -1,0 +1,113 @@
+{
+  "ae_ck": 139204176,
+  "ae_solo_ck": 69212700,
+  "input_sha256": "6a901986f00277a0dee29d44702a7189468be0e3fb3d278e71d7b1087065b883",
+  "join_ck": 69991476,
+  "join_requests": [
+    267380746,
+    160536175
+  ],
+  "overlap_ck": 49169700,
+  "pim_requests": [
+    88236112,
+    83410998
+  ],
+  "profile_ck": 112175456.50319828,
+  "shared_io_ck_per_slice": {},
+  "stages": [
+    {
+      "event_index": 11,
+      "name": "qkv",
+      "overlap_ck": 12001500,
+      "requests": [
+        22520881,
+        22542340
+      ]
+    },
+    {
+      "event_index": 12,
+      "name": "rope",
+      "overlap_ck": 134280,
+      "requests": [
+        267884,
+        302111
+      ]
+    },
+    {
+      "event_index": 13,
+      "name": "q_exchange_export",
+      "overlap_ck": 109620,
+      "requests": [
+        62637,
+        54846
+      ]
+    },
+    {
+      "event_index": 14,
+      "name": "q_exchange_import",
+      "overlap_ck": 198540,
+      "requests": [
+        32480,
+        31024
+      ]
+    },
+    {
+      "event_index": 15,
+      "name": "qkt",
+      "overlap_ck": 4499100,
+      "requests": [
+        13130422,
+        7299863
+      ]
+    },
+    {
+      "event_index": 20,
+      "name": "pv",
+      "overlap_ck": 3599460,
+      "requests": [
+        4612952,
+        8031425
+      ]
+    },
+    {
+      "event_index": 22,
+      "name": "o",
+      "overlap_ck": 8003340,
+      "requests": [
+        11203016,
+        12864445
+      ]
+    },
+    {
+      "event_index": 37,
+      "name": "gate_up",
+      "overlap_ck": 13924260,
+      "requests": [
+        31969640,
+        25044260
+      ]
+    },
+    {
+      "event_index": 41,
+      "name": "down",
+      "overlap_ck": 6699600,
+      "requests": [
+        4436200,
+        7240684
+      ]
+    }
+  ],
+  "tail_ck": 3159215,
+  "tail_requests": [
+    13269863,
+    6956921
+  ],
+  "total_ck": 142363391,
+  "total_requests": [
+    368886721,
+    250904094
+  ],
+  "units_at_ae_end": 2323,
+  "vlm_end_ck": 142363391,
+  "vlm_solo_ck": 112458802
+}
