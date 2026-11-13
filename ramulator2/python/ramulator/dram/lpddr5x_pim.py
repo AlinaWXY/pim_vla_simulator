@@ -126,13 +126,6 @@ def _constraints(*, mc_control=False):
                    TC("Rank", ["LOCALWR"], ["LOCALWR"], "nCCDS_WR")]
     result = [_copy(tc, _expand(tc.preceding, LOCAL_ALIASES), _expand(tc.following, LOCAL_ALIASES))
               for tc in result]
-    if mc_control:
-        for tc in list(result):
-            if "LOCALWR_LOCAL" in tc.following and "LOCALWR_LOCAL" not in tc.preceding:
-                result.append(_copy(tc, fol=["ROPE_EXEC_LOCAL"]))
-            if "LOCALWR_LOCAL" in tc.preceding and "LOCALWR_LOCAL" not in tc.following:
-                result.append(TC(tc.level, ["ROPE_EXEC_LOCAL"], tc.following,
-                                 f"({tc.latency})+nROPE+7*nROPEII"))
     return result
 
 
@@ -221,8 +214,8 @@ LPDDR5XPIM.timing_presets = {"LPDDR5X_8533": {
 
 
 MC_WIRE_COLUMNS = {**dict.fromkeys((cmd for cmd in MACS if not cmd.endswith("_LOCAL")), "RD"),
-                   "LOCALRD": "RD", "LOCALWR": "WR", "LOCALWR_LOCAL": "WR",
-                   "ROPE_EXEC_LOCAL": "WR", "WRGB": "WR"}
+                   "LOCALRD": "RD", "LOCALRD_LOCAL": "RD", "LOCALWR": "WR",
+                   "LOCALWR_LOCAL": "WR", "WRGB": "WR"}
 MC_EXTERNAL = set(LPDDR5.commands) | {"ACTAB"} | MC_WIRE_COLUMNS.keys()
 
 
@@ -232,7 +225,8 @@ class LPDDR5XMemoryController(LPDDR5XPIM):
     def to_config(self):
         config = super().to_config()
         del config["command_expansions"]
-        config["bank_targets"].append([self.commands.index("LOCALWR_LOCAL"), "all", -1, 0])
+        for name in ("LOCALRD_LOCAL", "LOCALWR_LOCAL"):
+            config["bank_targets"].append([self.commands.index(name), "all", -1, 0])
         return config
 
     @classmethod
@@ -278,8 +272,6 @@ def build_spec(mac_freq_mult=4, *, mc_control=False):
                 meta["wire_command"] = MC_WIRE_COLUMNS[c]
             if c in ("MAC_RUN", "ROPE_RUN", "BCAST"):
                 meta["completion"] = 0
-            if c == "ROPE_EXEC_LOCAL":
-                meta["completion"] = timings["nLOCALWR"] + timings["nROPE"] + 7 * timings["nROPEII"]
             if c == "ACTAB":
                 meta["completion"] = timings["nRCD"]
         commands[c] = meta

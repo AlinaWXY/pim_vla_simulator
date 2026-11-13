@@ -158,6 +158,7 @@ class ProgramSax final : public nlohmann::json_sax<Json> {
     if(k=="kv_token")return &o.kv_token;
     if(k=="reduction_word")return &o.reduction_word;
     if(k=="lanes")return &o.lanes;
+    if(k=="weight_lane_offset")return &o.weight_lane_offset;
     if(k=="elements")return &o.elements;
     if(k=="bytes")return &o.bytes;
     if(k=="token")return &o.token;

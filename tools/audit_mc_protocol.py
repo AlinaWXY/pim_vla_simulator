@@ -66,41 +66,41 @@ def check_programs(baseline, current):
             program.pop("source_sha256")
         old_stages = {stage["name"]:stage for stage in old["stages"]}
         new_stages = {stage["name"]:stage for stage in new["stages"]}
-        rope_stores = Counter()
+        rope_reads = rope_stores = 0
         if "rope" in old_stages:
             old_rope = old_stages.pop("rope")
             new_rope = new_stages.pop("rope")
-            if any(new_rope["channels"]):
-                raise ValueError("standalone RoPE work remains")
-            rope_stores.update(tuple(op["addr"]) for channel in old_rope["channels"]
-                               for op in walk(channel) if op["op"] == "LOCALWR")
+            def rope_operands(stage):
+                return Counter(json.dumps({k:v for k,v in op.items()
+                                           if k not in {"id", "deps", "issue_deps", "children"}},
+                                          sort_keys=True)
+                               for channel in stage["channels"] for op in walk(channel))
+            if rope_operands(old_rope) != rope_operands(new_rope):
+                raise ValueError(f"RoPE coefficients, vectors or destinations changed: {path.name}")
+            rope_reads = sum(op.get("dest") == "rope_coefficient" for channel in new_rope["channels"]
+                             for op in walk(channel))
+            rope_stores = sum(op.get("source") == "rope_output" for channel in new_rope["channels"]
+                              for op in walk(channel))
         if old["dataflow"] == "fused":
             for name in ("o", "gate_up", "down"):
                 spills += compare_fused_export(old_stages.pop(name), new_stages.pop(name))
         old["stages"] = [stage for name, stage in old_stages.items() if name != "qkv"]
         new["stages"] = [stage for name, stage in new_stages.items() if name != "qkv"]
-        new_rope_stores = Counter()
         for before, after in zip(old_stages["qkv"]["channels"], new_stages["qkv"]["channels"], strict=True):
             def canonical(channel):
-                operations = []
-                for op in walk(channel):
-                    record = {k:v for k,v in op.items() if k not in {"id", "deps", "issue_deps", "children"}}
-                    if record.get("source") == "rope_writeback":
-                        new_rope_stores[tuple(record["addr"])] += 1
-                        record["source"] = "qkv_output"
-                    operations.append(json.dumps(record, sort_keys=True))
-                return sorted(operations)
+                return sorted(json.dumps({k:v for k,v in op.items()
+                                          if k not in {"id", "deps", "issue_deps", "children"}},
+                                         sort_keys=True)
+                              for op in walk(channel))
             if canonical(before) != canonical(after):
                 raise ValueError(f"Q/K/V physical operands changed: {path.name}")
-        if rope_stores != new_rope_stores:
-            raise ValueError(f"RoPE destination mapping differs: {path.name}")
         for program in (old, new):
             program.pop("counts")
         if old != new:
             raise ValueError(f"tensor contract or logical operation changed: {path.name}")
         result[path.stem] = dict(tensor_layout_and_other_stages_match=True,
                                  accumulator_spill_packets=spills,
-                                 rope_vectors_fused_into_writeback=rope_stores.total())
+                                 rope_coefficients_read=rope_reads, rope_vectors_written=rope_stores)
     return result
 
 
@@ -111,6 +111,8 @@ def audit(directory, spec):
     modes = [False] * 16
     open_rows = [[-1] * 16 for _ in modes]
     register = [False] * len(modes)
+    qk_halves = [None] * len(modes)
+    coefficient = [None] * len(modes)
     allowed = {"ACT1", "ACT2", "ACTAB", "PREpb", "PREab", "REFpb", "REFab", "RD", "WR"}
     with (directory / "ca-commands.csv").open(newline="", encoding="utf-8") as ca, \
          (directory / "dq-bursts.csv").open(newline="", encoding="utf-8") as dq:
@@ -150,13 +152,29 @@ def audit(directory, spec):
             elif cmd in ("RD", "WR"):
                 opcode, mask = int(record["opcode"]), int(record["bank_mask"])
                 if opcode >= 0:
+                    valid_opcodes = range(9) if cmd == "RD" else {0, 1, 3}
                     if (not modes[ch] or register[ch] or (bg, bank) != (-1, -1)
-                            or open_rows[ch] != [row] * 16 or opcode > 3):
+                            or open_rows[ch] != [row] * 16 or opcode not in valid_opcodes):
                         raise ValueError(f"invalid all-bank column opcode: {record}")
                     masks = {0x11, 0xffff} if cmd == "WR" and opcode == 3 else {0xffff}
                     if mask not in masks:
                         raise ValueError(f"invalid bank mask for opcode: {record}")
                     counters[f"{cmd}_opcode_{opcode}"] += 1
+                    col = int(record["column"])
+                    if cmd == "RD" and opcode in (4, 5):
+                        address = (row, col)
+                        if opcode == 4 and qk_halves[ch] is None:
+                            qk_halves[ch] = address
+                        elif opcode == 5 and qk_halves[ch] == address:
+                            qk_halves[ch] = None
+                        else:
+                            raise ValueError(f"feature QK must read low then high at the same address: {record}")
+                    if cmd == "RD" and opcode == 6:
+                        coefficient[ch] = (row, col)
+                    if cmd == "RD" and opcode in (7, 8):
+                        expected = (row, col - 8 * (opcode - 6))
+                        if coefficient[ch] != expected:
+                            raise ValueError(f"RoPE read lacks its coefficient column: {record}")
                 register_write = cmd == "WR" and register[ch] and row == rows - 3
                 if not modes[ch] or register_write:
                     direction = cmd[0]
@@ -176,6 +194,8 @@ def audit(directory, spec):
                     counters["internal_reads" if cmd == "RD" else "internal_writes"] += 1
         if next(bursts, None) is not None:
             raise ValueError(f"unexpected DQ burst after all CA commands: {directory}")
+    if any(half is not None for half in qk_halves):
+        raise ValueError(f"feature QK has an unmatched low-half read: {directory}")
     metrics = read_json(directory / "raw.json")["metrics"]
     if (32 * counters["host_reads"] != metrics["pim_read_bytes"] or
             32 * counters["host_writes"] != metrics["pim_write_bytes"]):
@@ -198,7 +218,13 @@ def main():
     for case, slices in SLICES.items():
         for step, layer in slices:
             label = f"{case}-s{step}-l{layer}"
-            results[label] = audit(args.traces / label / "on", spec)
+            counts = audit(args.traces / label / "on", spec)
+            expected_qk = {4: 16 * 496, 5: 16 * 496} if case == "c" else {3: 16 * 496}
+            expected_rope = {6: 16 * 8, 7: 16 * 8, 8: 16 * 8} if case in "eg" else {}
+            for opcode in range(3, 9):
+                if counts.get(f"RD_opcode_{opcode}", 0) != (expected_qk | expected_rope).get(opcode, 0):
+                    raise ValueError(f"wrong QK or RoPE opcode counts: {label}")
+            results[label] = counts
     write_json(args.output, dict(programs=programs, slices=results))
 
 

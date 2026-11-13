@@ -14,8 +14,18 @@ Clock node_ready(const DRAMNode* n,int cmd,const AddrVec_t& a) {
 }
 bool starts(const std::string& s,const std::string& p) {return s.rfind(p,0)==0;}
 bool is_mac(const std::string& n) {return starts(n,"MACAB")||starts(n,"MACQK");}
-enum RDOpcode { MAC=0, MAC_INIT=1, MAC_RED=2, MAC_INIT_RED=3 };
-enum WROpcode { WB_ACC=0, WB_MAC=1, WB_ROPE=2, WB_OBUF=3 };
+enum RDOpcode {
+  MAC=0, MAC_INIT=1, MAC_RED=2, MAC_INIT_RED=3, MAC_INIT_RED_LOW=4,
+  MAC_INIT_RED_HIGH=5, RD_ROPE=6, RD_ROPE_Q=7, RD_ROPE_K=8
+};
+enum WROpcode { WB_ACC=0, WB_MAC=1, WB_OBUF=3 };
+
+int qk_opcode(const Operation& op) {
+  if(op.lanes==16&&op.weight_lane_offset==0)return MAC_INIT_RED;
+  require(op.lanes==8&&(op.weight_lane_offset==0||op.weight_lane_offset==8),
+          "QK column must select the whole, low half, or high half");
+  return op.weight_lane_offset==0?MAC_INIT_RED_LOW:MAC_INIT_RED_HIGH;
+}
 }
 
 std::vector<Operation> parse_operations(const ConfigNode& node) {
@@ -38,6 +48,7 @@ std::vector<Operation> parse_operations(const ConfigNode& node) {
     o.output_tile=x["output_tile"].as<int>(0);o.kv_token=x["kv_token"].as<int>(0);
     o.reduction_word=x["reduction_word"].as<int>(16);
     o.lanes=x["lanes"].as<int>(16);o.elements=x["elements"].as<int>(16);
+    o.weight_lane_offset=x["weight_lane_offset"].as<int>(0);
     o.bytes=x["bytes"].as<int>(32);o.token=x["token"].as<int>(0);
     o.release_result=x["release_result"].as<bool>(false);
     o.dest=x["dest"].as<std::string>("");o.source=x["source"].as<std::string>("");
@@ -319,11 +330,14 @@ void PIMController::update_mc_mode(int cmd,const AddrVec_t& addr) {
   } else if(name=="WRGB") {
     require(pim_mode&&has_broadcast&&broadcast_addr[4]==last_row-2,
             "Host SRF write requires the all-bank register row");
-  } else if(is_mac(name)||starts(name,"LOCALWR")||name=="ROPE_EXEC_LOCAL") {
+  } else if(is_mac(name)||starts(name,"LOCALWR")) {
     const bool input_store=name=="LOCALWR"&&has_broadcast&&
         broadcast_addr[2]==addr[2]&&broadcast_addr[3]==addr[3]&&broadcast_addr[4]==addr[4];
     require(pim_mode&&(!has_broadcast||input_store),"MAC/store does not match the current rank state");
     if(addr[2]<0)require(all_bank_row==addr[4],"all-bank column requires ACTAB");
+  } else if(name=="LOCALRD_LOCAL") {
+    require(pim_mode&&!has_broadcast&&addr[2]<0&&all_bank_row==addr[4],
+            "all-bank RoPE read requires its active data row");
   } else if(name=="LOCALRD") {
     require(pim_mode&&(!has_broadcast||
             (broadcast_addr[2]==addr[2]&&broadcast_addr[3]==addr[3]&&broadcast_addr[4]==addr[4])),
@@ -372,26 +386,33 @@ Candidate PIMController::next_pim(Clock clk) {
   size_t group=1;
   int opcode=-1;
   uint16_t mask=0;
-  if(mc_control&&op.name=="LOCALWR"&&(op.source=="rope_writeback"||op.source=="qkv_output"||
-                                      op.source=="reduction_output"||op.source=="fused_result")) {
+  const bool rope_load=op.name=="LOCALRD"&&(op.dest=="rope_coefficient"||op.dest=="rope_input");
+  const bool rope_store=op.name=="LOCALWR"&&op.source=="rope_output";
+  if(mc_control&&(rope_load||rope_store||(op.name=="LOCALWR"&&
+                  (op.source=="qkv_output"||op.source=="reduction_output"||op.source=="fused_result")))) {
     const size_t required=op.source=="reduction_output"?2:16;
     if(cursor.next+required<=cursor.decoded_until) {
       for(size_t i=0;i<required;++i) {
         const auto& store=cursor.ops->at(cursor.next+i);
-        if(store.name!=op.name||store.source!=op.source||store.addr[4]!=op.addr[4]||
+        if(store.name!=op.name||store.source!=op.source||store.dest!=op.dest||
+           ((rope_load||rope_store)&&(store.slot!=op.slot||store.token!=op.token))||
+           store.addr[4]!=op.addr[4]||
            store.addr[5]!=op.addr[5]||store.addr[2]<0||store.addr[2]>=4||
            store.addr[3]<0||store.addr[3]>=4)break;
         mask|=1u<<(4*store.addr[2]+store.addr[3]);
       }
       if(mask==(required==2?0x11:0xffff)) {
         group=required;
-        opcode=op.source=="rope_writeback"?WB_ROPE:
-               (required==2||op.source=="fused_result"?WB_OBUF:WB_ACC);
-        cmd=device.m_spec->get_command_id(opcode==WB_ROPE?"ROPE_EXEC_LOCAL":"LOCALWR_LOCAL");
+        if(rope_load) {
+          opcode=op.dest=="rope_coefficient"?RD_ROPE:(op.slot==0?RD_ROPE_Q:RD_ROPE_K);
+          cmd=device.m_spec->get_command_id("LOCALRD_LOCAL");
+        } else {
+          opcode=op.source=="qkv_output"?WB_ACC:WB_OBUF;
+          cmd=device.m_spec->get_command_id("LOCALWR_LOCAL");
+        }
       }
     }
-    require(op.source!="rope_writeback"||(group==16&&op.addr[5]>=8&&op.addr[5]<24),
-            "RoPE writeback requires one Q/K word in every bank");
+    require(!(rope_load||rope_store)||group==16,"RoPE array command requires one column in every bank");
     require(op.source!="fused_result"||group==16,"fused output requires one packet in every bank");
     if(group==1)mask=0;
   }
@@ -414,7 +435,7 @@ Candidate PIMController::next_pim(Clock clk) {
                        make_candidate(cmd,physical,Candidate::PIM,at,local&&!mc_control);
   if(mc_control&&c.final) {
     if(is_mac(op.name)) {
-      opcode=op.name=="MACQK"?MAC_INIT_RED:(op.fragment==0?MAC_INIT:MAC);
+      opcode=op.name=="MACQK"?qk_opcode(op):(op.fragment==0?MAC_INIT:MAC);
       mask=0xffff;
     }
     c.opcode=opcode;c.group=group;c.bank_mask=mask;
@@ -572,7 +593,7 @@ void PIMController::finish_pim(const Candidate& c,Clock clk) {
     pim_dq_end=std::max(pim_dq_end,clk+info[cmd].latency+info[cmd].burst);gap_write_phase=false; }
   size_t index=c.index;cursor.mark(index,complete);
   pim_arrival=clk;
-  if(mc_control&&c.opcode==MAC_INIT_RED) {
+  if(mc_control&&op.name=="MACQK") {
     const auto& reduce=cursor.ops->at(cursor.next);
     require(reduce.name=="REDUCE"&&reduce.kv_token==op.kv_token,"MAC_RED requires its QK reduction");
     Clock reduced=complete+info[command(reduce,false)].completion;

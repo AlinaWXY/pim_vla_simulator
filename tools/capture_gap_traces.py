@@ -26,19 +26,22 @@ def native(binary, config, output):
         raise RuntimeError(f"native exit {run.returncode}: {(output / 'native.log').read_text()}")
 
 
-def generate(variant, directory, model, *, mc_control=False):
+def generate(variant, directory, model, *, mc_control=False, batch_output=False):
     protocol = ["--mc-control"] if mc_control else []
+    if batch_output:
+        protocol.append("--batch-output")
     subprocess.run([sys.executable, str(ROOT / "programs/gen_pim_program.py"),
                     "--variant", variant, "--compact", "--output", str(directory),
                     "--execution-model", model, *protocol], check=True)
     return directory / f"{variant}.json"
 
 
-def capture(case, binary, output, ledger, slices, spec, mac_freq_mult, mc_control):
+def capture(case, binary, output, ledger, slices, spec, mac_freq_mult, mc_control, batch_output):
     config = case_config(case, mac_freq_mult=mac_freq_mult, run_kind="ae_solo")
     variant = variant_name(config)
     schedule_path = ROOT / f"input-data/ae-{variant}.json"
-    program = generate(variant, output / "programs", "native_dram_requests", mc_control=mc_control)
+    program = generate(variant, output / "programs", "native_dram_requests", mc_control=mc_control,
+                       batch_output=batch_output)
     schedule = read_json(schedule_path)
     vlm = ROOT / "input-data/vlm.json"
     config.update(spec_path=str(spec), program_path=str(program), vlm_path=str(vlm))
@@ -46,8 +49,6 @@ def capture(case, binary, output, ledger, slices, spec, mac_freq_mult, mc_contro
         directory = output / f"{case}-s{step}-l{layer}"
         schedule_slice = directory / "ae-slice.json"
         events = [e for e in schedule["events"] if (e["step"], e["layer"]) == (step, layer)]
-        if mc_control:
-            events = [e for e in events if not (e["kind"] == "pim" and e["stage"] == "rope")]
         if not events:
             raise ValueError(f"empty AE slice: {case}, {step}, {layer}")
         write_json(schedule_slice, {**schedule, "events": events})
@@ -104,6 +105,7 @@ def main():
     parser.add_argument("--mac-freq-mult", type=int, choices=(1, 2, 4), default=4,
                         help="MAC frequency for newly captured traces (default: 4)")
     parser.add_argument("--mc-control", action="store_true", help="use the rank-mode CA protocol")
+    parser.add_argument("--batch-output", action="store_true", help="batch result exports in streaming cases")
     parser.add_argument("--cases", choices=list("cdefg"), nargs="+", default=list("cdefg"))
     parser.add_argument("--slice", type=int, nargs=2, metavar=("STEP", "LAYER"),
                         help="capture only one step/layer for the selected cases")
@@ -111,6 +113,8 @@ def main():
     parser.add_argument("--repeat-fused-g", action="store_true",
                         help="reuse prepared g-fused config and repeat each g slice using fused windows")
     args = parser.parse_args()
+    if args.batch_output and (not args.mc_control or any(case in "fg" for case in args.cases)):
+        parser.error("--batch-output requires --mc-control and streaming cases c/d/e")
     if args.mc_control and (args.fused_ledger or args.repeat_fused_g):
         parser.error("--mc-control uses the native matched-slice paths")
     output = args.output.resolve()
@@ -139,7 +143,7 @@ def main():
         write_json(spec, build_spec(args.mac_freq_mult, mc_control=args.mc_control))
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger, slices,
-                               spec, args.mac_freq_mult, args.mc_control)
+                               spec, args.mac_freq_mult, args.mc_control, args.batch_output)
                    for case in args.cases]
         for future in futures:
             future.result()

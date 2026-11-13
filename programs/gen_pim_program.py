@@ -160,7 +160,7 @@ def gemm(b, *, rows, fragments, columns, base, fused, views, output_tile=0,
     return last_mac
 
 
-def local_projection_spills(b, last, feature, *, mc_control=False, rope_writeback=False):
+def local_projection_spills(b, last, feature, *, mc_control=False):
     writes = []
 
     def prepare_qk(bank, col):
@@ -177,7 +177,7 @@ def local_projection_spills(b, last, feature, *, mc_control=False, rope_writebac
 
     def write_qk(bank, col, cast, regions):
         writes.append(b.emit("LOCALWR", L.WORK_BASE + col * 32, bank, deps=[cast],
-                             source="rope_writeback" if rope_writeback else "qkv_output",
+                             source="qkv_output",
                              source_bank=bank, source_regions=regions, output_bytes=32))
 
     if mc_control:
@@ -206,7 +206,7 @@ def local_projection_spills(b, last, feature, *, mc_control=False, rope_writebac
     return b.fence(writes)
 
 
-def qkv(channel, feature, fused, *, mc_control=False, rope_writeback=False):
+def qkv(channel, feature, fused, *, mc_control=False):
     b = Builder(channel, "qkv")
     rows, cols, views = (16, 24, 2) if feature else (8, 48, 4)
     if fused:
@@ -214,16 +214,16 @@ def qkv(channel, feature, fused, *, mc_control=False, rope_writeback=False):
         inner = Builder(channel, "qkv")
         last = gemm(inner, rows=rows, fragments=64, columns=cols, base=L.QKV_BASE,
                     fused=True, views=views)
-        local_projection_spills(inner, last, feature, mc_control=mc_control, rope_writeback=rope_writeback)
+        local_projection_spills(inner, last, feature, mc_control=mc_control)
         b.descriptor("qkv", inner, [seal])
     else:
         last = gemm(b, rows=rows, fragments=64, columns=cols, base=L.QKV_BASE,
                     fused=False, views=views)
-        local_projection_spills(b, last, feature, mc_control=mc_control, rope_writeback=rope_writeback)
+        local_projection_spills(b, last, feature, mc_control=mc_control)
     return b.ops
 
 
-def rope(channel, fused):
+def rope(channel, fused, *, mc_control=False):
     outer, b = Builder(channel, "rope"), Builder(channel, "rope")
     writes, last_store = [], {}
     for token in range(8):
@@ -240,9 +240,16 @@ def rope(channel, fused):
             q_exec[bank] = b.emit("ROPE_EXEC", L.Q_BASE + token * 32, bank,
                                   deps=[coefficients[bank], reads[bank]], slot=0,
                                   pairs=8, shared_unit="bank_rope", token=token)
-            k_reads[bank] = b.emit("LOCALRD", L.K_SUFFIX_BASE + token * 32, bank,
-                                   deps=[reads[bank]], issue_deps=[q_exec[bank]],
-                                   dest="rope_input", slot=1, token=token)
+            if not mc_control:
+                k_reads[bank] = b.emit("LOCALRD", L.K_SUFFIX_BASE + token * 32, bank,
+                                       deps=[reads[bank]], issue_deps=[q_exec[bank]],
+                                       dest="rope_input", slot=1, token=token)
+        # With one rank-wide RD, all banks must be ready for the K column.
+        if mc_control:
+            for bank in range(16):
+                k_reads[bank] = b.emit("LOCALRD", L.K_SUFFIX_BASE + token * 32, bank,
+                                       deps=[reads[bank]], issue_deps=[q_exec[bank]],
+                                       dest="rope_input", slot=1, token=token)
         for bank in range(16):
             k_exec[bank] = b.emit("ROPE_EXEC", L.K_SUFFIX_BASE + token * 32, bank,
                                   deps=[coefficients[bank], k_reads[bank]], slot=1,
@@ -311,7 +318,7 @@ def q_exchange(channel, gpu_rope, feature, export):
     return b.ops
 
 
-def qkt(channel, feature, fused):
+def qkt(channel, feature, fused, *, batch_output=False):
     outer, b = Builder(channel, "qkt"), Builder(channel, "qkt")
     previous, reductions = [], []
     n = 992 if feature else 496
@@ -320,13 +327,13 @@ def qkt(channel, feature, fused):
                      slot=0, rows=16, lanes=8 if feature else 16,
                      weight_lane_offset=8 * (token % 2) if feature else 0,
                      kv_token=token, output_bytes_per_bank=64, output_columns=1)
-        word = 16 + token % QKT_BATCH_COLUMNS if fused else 16
+        word = 16 + token % QKT_BATCH_COLUMNS if fused or batch_output else 16
         reduce = b.emit("REDUCE", bank=-1, deps=[mac], elements=16,
                         levels=["bank_group", "rank"], kv_token=token,
                         reduction_word=word, cache_result=False,
                         result_storage="bank_query_output_pool")
         reductions.append(reduce)
-        if fused:
+        if fused or batch_output:
             previous = [reduce]
             if len(reductions) < QKT_BATCH_COLUMNS and token != n - 1:
                 continue
@@ -341,7 +348,16 @@ def qkt(channel, feature, fused):
                     outputs.append(b.emit("LOCALWR", offset, bank, deps=[full],
                                           source="reduction_output", result_slot=packet,
                                           source_regions=regions, release_result=True, kv_token=stored))
-            previous = [b.fence(outputs)]
+            sealed = b.fence(outputs)
+            if batch_output:
+                outputs = []
+                for stored in range(first, token + 1):
+                    for packet in range(2):
+                        bank, offset = L.score_location(stored, packet)
+                        outputs.append(b.emit("RD", offset, bank, deps=[sealed],
+                                              epoch="score_stream", tensor="scores"))
+                sealed = b.fence(outputs)
+            previous = [sealed]
             reductions = []
             continue
         outputs = []
@@ -364,7 +380,7 @@ def qkt(channel, feature, fused):
 
 
 def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0,
-                   store_to_dram=False, packet_base=0, group_stores=False):
+                   store_to_dram=False, packet_base=0, group_stores=False, batch_output=False):
     last = []
     pending = []
     elements = 16 if bf16 else 8
@@ -389,11 +405,12 @@ def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0,
         if bf16:
             ready = b.emit("CAST", bank=bank, deps=[gather], elements=elements, output_bytes=32,
                            source_regions=regions, output_tile=tile)
-        if store_to_dram:
+        if store_to_dram or batch_output:
             target, offset = L.fused_result_location(packet_base + packet)
             pending.append(dict(offset=offset, bank=target, deps=[ready], result_bank=bank,
                                 result_slot=(query * features_per_bank + lane) // 8,
-                                source_regions=regions, source="fused_result", source_bank=bank,
+                                source_regions=regions, source="stream_result" if batch_output else "fused_result",
+                                source_bank=bank,
                                 output_tile=tile, result_packet=packet_base + packet,
                                 output_bytes=32, release_result=True))
             if not group_stores or len(pending) == L.BANKS:
@@ -405,6 +422,13 @@ def export_results(b, count, deps, *, features_per_bank, bf16, epoch, tile=0,
                                source_regions=regions, output_tile=tile, release_result=True, epoch=epoch))
     if pending:
         raise ValueError("fused all-bank export needs a whole bank stripe")
+    if batch_output:
+        sealed = b.fence(last)
+        last = []
+        for packet in range(packet_base, packet_base + count):
+            bank, offset = L.fused_result_location(packet)
+            last.append(b.emit("RD", offset, bank, deps=[sealed], epoch=epoch,
+                               tensor="stream_result", result_packet=packet))
     return b.fence(last)
 
 
@@ -416,7 +440,7 @@ def read_spilled_results(b, count, descriptor):
                tensor="fused_result", result_packet=packet)
 
 
-def pv(channel, feature, fused):
+def pv(channel, feature, fused, *, batch_output=False):
     outer, b = Builder(channel, "pv"), Builder(channel, "pv")
     fragments, columns = (62, 8) if feature else (31, 16)
     seal = staged_input(outer, 16, fragments) if fused else None
@@ -439,11 +463,12 @@ def pv(channel, feature, fused):
         outer.descriptor("pv", b, [seal])
         return outer.ops
     export_results(b, 128 if feature else 256, [last], features_per_bank=columns,
-                   bf16=True, epoch="pv_export")
+                   bf16=True, epoch="pv_export", batch_output=batch_output)
     return b.ops
 
 
-def output_projection(channel, feature, fused, store_results=False, *, group_stores=False):
+def output_projection(channel, feature, fused, store_results=False, *, group_stores=False,
+                      batch_output=False):
     outer, b = Builder(channel, "o"), Builder(channel, "o")
     fragments = 8 if feature else 16
     previous = []
@@ -454,7 +479,7 @@ def output_projection(channel, feature, fused, store_results=False, *, group_sto
         done = export_results(b, 512, [last], features_per_bank=32, bf16=True,
                               epoch=f"o_tile{tile}_export", tile=tile,
                               store_to_dram=store_results, packet_base=tile * 512,
-                              group_stores=group_stores)
+                              group_stores=group_stores, batch_output=batch_output)
         previous = [done]
     if fused:
         run = outer.descriptor("o", b)
@@ -464,7 +489,7 @@ def output_projection(channel, feature, fused, store_results=False, *, group_sto
     return b.ops
 
 
-def ffn(channel, name, fused, store_results=False, *, group_stores=False):
+def ffn(channel, name, fused, store_results=False, *, group_stores=False, batch_output=False):
     outer, b = Builder(channel, name), Builder(channel, name)
     fragments, columns, base, packets = ((64, 32, L.GU_BASE, 1024) if name == "gate_up"
                                         else (256, 4, L.DOWN_BASE, 128))
@@ -496,7 +521,7 @@ def ffn(channel, name, fused, store_results=False, *, group_stores=False):
                            bf16=False, epoch=name + "_export")
         return outer.ops
     export_results(b, packets, [last], features_per_bank=columns,
-                   bf16=False, epoch=name + "_export")
+                   bf16=False, epoch=name + "_export", batch_output=batch_output)
     return b.ops
 
 
@@ -652,7 +677,8 @@ def kernel_window_metadata(name, channels):
             "join_before": "external_export_all_channels"}
 
 
-def generate(variant, channel_count=16, *, execution_model="native_dram_requests", mc_control=False):
+def generate(variant, channel_count=16, *, execution_model="native_dram_requests", mc_control=False,
+             batch_output=False):
     if variant not in VARIANTS or channel_count not in (1, 16):
         raise ValueError("unsupported variant/channel count")
     layout, rope_location, flow = VARIANTS[variant]
@@ -662,22 +688,26 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
     if kernel_windows and flow != "fused":
         raise ValueError("fused_kernel_windows requires a fused f/g variant")
     feature, fused, gpu = layout == "feature", flow == "fused", rope_location == "gpu"
-    factories = [("qkv", lambda c: qkv(c, feature, fused, mc_control=mc_control,
-                                      rope_writeback=mc_control and not gpu))]
+    if batch_output and (not mc_control or fused):
+        raise ValueError("batched output control requires MC protocol with streaming inputs")
+    factories = [("qkv", lambda c: qkv(c, feature, fused, mc_control=mc_control))]
     if gpu:
         factories += [("rope_export", lambda c: rope_gpu(c, True)),
                       ("rope_import", lambda c: rope_gpu(c, False))]
     else:
-        factories += [("rope", lambda c: [] if mc_control else rope(c, fused))]
+        factories += [("rope", lambda c: rope(c, fused, mc_control=mc_control))]
     group_stores = mc_control and fused
     store_results = kernel_windows or group_stores
     factories += [("q_exchange_export", lambda c: q_exchange(c, gpu, feature, True)),
                   ("q_exchange_import", lambda c: q_exchange(c, gpu, feature, False)),
-                  ("qkt", lambda c: qkt(c, feature, fused)),
-                  ("pv", lambda c: pv(c, feature, fused)),
-                  ("o", lambda c: output_projection(c, feature, fused, store_results, group_stores=group_stores)),
-                  ("gate_up", lambda c: ffn(c, "gate_up", fused, store_results, group_stores=group_stores)),
-                  ("down", lambda c: ffn(c, "down", fused, store_results, group_stores=group_stores))]
+                  ("qkt", lambda c: qkt(c, feature, fused, batch_output=batch_output)),
+                  ("pv", lambda c: pv(c, feature, fused, batch_output=batch_output)),
+                  ("o", lambda c: output_projection(c, feature, fused, store_results,
+                                                     group_stores=group_stores, batch_output=batch_output)),
+                  ("gate_up", lambda c: ffn(c, "gate_up", fused, store_results,
+                                            group_stores=group_stores, batch_output=batch_output)),
+                  ("down", lambda c: ffn(c, "down", fused, store_results,
+                                         group_stores=group_stores, batch_output=batch_output))]
     stages, counts = [], {}
     for name, factory in factories:
         channels = [factory(c) for c in range(channel_count)]
@@ -729,12 +759,14 @@ def main():
     parser.add_argument("--compact", action="store_true", help="omit indentation in persisted JSON")
     parser.add_argument("--execution-model", choices=EXECUTION_MODELS, default="native_dram_requests")
     parser.add_argument("--mc-control", action="store_true", help="attach DRAM accumulator spill addresses")
+    parser.add_argument("--batch-output", action="store_true", help="batch DRAM result exports with streaming inputs")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     variants = [args.variant] if args.variant else [v for v in VARIANTS
                if args.execution_model != "fused_kernel_windows" or VARIANTS[v][2] == "fused"]
     for variant in variants:
-        data = generate(variant, execution_model=args.execution_model, mc_control=args.mc_control)
+        data = generate(variant, execution_model=args.execution_model, mc_control=args.mc_control,
+                        batch_output=args.batch_output)
         path = args.output / (variant + ".json")
         path.write_text(json.dumps(data, separators=(",", ":") if args.compact else None,
                                    indent=None if args.compact else 2) + "\n", encoding="utf-8")

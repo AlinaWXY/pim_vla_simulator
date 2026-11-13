@@ -32,7 +32,7 @@ struct Operation {
   int id=0,slot=0,result_slot=0,rows=1,pairs=1;
   int dest_slot=-1,source_bank=0,tensor_fragment=-1,output_columns=1,output_column=0;
   int fragment=0,output_tile=0,kv_token=0,lanes=16,elements=16,bytes=32,token=0;
-  int reduction_word=16;
+  int reduction_word=16, weight_lane_offset=0;
   bool release_result=false;
   std::string dest,source;
   std::vector<ResourceRegion> source_regions;

@@ -31,10 +31,18 @@ spills, read-modify-writes, and the source RD in Down broadcast.
 | --- | --- | --- |
 | `0000` | MAC into the current accumulator | WB_ACC |
 | `0001` | MAC_INIT overwrites the accumulator | WB_MAC, reserved for the bypass path |
-| `0010` | MAC_RED, reserved for a multi-MAC reduction | WB_ROPE |
+| `0010` | MAC_RED, reserved for a multi-MAC reduction | Reserved |
 | `0011` | MAC_INIT_RED starts and reduces a one-MAC dot product | WB_OBUF |
+| `0100` | MAC_INIT_RED with K BF16 lanes 0–7 | Reserved |
+| `0101` | MAC_INIT_RED with K BF16 lanes 8–15 | Reserved |
+| `0110` | RD_ROPE loads the addressed coefficient column into each bank's RoPE register | Reserved |
+| `0111` | RD_ROPE_Q loads a Q vector and schedules rotation with the loaded coefficients | Reserved |
+| `1000` | RD_ROPE_K loads a K vector and schedules rotation with the loaded coefficients | Reserved |
 
 This QK program issues one MAC per key and reduces its 16 bank contributions.
+Token-wise uses the entire 32 B column. Feature-wise uses its original packed
+K columns and selects one half with the opcode. Both half-column forms use the
+same MAC timing and reduction as the whole-column form.
 MAC_INIT_RED schedules the original 4 CK reduction at MAC completion. It
 fills the original per-bank output slots without another CA command. Fused
 QK uses one WB_OBUF per score column and an implicit bank-enable mask for
@@ -43,14 +51,26 @@ and Down use one WB_OBUF per 16-bank result stripe. The controller drains
 these stripes to DRAM while still in PIM mode, then reads the stage's
 results in DRAM mode.
 
-The local-RoPE cases execute WB_ROPE when the Q/K projection first writes
-its BF16 result. For local query index `i = (column - 8) % 8`, the token index
-in the 16-token window is `2*i + (channel & 1)`. The timing model assumes
-the eight existing offline coefficient vectors for that channel are
-preloaded and shared by its bank PEs. It models the existing cast order,
-8 CK RoPE vector initiation interval, and 11 CK rotation latency before
-the local store. There is no separate local RoPE stage on CA. GPU-RoPE
-cases retain their GPU steps. Tensor values are outside this timing model.
+Local RoPE runs after the BF16 Q/K projection stores. In each bank, the
+working row holds eight coefficient columns at 0–7, Q at 8–15, and K
+at 16–23. The MC can open this row with one ACTAB, subject to refresh and
+any existing row conflict. For each local token, RD_ROPE reads its explicit
+coefficient column in all banks, RD_ROPE_Q/K read their addressed vectors,
+and ordinary WB_OBUF stores the rotations back to those columns. Every bank
+reads its own coefficients. These commands occupy CA and transfer zero DQ
+bytes. Bank-local RoPE still has an 8 CK vector initiation interval and
+11 CK rotation latency. The model checks the lifetimes of the coefficient,
+input and output slots. GPU-RoPE cases retain their GPU steps.
+
+Q and K can have different token counts and can span multiple 32 B blocks
+per token. A coefficient block describes one position and one block of eight
+feature pairs. One activation per bank suffices for the entire operation
+when the Q, K and distinct coefficient blocks all fit in the same row
+(64 columns per bank), at aligned column positions across the rank. Feature
+pairs must be within the block processed by one bank. Larger layouts use
+one activation per row tile when the corresponding coefficient and data
+columns are co-located. The current experiment generates the fixed 8-token
+layout and models the command protocol and timing.
 
 ## Reproduction
 
@@ -64,15 +84,33 @@ c++ -std=c++20 -O3 tools/gap_replay.cpp -o build/gap_replay
 python3 tools/capture_gap_traces.py --binary build/pim_vla_sim \
   --output results/baseline-ca-traces --mac-freq-mult 2
 python3 tools/capture_gap_traces.py --binary build/pim_vla_sim \
-  --output results/mc-final-traces --mac-freq-mult 2 --mc-control
-python3 tools/estimate_dq_gaps.py --traces results/mc-final-traces \
-  --spec results/mc-final-traces/spec-k2.json --engine build/gap_replay \
-  --output results/mc-final/replay
-python3 tools/plot_pim_buses.py --traces results/mc-final-traces \
-  --output results/mc-final/buses --title 'Top-level memory controller | MAC 2x'
-python3 tools/audit_mc_protocol.py --traces results/mc-final-traces \
-  --baseline results/baseline-ca-traces --spec results/mc-final-traces/spec-k2.json \
-  --output results/mc-final/protocol-audit.json
+  --output results/mc-rd-rope-traces --mac-freq-mult 2 --mc-control
+python3 tools/estimate_dq_gaps.py --traces results/mc-rd-rope-traces \
+  --spec results/mc-rd-rope-traces/spec-k2.json --engine build/gap_replay \
+  --output results/mc-rd-rope/replay
+python3 tools/plot_pim_buses.py --traces results/mc-rd-rope-traces \
+  --output results/mc-rd-rope/buses --title 'Top-level memory controller | MAC 2x'
+python3 tools/audit_mc_protocol.py --traces results/mc-rd-rope-traces \
+  --baseline results/baseline-ca-traces --spec results/mc-rd-rope-traces/spec-k2.json \
+  --output results/mc-rd-rope/protocol-audit.json
+```
+
+To isolate the cost of per-packet export, capture c/d/e with the same
+streaming inputs and `--mc-control --batch-output --cases c d e`. This
+control writes result packets to the same DRAM addresses and groups Host
+reads. QK buffers at most 496 scores per bank in the existing output pool.
+The two score packets for a key share one WB_OBUF command. Projection and
+FFN result writes still issue per packet. Q exchange retains its original
+request order. The normal c/d/e runs retain per-packet output for comparison.
+
+```sh
+python3 tools/capture_gap_traces.py --binary build/pim_vla_sim \
+  --output results/mc-rd-rope-batched-traces --mac-freq-mult 2 \
+  --mc-control --batch-output --cases c d e
+python3 tools/compare_mc_output_batch.py --single results/mc-rd-rope-traces \
+  --batched results/mc-rd-rope-batched-traces \
+  --single-replay results/mc-rd-rope/replay/gap-estimate.json --engine build/gap_replay \
+  --output results/mc-rd-rope/output-control
 ```
 
 The matched-slice e2e estimator repeats each sampled slice 180 times. Cases
