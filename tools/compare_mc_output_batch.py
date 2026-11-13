@@ -1,6 +1,7 @@
 """Compare per-packet and batched output with the same streaming inputs."""
 
 import argparse
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import csv
 from pathlib import Path
@@ -20,16 +21,31 @@ def assert_same_inputs(original, batched):
     after = read_json(batched)
     if before["tensor_contract"] != after["tensor_contract"]:
         raise ValueError("output batching changed the tensor contract")
+    if before["expected_dq_bytes"] != after["expected_dq_bytes"]:
+        raise ValueError("output batching changed expected DQ bytes")
+    packets = 0
     for left, right in zip(before["stages"], after["stages"], strict=True):
         if left["name"] != right["name"]:
             raise ValueError("output batching changed stage order")
         for x, y in zip(left["channels"], right["channels"], strict=True):
+            before_ops, after_ops = list(walk(x)), list(walk(y))
+
             def inputs(ops):
                 return [(op["op"], op["addr"], op.get("slot"), op.get("fragment"),
                          op.get("kv_token"), op.get("weight_lane_offset"))
-                        for op in walk(ops) if op["op"] in {"WRGB", "MACAB", "MACQK"}]
-            if inputs(x) != inputs(y):
+                        for op in ops if op["op"] in {"WRGB", "MACAB", "MACQK"}]
+            if inputs(before_ops) != inputs(after_ops):
                 raise ValueError(f"output batching changed input/MAC issue order in {left['name']}")
+            spills = Counter(tuple(op["spill_addr"]) for op in before_ops if op["op"] == "RDRES")
+            reads = Counter(tuple(op["addr"]) for op in before_ops if op["op"] == "RD")
+            batched_reads = Counter(tuple(op["addr"]) for op in after_ops if op["op"] == "RD")
+            batched_spills = Counter(tuple(op["addr"]) for op in after_ops
+                                     if op["op"] == "LOCALWR" and
+                                     op.get("source") in {"reduction_output", "stream_result"})
+            if batched_reads != reads + spills or batched_spills != spills:
+                raise ValueError(f"output batching changed Host read or spill addresses in {left['name']}")
+            packets += spills.total()
+    return packets
 
 
 def count_modes(directory, rows):

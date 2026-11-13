@@ -189,7 +189,7 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--title", required=True)
     parser.add_argument("--bin-us", type=float, default=0.5)
-    parser.add_argument("--cases", choices=list("cdefg"), nargs="+", default=list("cdefg"))
+    parser.add_argument("--cases", choices=list("bcdefg"), nargs="+", default=list("cdefg"))
     args = parser.parse_args()
     if not args.bin_us > 0:
         parser.error("--bin-us must be positive")

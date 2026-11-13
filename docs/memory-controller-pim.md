@@ -51,6 +51,13 @@ and Down use one WB_OBUF per 16-bank result stripe. The controller drains
 these stripes to DRAM while still in PIM mode, then reads the stage's
 results in DRAM mode.
 
+MC-controlled streaming cases b–e batch result exports by default. Each
+batch writes all results into their assigned DRAM columns in PIM mode, then
+switches once to DRAM mode for the Host reads. QK uses up to 496 score
+columns per batch, within the existing per-bank output pool. The two score
+packets per key share one WB_OBUF. PV, O and FFN batch the reads at the
+existing tile or stage boundaries. Q exchange uses its existing schedule.
+
 Local RoPE runs after the BF16 Q/K projection stores. In each bank, the
 working row holds eight coefficient columns at 0–7, Q at 8–15, and K
 at 16–23. The MC can open this row with one ACTAB, subject to refresh and
@@ -84,37 +91,32 @@ c++ -std=c++20 -O3 tools/gap_replay.cpp -o build/gap_replay
 python3 tools/capture_gap_traces.py --binary build/pim_vla_sim \
   --output results/baseline-ca-traces --mac-freq-mult 2
 python3 tools/capture_gap_traces.py --binary build/pim_vla_sim \
-  --output results/mc-rd-rope-traces --mac-freq-mult 2 --mc-control
-python3 tools/estimate_dq_gaps.py --traces results/mc-rd-rope-traces \
-  --spec results/mc-rd-rope-traces/spec-k2.json --engine build/gap_replay \
-  --output results/mc-rd-rope/replay
-python3 tools/plot_pim_buses.py --traces results/mc-rd-rope-traces \
-  --output results/mc-rd-rope/buses --title 'Top-level memory controller | MAC 2x'
-python3 tools/audit_mc_protocol.py --traces results/mc-rd-rope-traces \
-  --baseline results/baseline-ca-traces --spec results/mc-rd-rope-traces/spec-k2.json \
-  --output results/mc-rd-rope/protocol-audit.json
+  --output results/mc-default-batch-traces --mac-freq-mult 2 --mc-control \
+  --cases b c d e f g
+python3 tools/estimate_dq_gaps.py --traces results/mc-default-batch-traces \
+  --spec results/mc-default-batch-traces/spec-k2.json --engine build/gap_replay \
+  --output results/mc-default-batch/replay
+python3 tools/plot_pim_buses.py --traces results/mc-default-batch-traces \
+  --output results/mc-default-batch/buses --title 'Top-level MC | MAC 2x' --cases b c d e f g
 ```
 
-To isolate the cost of per-packet export, capture c/d/e with the same
-streaming inputs and `--mc-control --batch-output --cases c d e`. This
-control writes result packets to the same DRAM addresses and groups Host
-reads. QK buffers at most 496 scores per bank in the existing output pool.
-The two score packets for a key share one WB_OBUF command. Projection and
-FFN result writes still issue per packet. Q exchange retains its original
-request order. The normal c/d/e runs retain per-packet output for comparison.
+The per-packet control uses the same input stream and `--no-batch-output`.
+Compare the generated programs with this control to verify the streaming
+input order, Host read addresses and result spill addresses.
 
 ```sh
 python3 tools/capture_gap_traces.py --binary build/pim_vla_sim \
-  --output results/mc-rd-rope-batched-traces --mac-freq-mult 2 \
-  --mc-control --batch-output --cases c d e
-python3 tools/compare_mc_output_batch.py --single results/mc-rd-rope-traces \
-  --batched results/mc-rd-rope-batched-traces \
-  --single-replay results/mc-rd-rope/replay/gap-estimate.json --engine build/gap_replay \
-  --output results/mc-rd-rope/output-control
+  --output results/mc-rd-rope-traces --mac-freq-mult 2 \
+  --mc-control --no-batch-output
+python3 tools/audit_mc_protocol.py --traces results/mc-default-batch-traces \
+  --baseline results/baseline-ca-traces --per-packet results/mc-rd-rope-traces \
+  --spec results/mc-default-batch-traces/spec-k2.json \
+  --output results/mc-default-batch/protocol-audit.json
 ```
 
-The matched-slice e2e estimator repeats each sampled slice 180 times. Cases
-c–e use the prior α=1.0 and same-first DQ replay. Cases f/g use the prior
+The matched-slice e2e estimator repeats each sampled slice 180 times. Case b
+adds the VLM profile duration after the serial AE run. Cases c–e use the
+prior α=1.0 and same-first DQ replay. Cases f/g use the prior
 shared-I/O accounting and ideal overlap outside I/O epochs. The estimator
 omits shared CA contention with VLM. The CA and DQ graphs use native AE-solo
 timestamps and show 0.5 µs bins, including AE GPU intervals on the time

@@ -678,7 +678,7 @@ def kernel_window_metadata(name, channels):
 
 
 def generate(variant, channel_count=16, *, execution_model="native_dram_requests", mc_control=False,
-             batch_output=False):
+             batch_output=None):
     if variant not in VARIANTS or channel_count not in (1, 16):
         raise ValueError("unsupported variant/channel count")
     layout, rope_location, flow = VARIANTS[variant]
@@ -688,6 +688,8 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
     if kernel_windows and flow != "fused":
         raise ValueError("fused_kernel_windows requires a fused f/g variant")
     feature, fused, gpu = layout == "feature", flow == "fused", rope_location == "gpu"
+    if batch_output is None:
+        batch_output = mc_control and not fused
     if batch_output and (not mc_control or fused):
         raise ValueError("batched output control requires MC protocol with streaming inputs")
     factories = [("qkv", lambda c: qkv(c, feature, fused, mc_control=mc_control))]
@@ -759,7 +761,8 @@ def main():
     parser.add_argument("--compact", action="store_true", help="omit indentation in persisted JSON")
     parser.add_argument("--execution-model", choices=EXECUTION_MODELS, default="native_dram_requests")
     parser.add_argument("--mc-control", action="store_true", help="attach DRAM accumulator spill addresses")
-    parser.add_argument("--batch-output", action="store_true", help="batch DRAM result exports with streaming inputs")
+    parser.add_argument("--batch-output", action=argparse.BooleanOptionalAction, default=None,
+                        help="batch DRAM result exports (default for MC-controlled streaming)")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     variants = [args.variant] if args.variant else [v for v in VARIANTS

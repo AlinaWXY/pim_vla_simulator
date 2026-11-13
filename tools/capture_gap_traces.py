@@ -26,10 +26,10 @@ def native(binary, config, output):
         raise RuntimeError(f"native exit {run.returncode}: {(output / 'native.log').read_text()}")
 
 
-def generate(variant, directory, model, *, mc_control=False, batch_output=False):
+def generate(variant, directory, model, *, mc_control=False, batch_output=None):
     protocol = ["--mc-control"] if mc_control else []
-    if batch_output:
-        protocol.append("--batch-output")
+    if batch_output is not None:
+        protocol.append("--batch-output" if batch_output else "--no-batch-output")
     subprocess.run([sys.executable, str(ROOT / "programs/gen_pim_program.py"),
                     "--variant", variant, "--compact", "--output", str(directory),
                     "--execution-model", model, *protocol], check=True)
@@ -105,8 +105,9 @@ def main():
     parser.add_argument("--mac-freq-mult", type=int, choices=(1, 2, 4), default=4,
                         help="MAC frequency for newly captured traces (default: 4)")
     parser.add_argument("--mc-control", action="store_true", help="use the rank-mode CA protocol")
-    parser.add_argument("--batch-output", action="store_true", help="batch result exports in streaming cases")
-    parser.add_argument("--cases", choices=list("cdefg"), nargs="+", default=list("cdefg"))
+    parser.add_argument("--batch-output", action=argparse.BooleanOptionalAction, default=None,
+                        help="batch result exports (default for MC-controlled streaming)")
+    parser.add_argument("--cases", choices=list("bcdefg"), nargs="+", default=list("cdefg"))
     parser.add_argument("--slice", type=int, nargs=2, metavar=("STEP", "LAYER"),
                         help="capture only one step/layer for the selected cases")
     parser.add_argument("--fused-ledger", type=Path, help="also rerun the existing full f/g model")
@@ -114,7 +115,7 @@ def main():
                         help="reuse prepared g-fused config and repeat each g slice using fused windows")
     args = parser.parse_args()
     if args.batch_output and (not args.mc_control or any(case in "fg" for case in args.cases)):
-        parser.error("--batch-output requires --mc-control and streaming cases c/d/e")
+        parser.error("--batch-output requires --mc-control and streaming cases b/c/d/e")
     if args.mc_control and (args.fused_ledger or args.repeat_fused_g):
         parser.error("--mc-control uses the native matched-slice paths")
     output = args.output.resolve()
@@ -144,9 +145,14 @@ def main():
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         futures = [pool.submit(capture, case, args.binary.resolve(), output, ledger, slices,
                                spec, args.mac_freq_mult, args.mc_control, args.batch_output)
-                   for case in args.cases]
+                   for case in args.cases if case != "b"]
         for future in futures:
             future.result()
+    if "b" in args.cases:
+        # b and c share the feature-wise program. Generate b after c's readers
+        # have finished to avoid writing the same program file concurrently.
+        capture("b", args.binary.resolve(), output, ledger, slices, spec,
+                args.mac_freq_mult, args.mc_control, args.batch_output)
 
 
 if __name__ == "__main__":

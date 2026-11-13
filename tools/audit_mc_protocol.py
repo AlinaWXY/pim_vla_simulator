@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiments.common import read_json, write_json
 from programs.gen_pim_program import walk
-from tools.capture_gap_traces import SLICES
+from tools.capture_gap_traces import COMPARISON_SLICES, SLICES
+from tools.compare_mc_output_batch import assert_same_inputs
 from workloads import layout
 
 
@@ -207,19 +208,34 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--traces", type=Path, required=True)
     parser.add_argument("--baseline", type=Path, required=True)
+    parser.add_argument("--per-packet", type=Path,
+                        help="MC trace root with per-packet output for validating the default batching")
     parser.add_argument("--spec", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     spec = read_json(args.spec)
     if not spec["metadata"].get("mc_command_control") or spec["timings"]["nMAC16"] != 32:
         parser.error("expected memory-controller protocol and 2× MAC")
-    programs = check_programs(args.baseline, args.traces)
+    programs = check_programs(args.baseline, args.per_packet or args.traces)
+    if args.per_packet:
+        for variant, result in programs.items():
+            original = args.per_packet / "programs" / f"{variant}.json"
+            current = args.traces / "programs" / original.name
+            if variant.endswith("_before"):
+                result["batched_spill_packets"] = assert_same_inputs(original, current)
+            else:
+                before, after = read_json(original), read_json(current)
+                before.pop("source_sha256")
+                after.pop("source_sha256")
+                if before != after:
+                    raise ValueError(f"fused program changed: {variant}")
     results = {}
-    for case, slices in SLICES.items():
+    serial = {"b": COMPARISON_SLICES} if (args.traces / "b-s0-l0").is_dir() else {}
+    for case, slices in (serial | SLICES).items():
         for step, layer in slices:
             label = f"{case}-s{step}-l{layer}"
             counts = audit(args.traces / label / "on", spec)
-            expected_qk = {4: 16 * 496, 5: 16 * 496} if case == "c" else {3: 16 * 496}
+            expected_qk = {4: 16 * 496, 5: 16 * 496} if case in "bc" else {3: 16 * 496}
             expected_rope = {6: 16 * 8, 7: 16 * 8, 8: 16 * 8} if case in "eg" else {}
             for opcode in range(3, 9):
                 if counts.get(f"RD_opcode_{opcode}", 0) != (expected_qk | expected_rope).get(opcode, 0):

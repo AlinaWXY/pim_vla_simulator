@@ -557,9 +557,10 @@ def e_idle_breakdown(data, gaps, edges, burst_ck):
 
 def report_md(data):
     baseline = data["b_ms"]
+    baseline_source = "b 的 AE solo 首层切片" if data.get("serial_slices") else "c 的 AE solo 首层切片"
     lines = [
         "# 基于 PIM DQ 空隙的 VLM 干扰估算", "",
-        f"基准 b 为 c 的 AE solo 切片重复 180 次加 profile VLM，合计 **{baseline:.6f} ms**。"
+        f"基准 b 为 {baseline_source}重复 180 次加 profile VLM，合计 **{baseline:.6f} ms**。"
         f"MAC {data['mac_freq_mult']}×，16 通道，{data['clock_ps']} ps/CK。"
         f"{len(data['provenance'])} 组 trace 开关对照的 raw.json 均逐字节相同。", "",
         "| α | VLM 单元 | solo (ms) | profile (ms) | 单元最大绝对误差 (%) | 总时长误差 (%) |",
@@ -568,6 +569,11 @@ def report_md(data):
     for alpha, row in data["solo"].items():
         lines.append(f"| {alpha} | {row['units']} | {row['total_ms']:.9f} | {row['profile_ms']:.9f} | "
                      f"{row['max_unit_error_percent']:.3g} | {row['total_error_percent']:.3g} |")
+    if "serial_slices" in data:
+        lines += ["", "| b 串行切片 | AE ×180 (ms) | VLM (ms) | E2E (ms) |",
+                  "|---|---:|---:|---:|"]
+        for label, row in data["serial_slices"].items():
+            lines.append(f"| {label} | {row['ae_ms']:.6f} | {row['vlm_ms']:.6f} | {row['total_ms']:.6f} |")
     comparison = data["same_slice_comparison"]
     selected = next(row for row in comparison["candidates"] if row["slice"] == comparison["selected_slice"])
     lines += ["", "## c–g 同切片对照", "",
@@ -589,7 +595,7 @@ def report_md(data):
                      f"{candidate['e_over_g']:.6f} | {candidate['e_minus_g_ms']:.6f} | {candidate['g_explicit_io_ms']:.6f} |")
     usage = data["e_idle_breakdown"]
     if usage.get("status") == "vlm_completed_within_ae":
-        lines += ["", "VLM 已在 AE 结束前完成。逐阶段重放保留实际推进量，"
+        lines += ["", "VLM 在 AE 重复期间完成，逐阶段重放保留实际推进量。"
                   "全程有 VLM 需求时的 DQ 空闲分解不适用。"]
     else:
         totals = usage["totals"]
@@ -826,7 +832,24 @@ def main():
                             pool.submit(replay, engine, path, policy, seed, detail,
                                         REPEATS if args.details == "all" else 1)
                             for seed in (seeds if policy == "random" else [0])]
-        baseline = data["provenance"]["c-s0-l0"]["ae_slice_ck"] * REPEATS * ck_ms + data["solo"]["1.0"]["profile_ms"]
+        serial_slices = {}
+        for step, layer in COMPARISON_SLICES:
+            label = f"b-s{step}-l{layer}"
+            directory = args.traces / label
+            if directory.exists():
+                timeline, geometry, _, verification = load_trace(directory, step, layer)
+                if (verification["spec_sha256"] != spec_digest or timeline["clock_ps"] != clock_ps
+                        or verification["program_sha256"] !=
+                        data["provenance"][f"c-s{step}-l{layer}"]["program_sha256"]):
+                    raise ValueError(f"serial AE trace does not match the feature-wise inputs: {label}")
+                data["provenance"][label] = dict(verification, ae_slice_ck=timeline["ae_end_ck"])
+                data["geometry"][label] = geometry
+                ae_ms = timeline["ae_end_ck"] * REPEATS * ck_ms
+                serial_slices[label] = dict(ae_ms=ae_ms, vlm_ms=profile_ms, total_ms=ae_ms+profile_ms)
+        if serial_slices:
+            data["serial_slices"] = serial_slices
+        baseline = serial_slices.get("b-s0-l0", {}).get(
+            "total_ms", data["provenance"]["c-s0-l0"]["ae_slice_ck"] * REPEATS * ck_ms + profile_ms)
         data["b_ms"] = baseline
         for (label, alpha, policy), futures in jobs.items():
             samples = [future.result() for future in futures]
@@ -884,7 +907,8 @@ def main():
     if {commands[name]["dq_cycles"] for name in ("RD", "WR")} != {2}:
         raise ValueError("e idle audit requires the replay's 2 CK minimum DQ burst")
     e_replay = data["replay"][f"e-{selected['slice']}"]["1.0"]["same_first"]
-    if data.get("mc_command_control") and e_replay["tail_ms"] == 0:
+    if data.get("mc_command_control") and any(row["active_repetitions"] < REPEATS
+                                               for row in e_replay["stages"]):
         data["e_idle_breakdown"] = {"status": "vlm_completed_within_ae"}
     else:
         data["e_idle_breakdown"] = e_idle_breakdown(data, e_gaps, edges, commands["RD"]["dq_cycles"])
