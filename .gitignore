@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+/build/
+/results/
+/programs/generated/
+/ramulator2/ext/
+*.so
+*.log
+*.tgz
+*.tar
+.venv/

@@ -1,0 +1,4 @@
+*.sh text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+reference/2026-11-15/**/*.csv text eol=lf
