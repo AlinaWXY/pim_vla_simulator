@@ -38,4 +38,6 @@ Linux、GCC 14（C++20）、CMake ≥ 3.18、Python ≥ 3.10。`bash build.sh` �
 
 完整证据在 `dev0:/fact_data/xinyaowang/PIM_for_VLA/Important data/xinyao_1115-2026-11-15/`。`ramulator-runs.tar.gz` 含可直接重放的配置、生成后的 PIM 程序、AE 时间表、VLM workload 及逐 case 的 `raw.json`。解包后把配置中 `spec_path`、`program_path`、`ae_schedule_path` 和 `vlm_path` 的原实验目录前缀改成解包目录，再用 `build/pim_vla_sim --config <配置> --output <新目录>`。b 的配置为 `case-b-single-read.bauEXp/10/config.json`，c–g 为 `compiled-single-read-matrix.683RuH/compiled/<case>/config.json`。
 
+备份保留原始运行二进制。发布源码补上了 `gap_batch` 在无地址 barrier 上的检查。b–g 使用 `frfcfs` 或 `pim_head`，保留原始结果。
+
 Thor 的原始 Nsight、CUDA 时间样本、NCU 读写指标和锁定版 OpenPI 在同一备份。GPU benchmark 使用 `lerobot/pi05_base` snapshot `b211f3d44c36b6acfcf7ae94a64e8e96f75a64ba`、OpenPI `215abfb` 和 PyTorch `2.11.0+cu130`。基准脚本的 `--support` 指向含 token fixture 的目录，OpenPI `src` 加入 `PYTHONPATH`。

@@ -572,7 +572,8 @@ bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk)
       if(p.cmd<0)return false;
       if(info[p.cmd].direction)return true;
     }
-    if(p.at==NEVER)return false;
+    // A pending barrier has a wake-up time but no DRAM command address.
+    if(p.at==NEVER||p.addr.empty())return false;
     // A known dependency wait is a proven idle interval; summing future MAC
     // completions would overstate it because column fetch and compute overlap.
     Clock gap=std::max<Clock>(0,p.at-clk);
