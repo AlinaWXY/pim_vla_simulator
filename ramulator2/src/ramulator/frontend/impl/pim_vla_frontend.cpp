@@ -102,9 +102,19 @@ int run(const std::string& config_file,const std::string& output) {
   auto cfg=Config::parse_config_file(config_file);
   auto execution=cfg["execution_model"].as<std::string>("native_dram_requests");
   const bool trace=cfg["trace_ae_dq"].as<bool>(false);
+  const bool diagnostics=cfg["bus_diagnostics"].as<bool>(false);
+  const bool power_stats=cfg["dram_power_stats"].as<bool>(false);
+  const auto wck_mode=cfg["wck_rank_switch"].as<std::string>("always_on");
+  require(wck_mode=="always_on"||wck_mode=="resync","invalid wck_rank_switch mode");
+  const int trace_channel=cfg["trace_channel"].as<int>(-1);
+  const bool trace_ca=cfg["trace_ca_commands"].as<bool>(true);
+  require(trace_channel>=-1&&trace_channel<16,"trace_channel must be -1 or 0..15");
   const auto quantum_cfg=cfg["vlm_gpu_quantum_us"];
   require(!quantum_cfg||execution=="native_dram_requests","vlm_gpu_quantum_us requires native_dram_requests");
   require(!trace||execution=="native_dram_requests","trace_ae_dq requires native_dram_requests");
+  require(!power_stats||execution=="native_dram_requests","power stats requires native requests");
+  require(wck_mode!="resync"||execution=="native_dram_requests",
+          "WCK rank switch sync requires native_dram_requests");
   if(execution=="fused_kernel_windows")return run_fused_kernels(config_file,output);
   require(execution=="native_dram_requests","unknown execution_model");
   require(cfg.is_map()&&!cfg.map().count("refresh_allbank"),"refresh_allbank is retired: rank0 uses REFpb and rank1 uses REFab");
@@ -115,7 +125,7 @@ int run(const std::string& config_file,const std::string& output) {
   auto us=[&](Clock c){return c*tick_us;};
   std::string kind=cfg["run_kind"].as<std::string>("combined");
   require(kind=="combined"||kind=="ae_solo"||kind=="vlm_solo","invalid run_kind");
-  require(!trace||kind=="ae_solo","trace_ae_dq requires ae_solo");
+  require(!trace||kind!="vlm_solo","trace_ae_dq requires an AE workload");
   std::ofstream bursts,commands,epochs,timeline;
   if(trace) {
     bursts.open(output+"/dq-bursts.csv");
@@ -134,13 +144,16 @@ int run(const std::string& config_file,const std::string& output) {
   require(!quantum_cfg||(kind=="combined"&&!serial&&std::isfinite(quantum_us)&&quantum_us>0&&quantum_us<=5000000),
           "vlm_gpu_quantum_us must be positive and at most 5000000 in a concurrent combined run");
   const Clock vlm_quantum=quantum_cfg?std::max<Clock>(1,cycles(quantum_us)):0;
+  require(!power_stats||!serial,"power stats currently requires concurrent or solo epochs");
   bool fused=cfg["dataflow"].as<std::string>("streaming")=="fused";
   std::string policy=cfg["arbitration"].as<std::string>("frfcfs");
   if(policy.empty())policy="frfcfs";
   std::string layout=cfg["layout"].as<std::string>("feature"),rope=cfg["rope"].as<std::string>("gpu");
   require(layout=="feature"||layout=="token","invalid layout");
-  require(rope=="gpu"||rope=="local","invalid RoPE location");
-  require(layout!="feature"||(!fused&&rope=="gpu"),"feature layout requires streaming and GPU RoPE");
+  const auto model=cfg["model"].as<std::string>("pi05");
+  require(model=="pi05"||model=="gr00t_n16","unknown workload model");
+  require(model=="pi05" ? rope=="gpu"||rope=="local" : rope=="none","RoPE location differs from workload model");
+  require(layout!="feature"||(!fused&&(model!="pi05"||rope=="gpu")),"invalid feature layout dataflow or RoPE");
   bool arbitration_present=bool(cfg["arbitration"])&&!cfg["arbitration"].as<std::string>("").empty();
   require(arbitration_present==(!serial&&!fused),"arbitration is required only for concurrent streaming");
   require(policy=="frfcfs"||policy=="pim_head"||policy=="pim_lookahead"||policy=="gap_batch","invalid arbitration");
@@ -157,13 +170,22 @@ int run(const std::string& config_file,const std::string& output) {
   for(int c=0;c<16;c++) {
     channels[c]=std::make_unique<PIMController>(c,specification,specification["metadata"]);
     auto& mc=*channels[c];mc.fused=fused;mc.policy=policy;mc.legacy_gap_batch=!closed;
-    if(trace) {
+    mc.checker.resync_on_switch=wck_mode=="resync";
+    if(mc.checker.resync_on_switch) {
+      const auto& spec=*mc.device.m_spec;
+      require(spec.get_timing_value("tCK_ps")==938&&spec.get_timing_value("nCL")==23&&
+              spec.get_timing_value("nCWL")==12&&spec.get_timing_value("nBL_min")==2&&
+              spec.get_timing_value("nBL_max")==4&&spec.get_timing_value("nWCKPST")==1,
+              "WCK resync timing requires the LPDDR5X-8533 BG/BL16 spec");
+    }
+    if(power_stats)mc.power_stats=std::make_unique<DramPowerStats>(mc.device);
+    if(trace&&(trace_channel<0||trace_channel==c)) {
       mc.checker.dq_trace=&bursts;
-      mc.checker.ca_trace=&commands;
-      mc.checker.epoch_trace=fused?&epochs:nullptr;
+      mc.checker.ca_trace=trace_ca?&commands:nullptr;
+      mc.checker.epoch_trace=(fused||diagnostics)?&epochs:nullptr;
       mc.checker.trace_channel=c;
     }
-    mc.checker.split_traffic=closed&&do_ae&&do_vlm;
+    mc.checker.split_traffic=(closed&&do_ae&&do_vlm)||diagnostics;
     if(closed)set_watermarks(mc,w_max);
     else {
       mc.window=calib["window"].as<int>(64);mc.write_high=calib["write_high"].as<int>(48);mc.write_low=calib["write_low"].as<int>(16);
@@ -175,23 +197,30 @@ int run(const std::string& config_file,const std::string& output) {
   std::vector<Event> events;
   if(do_ae) {
     int layer_stride_bytes=0;
-    std::string program_model;
-    programs=read_program_json(cfg["program_path"].as<std::string>(),&layer_stride_bytes,&program_model);
+    std::string program_model, workload_model;
+    programs=read_program_json(cfg["program_path"].as<std::string>(),&layer_stride_bytes,&program_model,&workload_model);
     require(!closed||program_model!="fused_kernel_windows","closed loop requires a native request program");
     require(layer_stride_bytes>0&&layer_stride_bytes%2048==0,"layer stride must contain complete DRAM rows");
     layer_stride_rows=layer_stride_bytes/2048;
     auto schedule=Config::parse_config_file(cfg["ae_schedule_path"].as<std::string>());
+    require(workload_model==model&&schedule["model"].as<std::string>("pi05")==model,
+            "AE program and schedule must match the workload model");
+    const int layer_capacity=specification["organization"]["row"].as<int>(32768)/layer_stride_rows;
+    const int layers=schedule["layers"].as<int>(0);
+    require(layers>=0&&layers<=layer_capacity,"AE layers exceed rank1 bank capacity");
     const auto schedule_events=schedule["events"];
     for(const auto& e:schedule_events.seq()) {
       Event v;v.kind=e["kind"].as<std::string>();v.name=e[v.kind=="pim"?"stage":"name"].as<std::string>();
       v.us=e["us"].as<double>(0);v.step=e["step"].as<int>(0);v.layer=e["layer"].as<int>(0);
       require(v.kind=="gpu"||programs.count(v.name),"AE stage has no PIM program: "+v.name);
+      require(v.kind=="gpu"||v.layer<layer_capacity,"AE event exceeds rank1 bank capacity");
       events.push_back(v);
     }
   }
   std::vector<Kernel> kernels;
   if(do_vlm) {
     auto input=Config::parse_config_file(cfg["vlm_path"].as<std::string>());
+    require(input["model"].as<std::string>("pi05")==model,"VLM workload must match the configured model");
     const auto input_units=input["units"];
     ConfigNode mlp_units;
     if(cfg["mlp_path"]) {
@@ -260,7 +289,7 @@ int run(const std::string& config_file,const std::string& output) {
         const auto& e=events[ae_index];
         trace_event(stage_start,now,static_cast<int>(results.size()));
         results.push_back({static_cast<int>(results.size()),e.step,e.layer,e.name,stage_start,now,0});
-        pim_active=false;++ae_index;for(auto& mc:channels){mc->checker.set_stage(now,-1);mc->stage=-1;}state_changed=true;
+        pim_active=false;++ae_index;for(auto& mc:channels){mc->checker.set_stage(now,-1);if(mc->power_stats)mc->power_stats->set_stage(now,-1);mc->stage=-1;}state_changed=true;
       }
       if(!ae_gpu_active&&!pim_active&&ae_index<events.size()) {
         const auto& e=events[ae_index];
@@ -377,7 +406,7 @@ int run(const std::string& config_file,const std::string& output) {
   for(int c=0;c<16;c++)for(const auto& [sid,s]:channels[c]->checker.stats){if(comma)out<<',';comma=true;
     Clock duration=sid<0?background_duration:results.at(sid).end-results.at(sid).start;
     out<<"{\"channel\":"<<c<<",\"stage_id\":"<<sid<<",\"ca_cycles\":"<<s.ca<<",\"dq_cycles\":"<<s.dq<<",\"read_bytes\":"<<s.read<<",\"write_bytes\":"<<s.write<<",\"gpu_read_bytes\":"<<s.gpu_read<<",\"gpu_write_bytes\":"<<s.gpu_write<<",\"pim_read_bytes\":"<<s.pim_read<<",\"pim_write_bytes\":"<<s.pim_write<<",\"duration_cycles\":"<<duration;
-    if(sid>=0&&channels[c]->checker.split_traffic) {
+    if(sid>=0&&closed&&do_ae&&do_vlm) {
       out<<",\"phase_cycles\":{";
       auto phase=[&](const char* name,const BusUtilization& u) {
         out<<json_string(name)<<":{\"duration\":"<<u.duration<<",\"gpu_ca\":"<<u.ca[0]
@@ -390,6 +419,48 @@ int run(const std::string& config_file,const std::string& output) {
     }
     out<<"}";}
   out<<"]\n}\n";out.close();
+  if(wck_mode=="resync"||diagnostics) {
+    std::ofstream wck(output+"/wck-switches.csv");
+    wck<<"channel,direction,switches,dq_gap_ck,required_resync_gap_ck\n";
+    for(int c=0;c<16;++c) {
+      const auto& bus=channels[c]->checker;
+      for(int pair=0;pair<4;++pair)
+        wck<<c<<','<<(pair<2?'R':'W')<<(pair%2?'W':'R')<<','<<bus.rank_switches[pair]
+           <<','<<bus.switch_gap_ck[pair]<<','<<bus.sync_minimum_ck[pair]<<'\n';
+    }
+    wck.close();require(bool(wck),"failed to write WCK stats");
+  }
+  if(diagnostics) {
+    std::ofstream diag(output+"/bus-diagnostics.json");
+    diag<<"{\"schema_version\":1,\"trace_channel\":"<<trace_channel
+        <<",\"rank0\":\"GPU\",\"rank1\":\"PIM\",\"stages\":[";
+    bool sep=false;
+    for(int c=0;c<16;++c)for(const auto& [sid,s]:channels[c]->checker.stats) {
+      if(sid<0)continue;
+      if(sep)diag<<',';
+      sep=true;
+      const auto& a=s.phases[0];const auto& b=s.phases[1];
+      diag<<"{\"channel\":"<<c<<",\"stage_id\":"<<sid
+          <<",\"duration_ck\":"<<a.duration+b.duration
+          <<",\"gpu_ca_ck\":"<<a.ca[0]+b.ca[0]
+          <<",\"pim_ca_ck\":"<<a.ca[1]+b.ca[1]
+          <<",\"gpu_dq_ck\":"<<a.dq[0]+b.dq[0]
+          <<",\"pim_dq_ck\":"<<a.dq[1]+b.dq[1]
+          <<",\"io_epoch_ck\":"<<b.duration
+          <<",\"io_epoch_gpu_dq_ck\":"<<b.dq[0]<<'}';
+    }
+    diag<<"]}\n";diag.close();require(bool(diag),"failed to write bus diagnostics");
+  }
+  if(power_stats) {
+    std::ofstream power(output+"/dram-power-stats.json");
+    power<<"{\"schema_version\":1,\"clock_ps\":"<<std::setprecision(15)<<tick_us*1000000
+         <<",\"elapsed_ck\":"<<now<<",\"state_names\":[\"precharged\",\"activating\",\"active\",\"precharging\",\"refreshing\"],\"command_names\":[";
+    const auto& names=channels[0]->device.m_spec->command_names;
+    for(size_t i=0;i<names.size();++i){if(i)power<<',';power<<json_string(names[i]);}
+    power<<"],\"channels\":[";
+    for(int c=0;c<16;++c){if(c)power<<',';channels[c]->power_stats->finish(now);channels[c]->power_stats->write(power,c);}
+    power<<"]}\n";power.close();require(bool(power),"failed to write DRAM power statistics");
+  }
   std::cout<<"completed "<<kind<<" total_us="<<us(now)<<" commands="<<checks<<"\n";
   return 0;
 }

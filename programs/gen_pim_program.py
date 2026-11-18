@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from workloads import layout as L
+from workloads.models import MODELS, PI05, get
 from programs import descriptors as D
+from programs import gr00t_n16
 
 VARIANTS = {
     "feature_gpu_before": ("feature", "gpu", "streaming"),
@@ -709,7 +711,20 @@ def kernel_window_metadata(name, channels):
 
 
 def generate(variant, channel_count=16, *, execution_model="native_dram_requests", mc_control=False,
-             batch_output=None):
+             batch_output=None, model=PI05.name, vl_tokens=None):
+    spec = get(model)
+    if spec != PI05:
+        if variant not in gr00t_n16.VARIANTS or channel_count not in (1, 16):
+            raise ValueError("unsupported GR00T variant/channel count")
+        if execution_model != "native_dram_requests":
+            raise ValueError("GR00T uses the native request model for streaming and fused variants")
+        program = gr00t_n16.generate(variant, channel_count, vl_tokens, (
+            Builder, staged_input, gemm, walk, attach_hazard_dependencies, validate_ops))
+        sources = (Path(__file__), ROOT / "programs/gr00t_n16.py", ROOT / "programs/descriptors.py",
+                   ROOT / "workloads/models.py", ROOT / "workloads/layout.py")
+        program["source_sha256"] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                    for p in sources}
+        return program
     if variant not in VARIANTS or channel_count not in (1, 16):
         raise ValueError("unsupported variant/channel count")
     layout, rope_location, flow = VARIANTS[variant]
@@ -782,7 +797,7 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
                                 qkt_reduction_words_per_bank=QKT_BATCH_COLUMNS)
     return dict(schema_version=1, architecture_version=2, execution_model=execution_model,
                 variant=variant, channels=channel_count,
-                layout=layout, rope=rope_location, dataflow=flow, repetitions=dict(layers=18, steps=10),
+                layout=layout, rope=rope_location, dataflow=flow, repetitions=dict(layers=spec.layers, steps=spec.steps),
                 address_format=["channel", "rank", "bank_group", "bank", "row", "column_32B"],
                 slot_unit_bytes=32,
                 dependency_semantics="deps require completion; issue_deps require issue; indices local to stage/channel or descriptor children",
@@ -793,7 +808,9 @@ def generate(variant, channel_count=16, *, execution_model="native_dram_requests
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--variant", choices=list(VARIANTS))
+    parser.add_argument("--model", choices=MODELS, default=PI05.name)
+    parser.add_argument("--vl-tokens", type=int, help="sequence length from the GR00T Thor capture")
+    parser.add_argument("--variant", choices=[*VARIANTS, *gr00t_n16.VARIANTS])
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--compact", action="store_true", help="omit indentation in persisted JSON")
     parser.add_argument("--execution-model", choices=EXECUTION_MODELS, default="native_dram_requests")
@@ -802,15 +819,16 @@ def main():
                         help="batch DRAM result exports (default for MC-controlled streaming)")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    variants = [args.variant] if args.variant else [v for v in VARIANTS
-               if args.execution_model != "fused_kernel_windows" or VARIANTS[v][2] == "fused"]
+    variants = VARIANTS if args.model == PI05.name else gr00t_n16.VARIANTS
+    variants = [args.variant] if args.variant else [v for v, fields in variants.items()
+               if args.execution_model != "fused_kernel_windows" or fields[-1] == "fused"]
     for variant in variants:
         data = generate(variant, execution_model=args.execution_model, mc_control=args.mc_control,
-                        batch_output=args.batch_output)
+                        batch_output=args.batch_output, model=args.model, vl_tokens=args.vl_tokens)
         path = args.output / (variant + ".json")
         path.write_text(json.dumps(data, separators=(",", ":") if args.compact else None,
                                    indent=None if args.compact else 2) + "\n", encoding="utf-8")
-        print(json.dumps(dict(variant=variant, path=str(path), dq_bytes=data["expected_dq_bytes_per_layer"],
+        print(json.dumps(dict(variant=variant, path=str(path), dq_bytes=data.get("expected_dq_bytes_per_layer"),
                               sha256=hashlib.sha256(path.read_bytes()).hexdigest())), flush=True)
 
 

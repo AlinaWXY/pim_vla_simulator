@@ -88,7 +88,8 @@ def run_closed_loop(binary, configs, output, calibration_path, cases, *, resume=
                     allow_scaled_unit_errors=False):
     output = Path(output)
     calibration_path = Path(calibration_path).resolve()
-    ledger, solo = load_calibration(binary, configs["b"], calibration_path,
+    baseline = configs["b"] if "b" in configs else configs["n16-b"]
+    ledger, solo = load_calibration(binary, baseline, calibration_path,
                                     allow_scaled_unit_errors=allow_scaled_unit_errors)
     historical = {r["case"]: r for r in read_json(
         ROOT / "reference/e2e-gio-bcast-20261109/data/completed-cases.json")["evaluation"]}
@@ -111,7 +112,8 @@ def run_closed_loop(binary, configs, output, calibration_path, cases, *, resume=
         if raw["execution_model"] != "native_dram_requests" or raw["vlm_release"] != "closed_loop":
             raise ValueError("case did not use the common native closed-loop model")
         report = summarize(case, raw, ae_solo, solo, output, program=read_json(cfg["program_path"]),
-                           calibration={"parameters": {"alpha": 1.0}}, vlm_input=read_json(cfg["vlm_path"]))
+                           calibration={"parameters": {"alpha": 1.0}}, vlm_input=read_json(cfg["vlm_path"]),
+                           schedule=read_json(cfg["ae_schedule_path"]) if "model" in cfg else None)
         residual = 1000 * (report["total_ms"] - sum(report[k] for k in (
             "AE_solo_ms", "PIM_interference_ms", "AE_GPU_wait_ms", "VLM_remaining_ms")))
         if abs(residual) > 0.002:

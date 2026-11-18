@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 
 from experiments.common import write_csv, write_json
-from experiments.config import CASES, variant_name
+from experiments.config import CASES, GR00T_CASES, variant_name
 from experiments.native import metrics, total_us
 
 
@@ -21,7 +21,8 @@ def stage_key(row):
     return (row["stage_id"], row["name"], row["step"], row["layer"])
 
 
-def summarize(case, combined, ae_solo, vlm_solo, output, *, program=None, calibration=None, vlm_input=None):
+def summarize(case, combined, ae_solo, vlm_solo, output, *, program=None, calibration=None, vlm_input=None,
+              schedule=None):
     output = Path(output)
     solo_stages = {stage_key(row): row for row in ae_solo["stages"]}
     current = {stage_key(row): row for row in combined["stages"]}
@@ -69,19 +70,23 @@ def summarize(case, combined, ae_solo, vlm_solo, output, *, program=None, calibr
     # originate from integer CK in C++, not floating-point model retiming.
     if abs(checks["AE_timestamp_accounting_error_us"]) > 0.002:
         raise ValueError(f"{case}: AE timestamp identity failed: {checks['AE_timestamp_accounting_error_us']}")
-    if case == "b":
+    if case in {"b", "n16-b"}:
         checks["serial_sum_error_us"] = total - ae_us - vlm_us
         if abs(checks["serial_sum_error_us"]) > 0.002:
             raise ValueError(f"case b native total != AE_solo + VLM_solo: {checks['serial_sum_error_us']} us")
-    if program is not None:
+    if schedule is not None:
+        stage_dq = {stage["name"]: stage["expected_dq_bytes"] for stage in program["stages"]}
+        expected = sum(stage_dq[name] * count for name, count in schedule["stage_occurrences"].items())
+    elif program is not None:
         expected = program.get("expected_dq_bytes_per_layer", program.get("expected_dq_bytes"))
         if expected is None:
             raise ValueError(f"{case}: program has no DQ conservation contract")
         if isinstance(expected, dict):
             expected = expected["total"]
-        actual = m.get("pim_read_bytes", 0) + m.get("pim_write_bytes", 0)
         # Full AE schedule instantiates every single-layer template 180 times.
         expected *= 180
+    if program is not None:
+        actual = m.get("pim_read_bytes", 0) + m.get("pim_write_bytes", 0)
         checks["PIM_DQ_expected_bytes"] = expected
         checks["PIM_DQ_actual_bytes"] = actual
         if expected != actual:
@@ -110,7 +115,7 @@ def summarize(case, combined, ae_solo, vlm_solo, output, *, program=None, calibr
     remaining_ms = float(m["VLM_remaining_us"]) / 1000
     # The original 21 columns remain first. Compatibility names are explicit
     # aliases of native measurements; there is no second corrected timeline.
-    result = dict(case=case, variant=variant_name(CASES[case]), total_ms=total / 1000,
+    result = dict(case=case, variant=variant_name((CASES | GR00T_CASES)[case]), total_ms=total / 1000,
                   AE_solo_ms=ae_us / 1000, PIM_interference_ms=interference / 1000,
                   AE_GPU_wait_ms=wait / 1000, net_overlap_ms=(ae_us + vlm_us - total) / 1000,
                   AE_native_schedule_ms=ae_us / 1000,
@@ -123,6 +128,8 @@ def summarize(case, combined, ae_solo, vlm_solo, output, *, program=None, calibr
         result[field] = m[field]
     result.update(AE_parallel_ms=ae_elapsed / 1000, VLM_solo_ms=vlm_us / 1000,
                   VLM_remaining_ms=remaining_ms, PIM_stages=len(stages), VLM_work_units=len(kernels))
+    if case in GR00T_CASES:
+        result["model"] = GR00T_CASES[case]["model"]
     write_csv(output / f"{case}-PIM-and-AE-waits.csv", stages)
     write_csv(output / f"{case}-VLM-placement.csv", kernels)
     write_csv(output / f"{case}-bus.csv", bus)
@@ -132,11 +139,17 @@ def summarize(case, combined, ae_solo, vlm_solo, output, *, program=None, calibr
 
 def write_report(output, rows, calibration, repeat_checks):
     output = Path(output)
+    model = rows[0].get("model") if rows else None
+    interpretation = ("Single Ramulator2 instance, closed-loop synthetic sequential VLM addresses; "
+                      "model estimate, not Thor concurrent hardware measurement")
+    if model:
+        interpretation = ("Single Ramulator2 instance with measured GPU kernel times and synthetic "
+                          "sequential VLM sector addresses")
     write_csv(output / "evaluation-b-g.csv", rows)
     write_json(output / "summary.json", {
         "schema_version": 1, "evaluation": rows, "calibration": calibration,
         "repeat_checks": repeat_checks,
-        "interpretation": "Single Ramulator2 instance, closed-loop synthetic sequential VLM addresses; model estimate, not Thor concurrent hardware measurement",
+        "interpretation": interpretation,
         "unmodeled": ["GPU SM occupancy of PIM transfers", "GPU/PIM control handoff latency",
                       "GPU compute interference beyond nonpreemptive kernel serialization", "actual VLM burst arrival/address traces"],
         "latency_correction": None,
@@ -152,10 +165,14 @@ def write_report(output, rows, calibration, repeat_checks):
     lines = ["# Ramulator2 重写版消融实验", "", "本表直接由同一个原生仿真器的事件时间戳计算，未使用旧时间线重放、常数偏差或事后归一化。", "",
              "| case | AE 单独 ms | AE 并发 ms | PIM 干扰 ms | AE GPU 等待 ms | VLM stall ms | 总时延 ms |",
              "|---|---:|---:|---:|---:|---:|---:|"]
+    if model:
+        lines[0] = "# " + model + " Ramulator2 仿真"
     for r in rows:
         lines.append(f"| {r['case']} | {r['AE_solo_ms']:.6f} | {r['AE_parallel_ms']:.6f} | {r['PIM_interference_ms']:.6f} | {r['AE_GPU_wait_ms']:.6f} | {r['VLM_memory_stall_ms']:.6f} | {r['total_ms']:.6f} |")
     v = calibration["validation"]
     lines += ["", f"VLM 校准总时延 {v['total_us']/1000:.6f} ms；目标 {v['target_us']/1000:.6f} ms；相对误差 {v['relative_error']:.3%}。逐 kernel 相对误差中位数 {v['kernel_relative_error_median']:.3%}，p90 {v['kernel_relative_error_p90']:.3%}。",
               "", "alpha 是对 L2 写扇区代理拟合的 DRAM 写回比例，不是已测 DRAM 写流量。VLM 使用均匀释放与连续合成地址，结果不能当作真实 Thor 并发硬件性能。固定省略 GPU 搬运 SM 开销与控制交接延迟；AE GPU 算子与 VLM kernel 按非抢占规则分时。",
               "", "CSV 前 21 列兼容旧表。AE_native_schedule_ms 等于 AE_solo_ms；raw_model_total_ms 等于 total_ms，均无修正。VLM_completed_model_ms 累加 AE 完成时已结束单元的原生 VLM solo 时长；completed_units 统计这些单元。VLM_remaining_model_ms 等于 AE 完成后的实际 VLM 尾部时长，可能包含已启动但未完成的单元，因此不要求它与 completed 列构成 solo 时长的补集。GPU 命令与行命中统计均来自 rank0 原生执行。", ""]
+    if model:
+        lines[-4] = "VLM 使用 Thor 捕获的 kernel 时长、读取扇区数及 L2 写扇区代理。DRAM 写回比例由 solo 总时延拟合，并发仿真使用连续合成地址与原生 GPU 让出机制。"
     (output / "REPORT.zh-CN.md").write_text("\n".join(lines), encoding="utf-8")

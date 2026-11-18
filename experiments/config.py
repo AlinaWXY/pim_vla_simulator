@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import math
+from workloads.models import PI05, GR00T_N16_H15, get
 
 ARBITRATIONS = {"frfcfs", "pim_head", "pim_lookahead", "gap_batch"}
 CASES = {
@@ -16,10 +17,20 @@ CASES = {
     "e-lookahead": dict(layout="token", rope="local", dataflow="streaming", mode="concurrent", arbitration="pim_lookahead"),
     "e-gap": dict(layout="token", rope="local", dataflow="streaming", mode="concurrent", arbitration="gap_batch"),
 }
+GR00T_CASES = {
+    "n16-" + case: dict(CASES[case], rope="none", model=GR00T_N16_H15.name)
+    for case in ("b", "c", "d", "f")
+}
+
+
+def model_cases(model=PI05.name):
+    return CASES if get(model) == PI05 else GR00T_CASES
 
 
 def variant_name(config):
     suffix = "after" if config["dataflow"] == "fused" else "before"
+    if config.get("model", PI05.name) == GR00T_N16_H15.name:
+        return f"{GR00T_N16_H15.name}-{config['layout']}_{suffix}"
     return f"{config['layout']}_{config['rope']}_{suffix}"
 
 
@@ -41,6 +52,7 @@ def validate_calibration(params):
 
 
 def validate_config(config):
+    spec = get(config.get("model", PI05.name))
     execution = config.get("execution_model", "native_dram_requests")
     if execution not in {"native_dram_requests", "fused_kernel_windows"}:
         raise ValueError("unknown execution_model")
@@ -70,11 +82,12 @@ def validate_config(config):
             raise ValueError("uniform does not accept closed-loop settings")
     if "refresh_allbank" in config:
         raise ValueError("refresh_allbank is forbidden: rank0 uses REFpb and rank1 uses REFab as a fixed hardware rule")
-    for name, options in (("layout", {"feature", "token"}), ("rope", {"gpu", "local"}),
+    for name, options in (("layout", {"feature", "token"}), ("rope", {"gpu", "local"} if spec.rope else {"none"}),
                           ("dataflow", {"streaming", "fused"}), ("mode", {"serial", "concurrent"})):
         if config.get(name) not in options:
             raise ValueError(f"{name} must be one of {sorted(options)}")
-    if config["layout"] == "feature" and (config["rope"] != "gpu" or config["dataflow"] != "streaming"):
+    if config["layout"] == "feature" and (config["dataflow"] != "streaming"
+                                            or (spec.rope and config["rope"] != "gpu")):
         raise ValueError("feature layout requires gpu RoPE and streaming dataflow")
     competing = config["mode"] == "concurrent" and config["dataflow"] == "streaming"
     if competing:
@@ -94,9 +107,10 @@ def validate_config(config):
     return config
 
 
-def case_config(case, *, mac_freq_mult=4, run_kind="combined", **paths):
-    if case not in CASES:
+def case_config(case, *, model=PI05.name, mac_freq_mult=4, run_kind="combined", **paths):
+    cases = model_cases(model)
+    if case not in cases:
         raise ValueError(f"unknown simulated case {case!r}; case a is measured, never simulated")
-    cfg = deepcopy(CASES[case])
+    cfg = deepcopy(cases[case])
     cfg.update(case=case, mac_freq_mult=mac_freq_mult, run_kind=run_kind, **paths)
     return validate_config(cfg)

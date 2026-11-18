@@ -109,6 +109,16 @@ Clock PIMController::ready_at(int cmd,const AddrVec_t& addr,uint16_t bank_mask) 
     at=std::max(at,node_ready(device.m_root.get(),cmd,device.partner_addr_vec(cmd,addr)));
   return std::max<Clock>(0,at);
 }
+bool PIMController::needs_switch_sync(int cmd,const AddrVec_t& addr) const {
+  return checker.resync_on_switch&&info[cmd].direction&&!checker.bursts.empty()&&
+         checker.bursts.back().rank!=addr[1];
+}
+Clock PIMController::switch_candidate_at(int cmd,const AddrVec_t& addr,Clock native_at) const {
+  if(!needs_switch_sync(cmd,addr)||native_at==NEVER)return native_at;
+  const auto& next=info[cmd];
+  const Clock cas_at=checker.bursts.back().end+checker.switch_gap(next.direction)-next.latency-1;
+  return std::max({now,external_free,native_at-1,cas_at});
+}
 Clock PIMController::spacing(int pre,const AddrVec_t& a,int following,const AddrVec_t& b) const {
   // Query the spec's own pair constraints, including rank siblings and BG
   // broadcasts. This is a policy prediction, never an alternative legality test.
@@ -120,6 +130,10 @@ Clock PIMController::spacing(int pre,const AddrVec_t& a,int following,const Addr
       if(t.cmd==following && t.window==1 && t.sibling!=same) answer=std::max<Clock>(answer,t.val);
     }
     ancestors_same=same;
+  }
+  if(checker.resync_on_switch&&a[1]!=b[1]&&info[pre].direction&&info[following].direction) {
+    const auto& old=info[pre];const auto& next=info[following];
+    answer=std::max(answer,old.latency+old.burst+checker.switch_gap(next.direction)-next.latency);
   }
   return answer;
 }
@@ -134,6 +148,7 @@ void PIMController::set_stage(const std::vector<Operation>& ops,int stage_id,Clo
   stage=stage_id;top.reset(&ops,clk);inner.reset(nullptr,clk);descriptor_index=-1;epoch_owned=false;pim_arrival=clk;
   exclusive_q_exchange=fused&&!ops.empty()&&ops.front().epoch=="q_exchange_exclusive";
   checker.set_stage(clk,stage_id);
+  if(power_stats)power_stats->set_stage(clk,stage_id);
   resources.start_stage(name,clk);
   if(mc_control) {
     input_rows.clear();
@@ -162,6 +177,7 @@ void PIMController::reset_serial_epoch(Clock origin) {
   // measurements. Reset device state at the epoch boundary, never elapsed
   // time or measured durations. Concurrent cases never take this path.
   require(!kernel&&gpu_outstanding==0&&stage_finished(origin),"serial epoch reset has live work");
+  require(pending_sync_column.cmd<0,"serial epoch reset with pending WCK sync");
   checker.advance(origin);checker.bursts.clear();
   checker.external_start=checker.external_end=checker.private_end=origin;
   checker.private_start=origin;
@@ -490,6 +506,7 @@ Candidate PIMController::next_pim(Clock clk) {
   c.arrival=pim_arrival;c.dependency_ready=at<=clk;c.index=cursor.next;
   if(fused&&info[cmd].direction)c.at=std::max(c.at,gpu_dq_end);
   if(blocked_by_owner(c,clk))return {};
+  if(c.cmd>=0)c.at=switch_candidate_at(c.cmd,c.addr,c.at);
   return c;
 }
 bool PIMController::blocked_by_owner(const Candidate& c,Clock clk) const {
@@ -532,6 +549,7 @@ Candidate PIMController::next_gpu(Clock clk) {
     if(device.m_spec->command_meta[cmd].is_opening && device.m_spec->command_names[cmd]=="ACT1")
       at=std::max(at,ready_at(device.m_spec->get_command_id("ACT2"),q.addr)-device.m_spec->get_timing_value("nAAD"));
     for(const auto& p:pending_act)if(p.cmd>=0&&cmd!=p.cmd && at+spacing(cmd,q.addr,p.cmd,p.addr)>p.deadline)at=std::max(at,p.deadline+1);
+    at=switch_candidate_at(cmd,q.addr,at);
     bool hit=(cmd==q.cmd),ready=at<=clk,best_ready=best.at<=clk;
     if(best.cmd<0 || (ready&&!best_ready) || (ready&&best_ready&&(hit>best.rowhit || (hit==best.rowhit&&q.arrival<best.arrival))) || (!ready&&!best_ready&&at<best.at)) {
       candidate.at=at;candidate.final=hit;candidate.rowhit=hit;
@@ -553,7 +571,12 @@ Candidate PIMController::next_refresh(Clock clk) {
 }
 bool PIMController::protect_pim(const Candidate& g,const Candidate& p,Clock clk) {
   if(g.cmd<0)return false;
-  if(policy=="pim_head")return p.cmd>=0&&p.dependency_ready&&clk+spacing(g.cmd,g.addr,p.cmd,p.addr)>p.at;
+  if(policy=="pim_head") {
+    if(p.cmd<0||!p.dependency_ready)return false;
+    const Clock gpu_issue=clk+needs_switch_sync(g.cmd,g.addr);
+    const Clock pim_issue=p.at+needs_switch_sync(p.cmd,p.addr);
+    return gpu_issue+spacing(g.cmd,g.addr,p.cmd,p.addr)>pim_issue;
+  }
   if(policy=="frfcfs")return false;
   Clock horizon=device.m_spec->get_timing_value("nCL")+device.m_spec->get_timing_value("nBL_min")+device.m_spec->get_timing_value("nCS");
   if(policy=="pim_lookahead") {
@@ -594,6 +617,7 @@ void PIMController::issue(int cmd,const AddrVec_t& addr,Clock clk,int stat_stage
   if(preq!=cmd)throw std::runtime_error("scheduler bypassed native prerequisite "+device.m_spec->command_names[cmd]+" requires "+device.m_spec->command_names[preq]+" at "+std::to_string(clk)+" rank="+std::to_string(addr[1])+" bg="+std::to_string(addr[2])+" bank="+std::to_string(addr[3])+" row="+std::to_string(addr[4]));
   update_mc_mode(cmd,addr);
   checker.observe(cmd,addr,clk,stat_stage,opcode,bank_mask);
+  if(power_stats)power_stats->observe(cmd,addr,clk,array_mask,info[cmd].direction);
   device.issue_command(cmd,addr,clk,array_mask);
   if(n=="REFpb"||n=="REFab")++refresh_counts.at(addr[1])[n=="REFab"];
   if(addr[1]==0)++gpu_command_counts[cmd];
@@ -687,7 +711,8 @@ Clock PIMController::step(Clock clk,bool permit_gpu,bool release_gpu) {
   now=clk;int outstanding_before=gpu_outstanding;
   const bool permit_release=permit_gpu&&release_gpu;
   retire_and_fill(clk,permit_release);
-  if(outstanding_before>0&&(kernel_finished()||(!release_gpu&&gpu_outstanding==0)))return clk;
+  if(pending_sync_column.cmd<0&&outstanding_before>0&&
+     (kernel_finished()||(!release_gpu&&gpu_outstanding==0)))return clk;
   bool stage_was_done=stage_finished(clk);
   Candidate pim=next_pim(clk);
   if(!stage_was_done&&stage_finished(clk))return clk;
@@ -709,7 +734,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu,bool release_gpu) {
   Candidate refresh=next_refresh(clk),chosen;
   // nAAD is a maximum ACT1-to-ACT2 distance. Issue the owned ACT2 at
   // its earliest legal opportunity, and never later than its deadline.
-  for(int lane=0;lane<2;lane++) {
+  for(int lane=0;pending_sync_column.cmd<0&&lane<2;lane++) {
     auto& a=pending_act[lane];
     if(a.cmd>=0) {
       require(clk<=a.deadline,"missed ACT2 deadline");
@@ -722,6 +747,7 @@ Clock PIMController::step(Clock clk,bool permit_gpu,bool release_gpu) {
   }
   auto can_issue=[&](const Candidate& c) {
     if(c.cmd<0||c.at>clk||blocked_by_owner(c,clk))return false;
+    if(needs_switch_sync(c.cmd,c.addr)&&(pending_act[0].cmd>=0||pending_act[1].cmd>=0))return false;
     const auto& name=device.m_spec->command_names[c.cmd];
     if(starts(name,"ACT1")) {
       // Never start ACT1 if an earlier constraint would prevent ACT2 at nAAD.
@@ -731,12 +757,34 @@ Clock PIMController::step(Clock clk,bool permit_gpu,bool release_gpu) {
     }
     return true;
   };
-  if(can_issue(refresh))chosen=refresh;
+  const bool sync_column_due=pending_sync_column.cmd>=0;
+  if(sync_column_due) {
+    require(pending_sync_column.at==clk,"missed column immediately following WCK CAS");
+    chosen=std::move(pending_sync_column);
+    pending_sync_column=Candidate{};
+  } else if(can_issue(refresh))chosen=refresh;
   else if(can_issue(pim)&& (fused||policy!="frfcfs"||!can_issue(gpu)||
       (pim.rowhit&&!gpu.rowhit)||(pim.rowhit==gpu.rowhit&&pim.arrival<=gpu.arrival)))chosen=pim;
   else if(can_issue(gpu)&&!protect_pim(gpu,pim,clk))chosen=gpu;
   else if(can_issue(pim))chosen=pim;
   if(chosen.cmd>=0) {
+    if(!sync_column_due&&needs_switch_sync(chosen.cmd,chosen.addr)) {
+      const char direction=info[chosen.cmd].direction;
+      const int cas=device.m_spec->get_command_id(direction=='R'?"CAS_RD":"CAS_WR");
+      require(info[cas].external_ca==1&&external_free<=clk,"WCK synchronization requires one free CA cycle");
+      // This CAS governs WCK only. The controller enforces Table 379 at
+      // admission and commits the selected column for the next CA cycle.
+      // Do not apply the generic LPDDR5 CAS rules for the other WCK policy.
+      checker.observe(cas,chosen.addr,clk,stage);
+      checker.last_sync_at=clk;
+      checker.last_sync_rank=chosen.addr[1];
+      checker.last_sync_direction=direction;
+      external_free=clk+1;
+      last_progress=clk;
+      chosen.at=clk+1;
+      pending_sync_column=std::move(chosen);
+      return clk+1;
+    }
     issue(chosen.cmd,chosen.addr,clk,stage,chosen.opcode,chosen.bank_mask);
     if(chosen.source==Candidate::GPU&&chosen.final) {
       if(gpu_queues[chosen.index].front().array_preq)++gpu_row_misses;

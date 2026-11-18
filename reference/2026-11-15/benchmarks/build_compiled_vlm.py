@@ -48,7 +48,7 @@ def counters(path, metric):
     return rows
 
 
-def build(directory):
+def build(directory, *, counter_identity=counter_name, launch_variant_validator=None):
     paths = [directory / f"compiled-prefix-{i}.json" for i in range(5)]
     series = [timings(path) for path in paths]
     first = series[0]
@@ -66,10 +66,11 @@ def build(directory):
         if category == "kernel":
             r, w = next(pairs)
             for direction, row in (("read", r), ("write", w)):
-                assert counter_name(row["Kernel Name"]) == counter_name(name), (i, name, row["Kernel Name"])
+                assert counter_identity(row["Kernel Name"]) == counter_identity(name), (i, name, row["Kernel Name"])
                 grid, block = (list(ast.literal_eval(row[field])) for field in ("Grid Size", "Block Size"))
                 if (grid, block) != (data["grid"], data["block"]):
-                    assert name in AUTOTUNED, (i, name, grid, block, data)
+                    assert name in AUTOTUNED or (launch_variant_validator is not None and
+                        launch_variant_validator(event, row)), (i, name, grid, block, data)
                     alternate_launches.append(dict(ordinal=i, name=name, direction=direction, sectors=row["sectors"],
                                                    counter_grid=grid, counter_block=block,
                                                    timing_grid=data["grid"], timing_block=data["block"]))

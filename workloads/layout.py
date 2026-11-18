@@ -4,15 +4,18 @@ Addresses use [channel, rank, bank_group, bank, row, 32-byte-column].
 The original branch's ownership formulas are retained. Down uses the requested
 co-resident weight/input rows; other operator address formulas are unchanged.
 """
+from workloads.models import PI05
+
 CHANNELS = 16
 BANKS = 16
 ROW_BYTES = 2048
 BURST_BYTES = 32
-HEADS, HEAD_DIM, HIDDEN, QUERIES, PREFIX = 8, 256, 1024, 16, 968
-PADDED_KV = 992
+HEADS, HEAD_DIM, HIDDEN, QUERIES = PI05.heads, PI05.head_dim, PI05.hidden, PI05.queries
+VALID_KV, PADDED_KV = PI05.kv_shape("decoder")
+PREFIX = VALID_KV - QUERIES
 SRF_BYTES, OUTPUT_BYTES = 1024, 2048
 LAYER_STRIDE_BYTES = 1 << 20
-LAYERS, STEPS = 18, 10
+LAYERS, STEPS = PI05.layers, PI05.steps
 QKV_BASE, V_BASE = 0x60000, 0x28000
 K_PREFIX_BASE, WORK_BASE = 0x10000, 0x14000
 Q_BASE, K_SUFFIX_BASE, COEF_BASE = 0x14100, 0x14200, 0x14000
@@ -38,8 +41,8 @@ def address(channel, offset, bank=0, rank=1):
     return [channel, rank, bg, ba, row, within // BURST_BYTES]
 
 
-def layer_address(relative, layer):
-    if not 0 <= layer < LAYERS or len(relative) != 6 or relative[1] != 1:
+def layer_address(relative, layer, spec=PI05):
+    if not 0 <= layer < spec.layers or len(relative) != 6 or relative[1] != 1:
         raise ValueError("invalid PIM layer address")
     result = list(relative)
     result[4] += layer * (LAYER_STRIDE_BYTES // ROW_BYTES)
@@ -168,8 +171,8 @@ def contract(layout, *, fused_kernel_windows=False, down_staging=False):
     if layout not in ("feature", "token"):
         raise ValueError(layout)
     result = {
-        "shape": {"heads": 8, "head_dim": 256, "hidden": 1024, "ffn": 4096,
-                  "queries": 16, "prefix": 968, "valid_kv": 984, "padded_kv": 992},
+        "shape": {"heads": HEADS, "head_dim": HEAD_DIM, "hidden": HIDDEN, "ffn": PI05.ffn,
+                  "queries": QUERIES, "prefix": PREFIX, "valid_kv": VALID_KV, "padded_kv": PADDED_KV},
         "topology": {"channels": 16, "ranks": 2, "gpu_rank": 0, "pim_rank": 1,
                      "bank_groups": 4, "banks_per_group": 4, "row_bytes": 2048},
         "buffers": {"srf_bytes_per_bank": 1024, "output_bytes_per_bank": 2048,

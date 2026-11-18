@@ -3,6 +3,9 @@ project(pim_vla_sim2 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(RAMULATOR_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
 add_subdirectory(ramulator2)
+add_executable(native_power_stats_tests tests/native_power_stats_tests.cpp)
+target_link_libraries(native_power_stats_tests PRIVATE ramulator)
+target_compile_options(native_power_stats_tests PRIVATE -Wall -Wextra -O3)
 add_executable(pim_vla_sim
   ramulator2/src/ramulator/controller/impl/pim_controller.cpp
   ramulator2/src/ramulator/controller/impl/pim_lookahead.cpp

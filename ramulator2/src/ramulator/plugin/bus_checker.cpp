@@ -63,6 +63,17 @@ void BusChecker::observe(int cmd,const AddrVec_t& addr,Clock now,int stage,int o
     if(old.direction=='W' && b.direction=='R') gap=spec->get_timing_value("nDQ_WTR");
     if(old.direction==b.direction && old.rank!=b.rank)
       gap=old.direction=='R'?spec->get_timing_value("nCS"):spec->get_timing_value("nDQ_RANK_WTW");
+    if(old.rank!=b.rank) {
+      const auto pair=(old.direction=='W'?2:0)+(b.direction=='W'?1:0);
+      ++rank_switches[pair];
+      switch_gap_ck[pair]+=b.start-old.end;
+      if(resync_on_switch) {
+        require(last_sync_at==now-1&&last_sync_rank==b.rank&&last_sync_direction==b.direction,
+                "cross-rank column without matching WCK sync CAS");
+        gap=std::max(gap,switch_gap(b.direction));
+        sync_minimum_ck[pair]+=gap;
+      }
+    }
     if(b.start-old.end<gap)throw std::runtime_error("DQ turnaround violation at CK "+std::to_string(now));
   }
   bursts.push_back(b);

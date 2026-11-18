@@ -10,9 +10,10 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from experiments.common import ROOT, object_sha256, read_json, sha256, source_revision, write_csv, write_json
-from experiments.config import CASES, validate_config, variant_name
+from experiments.config import CASES, GR00T_CASES, validate_config, variant_name
 from experiments.native import execute, runtime_libraries
 from experiments.prepare_inputs import ae_schedule, gpu_measurements, single_layer_schedule
+from workloads.models import MODELS, PI05
 
 VARIANTS = {variant_name(CASES[c]): c for c in ("b", "d", "e", "f", "g")}
 
@@ -198,7 +199,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--binary", type=Path, default=ROOT / "build/pim_vla_sim")
-    parser.add_argument("--input-dir", type=Path, default=ROOT / "input-data")
+    parser.add_argument("--input-dir", type=Path)
+    parser.add_argument("--model", choices=MODELS, default=PI05.name)
+    parser.add_argument("--layer-kind", choices=("cross", "self"), default="cross")
     parser.add_argument("--program-dir", type=Path, default=ROOT / "programs/generated")
     parser.add_argument("--spec", type=Path)
     parser.add_argument("--requirements", type=Path, help="hash the requirements text; never copy or publish the original document")
@@ -214,9 +217,36 @@ def main():
         sys.path.insert(0, str(ROOT / "ramulator2/python"))
         from ramulator.dram.lpddr5x_pim import build_spec
         spec = build_spec(mac_freq_mult=args.mac_freq_mult)
-    configs = prepare(args.output, input_dir=args.input_dir, program_dir=args.program_dir, spec=spec)
+    input_dir = args.input_dir or ROOT / "input-data"
+    if args.model != PI05.name:
+        from experiments.gr00t_n16_inputs import single_layer
+        if args.input_dir is None:
+            input_dir /= args.model
+        variants = {variant_name(c): c for c in GR00T_CASES.values()}
+        for variant, case in variants.items():
+            full = read_json(input_dir / f"ae-{variant}.json")
+            schedule = single_layer(full, args.layer_kind)
+            schedule_path = (args.output / "inputs" / f"{variant}-{args.layer_kind}.json").resolve()
+            write_json(schedule_path, schedule)
+            cfg = {k: v for k, v in case.items() if k != "arbitration"}
+            cfg.update(mode="serial", run_kind="ae_solo", spec=spec, mac_freq_mult=args.mac_freq_mult,
+                       ae_schedule_path=str(schedule_path),
+                       program_path=str((args.program_dir / f"{variant}.json").resolve()))
+            write_json(args.output / "configs" / f"{variant}.json", validate_config(cfg))
+            if not args.prepare_only:
+                hashes = []
+                for i in range(args.repeats):
+                    destination = args.output / variant / f"repeat-{i}"
+                    raw = execute(args.binary, cfg, destination)
+                    if len(raw["stages"]) != sum(schedule["stage_occurrences"].values()):
+                        raise ValueError("single-layer native stage count differs from the schedule")
+                    hashes.append(sha256(destination / "raw.json"))
+                if len(set(hashes)) != 1:
+                    raise ValueError(f"{variant} single-layer repetitions differ")
+        return
+    configs = prepare(args.output, input_dir=input_dir, program_dir=args.program_dir, spec=spec)
     if not args.prepare_only:
-        run(args.binary, configs, args.output, repeats=args.repeats, input_dir=args.input_dir, requirements=args.requirements)
+        run(args.binary, configs, args.output, repeats=args.repeats, input_dir=input_dir, requirements=args.requirements)
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@
 #include "ramulator/base/config.h"
 #include "ramulator/dram/device.h"
 #include "ramulator/controller/impl/pim_resources.h"
+#include "ramulator/controller/impl/pim_power_stats.h"
 #include "ramulator/controller/impl/pim_lookahead.h"
 
 namespace PimVla {
@@ -74,7 +75,14 @@ class BusChecker {
   const std::string* trace_stage_name=nullptr;
   int trace_channel=0;
   Clock trace_epoch_start=0;
+  bool resync_on_switch=false;
+  Clock last_sync_at=-2;
+  int last_sync_rank=-1;
+  char last_sync_direction=0;
+  // Index by previous and next DQ direction: RR, RW, WR, WW.
+  std::array<uint64_t,4> rank_switches{}, switch_gap_ck{}, sync_minimum_ck{};
   uint64_t checked=0;
+  Clock switch_gap(char direction) const {return direction=='R'?19:11;}
   std::map<int,BusStat> stats;
   void observe(int cmd,const AddrVec_t& addr,Clock now,int stage,int opcode=-1,uint16_t bank_mask=0);
   void advance(Clock now);
@@ -123,6 +131,7 @@ class PIMController {
   DRAMDevice device;
   std::vector<CommandInfo> info;
   BusChecker checker;
+  std::unique_ptr<DramPowerStats> power_stats;
   PimResources resources;
   std::unique_ptr<NativeLookahead> lookahead;
   std::vector<ForecastEntry> forecast;
@@ -145,6 +154,9 @@ class PIMController {
   std::array<Clock,2> refresh_due{};
   std::array<int,2> refresh_bank{};
   std::array<PendingAct,2> pending_act;
+  Candidate pending_sync_column;
+  bool needs_switch_sync(int cmd,const AddrVec_t& addr) const;
+  Clock switch_candidate_at(int cmd,const AddrVec_t& addr,Clock native_at) const;
   // Fixed hardware policy: GPU rank0 uses paired REFpb; PIM rank1 uses REFab.
   static constexpr std::array<bool,2> refresh_all_bank{false,true};
   std::array<std::array<uint64_t,2>,2> refresh_counts{}; // [rank][REFpb,REFab]

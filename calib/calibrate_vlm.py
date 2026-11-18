@@ -49,12 +49,23 @@ def assess(raw, vlm):
                 work_units=len(expected), kernel_count=len(errors), passed=abs(error) <= 0.05)
 
 
+def require_complete_capture(vlm):
+    units = vlm["units"]
+    if vlm.get("model", "pi05") == "pi05":
+        complete = len(units) == 2357
+    else:
+        complete = (vlm.get("model") == "gr00t_n16" and vlm.get("capture_complete")
+                    and sum(u["kind"] == "kernel" for u in units) == vlm["kernel_count"] > 0
+                    and [u["ordinal"] for u in units] == list(range(len(units))))
+    if not complete:
+        raise ValueError("calibration requires the full captured VLM workload")
+
+
 def evaluate_candidate(binary, base_config, output, index, *, resume=False, parameters=None):
     parameters = parameters or list(candidate_parameters())[index]
     output = Path(output)
     vlm = read_json(base_config["vlm_path"])
-    if len(vlm["units"]) != 2357:
-        raise ValueError("calibration requires the full captured VLM workload")
+    require_complete_capture(vlm)
     cfg = dict(base_config, run_kind="vlm_solo", vlm_release="uniform", calibration=parameters)
     print(f"CALIBRATION {index}: {parameters}", flush=True)
     raw = execute(binary, cfg, output / f"candidate-{index:02d}", resume=resume)
@@ -64,7 +75,7 @@ def evaluate_candidate(binary, base_config, output, index, *, resume=False, para
     return row
 
 
-def freeze_candidate(binary, base_config, output, row):
+def freeze_candidate(binary, base_config, output, row, *, selection="first passing candidate in declared order"):
     output = Path(output)
     index = row["candidate"]
     parameters = {key: row[key] for key in ("alpha", "window", "write_high", "write_low")}
@@ -82,7 +93,7 @@ def freeze_candidate(binary, base_config, output, row):
     if measured["inputs"]["vlm_path"]["sha256"] != sha256(base_config["vlm_path"]):
         raise ValueError("calibration VLM input changed before freezing")
     selected = dict(schema_version=1, parameters=parameters, validation=result,
-                    selected_candidate=index, selection="first passing candidate in declared order",
+                    selected_candidate=index, selection=selection,
                     source_commit=source_revision(), vlm_sha256=sha256(base_config["vlm_path"]),
                     binary_sha256=sha256(binary), spec=base_config.get("spec"),
                     spec_sha256=object_sha256(base_config.get("spec")),
@@ -139,8 +150,7 @@ def calibrate(binary, base_config, output, *, resume=False, candidates=None):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     vlm = read_json(base_config["vlm_path"])
-    if len(vlm["units"]) != 2357:
-        raise ValueError("calibration requires the full captured VLM workload")
+    require_complete_capture(vlm)
     rows = []
     selected = None
     for index, parameters in enumerate(candidates or candidate_parameters()):

@@ -1,4 +1,108 @@
-# PIM-VLA · 2026-11-15
+# PIM-VLA · 2026-11-18
+
+## WCK rank switching
+
+[时序、配置与 DQ 统计方法](docs/wck-rank-switch.md)
+
+## GR00T N1.6 H=15
+
+本目录从 `PIM_for_VLA/experiments/2026-11-17-g-power-rerun/source` 复制。
+`--model gr00t_n16` 选择 GR00T，省略时使用 π0.5。π0.5 继续使用原 JSON 格式，缺省的 `model` 按 π0.5 解析。
+
+GR00T 的程序依据 Thor 捕获的 VLM 总序列长度生成。单帧 cross K/V 在 4 个去噪步间复用。
+DiT 交替执行 16 个 cross 层和 16 个 self 层，输入为 15 个 action token 和 1 个 state token。
+cross 的图像和文本 mask 保留完整的 VLM 序列长度。旧的 fused kernel-window 执行路径仍用于 π0.5，
+GR00T 的 n16-f 使用同一原生请求执行路径中的本地 PV→O 交接。
+
+Thor 脚本和捕获在 `thor/` 下。捕获使用已校验的 GR00T N1.6 3B 权重、BF16、
+PyTorch 2.11.0+cu130 和 batch 1。早期对照使用三张固定种子的 256×256 图像和固定英文提示；640×480 结果见下节。
+Eagle 使用保留图像边界的 PyTorch SDPA。基准包括完整编译 AE，以及按仿真边界编译和计时的 AE 算子。
+
+```bash
+python3 experiments/prepare_inputs.py --model gr00t_n16 --source thor/capture
+python3 programs/gen_pim_program.py --model gr00t_n16 \
+    --vl-tokens "$(python3 -c 'import json; print(json.load(open("thor/capture/fixture.json"))["vl_tokens"])')" \
+    --output programs/generated --compact
+python3 experiments/run.py --model gr00t_n16 --mac-freq-mult 2 --spec reference/spec/four-batch-k2.json \
+    --vlm-gpu-quantum-us 2 --output results/gr00t-n16-h15/full
+```
+
+引用同一份 LPDDR5X/MAC 配置时，可用 `--spec` 显式指定 π0.5 发布回放的 K2/ACTAB 四批 spec。
+VLM 单跑以 Thor 的编译时延为校准目标。校准使用 CUPTI 时序与 Nsight Compute 的 L2 扇区计数，
+保留逐 kernel 时长，通过窗口和写回比例搜索在 5% 内的配置。四个结果 case 为
+`n16-b`、`n16-c`、`n16-d`、`n16-f`。π0.5 验证记录在 `results/pi05-regression/`。
+
+[640×480 冷缓存单读版汇总](results/gr00t-n16-h15-640x480-single-read/matrix/REPORT.zh-CN.md) ·
+[256×256 冷缓存对照汇总](results/gr00t-n16-h15-single-read/matrix/REPORT.zh-CN.md) ·
+[自然缓存对照](results/gr00t-n16-h15/matrix/REPORT.zh-CN.md) ·
+[Thor AE 算子时延](results/gr00t-n16-h15/thor-ae-operators.csv) ·
+[π0.5 回归校验](results/pi05-regression/summary.json)
+
+### H=15 冷缓存单读版（256×256 对照）
+
+按 π0.5 发布口径，在 Thor 上用 192 MiB 的读写扫掠逐次驱逐 L2，再采集编译版 GPU 消费算子。
+输入的 shape、dtype 和布局与 PIM 导出匹配，数值采用固定种子的样本。
+准备脚本在每个去噪步和层核对 GPU 消费的字节数，将匹配的输出 RD 改为保留依赖的 barrier。
+GPU→PIM 写入、每帧 cross K/V 写入和原 VLM trace 随配置保留。
+
+| Case | AE 单跑 ms | AE 完成 ms | 端到端 ms |
+|---|---:|---:|---:|
+| n16-b | 45.607596 | 45.607596 | 84.374216 |
+| n16-c | 45.607596 | 46.763032 | 59.772845 |
+| n16-d | 43.869200 | 45.079250 | 59.335780 |
+| n16-f | 59.163636 | 60.132686 | 60.132686 |
+
+每个完整 case 重复两次，raw.json 逐字节一致。读取扣除与 GPU 消费输入按步、层逐字节配对，
+四个 case 均通过 DQ 流量守恒。PIM 写入字节数与自然缓存对照一致。
+
+```bash
+out=results/gr00t-n16-h15-single-read
+python3 experiments/prepare_gr00t_single_read.py \
+    --cold-profile thor/cold-consumers/measurements.json --output "$out/input-set"
+python3 experiments/run.py --model gr00t_n16 --mac-freq-mult 2 --spec reference/spec/four-batch-k2.json \
+    --input-dir "$out/input-set/input-data" --program-dir "$out/input-set/programs" \
+    --calibration results/gr00t-n16-h15/calibration/calibration.json --vlm-gpu-quantum-us 2 \
+    --output "$out/replay"
+```
+
+### 640×480 冷缓存单读版（2026-11-18）
+
+三路固定随机原图为 640×480，按 checkpoint 默认评估预处理和 Eagle 对齐，
+实际进入 ViT 的张量均为 `[1,3,252,336]`。324 个图像 token 加 47 个文本 token，
+总长 371、KV 对齐至 384。H=15，每步 16 个 query，4 个去噪步。
+
+Thor 编译版 VLM p50 为 58.679392 ms，完整 AE p50 为 44.007904 ms。
+VLM 校准使用同分辨率采集均值 58.547801 ms 为目标，得到 58.629582 ms（+0.140%）。
+采用 `alpha=0.5, window=256, write_high=192, write_low=64`，硬件继续使用 K2/ACTAB 四批、MAC 2× 和 2 µs GPU 让出量子。
+
+| Case | AE 单跑 ms | AE 完成 ms | 端到端 ms |
+|---|---:|---:|---:|
+| n16-b | 45.950081 | 45.950081 | 104.579663 |
+| n16-c | 45.950081 | 47.083475 | 78.358497 |
+| n16-d | 44.045465 | 45.167811 | 77.823912 |
+| n16-f | 59.458015 | 60.442819 | 74.409592 |
+
+14 组 GPU 消费算子重采冷 L2 编译时延：逐次进行 192 MiB 驱逐，驱逐不计入时延。
+只扣除与 GPU 消费输入逐步、逐层配对的 PIM 输出 RD；GPU→PIM 写入和每帧 cross K/V 写入保留。
+四个 case 各重复两次，raw.json 逐字节一致，PIM/GPU DQ 守恒、写入保留和来源哈希校验全部通过。
+本分辨率下 f 比 d 快 3.414320 ms；f 的 VLM 尾部为 13.966773 ms，d 为 32.656100 ms。
+
+VLM trace 含 757 个 kernel 和 1 个内存复制单元。12 处 fused SigLIP LayerNorm 计数使用每 CTA 两行、时序使用每 CTA 一行，均覆盖相同的 1296×1152 张量；代理及编译代码单独留档，CUPTI 时间保留。
+采集使用 packed SDPA；VLM 编译输出与 eager 的相对 RMS 差异为 10.71%，结果用于当前实现的性能分析。
+
+[完整报告](results/gr00t-n16-h15-640x480-single-read/matrix/REPORT.zh-CN.md) · [结果 CSV](results/gr00t-n16-h15-640x480-single-read/matrix/evaluation-b-g.csv) · [输入与复跑校验](results/gr00t-n16-h15-640x480-single-read/matrix/640x480-checks.json) · [本地证据校验](results/gr00t-n16-h15-640x480-single-read/local-evidence-checks.json)
+
+复跑使用这一组独立输入和校准文件：
+
+```bash
+base=results/gr00t-n16-h15-640x480-single-read
+python3 experiments/run.py --model gr00t_n16 --mac-freq-mult 2 \
+    --spec reference/spec/four-batch-k2.json --vlm-gpu-quantum-us 2 \
+    --program-dir "$base/input-set/programs" --input-dir "$base/input-set/input-data" \
+    --calibration "$base/calibration/calibration.json" --output "$base/replay"
+```
+
+## π0.5 发布基线
 
 OpenPI π0.5，BF16，action horizon 16，10 个去噪步。这里汇总 Thor 全 GPU 的 ViT/VLM 与 AE 并行实测，以及 Ramulator2 的 PIM/GPU 分工仿真。
 

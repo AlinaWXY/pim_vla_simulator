@@ -171,7 +171,9 @@ def profile_samples(name, functions, args, evict, n):
         for duration, sample in zip(durations, kernels):
             assert math.isclose(duration, sum(k.duration for k in sample), abs_tol=0.002)
         results[mode] = {"kernel": statistics(durations), "kernel_count_each_call": sorted({len(k) for k in kernels}),
-                         "kernel_names": dict(names)}
+                         "kernel_names": dict(names),
+                         "kernel_launches": [[dict(name=k.name, duration_us=k.duration) for k in sample]
+                                             for sample in kernels]}
     return results
 
 

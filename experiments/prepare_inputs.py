@@ -15,6 +15,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from experiments.common import ROOT, read_json, sha256
 from experiments.config import CASES, variant_name
+from workloads.models import MODELS, PI05
 
 REMOVED = {
     "q_projection", "k_projection", "v_projection", "attention_qkt", "attention_sv",
@@ -25,7 +26,9 @@ REMOVED = {
 def write_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        json.dump(value, handle, ensure_ascii=False, indent=2, sort_keys=True)
+        handle.write("\n")
 
 
 def layer_boundaries(ledger):
@@ -267,10 +270,15 @@ def prepare(source, output, *, include_helpers=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True)
-    parser.add_argument("--output", type=Path, default=ROOT / "input-data")
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--model", choices=MODELS, default=PI05.name)
     parser.add_argument("--include-arithmetic-helpers", action="store_true")
     args = parser.parse_args()
-    prepare(args.source, args.output, include_helpers=args.include_arithmetic_helpers)
+    if args.model == PI05.name:
+        prepare(args.source, args.output or ROOT / "input-data", include_helpers=args.include_arithmetic_helpers)
+    else:
+        from experiments.gr00t_n16_inputs import prepare as prepare_gr00t
+        prepare_gr00t(args.source, args.output or ROOT / "input-data" / args.model)
 
 
 if __name__ == "__main__":

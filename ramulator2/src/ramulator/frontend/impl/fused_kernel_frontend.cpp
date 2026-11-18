@@ -41,6 +41,10 @@ int descriptor_index(const std::vector<Operation>& ops) {
 
 int run_fused_kernels(const std::string& config_file,const std::string& output) {
   auto cfg=Config::parse_config_file(config_file);
+  const auto model=cfg["model"].as<std::string>("pi05");
+  require(model=="pi05"||model=="gr00t_n16","unknown workload model");
+  const auto rope=cfg["rope"].as<std::string>("gpu");
+  require(model=="pi05" ? rope=="gpu"||rope=="local" : rope=="none","RoPE location differs from workload model");
   require(cfg["mode"].as<std::string>()=="concurrent"&&cfg["dataflow"].as<std::string>()=="fused"&&
           cfg["run_kind"].as<std::string>("combined")=="combined","fused_kernel_windows requires concurrent fused combined execution");
   require(!cfg["arbitration"]&&!cfg["refresh_allbank"],"kernel windows do not accept request arbitration or refresh overrides");
@@ -52,8 +56,8 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
   auto cycles=[&](double t){require(std::isfinite(t)&&t>=0,"invalid AE measured duration");return static_cast<Clock>(std::ceil(t/tick_us-1e-10));};
   std::array<std::unique_ptr<PIMController>,16> channels;
   for(int c=0;c<16;++c) {channels[c]=std::make_unique<PIMController>(c,spec,spec["metadata"]);channels[c]->fused=true;}
-  int stride=0;std::string program_model;
-  auto programs=read_program_json(cfg["program_path"].as<std::string>(),&stride,&program_model);
+  int stride=0;std::string program_model,workload_model;
+  auto programs=read_program_json(cfg["program_path"].as<std::string>(),&stride,&program_model,&workload_model);
   require(program_model=="fused_kernel_windows","kernel windows require a generated fused_kernel_windows program");
   require(stride>0&&stride%2048==0,"invalid layer stride");
   std::map<std::string,std::array<int,16>> descriptors;
@@ -63,10 +67,16 @@ int run_fused_kernels(const std::string& config_file,const std::string& output) 
     for(int c=1;c<16;++c)require((indices[c]>=0)==(indices[0]>=0),"descriptor phase differs across channels");
   }
   auto schedule=read_json(cfg["ae_schedule_path"].as<std::string>());
+  require(workload_model==model&&schedule.value("model",std::string("pi05"))==model,
+          "AE program and schedule must match the workload model");
+  const int layer_capacity=spec["organization"]["row"].as<int>(32768)/(stride/2048);
+  require(schedule.value("layers",0)>=0&&schedule.value("layers",0)<=layer_capacity,
+          "AE layers exceed rank1 bank capacity");
   std::vector<CoarseEvent> events;
   for(const auto& e:schedule.at("events")) {
     CoarseEvent event;event.kind=e.at("kind");event.name=e.at(event.kind=="pim"?"stage":"name");
     event.step=e.value("step",0);event.layer=e.value("layer",0);event.duration=cycles(e.value("us",0.0));
+    require(event.kind=="gpu"||event.layer<layer_capacity,"AE event exceeds rank1 bank capacity");
     require(event.kind=="gpu"||(event.kind=="pim"&&programs.count(event.name)),"invalid AE event");events.push_back(event);
   }
   // A descriptor boundary is not a GPU handoff when both sides contain only

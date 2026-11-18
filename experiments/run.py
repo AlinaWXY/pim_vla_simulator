@@ -11,14 +11,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from analysis.report import summarize, write_report
 from calib.calibrate_vlm import assess, calibrate
 from experiments.common import ROOT, object_sha256, read_json, sha256, source_revision, write_json
-from experiments.config import CASES, case_config, validate_config, variant_name
+from experiments.config import CASES, GR00T_CASES, case_config, model_cases, validate_config, variant_name
 from experiments.native import execute, runtime_libraries, library_hashes
+from workloads.models import PI05, MODELS
 
 
 def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None, spec_path=None,
-                    vlm_release="closed_loop"):
+                    vlm_release="closed_loop", model=PI05.name):
     program_dir = Path(program_dir or ROOT / "programs/generated").resolve()
-    input_dir = Path(input_dir or ROOT / "input-data").resolve()
+    default_input = ROOT / "input-data"
+    if model != PI05.name:
+        default_input /= model
+    input_dir = Path(input_dir or default_input).resolve()
     if spec_path:
         spec = read_json(spec_path)
     else:
@@ -28,8 +32,8 @@ def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None
     output = Path(output)
     write_json(output / f"spec-k{mac_freq_mult}.json", spec)
     cfgs = {}
-    for case in CASES:
-        c = case_config(case, mac_freq_mult=mac_freq_mult)
+    for case in model_cases(model):
+        c = case_config(case, model=model, mac_freq_mult=mac_freq_mult)
         variant = variant_name(c)
         c.update(spec=deepcopy(spec), program_path=str(program_dir / f"{variant}.json"),
                  vlm_path=str(input_dir / "vlm.json"),
@@ -47,7 +51,7 @@ def prepare_configs(output, *, mac_freq_mult=4, program_dir=None, input_dir=None
 
 def run_solos(binary, configs, output, *, resume=False, reuse_solos=None, cases=None):
     ae_results = {}
-    for case in cases or ("c", "d", "e", "f", "g"):
+    for case in cases or (("c", "d", "e", "f", "g") if "b" in configs else tuple(configs)):
         cfg = dict(configs[case], run_kind="ae_solo")
         cfg.pop("vlm_gpu_quantum_us", None)
         variant = variant_name(cfg)
@@ -61,8 +65,9 @@ def run_solos(binary, configs, output, *, resume=False, reuse_solos=None, cases=
                 raise ValueError(f"standalone {variant} binary/result differs")
             if library_hashes(provenance) != library_hashes({"runtime_libraries": runtime_libraries(binary)}):
                 raise ValueError(f"standalone {variant} runtime library differs")
-            for key in ("spec", "layout", "rope", "dataflow", "mac_freq_mult", "run_kind"):
-                if previous[key] != cfg[key]:
+            for key in ("spec", "layout", "rope", "dataflow", "mac_freq_mult", "run_kind", "model"):
+                default = PI05.name if key == "model" else None
+                if previous.get(key, default) != cfg.get(key, default):
                     raise ValueError(f"standalone {variant} config {key} differs")
             for key in ("program_path", "ae_schedule_path"):
                 if provenance["inputs"][key]["sha256"] != sha256(cfg[key]):
@@ -77,32 +82,34 @@ def run_solos(binary, configs, output, *, resume=False, reuse_solos=None, cases=
 def run_matrix(binary, configs, output, *, calibration_path=None, cases=None, repeats=2, resume=False, reuse_solos=None):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
-    cases = list(cases or CASES)
-    if any(c not in CASES for c in cases):
+    cases = list(cases or configs)
+    if any(c not in configs for c in cases):
         raise ValueError("matrix includes an unknown case")
     if repeats < 2:
         raise ValueError("full matrix acceptance requires at least two native repetitions")
     # Gate 4 runs before VLM calibration. Every unique AE design is exercised,
     # even when a caller is running only an arbitration subset.
-    ae_results = run_solos(binary, configs, output, resume=resume, reuse_solos=reuse_solos)
+    serial = configs["b"] if "b" in configs else configs["n16-b"]
+    ae_results = run_solos(binary, configs, output, resume=resume, reuse_solos=reuse_solos,
+                           cases=None if "b" in configs else cases)
     if calibration_path:
         calibration = read_json(calibration_path)
         if not calibration.get("validation", {}).get("passed"):
             raise ValueError("calibration file has not passed the standalone acceptance gate")
-        if calibration["vlm_sha256"] != sha256(configs["b"]["vlm_path"]):
+        if calibration["vlm_sha256"] != sha256(serial["vlm_path"]):
             raise ValueError("calibration VLM source hash differs")
         if calibration["binary_sha256"] != sha256(binary):
             raise ValueError("calibration binary differs; recalibration is required")
         if library_hashes(calibration) != library_hashes({"runtime_libraries": runtime_libraries(binary)}):
             raise ValueError("calibration runtime library differs; recalibration is required")
-        if calibration["spec"] != configs["b"]["spec"]:
+        if calibration["spec"] != serial["spec"]:
             raise ValueError("calibration spec differs; recalibration is required")
         vlm = read_json(calibration["raw_path"])
         if sha256(calibration["raw_path"]) != calibration["raw_sha256"]:
             raise ValueError("calibration native result hash differs")
-        assess(vlm, read_json(configs["b"]["vlm_path"]))
+        assess(vlm, read_json(serial["vlm_path"]))
     else:
-        calibration = calibrate(binary, configs["b"], output / "calibration", resume=resume)
+        calibration = calibrate(binary, serial, output / "calibration", resume=resume)
         vlm = read_json(calibration["raw_path"])
     rows, repeat_checks = [], []
     for case in cases:
@@ -121,15 +128,16 @@ def run_matrix(binary, configs, output, *, calibration_path=None, cases=None, re
             raise ValueError(f"{case}: repeated native output differs byte-for-byte")
         rows.append(summarize(case, runs[0], ae_results[variant], vlm, output,
                               program=read_json(cfg["program_path"]), calibration=calibration,
-                              vlm_input=read_json(cfg["vlm_path"])))
+                              vlm_input=read_json(cfg["vlm_path"]),
+                              schedule=read_json(cfg["ae_schedule_path"]) if case in GR00T_CASES else None))
         write_report(output, rows, calibration, repeat_checks)
     write_json(output / "provenance.json", {
         "schema_version": 1, "source_commit": source_revision(), "binary_sha256": sha256(binary),
         "runtime_libraries": runtime_libraries(binary),
         "calibration": calibration, "cases": cases,
-        "spec_sha256": object_sha256(configs["b"]["spec"]),
+        "spec_sha256": object_sha256(serial["spec"]),
         "programs": {variant_name(cfg): sha256(cfg["program_path"]) for cfg in configs.values()},
-        "measured_inputs": {"vlm": sha256(configs["b"]["vlm_path"]),
+        "measured_inputs": {"vlm": sha256(serial["vlm_path"]),
                             **{variant_name(cfg): sha256(cfg["ae_schedule_path"]) for cfg in configs.values()}},
         "reproducibility": repeat_checks, "no_external_trace_replay": True, "no_constant_correction": True,
     })
@@ -185,13 +193,14 @@ def main():
     parser.add_argument("--binary", type=Path, default=ROOT / "build/pim_vla_sim")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--program-dir", type=Path)
+    parser.add_argument("--model", choices=MODELS, default=PI05.name)
     parser.add_argument("--input-dir", type=Path)
     parser.add_argument("--spec", type=Path)
     parser.add_argument("--mac-freq-mult", type=int, choices=(1, 2, 4), default=4)
     parser.add_argument("--calibration", type=Path)
-    parser.add_argument("--cases", nargs="+", choices=list(CASES), default=list(CASES))
+    parser.add_argument("--cases", nargs="+", choices=[*CASES, *GR00T_CASES])
     parser.add_argument("--repeats", type=int, default=2)
-    parser.add_argument("--vlm-release", choices=("closed_loop", "uniform"), default="closed_loop")
+    parser.add_argument("--vlm-release", choices=("closed_loop", "uniform"))
     parser.add_argument("--vlm-gpu-quantum-us", type=float,
                         help="let AE take the GPU at VLM execution checkpoints in concurrent cases")
     parser.add_argument("--prepare-only", action="store_true")
@@ -200,12 +209,17 @@ def main():
     parser.add_argument("--aggregate-from", type=Path, nargs="+", help="collect completed separate case jobs instead of running native work")
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
+    available_cases = model_cases(args.model)
+    args.cases = args.cases or list(available_cases)
+    if any(case not in available_cases for case in args.cases):
+        parser.error("--cases must belong to --model")
+    args.vlm_release = args.vlm_release or ("closed_loop" if args.model == PI05.name else "uniform")
     if args.aggregate_from:
         aggregate(args.aggregate_from, args.output, expected_cases=args.cases)
         return
     configs = prepare_configs(args.output / "configs", mac_freq_mult=args.mac_freq_mult,
                               program_dir=args.program_dir, input_dir=args.input_dir, spec_path=args.spec,
-                              vlm_release=args.vlm_release)
+                              vlm_release=args.vlm_release, model=args.model)
     if args.vlm_gpu_quantum_us is not None:
         for case in args.cases:
             if configs[case]["mode"] == "concurrent":
