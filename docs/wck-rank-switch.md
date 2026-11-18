@@ -38,4 +38,4 @@ uses frozen PIM timings and omits CA arbitration, refresh, VLM request
 availability, and fused episode restrictions. It provides a DQ-only
 comparison for archived c (all off) and g (all on). Case e uses token
 layout and local RoPE with streaming input, and case g uses fused input
-preload. The current job set contains cases b through e.
+preload. See the [b–g replay results](../reference/2026-11-18/wck-rank-switch/DQ-comparison.zh-CN.md).
