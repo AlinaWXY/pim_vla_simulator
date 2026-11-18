@@ -75,6 +75,7 @@
         "channel": 0,
         "timing": "always_on",
         "read_capacity_ck": 36130764,
+        "exclude_io_epochs": false,
         "duration_ck": 49259757,
         "gpu_read_dq_capacity_pct": 73.34742637889993
       },
@@ -82,6 +83,7 @@
         "channel": 0,
         "timing": "resync",
         "read_capacity_ck": 27168614,
+        "exclude_io_epochs": false,
         "duration_ck": 49259757,
         "gpu_read_dq_capacity_pct": 55.15377187102243
       }
@@ -91,6 +93,7 @@
         "channel": 0,
         "timing": "always_on",
         "read_capacity_ck": 58918762,
+        "exclude_io_epochs": false,
         "duration_ck": 62810211,
         "gpu_read_dq_capacity_pct": 93.8044325308826
       },
@@ -98,8 +101,47 @@
         "channel": 0,
         "timing": "resync",
         "read_capacity_ck": 58668620,
+        "exclude_io_epochs": false,
         "duration_ck": 62810211,
         "gpu_read_dq_capacity_pct": 93.40618199801939
+      }
+    }
+  },
+  "fixed_prior_pim_trace_excluding_io_epochs_channel_0": {
+    "c": {
+      "always_on": {
+        "channel": 0,
+        "timing": "always_on",
+        "read_capacity_ck": 36130764,
+        "exclude_io_epochs": true,
+        "duration_ck": 49259757,
+        "gpu_read_dq_capacity_pct": 73.34742637889993
+      },
+      "resync": {
+        "channel": 0,
+        "timing": "resync",
+        "read_capacity_ck": 27168614,
+        "exclude_io_epochs": true,
+        "duration_ck": 49259757,
+        "gpu_read_dq_capacity_pct": 55.15377187102243
+      }
+    },
+    "g": {
+      "always_on": {
+        "channel": 0,
+        "timing": "always_on",
+        "read_capacity_ck": 58230050,
+        "exclude_io_epochs": true,
+        "duration_ck": 62810211,
+        "gpu_read_dq_capacity_pct": 92.70793565714976
+      },
+      "resync": {
+        "channel": 0,
+        "timing": "resync",
+        "read_capacity_ck": 58224290,
+        "exclude_io_epochs": true,
+        "duration_ck": 62810211,
+        "gpu_read_dq_capacity_pct": 92.69876517370719
       }
     }
   },

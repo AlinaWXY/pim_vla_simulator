@@ -42,7 +42,7 @@ def occupancy(path):
     )
 
 
-def read_capacity(root, mode, channel=0):
+def read_capacity(root, mode, channel=0, *, exclude_io_epochs=False):
     """Pack 2 CK GPU reads into fixed rank1 gaps, respecting both switch edges."""
     trace = json.loads((root / "dq-timeline.json").read_bytes())
     assert trace["clock_ps"] == 938
@@ -50,6 +50,25 @@ def read_capacity(root, mode, channel=0):
                if r["kind"] == "pim" and r["name"] in LINEAR]
     assert len(windows) == 1080
     elapsed = sum(end-start for start,end in windows)
+    horizon = windows[-1][1]
+    if exclude_io_epochs:
+        epochs = {}
+        with (root / "dq-epochs.csv").open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                if int(row["channel"]) == channel:
+                    bounds = (int(row["start_ck"]), int(row["end_ck"]))
+                    epochs.setdefault(int(row["stage_id"]), []).append(bounds)
+        windows = []
+        for event in trace["events"]:
+            if event["kind"] != "pim" or event["name"] not in LINEAR:
+                continue
+            start, end = event["start_ck"], event["end_ck"]
+            for lo, hi in sorted(epochs.get(event["stage_id"], [])):
+                if start < min(lo, end):
+                    windows.append((start, min(lo, end)))
+                start = max(start, hi)
+            if start < end:
+                windows.append((start, end))
     guards = GUARD[mode]
     window = 0
     read_ck = 0
@@ -78,9 +97,10 @@ def read_capacity(root, mode, channel=0):
             pack(prior_end + setup, start - guards["R" + direction])
             prior_end, prior_direction = end, direction
     assert prior_direction, "missing PIM DQ trace"
-    pack(prior_end + guards[prior_direction + "R"], windows[-1][1])
+    pack(prior_end + guards[prior_direction + "R"], horizon)
     return dict(channel=channel, timing=mode, read_capacity_ck=read_ck,
-                duration_ck=elapsed, gpu_read_dq_capacity_pct=100 * read_ck / elapsed)
+                exclude_io_epochs=exclude_io_epochs, duration_ck=elapsed,
+                gpu_read_dq_capacity_pct=100 * read_ck / elapsed)
 
 
 def summarize_switches(path):
@@ -105,6 +125,9 @@ def main():
     result = {"always_on_c_g": {case: occupancy(root / "raw.json") for case,root in old.items()},
               "fixed_prior_pim_trace_channel_0": {
                   case: {mode: read_capacity(root,mode) for mode in GUARD} for case,root in old.items()},
+              "fixed_prior_pim_trace_excluding_io_epochs_channel_0": {
+                  case: {mode: read_capacity(root,mode,exclude_io_epochs=True) for mode in GUARD}
+                  for case,root in old.items()},
               "resync_runs": {}}
     for case, path in args.case:
         root = Path(path)
