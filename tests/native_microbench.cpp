@@ -68,6 +68,33 @@ static void gap_write_drain(const ConfigNode& spec) {
           "gap_batch starved reads after draining the write batch");
 }
 
+static void rank_switch_resync(const ConfigNode& spec) {
+  constexpr Clock start=100;
+  constexpr std::array<Clock,4> cas_delay={20,23,9,12};
+  for(int pair=0;pair<4;++pair) {
+    PIMController c(0,spec,spec["metadata"]);
+    warm_rows(c);
+    c.checker.resync_on_switch=true;
+    const auto* timing=c.device.m_spec;
+    const int first=timing->get_command_id(pair<2?"RD":"WR");
+    const std::string next=pair%2?"WR":"RD";
+    const std::vector<Operation> program={op(next,0)};
+    c.issue(first,{0,0,0,0,0,0},start,-1);
+    c.set_stage(program,0,start);
+
+    const Clock cas=start+cas_delay[pair];
+    require(c.step(start,false)==cas,"wrong earliest cross-rank CAS tick");
+    require(c.step(cas,false)==cas+1,"CAS did not reserve following CK");
+    const auto checked=c.checker.checked;
+    require(c.step(cas,false)==cas+1&&c.checker.checked==checked&&!c.top.issued(),
+            "same-cycle wakeup reissued CAS or issued the column early");
+    c.step(cas+1,false);
+    require(issued(c,0,timing->get_command_id(next))==cas+1,"cross-rank column issued late");
+    require(c.checker.rank_switches[pair]==1&&c.checker.switch_gap_ck[pair]==(pair%2?11:19),
+            "cross-rank DQ gap differs from Table 379");
+  }
+}
+
 int main(int argc,char** argv) {
   try {
     require(argc>=2,"usage: native_microbench spec.json [--fault-case]");
@@ -87,6 +114,7 @@ int main(int argc,char** argv) {
     }
     gap_wrgb_wait(spec);
     gap_write_drain(spec);
+    rank_switch_resync(spec);
     std::cout<<"{\"microbench\":\"gap_batch_regressions\",\"status\":\"passed\"}\n";
     constexpr int n=64;
     {
