@@ -708,6 +708,9 @@ void PIMController::finish_pim(const Candidate& c,Clock clk) {
   }
 }
 Clock PIMController::step(Clock clk,bool permit_gpu,bool release_gpu) {
+  // A frontend event can wake the channel again in the CAS cycle.
+  if(pending_sync_column.cmd>=0&&clk<pending_sync_column.at)
+    return pending_sync_column.at;
   now=clk;int outstanding_before=gpu_outstanding;
   const bool permit_release=permit_gpu&&release_gpu;
   retire_and_fill(clk,permit_release);
@@ -759,7 +762,8 @@ Clock PIMController::step(Clock clk,bool permit_gpu,bool release_gpu) {
   };
   const bool sync_column_due=pending_sync_column.cmd>=0;
   if(sync_column_due) {
-    require(pending_sync_column.at==clk,"missed column immediately following WCK CAS");
+    require(pending_sync_column.at==clk,"missed column immediately following WCK CAS at CK "+
+            std::to_string(clk)+" (expected "+std::to_string(pending_sync_column.at)+")");
     chosen=std::move(pending_sync_column);
     pending_sync_column=Candidate{};
   } else if(can_issue(refresh))chosen=refresh;
